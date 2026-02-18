@@ -7,6 +7,17 @@ export default function SEKKEPCreatePage() {
   const [loading, setLoading] = useState(false);
   const [asnList, setAsnList] = useState([]);
 
+  const layananMap = {
+    "Data Induk": "LY008",
+    "Kenaikan Pangkat": "LY009",
+    Mutasi: "LY010",
+    "Gaji Tunjangan": "LY011",
+    Cuti: "LY012",
+    "Penilaian Kinerja": "LY013",
+    Disiplin: "LY014",
+    Pensiun: "LY015",
+  };
+
   const [formData, setFormData] = useState({
     layanan_id: "LY008",
     asn_id: "",
@@ -83,6 +94,15 @@ export default function SEKKEPCreatePage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "jenis_layanan_kepegawaian") {
+      setFormData({
+        ...formData,
+        jenis_layanan_kepegawaian: value,
+        layanan_id: layananMap[value] || "LY008",
+      });
+      return;
+    }
+
     setFormData({ ...formData, [name]: value });
 
     // Auto-calculate lama_cuti if dates are provided
@@ -168,6 +188,8 @@ export default function SEKKEPCreatePage() {
           payload[key] = value;
         }
       });
+
+      payload.layanan_id = layananMap[formData.jenis_layanan_kepegawaian];
 
       // Submit
       const response = await api.post("/sek-kep", payload);
