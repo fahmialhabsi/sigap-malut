@@ -1,0 +1,56 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY117-LY121)
+jenis_kegiatan_keamanan,Jenis Kegiatan,enum,NULL,true,false,NULL,none,"Pembinaan Pangan Segar,Sosialisasi Pangan Aman,Fasilitasi PSAT,Koordinasi Pengawasan,Rekomendasi Teknis",Jenis kegiatan keamanan pangan
+tanggal_kegiatan,Tanggal Kegiatan,date,NULL,false,false,NULL,none,NULL,Tanggal pelaksanaan
+lokasi,Lokasi,varchar,255,false,false,NULL,none,NULL,Lokasi kegiatan
+objek_pembinaan,Objek Pembinaan,varchar,255,false,false,NULL,none,NULL,Pasar/UMKM/Rumah Makan/dll
+jenis_pangan_segar,Jenis Pangan Segar,text,NULL,false,false,NULL,none,NULL,Pangan segar yang dibina (sayur buah daging ikan)
+aspek_pembinaan,Aspek Pembinaan,text,NULL,false,false,NULL,none,NULL,Aspek yang dibina (kebersihan handling penyimpanan)
+jumlah_pelaku_dibina,Jumlah Pelaku Dibina,int,11,false,false,NULL,none,NULL,Jumlah pedagang/pelaku yang dibina
+hasil_pembinaan,Hasil Pembinaan,text,NULL,false,false,NULL,none,NULL,Hasil pembinaan
+tindak_lanjut_pembinaan,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Tindak lanjut pembinaan
+materi_sosialisasi,Materi Sosialisasi,text,NULL,false,false,NULL,none,NULL,Materi sosialisasi pangan aman
+sasaran_sosialisasi,Sasaran Sosialisasi,varchar,255,false,false,NULL,none,NULL,Pelaku usaha/masyarakat/pelajar
+jumlah_peserta_sosialisasi,Jumlah Peserta,int,11,false,false,NULL,none,NULL,Total peserta sosialisasi
+metode_sosialisasi,Metode Sosialisasi,enum,NULL,false,false,NULL,none,"Penyuluhan,Workshop,Seminar,Media Massa,Lainnya",Metode sosialisasi
+psat_nama_usaha,Nama Usaha PSAT,varchar,255,false,false,NULL,none,NULL,Nama usaha PSAT yang difasilitasi
+psat_jenis_usaha,Jenis Usaha PSAT,enum,NULL,false,false,NULL,none,"Rumah Makan,Katering,Jasa Boga,Kantin,Depot,Warung Makan,Lainnya",Jenis PSAT
+psat_alamat,Alamat PSAT,varchar,255,false,false,NULL,none,NULL,Alamat usaha PSAT
+psat_pemilik,Pemilik PSAT,varchar,255,false,false,NULL,none,NULL,Nama pemilik
+psat_status_sertifikat,Status Sertifikat PSAT,enum,NULL,false,false,NULL,none,"Belum,Proses,Sudah",Status sertifikat
+psat_jenis_fasilitasi,Jenis Fasilitasi,text,NULL,false,false,NULL,none,NULL,Fasilitasi yang diberikan
+psat_kendala,Kendala PSAT,text,NULL,false,false,NULL,none,NULL,Kendala yang dihadapi
+psat_solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi yang diberikan
+instansi_koordinasi_pengawasan,Instansi Koordinasi,text,NULL,false,false,NULL,none,NULL,Instansi yang dikoordinasikan (Dinkes BPOM Polisi Pamong Praja)
+topik_koordinasi,Topik Koordinasi,text,NULL,false,false,NULL,none,NULL,Topik rapat koordinasi
+hasil_koordinasi,Hasil Koordinasi,text,NULL,false,false,NULL,none,NULL,Hasil rapat koordinasi
+tindak_lanjut_koordinasi,Tindak Lanjut Koordinasi,text,NULL,false,false,NULL,none,NULL,Tindak lanjut koordinasi
+tanggal_rapat,Tanggal Rapat,date,NULL,false,false,NULL,none,NULL,Tanggal rapat koordinasi
+pemohon_rekomendasi,Pemohon Rekomendasi,varchar,255,false,false,NULL,none,NULL,Siapa yang minta rekomendasi
+instansi_pemohon,Instansi Pemohon,varchar,255,false,false,NULL,none,NULL,Asal instansi pemohon
+permasalahan,Permasalahan,text,NULL,false,false,NULL,none,NULL,Permasalahan yang dihadapi
+analisis_teknis,Analisis Teknis,text,NULL,false,false,NULL,none,NULL,Analisis teknis
+rekomendasi_teknis,Rekomendasi Teknis,text,NULL,false,false,NULL,none,NULL,Rekomendasi yang diberikan
+dasar_rekomendasi,Dasar Rekomendasi,text,NULL,false,false,NULL,none,NULL,Dasar pemberian rekomendasi
+status_rekomendasi,Status Rekomendasi,enum,NULL,false,false,NULL,none,"Diproses,Diterbitkan,Ditolak",Status rekomendasi
+nomor_rekomendasi,Nomor Rekomendasi,varchar,100,false,false,NULL,none,NULL,Nomor surat rekomendasi
+tanggal_rekomendasi,Tanggal Rekomendasi,date,NULL,false,false,NULL,none,NULL,Tanggal surat rekomendasi
+file_surat_rekomendasi,File Surat Rekomendasi,varchar,255,false,false,NULL,none,NULL,Upload surat rekomendasi PDF
+file_dokumentasi,File Dokumentasi,json,NULL,false,false,NULL,none,NULL,Array foto kegiatan
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Laporan kegiatan PDF
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Konsumsi,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,NULL,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data keamanan pangan sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,proses,selesai",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

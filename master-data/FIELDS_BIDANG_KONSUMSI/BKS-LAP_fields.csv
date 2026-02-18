@@ -1,0 +1,53 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY130-LY131)
+jenis_laporan,Jenis Laporan,enum,NULL,true,false,NULL,none,"Laporan Kinerja,Data SAKIP",Jenis laporan
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Periode laporan
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+bulan,Bulan,int,2,false,false,NULL,none,NULL,Bulan (jika bulanan)
+triwulan,Triwulan,int,1,false,false,NULL,none,NULL,Triwulan (1-4)
+semester,Semester,int,1,false,false,NULL,none,NULL,Semester (1-2)
+judul_laporan,Judul Laporan,varchar,255,true,false,NULL,none,NULL,Judul laporan kinerja
+ringkasan_eksekutif,Ringkasan Eksekutif,text,NULL,false,false,NULL,none,NULL,Ringkasan untuk pimpinan
+capaian_konsumsi_pangan,Capaian Konsumsi Pangan,text,NULL,false,false,NULL,none,NULL,Capaian program konsumsi
+capaian_penganekaragaman,Capaian Penganekaragaman,text,NULL,false,false,NULL,none,NULL,Capaian penganekaragaman pangan
+capaian_keamanan_pangan,Capaian Keamanan Pangan,text,NULL,false,false,NULL,none,NULL,Capaian keamanan pangan
+skor_pph,Skor PPH,decimal,"5,2",false,false,NULL,none,NULL,Skor Pola Pangan Harapan
+target_pph,Target PPH,decimal,"5,2",false,false,90,none,NULL,Target PPH
+status_pph,Status PPH,enum,NULL,false,false,NULL,none,"On Target,Di Bawah Target",Status vs target
+konsumsi_energi,Konsumsi Energi (Kkal/Kap/Hari),decimal,"10,2",false,false,NULL,none,NULL,Konsumsi energi
+konsumsi_protein,Konsumsi Protein (g/Kap/Hari),decimal,"10,2",false,false,NULL,none,NULL,Konsumsi protein
+jumlah_kelompok_pangan_dibina,Kelompok Dibina,int,11,false,false,NULL,none,NULL,Jumlah kelompok dibina
+jumlah_psat_difasilitasi,PSAT Difasilitasi,int,11,false,false,NULL,none,NULL,PSAT yang difasilitasi
+jumlah_psat_tersertifikasi,PSAT Tersertifikasi,int,11,false,false,NULL,none,NULL,PSAT tersertifikasi
+kegiatan_edukasi_dilakukan,Kegiatan Edukasi,int,11,false,false,NULL,none,NULL,Jumlah kegiatan edukasi
+peserta_edukasi_total,Total Peserta Edukasi,int,11,false,false,NULL,none,NULL,Total peserta edukasi
+kasus_keracunan_pangan,Kasus Keracunan,int,11,false,false,0,none,NULL,Jumlah kasus keracunan
+data_sakip_ikk,Indikator Kinerja Kunci,text,NULL,false,false,NULL,none,NULL,IKK SAKIP
+data_sakip_capaian,Capaian IKK (%),decimal,"5,2",false,false,NULL,none,NULL,Persentase capaian IKK
+data_sakip_target,Target IKK (%),decimal,"5,2",false,false,NULL,none,NULL,Target IKK
+anggaran_program,Anggaran (Rp),decimal,"15,2",false,false,NULL,none,NULL,Pagu anggaran
+realisasi_anggaran,Realisasi (Rp),decimal,"15,2",false,false,NULL,none,NULL,Realisasi anggaran
+persentase_serapan,Serapan Anggaran (%),decimal,"5,2",false,false,NULL,none,NULL,Auto-calculate
+permasalahan,Permasalahan,text,NULL,false,false,NULL,none,NULL,Masalah yang dihadapi
+solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi yang ditempuh
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi
+tindak_lanjut,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Rencana tindak lanjut
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan PDF
+file_data_pendukung,File Data Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,Sekretariat,none,NULL,Kepada siapa
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Konsumsi,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang menyusun
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Sekretariat/Pimpinan,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Laporan kinerja sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

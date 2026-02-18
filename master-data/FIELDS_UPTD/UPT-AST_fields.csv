@@ -1,0 +1,5 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+unit_kerja,Unit Kerja,enum,NULL,true,false,UPTD,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",AUTO-SET ke UPTD (field khusus UPTD)
+lokasi_unit,Lokasi Unit,varchar,255,false,false,UPTD Balai Pengawasan Mutu,none,NULL,Lokasi fisik aset UPTD (field khusus UPTD)
+kategori_aset_uptd,Kategori Aset UPTD,enum,NULL,false,false,NULL,none,"Alat Inspeksi,Peralatan Lab,Alat Kantor,Kendaraan,Lainnya",Kategori khusus aset UPTD (field khusus UPTD)
+akses_terbatas,Akses Terbatas,boolean,NULL,true,false,1,none,NULL,UPTD hanya bisa akses aset sendiri (field khusus UPTD)

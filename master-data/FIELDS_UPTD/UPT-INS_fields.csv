@@ -1,0 +1,105 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY177-LY190)
+jenis_layanan_inspeksi,Jenis Layanan,enum,NULL,true,false,NULL,none,"Inspeksi Lapangan,Audit Sertifikasi,Audit Ulang,Pengambilan Sampel,Pengujian Mutu,Verifikasi Hasil Uji,Rekomendasi Pengawasan,Pembinaan,Koordinasi OPD,Monitoring Perbaikan,Penjadwalan,Pelaksanaan Lapangan,Pelaporan Teknis,Data Layanan",Jenis layanan inspeksi
+nomor_inspeksi,Nomor Inspeksi,varchar,100,false,false,NULL,none,NULL,Nomor registrasi inspeksi
+nomor_audit_ins,Nomor Audit,varchar,100,false,false,NULL,none,NULL,Nomor audit sertifikasi
+tanggal_inspeksi,Tanggal Inspeksi,date,NULL,false,false,NULL,none,NULL,Tanggal inspeksi dilakukan
+lokasi_inspeksi,Lokasi Inspeksi,varchar,255,false,false,NULL,none,NULL,Lokasi inspeksi
+objek_inspeksi,Objek Inspeksi,varchar,255,false,false,NULL,none,NULL,Apa yang diinspeksi (UMKM pasar rumah makan dll)
+nama_usaha_inspeksi,Nama Usaha,varchar,255,false,false,NULL,none,NULL,Nama usaha yang diinspeksi
+pemilik_usaha_inspeksi,Pemilik,varchar,255,false,false,NULL,none,NULL,Nama pemilik
+alamat_inspeksi,Alamat,text,NULL,false,false,NULL,none,NULL,Alamat lokasi inspeksi
+tim_inspeksi,Tim Inspeksi,text,NULL,false,false,NULL,none,NULL,Nama-nama tim inspeksi
+jenis_sertifikasi_audit,Jenis Sertifikasi,enum,NULL,false,false,NULL,none,"GMP,GHP,NKV,Prima 1,Prima 2,Prima 3,GFP,HACCP,Lainnya",Jenis sertifikasi yang diaudit
+audit_awal_ulang,Audit,enum,NULL,false,false,Awal,none,"Awal,Ulang,Surveillance",Audit awal atau ulang
+alasan_audit_ulang,Alasan Audit Ulang,text,NULL,false,false,NULL,none,NULL,Alasan audit ulang
+checklist_inspeksi,Checklist Inspeksi,json,NULL,false,false,NULL,none,NULL,JSON checklist inspeksi
+skor_inspeksi,Skor Inspeksi,decimal,"5,2",false,false,NULL,none,NULL,Skor hasil inspeksi
+hasil_inspeksi,Hasil Inspeksi,enum,NULL,false,false,NULL,none,"Lulus,Tidak Lulus,Lulus Bersyarat",Hasil inspeksi
+temuan_inspeksi,Temuan Inspeksi,text,NULL,false,false,NULL,none,NULL,Temuan hasil inspeksi
+catatan_inspeksi,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan inspeksi
+rekomendasi_inspeksi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi tindak lanjut
+tindakan_korektif_inspeksi,Tindakan Korektif,text,NULL,false,false,NULL,none,NULL,Tindakan perbaikan yang diperlukan
+batas_waktu_ins,Batas Waktu Perbaikan,date,NULL,false,false,NULL,none,NULL,Deadline perbaikan
+jenis_sampel_pangan,Jenis Sampel,varchar,255,false,false,NULL,none,NULL,Jenis sampel pangan
+lokasi_pengambilan,Lokasi Pengambilan,varchar,255,false,false,NULL,none,NULL,Lokasi pengambilan sampel
+tanggal_sampling,Tanggal Sampling,date,NULL,false,false,NULL,none,NULL,Tanggal pengambilan sampel
+sampler,Sampler,varchar,255,false,false,NULL,none,NULL,Nama petugas sampling
+jumlah_sampel_diambil,Jumlah Sampel,int,11,false,false,NULL,none,NULL,Jumlah sampel yang diambil
+metode_sampling,Metode Sampling,varchar,255,false,false,NULL,none,NULL,Metode pengambilan sampel
+kondisi_sampel,Kondisi Sampel,enum,NULL,false,false,Baik,none,"Baik,Rusak,Kadaluarsa",Kondisi sampel
+penyimpanan_sampel,Penyimpanan,varchar,255,false,false,NULL,none,NULL,Cara penyimpanan sampel
+nomor_sampel,Nomor Sampel,varchar,100,false,false,NULL,none,NULL,Nomor identifikasi sampel
+parameter_pengujian,Parameter Pengujian,text,NULL,false,false,NULL,none,NULL,Parameter yang diuji
+metode_pengujian,Metode Pengujian,varchar,255,false,false,NULL,none,NULL,Metode pengujian
+analis_pengujian,Analis,varchar,255,false,false,NULL,none,NULL,Nama analis
+tanggal_pengujian_mulai,Tanggal Pengujian Mulai,date,NULL,false,false,NULL,none,NULL,Tanggal mulai uji
+tanggal_pengujian_selesai,Tanggal Pengujian Selesai,date,NULL,false,false,NULL,none,NULL,Tanggal selesai uji
+hasil_pengujian,Hasil Pengujian,text,NULL,false,false,NULL,none,NULL,Hasil pengujian
+kesimpulan_pengujian,Kesimpulan,enum,NULL,false,false,NULL,none,"Memenuhi Syarat,Tidak Memenuhi Syarat",Kesimpulan hasil uji
+tanggal_verifikasi_uji,Tanggal Verifikasi,date,NULL,false,false,NULL,none,NULL,Tanggal verifikasi hasil
+verifikator_uji,Verifikator,varchar,255,false,false,NULL,none,NULL,Nama verifikator
+hasil_verifikasi_uji,Hasil Verifikasi,enum,NULL,false,false,NULL,none,"Approved,Rejected,Need Retest",Hasil verifikasi
+catatan_verifikasi_uji,Catatan Verifikasi,text,NULL,false,false,NULL,none,NULL,Catatan verifikasi
+jenis_rekomendasi_pengawasan,Jenis Rekomendasi,enum,NULL,false,false,NULL,none,"Rekomendasi Tindakan,Rekomendasi Sanksi,Rekomendasi Pembinaan,Rekomendasi Pemantauan",Jenis rekomendasi
+isi_rekomendasi_pengawasan,Isi Rekomendasi,text,NULL,false,false,NULL,none,NULL,Isi rekomendasi pengawasan
+tindak_lanjut_rekomendasi,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Tindak lanjut rekomendasi
+status_rekomendasi_pengawasan,Status,enum,NULL,false,false,Open,none,"Open,In Progress,Closed",Status rekomendasi
+jenis_pembinaan,Jenis Pembinaan,enum,NULL,false,false,NULL,none,"Pembinaan Langsung,Bimbingan Teknis,Konsultasi,Pelatihan,Lainnya",Jenis pembinaan
+tanggal_pembinaan,Tanggal Pembinaan,date,NULL,false,false,NULL,none,NULL,Tanggal pembinaan
+lokasi_pembinaan,Lokasi Pembinaan,varchar,255,false,false,NULL,none,NULL,Lokasi pembinaan
+penerima_pembinaan,Penerima Pembinaan,varchar,255,false,false,NULL,none,NULL,Yang dibina
+materi_pembinaan,Materi Pembinaan,text,NULL,false,false,NULL,none,NULL,Materi yang diberikan
+hasil_pembinaan,Hasil Pembinaan,text,NULL,false,false,NULL,none,NULL,Hasil pembinaan
+opd_dikoordinasikan,OPD Dikoordinasikan,text,NULL,false,false,NULL,none,NULL,OPD yang dikoordinasikan (Dinkes BPOM dll)
+tanggal_koordinasi,Tanggal Koordinasi,date,NULL,false,false,NULL,none,NULL,Tanggal rapat koordinasi
+topik_koordinasi_opd,Topik Koordinasi,text,NULL,false,false,NULL,none,NULL,Topik rapat
+hasil_koordinasi_opd,Hasil Koordinasi,text,NULL,false,false,NULL,none,NULL,Hasil rapat koordinasi
+tindak_lanjut_koordinasi,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Tindak lanjut koordinasi
+objek_monitoring,Objek Monitoring,varchar,255,false,false,NULL,none,NULL,Apa yang dimonitoring
+tanggal_monitoring,Tanggal Monitoring,date,NULL,false,false,NULL,none,NULL,Tanggal monitoring
+hasil_monitoring,Hasil Monitoring,text,NULL,false,false,NULL,none,NULL,Hasil monitoring perbaikan
+status_perbaikan_monitoring,Status Perbaikan,enum,NULL,false,false,NULL,none,"Belum,Proses,Selesai,Verified",Status perbaikan
+tanggal_penjadwalan,Tanggal Dijadwalkan,date,NULL,false,false,NULL,none,NULL,Tanggal kegiatan dijadwalkan
+jenis_kegiatan_jadwal,Jenis Kegiatan,enum,NULL,false,false,NULL,none,"Inspeksi,Audit,Sampling,Pengujian,Pembinaan,Monitoring",Jenis kegiatan yang dijadwalkan
+petugas_dijadwalkan,Petugas,text,NULL,false,false,NULL,none,NULL,Petugas yang dijadwalkan
+status_jadwal,Status Jadwal,enum,NULL,false,false,Scheduled,none,"Scheduled,Ongoing,Completed,Cancelled,Rescheduled",Status jadwal
+jenis_layanan_lapangan,Jenis Layanan Lapangan,varchar,255,false,false,NULL,none,NULL,Jenis layanan yang dilaksanakan
+tanggal_pelaksanaan,Tanggal Pelaksanaan,date,NULL,false,false,NULL,none,NULL,Tanggal pelaksanaan
+lokasi_pelaksanaan,Lokasi Pelaksanaan,varchar,255,false,false,NULL,none,NULL,Lokasi pelaksanaan
+tim_pelaksana,Tim Pelaksana,text,NULL,false,false,NULL,none,NULL,Tim yang melaksanakan
+hasil_pelaksanaan,Hasil Pelaksanaan,text,NULL,false,false,NULL,none,NULL,Hasil pelaksanaan
+periode_pelaporan_teknis,Periode Pelaporan,date,NULL,false,false,NULL,none,NULL,Periode laporan teknis
+jenis_laporan_teknis,Jenis Laporan,enum,NULL,false,false,NULL,none,"Bulanan,Triwulanan,Semesteran,Tahunan",Jenis laporan
+total_inspeksi,Total Inspeksi,int,11,false,false,NULL,none,NULL,Total inspeksi dalam periode
+total_audit_teknis,Total Audit,int,11,false,false,NULL,none,NULL,Total audit dalam periode
+total_sampel_diambil,Total Sampel,int,11,false,false,NULL,none,NULL,Total sampel diambil
+total_pengujian_teknis,Total Pengujian,int,11,false,false,NULL,none,NULL,Total pengujian dilakukan
+persentase_kelulusan_teknis,Persentase Kelulusan (%),decimal,"5,2",false,false,NULL,none,NULL,Persentase kelulusan
+temuan_tidak_sesuai,Temuan Tidak Sesuai,int,11,false,false,NULL,none,NULL,Total temuan
+tindakan_pengawasan,Tindakan Pengawasan,int,11,false,false,NULL,none,NULL,Total tindakan pengawasan
+pembinaan_dilakukan,Pembinaan Dilakukan,int,11,false,false,NULL,none,NULL,Total pembinaan
+ringkasan_laporan_teknis,Ringkasan,text,NULL,false,false,NULL,none,NULL,Ringkasan laporan teknis
+jenis_data_layanan,Jenis Data,enum,NULL,false,false,NULL,none,"Data Inspeksi,Data Audit,Data Sampling,Data Pengujian,Data Sertifikasi,Data Pembinaan,Data Monitoring",Jenis data layanan
+periode_data,Periode Data,date,NULL,false,false,NULL,none,NULL,Periode data
+format_data,Format Data,enum,NULL,false,false,Excel,none,"Excel,PDF,CSV,JSON",Format data
+keterangan_data,Keterangan Data,text,NULL,false,false,NULL,none,NULL,Keterangan data
+file_laporan_inspeksi,File Laporan Inspeksi,varchar,255,false,false,NULL,none,NULL,Upload laporan inspeksi
+file_laporan_audit_ins,File Laporan Audit,varchar,255,false,false,NULL,none,NULL,Upload laporan audit
+file_hasil_pengujian,File Hasil Pengujian,varchar,255,false,false,NULL,none,NULL,Upload hasil uji
+file_berita_acara,File Berita Acara,varchar,255,false,false,NULL,none,NULL,Upload BA sampling/inspeksi
+file_dokumentasi,File Dokumentasi,json,NULL,false,false,NULL,none,NULL,Array foto dokumentasi
+file_laporan_teknis_ins,File Laporan Teknis,varchar,255,false,false,NULL,none,NULL,Upload laporan teknis
+file_data_layanan,File Data Layanan,varchar,255,false,false,NULL,none,NULL,Upload data layanan
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kasi Manajemen Teknis,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Pelaku Usaha/Masyarakat,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data inspeksi sensitif (kecuali penjadwalan & pelaksanaan umum)
+status,Status,enum,NULL,true,false,pending,none,"pending,scheduled,ongoing,completed,verified",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

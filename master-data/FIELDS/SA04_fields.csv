@@ -1,0 +1,18 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+jenis_peraturan,Jenis Peraturan,enum,NULL,true,false,NULL,none,"UU,PP,Perpres,Permen,Pergub,Perkada,SK_Kadis,Pedoman,SOP,Lainnya",Jenis peraturan
+nomor_peraturan,Nomor Peraturan,varchar,100,true,false,NULL,none,NULL,Nomor resmi
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun ditetapkan
+judul,Judul,text,NULL,true,false,NULL,none,NULL,Tentang apa
+ringkasan,Ringkasan,text,NULL,false,false,NULL,none,NULL,Ringkasan isi
+file_path,File PDF,varchar,255,false,false,NULL,none,NULL,Path file upload
+file_size,Ukuran File,int,11,false,false,NULL,none,NULL,Ukuran KB
+status,Status,enum,NULL,true,false,berlaku,none,"berlaku,dicabut,diubah",Status peraturan
+tags,Tags,json,NULL,false,false,NULL,none,NULL,Keyword search
+dicabut_oleh,Dicabut Oleh,varchar,255,false,false,NULL,none,NULL,Peraturan pencabut
+mengubah,Mengubah,varchar,255,false,false,NULL,none,NULL,Mengubah peraturan
+diubah_oleh,Diubah Oleh,varchar,255,false,false,NULL,none,NULL,Peraturan pengubah
+download_count,Jumlah Download,int,11,true,false,0,none,NULL,Tracking popularitas
+uploaded_by,Diupload Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

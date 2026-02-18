@@ -1,0 +1,52 @@
+layanan_id,layanan_code,layanan_name,modul_ui_id,is_sensitive,penanggung_jawab,pelaksana,status_aktif,menu_order
+LY001,administrasi_umum,Administrasi Umum,SEK-ADM,Biasa,Kasubbag Umum,Staff Umum,true,1
+LY002,tata_naskah_dinas,Tata Naskah Dinas,SEK-ADM,Sensitif,Kasubbag Umum,Staff Tata Usaha,true,2
+LY003,kearsipan_dinamis_statis,Kearsipan Dinamis & Statis,SEK-ADM,Sensitif,Kasubbag Umum,Arsiparis,true,3
+LY004,agenda_disposisi_pimpinan,Agenda & Disposisi Pimpinan,SEK-ADM,Biasa,Kasubbag Umum,Staff TU,true,4
+LY005,administrasi_rapat,Administrasi Rapat,SEK-ADM,Biasa,Kasubbag Umum,Staff Umum,true,5
+LY006,dokumentasi_administrasi,Dokumentasi Administrasi,SEK-ADM,Biasa,Kasubbag Umum,Staff Dokumentasi,true,6
+LY007,perjalanan_dinas,Perjalanan Dinas,SEK-RMH,Sensitif,Kasubbag Umum,Staff Umum,true,1
+LY008,data_induk_asn,Data Induk ASN,SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Kepegawaian,true,1
+LY009,kenaikan_pangkat,Kenaikan Pangkat,SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Kepegawaian,true,2
+LY010,mutasi_jabatan_internal,Mutasi & Jabatan Internal,SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Kepegawaian,true,3
+LY011,gaji_tunjangan,Gaji & Tunjangan,SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Keuangan,true,4
+LY012,cuti_absensi,Cuti & Absensi,SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Kepegawaian,true,5
+LY013,penilaian_kinerja_asn,Penilaian Kinerja ASN (SKP),SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Kepegawaian,true,6
+LY014,disiplin_sanksi,Disiplin & Sanksi,SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Kepegawaian,true,7
+LY015,pensiun_purna_bakti,Pensiun & Purna Bakti,SEK-KEP,Sensitif,Kasubbag Kepegawaian,Staff Kepegawaian,true,8
+LY016,penyusunan_rka_dpa,Penyusunan RKA & DPA,SEK-KEU,Sensitif,Fungsional Perencana,Staff Perencanaan,true,1
+LY017,administrasi_belanja,Administrasi Belanja,SEK-KEU,Sensitif,Bendahara,Staff Keuangan,true,2
+LY018,pencairan_anggaran,Pencairan Anggaran,SEK-KEU,Sensitif,Bendahara,Staff Keuangan,true,3
+LY019,spj_pertanggungjawaban,SPJ & Pertanggungjawaban,SEK-KEU,Sensitif,Bendahara,Penerima Uang,true,4
+LY020,laporan_keuangan,Laporan Keuangan,SEK-KEU,Sensitif,Bendahara,Staff Keuangan,true,5
+LY021,revisi_anggaran,Revisi Anggaran,SEK-KEU,Sensitif,Fungsional Perencana,Staff Perencanaan,true,6
+LY022,monitoring_realisasi,Monitoring Realisasi Anggaran,SEK-KEU,Sensitif,Bendahara,Staff Keuangan,true,7
+LY023,inventarisasi_bmd,Inventarisasi BMD,SEK-AST,Biasa,Kasubbag Umum,Staff Aset,true,1
+LY024,pengadaan_penerimaan,Pengadaan & Penerimaan Aset,SEK-AST,Biasa,Kasubbag Umum,Staff Aset,true,2
+LY025,penatausahaan_aset,Penatausahaan Aset,SEK-AST,Biasa,Kasubbag Umum,Staff Aset,true,3
+LY026,pemeliharaan_aset,Pemeliharaan Aset,SEK-AST,Biasa,Kasubbag Umum,Staff Aset,true,4
+LY027,pengamanan_aset,Pengamanan Aset,SEK-AST,Biasa,Kasubbag Umum,Staff Aset,true,5
+LY028,penghapusan_aset,Penghapusan Aset,SEK-AST,Biasa,Kasubbag Umum,Staff Aset,true,6
+LY029,laporan_aset,Laporan Aset,SEK-AST,Biasa,Kasubbag Umum,Staff Aset,true,7
+LY030,rumah_tangga_kebersihan_kerapihan,Rumah Tangga Kebersihan & Kerapihan,SEK-RMH,Biasa,Kasubbag Umum,Staff Rumah Tangga,true,2
+LY031,keamanan_kantor,Keamanan Kantor,SEK-RMH,Biasa,Kasubbag Umum,Security,true,3
+LY032,fasilitas_kantor,Fasilitas Kantor,SEK-RMH,Biasa,Kasubbag Umum,Staff Rumah Tangga,true,4
+LY033,ruang_rapat_kegiatan,Ruang Rapat & Kegiatan,SEK-RMH,Biasa,Kasubbag Umum,Staff Rumah Tangga,true,5
+LY034,kendaraan_dinas,Kendaraan Dinas,SEK-RMH,Biasa,Kasubbag Umum,Driver,true,6
+LY035,keprotokolan_pimpinan,Keprotokolan Pimpinan,SEK-HUM,Biasa,Kasubbag Umum,Staff Protokol,true,1
+LY036,acara_resmi_dinas,Acara Resmi Dinas,SEK-HUM,Biasa,Kasubbag Umum,Staff Protokol,true,2
+LY037,penerimaan_tamu,Penerimaan Tamu,SEK-HUM,Biasa,Kasubbag Umum,Resepsionis,true,3
+LY038,publikasi_kegiatan,Publikasi Kegiatan,SEK-HUM,Biasa,Kasubbag Umum,Staff Humas,true,4
+LY039,dokumentasi_pimpinan,Dokumentasi Pimpinan,SEK-HUM,Biasa,Kasubbag Umum,Staff Dokumentasi,true,5
+LY040,penyusunan_renstra,Penyusunan Renstra,SEK-REN,Sensitif,Fungsional Perencana,Staff Perencanaan,true,1
+LY041,penyusunan_renja,Penyusunan Renja,SEK-REN,Sensitif,Fungsional Perencana,Staff Perencanaan,true,2
+LY042,fasilitasi_program_bidang,Fasilitasi Program Bidang,SEK-REN,Biasa,Fungsional Perencana,Staff Perencanaan,true,3
+LY043,sinkronisasi_program_anggaran,Sinkronisasi Program & Anggaran,SEK-REN,Sensitif,Fungsional Perencana,Staff Perencanaan,true,4
+LY044,lkjip_lakip,LKJIP & LAKIP,SEK-REN,Sensitif,Fungsional Perencana,Staff Perencanaan,true,5
+LY045,laporan_kinerja,Laporan Kinerja,SEK-REN,Biasa,Fungsional Perencana,Staff Perencanaan,true,6
+LY046,bahan_kebijakan_teknis,Bahan Kebijakan Teknis,SEK-KBJ,Sensitif,Sekretaris,Fungsional Perencana,true,1
+LY047,rekapitulasi_ringkasan_laporan_semua_bidang,Rekapitulasi Ringkasan Laporan Semua Bidang,SEK-KBJ,Sensitif,Sekretaris,Staff Sekretariat,true,2
+LY048,laporan_stok_kerawanan_pangan,Laporan Stok & Kerawanan Pangan,SEK-LKT,Biasa,Sekretaris,Bidang Ketersediaan,true,1
+LY049,rencana_realisasi_distribusi,Rencana & Realisasi Distribusi,SEK-LDS,Biasa,Sekretaris,Bidang Distribusi,true,1
+LY050,laporan_pengawasan_konsumsi_keamanan,Laporan Pengawasan Konsumsi & Keamanan,SEK-LKS,Biasa,Sekretaris,Bidang Konsumsi,true,1
+LY051,hasil_uptd_pengujian_laboratorium,Hasil UPTD Pengujian Laboratorium,SEK-LUP,Sensitif,Sekretaris,UPTD,true,1
