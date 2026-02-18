@@ -4,8 +4,11 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import ModulePage from "./pages/ModulePage";
 import BKTPGDCreatePage from "./pages/BKTPGDCreatePage";
+import BKTKRWCreatePage from "./pages/BKTKRWCreatePage";
 import BDSHRGCreatePage from "./pages/BDSHRGCreatePage";
 import SEKADMCreatePage from "./pages/SEKADMCreatePage";
+import SEKKEPCreatePage from "./pages/SEKKEPCreatePage";
+import SEKKEUCreatePage from "./pages/SEKKEUCreatePage";
 import ViewDetailPage from "./pages/ViewDetailPage"; // ← NEW
 import EditPage from "./pages/EditPage"; // ← NEW
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -63,6 +66,15 @@ function App() {
         />
 
         <Route
+          path="/module/bkt-krw/create"
+          element={
+            <PrivateRoute>
+              <BKTKRWCreatePage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
           path="/module/bds-hrg/create"
           element={
             <PrivateRoute>
@@ -76,6 +88,24 @@ function App() {
           element={
             <PrivateRoute>
               <SEKADMCreatePage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/module/sek-kep/create"
+          element={
+            <PrivateRoute>
+              <SEKKEPCreatePage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/module/sek-keu/create"
+          element={
+            <PrivateRoute>
+              <SEKKEUCreatePage />
             </PrivateRoute>
           }
         />

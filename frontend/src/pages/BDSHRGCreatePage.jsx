@@ -8,7 +8,16 @@ export default function BDSHRGCreatePage() {
   const [komoditasList, setKomoditasList] = useState([]);
   const [pasarList, setPasarList] = useState([]);
 
+  const layananMap = {
+    "Pemantauan Harga": "LY087",
+    "Analisis Fluktuasi": "LY088",
+    "Rekomendasi Stabilisasi": "LY089",
+    "Operasi Pasar": "LY090",
+    "Koordinasi TPID": "LY091",
+  };
+
   const [formData, setFormData] = useState({
+    jenis_layanan_harga: "Pemantauan Harga",
     komoditas_id: "",
     nama_komoditas: "",
     nama_pasar: "",
@@ -82,8 +91,8 @@ export default function BDSHRGCreatePage() {
 
       await api.post("/bds-hrg", {
         unit_kerja: "Bidang Distribusi",
-        layanan_id: "LY087",
-        jenis_layanan_harga: "Pemantauan Harga",
+        layanan_id: layananMap[formData.jenis_layanan_harga],
+        jenis_layanan_harga: formData.jenis_layanan_harga,
         komoditas_id: parseInt(formData.komoditas_id),
         nama_komoditas: formData.nama_komoditas,
         nama_pasar: formData.nama_pasar,
@@ -124,6 +133,24 @@ export default function BDSHRGCreatePage() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Jenis Layanan <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="jenis_layanan_harga"
+              value={formData.jenis_layanan_harga}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="Pemantauan Harga">Pemantauan Harga</option>
+              <option value="Analisis Fluktuasi">Analisis Fluktuasi</option>
+              <option value="Rekomendasi Stabilisasi">Rekomendasi Stabilisasi</option>
+              <option value="Operasi Pasar">Operasi Pasar</option>
+              <option value="Koordinasi TPID">Koordinasi TPID</option>
+            </select>
+          </div>
           {/* Komoditas */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

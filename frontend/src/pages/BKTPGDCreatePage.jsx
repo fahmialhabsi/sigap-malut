@@ -8,6 +8,14 @@ export default function BKTPGDCreatePage() {
   const [komoditasList, setKomoditasList] = useState([]);
   const [kabupatenList, setKabupatenList] = useState([]);
 
+  const layananMap = {
+    "Pemantauan Produksi": "LY057",
+    "Pemantauan Pasokan": "LY058",
+    "Neraca Pangan": "LY059",
+    "Early Warning": "LY060",
+    "Sistem Informasi": "LY061",
+  };
+
   const [formData, setFormData] = useState({
     komoditas_id: "",
     nama_komoditas: "",
@@ -105,7 +113,7 @@ export default function BKTPGDCreatePage() {
       // Submit ke Bidang Ketersediaan (BKT-PGD)
       const bktPgdData = {
         unit_kerja: "Bidang Ketersediaan",
-        layanan_id: "LY057",
+        layanan_id: layananMap[formData.jenis_pengendalian],
         jenis_pengendalian: formData.jenis_pengendalian,
         komoditas_id: parseInt(formData.komoditas_id),
         nama_komoditas: formData.nama_komoditas,
