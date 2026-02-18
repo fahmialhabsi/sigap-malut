@@ -1,51 +1,54 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+import api from "../utils/api";
 
-const modules = [
+const defaultModules = [
   {
     category: "Sekretariat",
     items: [
-      { id: "SEK-ADM", name: "Administrasi Umum", icon: "📄" },
-      { id: "SEK-KEP", name: "Kepegawaian", icon: "👥" },
-      { id: "SEK-KEU", name: "Keuangan", icon: "💰" },
-      { id: "SEK-REN", name: "Perencanaan", icon: "📊" },
-      { id: "SEK-AST", name: "Aset", icon: "🏢" },
+      { id: "M001", name: "Data ASN", icon: "👥" },
+      { id: "M011", name: "Administrasi Umum", icon: "📄" },
+      { id: "M016", name: "Aset & BMD", icon: "🏢" },
+      { id: "M020", name: "Keuangan", icon: "💰" },
+      { id: "M027", name: "Perencanaan", icon: "📊" },
+      { id: "M081", name: "Laporan Masyarakat", icon: "💬" },
     ],
   },
   {
     category: "Bidang Ketersediaan",
     items: [
-      { id: "BKT-PGD", name: "Produksi Pangan", icon: "🌾" },
-      { id: "BKT-KRW", name: "Kerawanan Pangan", icon: "⚠️" },
-      { id: "BKT-FSL", name: "Fasilitasi", icon: "🤝" },
-      { id: "BKT-KBJ", name: "Kebijakan", icon: "📋" },
+      { id: "M032", name: "Data Komoditas", icon: "📦" },
+      { id: "M033", name: "Produksi Pangan", icon: "🌾" },
+      { id: "M036", name: "Peta Kerawanan", icon: "📍" },
+      { id: "M038", name: "Early Warning", icon: "🚨" },
     ],
   },
   {
     category: "Bidang Distribusi",
     items: [
-      { id: "BDS-HRG", name: "Harga Pangan", icon: "💵" },
-      { id: "BDS-CPD", name: "Cadangan Pangan", icon: "📦" },
-      { id: "BDS-MON", name: "Monitoring", icon: "📈" },
-      { id: "BDS-KBJ", name: "Kebijakan", icon: "📋" },
+      { id: "M042", name: "Data Pasar", icon: "🏪" },
+      { id: "M043", name: "Harga Pangan", icon: "💵" },
+      { id: "M047", name: "Distribusi Pangan", icon: "🚚" },
+      { id: "M048", name: "Cadangan Pangan", icon: "📦" },
+      { id: "M051", name: "Operasi Pasar", icon: "🛒" },
     ],
   },
   {
     category: "Bidang Konsumsi",
     items: [
-      { id: "BKS-KMN", name: "Keamanan Pangan", icon: "🛡️" },
-      { id: "BKS-DVR", name: "Diversifikasi", icon: "🍽️" },
-      { id: "BKS-BMB", name: "Bimbingan Masyarakat", icon: "👨‍🏫" },
-      { id: "BKS-KBJ", name: "Kebijakan", icon: "📋" },
+      { id: "M056", name: "Data Konsumsi", icon: "🍽️" },
+      { id: "M058", name: "Data SPPG", icon: "👥" },
+      { id: "M063", name: "Inspeksi Keamanan", icon: "🔍" },
+      { id: "M066", name: "Data UMKM Pangan", icon: "🏭" },
     ],
   },
   {
     category: "UPTD",
     items: [
-      { id: "UPT-MTU", name: "Mutu Pangan", icon: "🔬" },
-      { id: "UPT-TKN", name: "Teknis", icon: "⚙️" },
-      { id: "UPT-ADM", name: "Administrasi", icon: "📑" },
+      { id: "M068", name: "Sertifikasi Prima", icon: "✅" },
+      { id: "M072", name: "Audit Pangan", icon: "📋" },
+      { id: "M074", name: "Uji Laboratorium", icon: "🧪" },
     ],
   },
 ];
@@ -53,9 +56,59 @@ const modules = [
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState(["Sekretariat"]);
+  const [moduleGroups, setModuleGroups] = useState(defaultModules);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+
+  const isSuperAdmin = useMemo(() => user?.role === "super_admin", [user]);
+
+  useEffect(() => {
+    if (!isSuperAdmin) {
+      setModuleGroups(defaultModules);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchModules = async () => {
+      try {
+        const response = await api.get("/modules");
+        const items = response.data.data || [];
+
+        const grouped = items.reduce((acc, item) => {
+          const category = item.bidang || "Lainnya";
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push({
+            id: item.modul_id,
+            name: item.nama_modul,
+            icon: "📄",
+          });
+          return acc;
+        }, {});
+
+        const groups = Object.keys(grouped).map((category) => ({
+          category,
+          items: grouped[category],
+        }));
+
+        if (isMounted && groups.length > 0) {
+          setModuleGroups(groups);
+          setExpandedCategories([groups[0].category]);
+        }
+      } catch (error) {
+        console.error("Gagal memuat daftar modul:", error);
+      }
+    };
+
+    fetchModules();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isSuperAdmin]);
 
   const toggleCategory = (category) => {
     if (expandedCategories.includes(category)) {
@@ -108,7 +161,7 @@ export default function DashboardLayout({ children }) {
             {sidebarOpen && <span>Dashboard</span>}
           </Link>
 
-          {modules.map((category) => (
+          {moduleGroups.map((category) => (
             <div key={category.category} className="mb-2">
               <button
                 onClick={() => toggleCategory(category.category)}
