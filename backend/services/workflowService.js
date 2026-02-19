@@ -149,7 +149,20 @@ class WorkflowService {
   // Send bypass alert
   async sendBypassAlert(bypass) {
     console.log("📧 Sending bypass alert to Sekretaris and Kepala Dinas");
-    // TODO: Implement email/WhatsApp notification
+    // Implementasi notifikasi email/WhatsApp
+    const emailService = require("../utils/emailService");
+    const whatsappService = require("../utils/whatsappService");
+    const recipients = [bypass.sekretarisEmail, bypass.kepalaDinasEmail];
+    const subject = `ALERT: BYPASS KOORDINASI oleh ${bypass.namaStaf}`;
+    const message = `BYPASS terdeteksi pada workflow: ${bypass.workflowId}\n\nDetail:\n${JSON.stringify(bypass, null, 2)}`;
+    // Kirim email
+    recipients.forEach((email) => {
+      emailService.sendEmail(email, subject, message);
+    });
+    // Kirim WhatsApp
+    recipients.forEach((phone) => {
+      whatsappService.sendMessage(phone, message);
+    });
   }
 
   // Get workflow statistics

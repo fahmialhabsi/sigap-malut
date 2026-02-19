@@ -5,6 +5,7 @@ const useAuthStore = create((set) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  isInitialized: false,
 
   login: async (username, password) => {
     try {
@@ -18,6 +19,7 @@ const useAuthStore = create((set) => ({
         user,
         token,
         isAuthenticated: true,
+        isInitialized: true,
       });
 
       return { success: true };
@@ -37,6 +39,7 @@ const useAuthStore = create((set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
+      isInitialized: true,
     });
   },
 
@@ -51,10 +54,24 @@ const useAuthStore = create((set) => ({
           user,
           token,
           isAuthenticated: true,
+          isInitialized: true,
         });
       } catch (error) {
         console.error("Parse user error:", error);
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isInitialized: true,
+        });
       }
+    } else {
+      set({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isInitialized: true,
+      });
     }
   },
 }));
