@@ -2,20 +2,26 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import ModulePage from "./pages/ModulePage";
-import BKTPGDCreatePage from "./pages/BKTPGDCreatePage";
-import BKTKRWCreatePage from "./pages/BKTKRWCreatePage";
-import BDSHRGCreatePage from "./pages/BDSHRGCreatePage";
-import SEKADMCreatePage from "./pages/SEKADMCreatePage";
-import SEKKEPCreatePage from "./pages/SEKKEPCreatePage";
-import SEKKEUCreatePage from "./pages/SEKKEUCreatePage";
-import ViewDetailPage from "./pages/ViewDetailPage"; // ← NEW
-import EditPage from "./pages/EditPage"; // ← NEW
+import GenericCreatePage from "./pages/GenericCreatePage";
+import ViewDetailPage from "./pages/ViewDetailPage";
+import EditPage from "./pages/EditPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import useAuthStore from "./stores/authStore";
+import GeneratedRoutes from "./routes/generatedRoutes";
+import ChatbotUploadPage from "./pages/ChatbotUploadPage";
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+
+  // Tunggu inisialisasi selesai
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -35,7 +41,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/dashboard"
           element={
@@ -44,73 +50,30 @@ function App() {
             </PrivateRoute>
           }
         />
-
-        {/* Module List */}
         <Route
-          path="/module/:moduleId"
+          path="/module/:moduleId/create"
           element={
             <PrivateRoute>
-              <ModulePage />
+              <GenericCreatePage />
             </PrivateRoute>
           }
         />
-
-        {/* Create Pages */}
         <Route
-          path="/module/bkt-pgd/create"
+          path="/module/:moduleId/view/:id"
           element={
             <PrivateRoute>
-              <BKTPGDCreatePage />
+              <ViewDetailPage />
             </PrivateRoute>
           }
         />
-
         <Route
-          path="/module/bkt-krw/create"
+          path="/module/:moduleId/edit/:id"
           element={
             <PrivateRoute>
-              <BKTKRWCreatePage />
+              <EditPage />
             </PrivateRoute>
           }
         />
-
-        <Route
-          path="/module/bds-hrg/create"
-          element={
-            <PrivateRoute>
-              <BDSHRGCreatePage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/module/sek-adm/create"
-          element={
-            <PrivateRoute>
-              <SEKADMCreatePage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/module/sek-kep/create"
-          element={
-            <PrivateRoute>
-              <SEKKEPCreatePage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/module/sek-keu/create"
-          element={
-            <PrivateRoute>
-              <SEKKEUCreatePage />
-            </PrivateRoute>
-          }
-        />
-
-        {/* View Detail - GENERIC for all modules */}
         <Route
           path="/module/:moduleId/:id"
           element={
@@ -119,8 +82,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
-        {/* Edit Page - GENERIC for all modules */}
         <Route
           path="/module/:moduleId/:id/edit"
           element={
@@ -129,8 +90,15 @@ function App() {
             </PrivateRoute>
           }
         />
-
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route
+          path="/chatbot-upload"
+          element={
+            <PrivateRoute>
+              <ChatbotUploadPage />
+            </PrivateRoute>
+          }
+        />
+        {GeneratedRoutes({ PrivateRoute })}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

@@ -98,7 +98,9 @@ export default function BKTKRWCreatePage() {
               <option value="Identifikasi">Identifikasi</option>
               <option value="Peta Kerawanan">Peta Kerawanan</option>
               <option value="Rencana Aksi">Rencana Aksi</option>
-              <option value="Koordinasi Lintas Sektor">Koordinasi Lintas Sektor</option>
+              <option value="Koordinasi Lintas Sektor">
+                Koordinasi Lintas Sektor
+              </option>
             </select>
           </div>
 

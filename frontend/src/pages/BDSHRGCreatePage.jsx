@@ -28,6 +28,33 @@ export default function BDSHRGCreatePage() {
     harga: "",
     satuan: "kg",
     tren_harga: "Stabil",
+    tingkat_fluktuasi: "",
+    penyebab_fluktuasi: "",
+    dampak_fluktuasi: "",
+    analisis_harga: "",
+    prediksi_harga: "",
+    rekomendasi_stabilisasi: "",
+    jenis_operasi_pasar: "",
+    tanggal_operasi_pasar: "",
+    lokasi_operasi_pasar: "",
+    komoditas_operasi_pasar: "",
+    harga_pasar_normal: "",
+    harga_operasi_pasar: "",
+    subsidi_per_unit: "",
+    volume_operasi_pasar: "",
+    jumlah_pembeli: "",
+    total_nilai_subsidi: "",
+    sumber_anggaran: "",
+    tanggal_rapat_tpid: "",
+    tempat_rapat_tpid: "",
+    peserta_tpid: "",
+    agenda_tpid: "",
+    hasil_rapat_tpid: "",
+    rekomendasi_tpid: "",
+    tindak_lanjut_tpid: "",
+    inflasi_pangan: "",
+    target_inflasi_tpid: "",
+    status_inflasi: "",
     keterangan: "",
   });
 
@@ -89,26 +116,70 @@ export default function BDSHRGCreatePage() {
         return;
       }
 
-      await api.post("/bds-hrg", {
+      const toNumber = (value) =>
+        value === "" || value === null || value === undefined
+          ? undefined
+          : parseFloat(value);
+      const toInt = (value) =>
+        value === "" || value === null || value === undefined
+          ? undefined
+          : parseInt(value, 10);
+
+      const payload = {
         unit_kerja: "Bidang Distribusi",
         layanan_id: layananMap[formData.jenis_layanan_harga],
         jenis_layanan_harga: formData.jenis_layanan_harga,
-        komoditas_id: parseInt(formData.komoditas_id),
+        komoditas_id: toInt(formData.komoditas_id),
         nama_komoditas: formData.nama_komoditas,
         nama_pasar: formData.nama_pasar,
         tanggal_pantau: formData.tanggal_pantau,
         periode: formData.periode,
-        tahun: parseInt(formData.tahun),
-        bulan: parseInt(formData.bulan),
-        harga: parseFloat(formData.harga),
+        tahun: toInt(formData.tahun),
+        bulan: toInt(formData.bulan),
+        harga: toNumber(formData.harga),
         satuan: formData.satuan,
         tren_harga: formData.tren_harga,
+        tingkat_fluktuasi: formData.tingkat_fluktuasi,
+        penyebab_fluktuasi: formData.penyebab_fluktuasi,
+        dampak_fluktuasi: formData.dampak_fluktuasi,
+        analisis_harga: formData.analisis_harga,
+        prediksi_harga: formData.prediksi_harga,
+        rekomendasi_stabilisasi: formData.rekomendasi_stabilisasi,
+        jenis_operasi_pasar: formData.jenis_operasi_pasar,
+        tanggal_operasi_pasar: formData.tanggal_operasi_pasar,
+        lokasi_operasi_pasar: formData.lokasi_operasi_pasar,
+        komoditas_operasi_pasar: formData.komoditas_operasi_pasar,
+        harga_pasar_normal: toNumber(formData.harga_pasar_normal),
+        harga_operasi_pasar: toNumber(formData.harga_operasi_pasar),
+        subsidi_per_unit: toNumber(formData.subsidi_per_unit),
+        volume_operasi_pasar: toNumber(formData.volume_operasi_pasar),
+        jumlah_pembeli: toInt(formData.jumlah_pembeli),
+        total_nilai_subsidi: toNumber(formData.total_nilai_subsidi),
+        sumber_anggaran: formData.sumber_anggaran,
+        tanggal_rapat_tpid: formData.tanggal_rapat_tpid,
+        tempat_rapat_tpid: formData.tempat_rapat_tpid,
+        peserta_tpid: formData.peserta_tpid,
+        agenda_tpid: formData.agenda_tpid,
+        hasil_rapat_tpid: formData.hasil_rapat_tpid,
+        rekomendasi_tpid: formData.rekomendasi_tpid,
+        tindak_lanjut_tpid: formData.tindak_lanjut_tpid,
+        inflasi_pangan: toNumber(formData.inflasi_pangan),
+        target_inflasi_tpid: toNumber(formData.target_inflasi_tpid),
+        status_inflasi: formData.status_inflasi,
         penanggung_jawab: "Kepala Bidang Distribusi",
         pelaksana: user.nama_lengkap || "Pengumpul Data Harga",
         status: "final",
         keterangan: formData.keterangan || "",
         created_by: user.id,
+      };
+
+      Object.keys(payload).forEach((key) => {
+        if (payload[key] === "" || Number.isNaN(payload[key])) {
+          delete payload[key];
+        }
       });
+
+      await api.post("/bds-hrg", payload);
 
       alert("✅ Data harga berhasil disimpan!");
       navigate("/module/bds-hrg");
@@ -146,7 +217,9 @@ export default function BDSHRGCreatePage() {
             >
               <option value="Pemantauan Harga">Pemantauan Harga</option>
               <option value="Analisis Fluktuasi">Analisis Fluktuasi</option>
-              <option value="Rekomendasi Stabilisasi">Rekomendasi Stabilisasi</option>
+              <option value="Rekomendasi Stabilisasi">
+                Rekomendasi Stabilisasi
+              </option>
               <option value="Operasi Pasar">Operasi Pasar</option>
               <option value="Koordinasi TPID">Koordinasi TPID</option>
             </select>
@@ -260,6 +333,384 @@ export default function BDSHRGCreatePage() {
               <option value="Turun">Turun</option>
             </select>
           </div>
+
+          {formData.jenis_layanan_harga === "Analisis Fluktuasi" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tingkat Fluktuasi
+                </label>
+                <select
+                  name="tingkat_fluktuasi"
+                  value={formData.tingkat_fluktuasi}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Pilih</option>
+                  <option value="Rendah">Rendah</option>
+                  <option value="Sedang">Sedang</option>
+                  <option value="Tinggi">Tinggi</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Penyebab Fluktuasi
+                </label>
+                <textarea
+                  name="penyebab_fluktuasi"
+                  value={formData.penyebab_fluktuasi}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Dampak Fluktuasi
+                </label>
+                <textarea
+                  name="dampak_fluktuasi"
+                  value={formData.dampak_fluktuasi}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Analisis Harga
+                </label>
+                <textarea
+                  name="analisis_harga"
+                  value={formData.analisis_harga}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Prediksi Harga
+                </label>
+                <textarea
+                  name="prediksi_harga"
+                  value={formData.prediksi_harga}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </>
+          )}
+
+          {formData.jenis_layanan_harga === "Rekomendasi Stabilisasi" && (
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rekomendasi Stabilisasi
+              </label>
+              <textarea
+                name="rekomendasi_stabilisasi"
+                value={formData.rekomendasi_stabilisasi}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+
+          {formData.jenis_layanan_harga === "Operasi Pasar" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Jenis Operasi Pasar
+                </label>
+                <select
+                  name="jenis_operasi_pasar"
+                  value={formData.jenis_operasi_pasar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Pilih</option>
+                  <option value="Pasar Murah">Pasar Murah</option>
+                  <option value="Subsidi">Subsidi</option>
+                  <option value="Bantuan Langsung">Bantuan Langsung</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tanggal Operasi Pasar
+                </label>
+                <input
+                  type="date"
+                  name="tanggal_operasi_pasar"
+                  value={formData.tanggal_operasi_pasar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Lokasi Operasi Pasar
+                </label>
+                <input
+                  type="text"
+                  name="lokasi_operasi_pasar"
+                  value={formData.lokasi_operasi_pasar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Komoditas Operasi Pasar
+                </label>
+                <textarea
+                  name="komoditas_operasi_pasar"
+                  value={formData.komoditas_operasi_pasar}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Harga Pasar Normal (Rp)
+                </label>
+                <input
+                  type="number"
+                  name="harga_pasar_normal"
+                  value={formData.harga_pasar_normal}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Harga Operasi Pasar (Rp)
+                </label>
+                <input
+                  type="number"
+                  name="harga_operasi_pasar"
+                  value={formData.harga_operasi_pasar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Subsidi per Unit (Rp)
+                </label>
+                <input
+                  type="number"
+                  name="subsidi_per_unit"
+                  value={formData.subsidi_per_unit}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Volume (Ton)
+                </label>
+                <input
+                  type="number"
+                  name="volume_operasi_pasar"
+                  value={formData.volume_operasi_pasar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Jumlah Pembeli
+                </label>
+                <input
+                  type="number"
+                  name="jumlah_pembeli"
+                  value={formData.jumlah_pembeli}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Total Nilai Subsidi (Rp)
+                </label>
+                <input
+                  type="number"
+                  name="total_nilai_subsidi"
+                  value={formData.total_nilai_subsidi}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sumber Anggaran
+                </label>
+                <input
+                  type="text"
+                  name="sumber_anggaran"
+                  value={formData.sumber_anggaran}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </>
+          )}
+
+          {formData.jenis_layanan_harga === "Koordinasi TPID" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tanggal Rapat TPID
+                </label>
+                <input
+                  type="date"
+                  name="tanggal_rapat_tpid"
+                  value={formData.tanggal_rapat_tpid}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tempat Rapat
+                </label>
+                <input
+                  type="text"
+                  name="tempat_rapat_tpid"
+                  value={formData.tempat_rapat_tpid}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Peserta TPID
+                </label>
+                <textarea
+                  name="peserta_tpid"
+                  value={formData.peserta_tpid}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Agenda TPID
+                </label>
+                <textarea
+                  name="agenda_tpid"
+                  value={formData.agenda_tpid}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hasil Rapat TPID
+                </label>
+                <textarea
+                  name="hasil_rapat_tpid"
+                  value={formData.hasil_rapat_tpid}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rekomendasi TPID
+                </label>
+                <textarea
+                  name="rekomendasi_tpid"
+                  value={formData.rekomendasi_tpid}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tindak Lanjut TPID
+                </label>
+                <textarea
+                  name="tindak_lanjut_tpid"
+                  value={formData.tindak_lanjut_tpid}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Inflasi Pangan (%)
+                </label>
+                <input
+                  type="number"
+                  name="inflasi_pangan"
+                  value={formData.inflasi_pangan}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Target TPID (%)
+                </label>
+                <input
+                  type="number"
+                  name="target_inflasi_tpid"
+                  value={formData.target_inflasi_tpid}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status Inflasi
+                </label>
+                <select
+                  name="status_inflasi"
+                  value={formData.status_inflasi}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Pilih</option>
+                  <option value="On Target">On Target</option>
+                  <option value="Warning">Warning</option>
+                  <option value="Alert">Alert</option>
+                </select>
+              </div>
+            </>
+          )}
 
           {/* Keterangan */}
           <div className="md:col-span-2">

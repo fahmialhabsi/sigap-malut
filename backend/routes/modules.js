@@ -80,4 +80,34 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:moduleId", async (req, res) => {
+  try {
+    const moduleId = String(req.params.moduleId || "").toUpperCase();
+    const modules = await loadModules();
+
+    const moduleItem = modules.find(
+      (row) => String(row.modul_id || "").toUpperCase() === moduleId,
+    );
+
+    if (!moduleItem || !moduleItem.is_active) {
+      return res.status(404).json({
+        success: false,
+        message: "Modul tidak ditemukan",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: moduleItem,
+    });
+  } catch (error) {
+    console.error("Error reading module detail:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal membaca detail modul",
+      error: error.message,
+    });
+  }
+});
+
 export default router;

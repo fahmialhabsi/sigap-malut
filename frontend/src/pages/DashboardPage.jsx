@@ -1,141 +1,192 @@
+import Badge from "../components/ui/Badge";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Section from "../components/ui/Section";
+import Stat from "../components/ui/Stat";
+
 export default function DashboardPage() {
   return (
-    <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Dashboard Overview
-      </h2>
+    <div className="space-y-8">
+      <Section
+        eyebrow="Ringkasan Eksekutif"
+        title="Dashboard Kendali SIGAP Malut"
+        subtitle="Pantau indikator kinerja utama, alur koordinasi, serta kesiapan data lintas bidang untuk keputusan cepat."
+        actions={
+          <>
+            <span className="rounded-full border border-slate-200 bg-accentSoft px-3 py-1 text-xs font-semibold text-accentDark">
+              Hub Data Sekretariat
+            </span>
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+              190+ Modul
+            </span>
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+              Update harian
+            </span>
+          </>
+        }
+      />
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-500">Total Surat</p>
-              <p className="text-2xl font-bold text-gray-800">4</p>
-            </div>
-          </div>
-        </div>
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {[
+          {
+            label: "Surat Masuk",
+            value: "4",
+            note: "Tertata",
+            tone: "bg-accentSoft text-accentDark",
+          },
+          {
+            label: "Harga Pangan",
+            value: "5",
+            note: "On Target",
+            tone: "bg-amber-50 text-warning",
+          },
+          {
+            label: "Komoditas",
+            value: "14",
+            note: "Satu sumber",
+            tone: "bg-slate-100 text-slate-600",
+          },
+          {
+            label: "Pengguna Aktif",
+            value: "15",
+            note: "Terkontrol",
+            tone: "bg-emerald-50 text-emerald-700",
+          },
+        ].map((card) => (
+          <Card
+            key={card.label}
+            title={card.label}
+            value={card.value}
+            note={card.note}
+            tone={card.tone}
+          />
+        ))}
+      </section>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 bg-green-500 rounded-md p-3">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-500">Data Harga</p>
-              <p className="text-2xl font-bold text-gray-800">5</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-500">Komoditas</p>
-              <p className="text-2xl font-bold text-gray-800">14</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-500">Users</p>
-              <p className="text-2xl font-bold text-gray-800">15</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Success Message */}
-      <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-lg">
-        <div className="flex items-center">
-          <div className="flex-shrink-0">
-            <svg
-              className="h-6 w-6 text-green-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <h3 className="text-lg font-semibold text-green-800">
-              🎉 SIGAP Malut Full Stack Ready!
+      <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-ink">
+              Alert Prioritas Minggu Ini
             </h3>
-            <p className="text-green-700 mt-1">
-              Backend connected, authentication working, 38 modules available in
-              sidebar
-            </p>
-            <p className="text-sm text-green-600 mt-2">
-              Click any module in sidebar to view data →
-            </p>
+            <span className="text-xs text-muted">3 kasus</span>
+          </div>
+          <div className="mt-4 space-y-4">
+            {[
+              {
+                title: "KGB Terlambat",
+                desc: "1 pegawai melewati tenggat 30 hari.",
+                status: "Kritis",
+                tone: "bg-red-50 text-danger",
+              },
+              {
+                title: "Compliance Koordinasi",
+                desc: "2 bypass terdeteksi pada alur Sekretariat.",
+                status: "Warning",
+                tone: "bg-amber-50 text-warning",
+              },
+              {
+                title: "Inflasi Mendekati Target",
+                desc: "Harga cabai naik 5% minggu ini.",
+                status: "Monitor",
+                tone: "bg-slate-100 text-slate-600",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="flex items-start gap-4 rounded-xl border border-slate-200 px-4 py-3"
+              >
+                <Badge tone={item.tone}>{item.status}</Badge>
+                <div>
+                  <p className="text-sm font-semibold text-ink">{item.title}</p>
+                  <p className="text-xs text-muted">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+          <h3 className="text-lg font-semibold text-ink">Akses Cepat</h3>
+          <p className="mt-1 text-sm text-muted">
+            Jalur cepat ke modul prioritas hari ini.
+          </p>
+          <div className="mt-5 grid gap-3">
+            {[
+              "Dashboard Inflasi",
+              "Ringkasan Kepegawaian",
+              "Laporan Distribusi",
+              "Data SPPG",
+              "Portal Publik",
+            ].map((label) => (
+              <Button key={label} className="w-full justify-between">
+                <span>{label}</span>
+                <span className="text-muted">-&gt;</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+          <h3 className="text-lg font-semibold text-ink">Kinerja Bulanan</h3>
+          <p className="mt-1 text-sm text-muted">
+            Perbandingan capaian KPI lintas bidang.
+          </p>
+          <div className="mt-6 space-y-4">
+            {[
+              { label: "Sekretariat", value: "84%" },
+              { label: "Ketersediaan", value: "78%" },
+              { label: "Distribusi", value: "81%" },
+              { label: "Konsumsi", value: "76%" },
+            ].map((item) => (
+              <div key={item.label}>
+                <Stat label={item.label} value={item.value} />
+                <div className="mt-2 h-2 rounded-full bg-slate-100">
+                  <div
+                    className="h-2 rounded-full bg-accent"
+                    style={{ width: item.value }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+          <h3 className="text-lg font-semibold text-ink">
+            Ringkasan Laporan Strategis
+          </h3>
+          <p className="mt-1 text-sm text-muted">
+            Dashboard untuk Kepala Dinas dan Gubernur.
+          </p>
+          <div className="mt-6 grid gap-4">
+            {[
+              {
+                title: "Laporan Inflasi",
+                desc: "Siap untuk rapat TPID minggu ini.",
+              },
+              {
+                title: "Rekap SPPG",
+                desc: "Data valid 100% untuk pelaporan nasional.",
+              },
+              {
+                title: "Kinerja Bidang",
+                desc: "Ringkasan KPI bulanan sudah tersusun.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-xl border border-slate-200 px-4 py-3"
+              >
+                <p className="text-sm font-semibold text-ink">{item.title}</p>
+                <p className="text-xs text-muted">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

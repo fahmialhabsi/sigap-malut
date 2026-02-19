@@ -172,4 +172,32 @@ Berikan dalam format JSON:
   }
 }
 
-export default new AIService();
+// Handler untuk upload dokumen ke AI Chatbot
+export async function handleChatbotUpload(file, metadata) {
+  // file: isi dokumen/surat (string)
+  // metadata: info tambahan (pengirim, tanggal, dsb)
+  // 1. Klasifikasi dokumen
+  const classificationResult = await aiService.classifySurat(file);
+  // 2. Routing ke modul yang tepat
+  // Simulasi routing: pilih modul berdasarkan jenis_naskah
+  let modul = "SEK-ADM";
+  if (classificationResult.success && classificationResult.classification) {
+    const jenis = classificationResult.classification.jenis_naskah;
+    if (jenis === "Surat Masuk") modul = "SEK-ADM";
+    else if (jenis === "SK") modul = "SEK-KEP";
+    // Tambah logika lain sesuai kebutuhan
+  }
+  // 3. Ekstraksi data penting
+  const extracted = classificationResult.classification || {};
+  // 4. Notifikasi ke penanggung jawab (simulasi)
+  // TODO: Integrasi dengan workflowService untuk notifikasi real
+  return {
+    modul,
+    extracted,
+    classificationResult,
+    metadata,
+  };
+}
+
+const aiService = new AIService();
+export default aiService;
