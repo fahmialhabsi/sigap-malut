@@ -6701,3 +6701,40 @@ Semoga SIGAP Malut dapat:
 ✅ Mengembalikan hak-hak pegawai (KGB tepat waktu)
 ✅ Meningkatkan kredibilitas Dinas Pangan
 ✅ Berkontribusi pada ketahanan pangan Maluku Utara
+
+---
+
+# Pengaturan Integrasi Modul, UI/UX, dan Akses Role
+
+## 1. Integrasi Modul & Prinsip 1 Data
+
+- Semua modul wajib saling terintegrasi dan mengimplementasikan prinsip single source of truth (1 data). Backend harus menyediakan API yang mengatur dependensi antar modul, sehingga perubahan data di satu modul otomatis tersedia di modul lain. Frontend harus selalu mengambil data dari API, bukan file statis.
+
+## 2. UI/UX Dashboard Modular
+
+- Sidebar menggunakan kategori collapsible (expand/collapse per bidang).
+- Tambahkan floating action button (FAB) untuk tambah data, selalu muncul di pojok bawah layar.
+- Gunakan sticky header untuk tombol utama (tambah data, filter, search) agar selalu terlihat saat scroll.
+- Modul ditampilkan dalam grid/card, bukan list panjang, agar lebih compact.
+- Sidebar dan modul grid responsif, bisa collapse dan menyesuaikan layar.
+- Fitur "favorite" atau "recent" modul untuk akses cepat.
+
+## 3. Pengaturan Akses Modul Berdasarkan Role
+
+- Role fungsional keuangan, bendahara, pelaksana keuangan: hanya modul keuangan.
+- Kasubbag Umum & Kepegawaian: hanya modul administrasi & kepegawaian.
+- Fungsional perencana: hanya modul perencanaan.
+- Kepala bidang/UPTD: semua modul bidangnya.
+- Sekretaris: semua modul Sekretariat.
+- Sidebar dinamis: hanya tampilkan modul sesuai role dan unit_kerja.
+- Navigasi antar modul menggunakan dropdown/tab, bukan list panjang.
+
+## 4. Best Practice UI/UX Dashboard
+
+- Sidebar dengan icon dan nama singkat, expandable untuk detail.
+- Modul grid dengan search/filter di atas.
+- Floating action button (FAB) untuk tambah data, sticky di pojok bawah.
+- Sticky header untuk filter, search, dan tombol utama.
+- Breadcrumbs untuk navigasi.
+
+Pengaturan ini menjadi acuan resmi pengembangan dan penyesuaian sistem SIGAP Malut ke depan.

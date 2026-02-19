@@ -1,7 +1,35 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
+import { Children, isValidElement } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import * as HeroIcons from "@heroicons/react/outline";
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+
+// ...existing code...
+
+// Mapping role ke kategori modul yang boleh diakses
+const roleModuleAccess = {
+  super_admin: [
+    "Sekretariat",
+    "Bidang Ketersediaan",
+    "Bidang Distribusi",
+    "Bidang Konsumsi",
+    "UPTD",
+  ],
+  sekretaris: ["Sekretariat"],
+  kepala_bidang: [
+    "Bidang Ketersediaan",
+    "Bidang Distribusi",
+    "Bidang Konsumsi",
+  ],
+  kepala_uptd: ["UPTD"],
+  kasubbag_umum: ["Sekretariat"],
+  kasubbag_kepegawaian: ["Sekretariat"],
+  fungsional_perencana: ["Sekretariat"],
+  bendahara: ["Sekretariat:Keuangan"],
+  fungsional_keuangan: ["Sekretariat:Keuangan"],
+  pelaksana_keuangan: ["Sekretariat:Keuangan"],
+  // Tambahkan role lain sesuai kebutuhan
+};
 
 const defaultModules = [
   {
@@ -229,102 +257,7 @@ const moduleNameById = {
   SA10: "AI Configuration",
 };
 
-const moduleIconById = {
-  M001: "user-group",
-  M002: "calendar-days",
-  M003: "arrow-trending-up",
-  M004: "trophy",
-  M005: "calendar",
-  M006: "map",
-  M007: "academic-cap",
-  M008: "clipboard-document-check",
-  M009: "folder-open",
-  M010: "archive-box",
-  M011: "inbox-arrow-down",
-  M012: "paper-airplane",
-  M013: "arrow-path",
-  M014: "calendar-days",
-  M015: "document-text",
-  M016: "cube",
-  M017: "truck",
-  M018: "wrench-screwdriver",
-  M019: "arrow-right-circle",
-  M020: "banknotes",
-  M021: "document-chart-bar",
-  M022: "receipt-percent",
-  M023: "chart-pie",
-  M024: "banknotes",
-  M025: "shopping-cart",
-  M026: "building-office",
-  M027: "map",
-  M028: "clipboard-document-list",
-  M029: "building-office-2",
-  M030: "document-chart-bar",
-  M031: "magnifying-glass-chart",
-  M032: "shopping-bag",
-  M033: "chart-bar",
-  M034: "archive-box",
-  M035: "scale",
-  M036: "map-pin",
-  M037: "chart-bar-square",
-  M038: "bell-alert",
-  M039: "exclamation-triangle",
-  M040: "arrows-pointing-out",
-  M041: "chart-bar",
-  M042: "building-storefront",
-  M043: "currency-dollar",
-  M044: "arrow-trending-up",
-  M045: "list-bullet",
-  M046: "presentation-chart-line",
-  M047: "truck",
-  M048: "archive-box-arrow-down",
-  M049: "building-library",
-  M050: "arrow-up-tray",
-  M051: "shopping-cart",
-  M052: "hand-raised",
-  M053: "gift",
-  M054: "users",
-  M055: "chart-pie",
-  M056: "utensils",
-  M057: "chart-bar",
-  M058: "user-group",
-  M059: "truck",
-  M060: "heart",
-  M061: "shield-check",
-  M062: "arrows-pointing-out",
-  M063: "magnifying-glass",
-  M064: "exclamation-circle",
-  M065: "academic-cap",
-  M066: "building-storefront",
-  M067: "hand-raised",
-  M068: "shield-check",
-  M069: "check-badge",
-  M070: "globe-alt",
-  M071: "hand-thumb-up",
-  M072: "clipboard-document-check",
-  M073: "document-plus",
-  M074: "beaker",
-  M075: "test-tube",
-  M076: "virus",
-  M077: "scale",
-  M078: "eye",
-  M079: "cube",
-  M080: "building-office",
-  M081: "chat-bubble-left-right",
-  M082: "globe-alt",
-  M083: "folder-arrow-down",
-  M084: "document-magnifying-glass",
-  SA01: "chart-bar-square",
-  SA02: "puzzle-piece",
-  SA03: "document-text",
-  SA04: "book-open",
-  SA05: "users",
-  SA06: "clipboard-document-list",
-  SA07: "cog-6-tooth",
-  SA08: "cloud-arrow-down",
-  SA09: "shield-check",
-  SA10: "sparkles",
-};
+// moduleIconById dihapus karena tidak digunakan
 
 const toHeroIconComponentName = (iconName) =>
   `${iconName
@@ -360,69 +293,107 @@ export default function DashboardLayout({ children }) {
   const logout = useAuthStore((state) => state.logout);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [expandedCategories, setExpandedCategories] = useState(
-    defaultModules.map((module) => module.category),
-  );
+  // expandedCategories dihapus karena tidak digunakan
+  // State untuk search bar sidebar
+  const [search, setSearch] = useState("");
 
-  // Determine allowed modules for this user
-  const allowedModuleIds = useMemo(() => {
-    if (!user) return [];
-    if (user.role === "super_admin") return null; // null means all allowed
-    // Map unit_kerja to category name in defaultModules
-    // E.g. "Bidang Ketersediaan", "Bidang Distribusi", "Bidang Konsumsi", "UPTD", "Sekretariat"
-    // user.unit_kerja is expected to match one of these
-    // If not, fallback to empty
-    const allowedCategories = [];
-    if (user.unit_kerja) {
-      // Normalize for matching
-      const normalized = user.unit_kerja.trim().toLowerCase();
-      for (const cat of [
-        "Sekretariat",
-        "Bidang Ketersediaan",
-        "Bidang Distribusi",
-        "Bidang Konsumsi",
-        "UPTD",
-      ]) {
-        if (cat.toLowerCase() === normalized) allowedCategories.push(cat);
-      }
+  // Detect if children is a form (very basic: check for form element or prop)
+  const isFormMode = useMemo(() => {
+    if (!children) return false;
+    // If children is a React element and type is 'form' or has a prop 'formMode'
+    if (isValidElement(children)) {
+      if (children.type === "form") return true;
+      if (children.props && children.props.formMode) return true;
     }
-    if (allowedCategories.length === 0) return [];
-    // Collect all module ids for allowed categories
-    let ids = [];
-    for (const cat of allowedCategories) {
-      const group = defaultModules.find((g) => g.category === cat);
-      if (group) {
-        ids = ids.concat(group.items.map((item) => item.id));
-        // Add missingModuleIdsByCategory
-        if (missingModuleIdsByCategory[cat]) {
-          ids = ids.concat(missingModuleIdsByCategory[cat]);
+    // If children is an array, check if any is a form
+    if (Array.isArray(children)) {
+      return children.some(
+        (child) =>
+          isValidElement(child) &&
+          (child.type === "form" || (child.props && child.props.formMode)),
+      );
+    }
+    return false;
+  }, [children]);
+
+  // Group modules for sidebar (sekaligus filtering role)
+  const moduleGroups = useMemo(() => {
+    if (!user) return [];
+    // Dapatkan allowedModuleIds sesuai role
+    let allowedModuleIds = null;
+    if (user.role !== "super_admin") {
+      const allowedCategories = roleModuleAccess[user.role] || [];
+      if (allowedCategories.length === 0 && user.unit_kerja) {
+        const normalized = user.unit_kerja.trim().toLowerCase();
+        for (const cat of [
+          "Sekretariat",
+          "Bidang Ketersediaan",
+          "Bidang Distribusi",
+          "Bidang Konsumsi",
+          "UPTD",
+        ]) {
+          if (cat.toLowerCase() === normalized) allowedCategories.push(cat);
         }
       }
+      if (allowedCategories.length === 0) return [];
+      let ids = [];
+      for (const cat of allowedCategories) {
+        if (cat.startsWith("Sekretariat:")) {
+          const [mainCat] = cat.split(":");
+          const group = defaultModules.find((g) => g.category === mainCat);
+          if (group) {
+            ids = ids.concat(
+              group.items
+                .filter(
+                  (item) =>
+                    item.name.toLowerCase().includes("keuangan") ||
+                    item.name.toLowerCase().includes("anggaran") ||
+                    item.name.toLowerCase().includes("dpa") ||
+                    item.name.toLowerCase().includes("spj") ||
+                    item.name.toLowerCase().includes("belanja") ||
+                    item.name.toLowerCase().includes("realisasi") ||
+                    item.name.toLowerCase().includes("rka") ||
+                    item.name.toLowerCase().includes("renstra") ||
+                    item.name.toLowerCase().includes("renja") ||
+                    item.name.toLowerCase().includes("laporan keuangan") ||
+                    item.name.toLowerCase().includes("monitoring"),
+                )
+                .map((item) => item.id),
+            );
+            if (missingModuleIdsByCategory[mainCat]) {
+              ids = ids.concat(
+                missingModuleIdsByCategory[mainCat].filter((id) => {
+                  const name = moduleNameById[id]?.toLowerCase() || "";
+                  return (
+                    name.includes("keuangan") ||
+                    name.includes("anggaran") ||
+                    name.includes("dpa") ||
+                    name.includes("spj") ||
+                    name.includes("belanja") ||
+                    name.includes("realisasi") ||
+                    name.includes("rka") ||
+                    name.includes("renstra") ||
+                    name.includes("renja") ||
+                    name.includes("laporan keuangan") ||
+                    name.includes("monitoring")
+                  );
+                }),
+              );
+            }
+          }
+        } else {
+          const group = defaultModules.find((g) => g.category === cat);
+          if (group) {
+            ids = ids.concat(group.items.map((item) => item.id));
+            if (missingModuleIdsByCategory[cat]) {
+              ids = ids.concat(missingModuleIdsByCategory[cat]);
+            }
+          }
+        }
+      }
+      allowedModuleIds = ids;
     }
-    return ids;
-  }, [user]);
-
-  const moduleGroups = useMemo(() => {
-    // If super_admin, show all
-    if (!user || user.role === "super_admin") {
-      return defaultModules.map((categoryGroup) => {
-        const existingIds = new Set(categoryGroup.items.map((item) => item.id));
-        const extraItems = (
-          missingModuleIdsByCategory[categoryGroup.category] || []
-        )
-          .filter((id) => !existingIds.has(id))
-          .map((id) => ({
-            id,
-            name: moduleNameById[id] || id,
-            icon: moduleIconById[id] || "📄",
-          }));
-        return {
-          ...categoryGroup,
-          items: [...categoryGroup.items, ...extraItems],
-        };
-      });
-    }
-    // Otherwise, filter modules by allowedModuleIds
+    // Build moduleGroups sesuai allowedModuleIds
     return defaultModules
       .map((categoryGroup) => {
         const existingIds = new Set(categoryGroup.items.map((item) => item.id));
@@ -433,11 +404,11 @@ export default function DashboardLayout({ children }) {
           .map((id) => ({
             id,
             name: moduleNameById[id] || id,
-            icon: moduleIconById[id] || "📄",
+            icon: "📄",
           }));
-        // Filter items by allowedModuleIds
         const allItems = [...categoryGroup.items, ...extraItems].filter(
-          (item) => allowedModuleIds.includes(item.id),
+          (item) =>
+            allowedModuleIds === null || allowedModuleIds.includes(item.id),
         );
         if (allItems.length === 0) return null;
         return {
@@ -446,157 +417,145 @@ export default function DashboardLayout({ children }) {
         };
       })
       .filter(Boolean);
-  }, [user, allowedModuleIds]);
+  }, [user]);
 
-  const toggleCategory = (categoryName) => {
-    setExpandedCategories((prev) =>
-      prev.includes(categoryName)
-        ? prev.filter((name) => name !== categoryName)
-        : [...prev, categoryName],
-    );
-  };
+  // toggleCategory dihapus karena tidak digunakan
 
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
   };
 
+  // Refactor shell layout
   return (
-    <div className="min-h-screen bg-canvas text-ink">
+    <div className="min-h-screen bg-bg text-primary font-inter">
       <div className="flex min-h-screen">
+        {/* Sidebar */}
         <aside
-          className={`${
-            sidebarOpen ? "w-72" : "w-20"
-          } bg-slate-950 text-slate-100 transition-all duration-300 flex flex-col border-r border-slate-900`}
+          className={`transition-all duration-300 flex flex-col border-r border-neutral-300 bg-white shadow-sm ${sidebarOpen ? "w-[260px]" : "w-[64px]"}`}
         >
-          <div className="px-4 py-5 border-b border-slate-900">
-            <div className="flex items-center justify-between">
-              {sidebarOpen && (
-                <div>
-                  <p className="text-xs uppercase tracking-[0.4em] text-slate-400">
-                    SIGAP
-                  </p>
-                  <h1 className="text-lg font-display text-slate-100">
-                    Malut Command
-                  </h1>
-                  <p className="text-xs text-slate-500">Dinas Pangan</p>
-                </div>
-              )}
-              <button
-                onClick={() => setSidebarOpen((prev) => !prev)}
-                className="rounded-full border border-slate-800 bg-slate-900/70 p-2 text-slate-200 transition hover:border-slate-700 hover:text-white"
-              >
-                {sidebarOpen ? "◀" : "▶"}
-              </button>
-            </div>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto px-3 py-4">
-            <Link
-              to="/dashboard"
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
-                location.pathname === "/dashboard"
-                  ? "bg-accent text-white shadow-soft-sm"
-                  : "text-slate-200 hover:bg-slate-900/60"
-              }`}
-            >
-              <span className="text-base">🏠</span>
-              {sidebarOpen && <span>Dashboard</span>}
-            </Link>
-
-            {moduleGroups.map((category) => (
-              <div key={category.category} className="mt-5">
-                <button
-                  onClick={() => toggleCategory(category.category)}
-                  className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 transition hover:bg-slate-900/40"
-                >
-                  {sidebarOpen ? (
-                    <>
-                      <span>{category.category}</span>
-                      <span className="flex items-center gap-2">
-                        <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-200">
-                          {category.items.length}
-                        </span>
-                        <span>
-                          {expandedCategories.includes(category.category)
-                            ? "▼"
-                            : "▶"}
-                        </span>
-                      </span>
-                    </>
-                  ) : (
-                    <span className="mx-auto">●</span>
-                  )}
-                </button>
-
-                {expandedCategories.includes(category.category) && (
-                  <div className="ml-2 mt-2 space-y-1">
-                    {category.items.map((item) => {
-                      if (item.id === "CHATBOT") {
-                        return (
-                          <Link
-                            key={item.id}
-                            to="/chatbot-upload"
-                            className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
-                              location.pathname === "/chatbot-upload"
-                                ? "bg-slate-100 text-slate-900"
-                                : "text-slate-300 hover:bg-slate-900/70"
-                            }`}
-                          >
-                            <span className="text-base">
-                              {renderModuleIcon(item.icon)}
-                            </span>
-                            {sidebarOpen && <span>{item.name}</span>}
-                          </Link>
-                        );
-                      } else {
-                        return (
-                          <Link
-                            key={item.id}
-                            to={`/module/${item.id.toLowerCase()}`}
-                            className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
-                              location.pathname ===
-                              `/module/${item.id.toLowerCase()}`
-                                ? "bg-slate-100 text-slate-900"
-                                : "text-slate-300 hover:bg-slate-900/70"
-                            }`}
-                          >
-                            <span className="text-base">
-                              {renderModuleIcon(item.icon)}
-                            </span>
-                            {sidebarOpen && <span>{item.name}</span>}
-                          </Link>
-                        );
-                      }
-                    })}
-                  </div>
-                )}
+          <div className="px-4 py-5 border-b border-neutral-300 flex items-center justify-between">
+            {sidebarOpen ? (
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-muted">
+                  SIGAP
+                </p>
+                <h1 className="text-lg font-display text-primary">
+                  Malut Command
+                </h1>
+                <p className="text-xs text-muted">Dinas Pangan</p>
               </div>
-            ))}
+            ) : (
+              <span className="text-xl font-bold text-primary">S</span>
+            )}
+            <button
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              className="rounded-full border border-neutral-300 bg-bg p-2 text-primary transition hover:border-primary hover:text-primary"
+              title="Toggle Sidebar"
+            >
+              {sidebarOpen ? "◀" : "▶"}
+            </button>
+          </div>
+          {/* Sidebar nav */}
+          <nav className="flex-1 overflow-y-auto px-2 py-4">
+            <div className="mb-3 flex items-center gap-2">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Cari modul..."
+                className="w-full px-3 py-2 rounded bg-neutral-300 text-primary placeholder:text-muted border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              {moduleGroups
+                .map((category) => {
+                  const filteredItems =
+                    search.trim() === ""
+                      ? category.items
+                      : category.items.filter((item) =>
+                          item.name
+                            .toLowerCase()
+                            .includes(search.trim().toLowerCase()),
+                        );
+                  if (filteredItems.length === 0) return null;
+                  return (
+                    <div key={category.category} className="mt-2">
+                      <div className="font-bold text-xs uppercase text-muted mb-1 flex items-center gap-2">
+                        {renderModuleIcon(filteredItems[0]?.icon)}
+                        {sidebarOpen && category.category}
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        {filteredItems.map((item) => (
+                          <Link
+                            key={item.id}
+                            to={
+                              item.id === "CHATBOT"
+                                ? "/chatbot-upload"
+                                : `/module/${item.id.toLowerCase()}`
+                            }
+                            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
+                              location.pathname ===
+                              (item.id === "CHATBOT"
+                                ? "/chatbot-upload"
+                                : `/module/${item.id.toLowerCase()}`)
+                                ? "bg-primary text-white shadow"
+                                : "text-primary hover:bg-neutral-200"
+                            }`}
+                            aria-label={item.name}
+                          >
+                            <span className="text-base">
+                              {renderModuleIcon(item.icon)}
+                            </span>
+                            {sidebarOpen && (
+                              <span className="truncate font-medium">
+                                {item.name}
+                              </span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+                .filter(Boolean)}
+            </div>
+            {/* Floating Action Button (FAB) */}
+            <button
+              className="fixed bottom-8 right-8 z-50 bg-primary hover:bg-primary-600 text-white rounded-full shadow-lg p-4 flex items-center gap-2 transition"
+              title="Tambah Data Baru"
+              onClick={() => {
+                navigate("/module/tambah");
+              }}
+              style={{ boxShadow: "0 4px 24px 0 rgba(24, 144, 255, 0.2)" }}
+            >
+              <span className="text-xl">＋</span>
+              <span className="hidden md:inline">Tambah Data</span>
+            </button>
           </nav>
-
           {sidebarOpen && (
-            <div className="px-4 py-4 border-t border-slate-900">
+            <div className="px-4 py-4 border-t border-neutral-300">
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-100 truncate">
+                <p className="text-sm font-semibold text-primary truncate">
                   {user?.nama_lengkap || "User"}
                 </p>
-                <p className="text-xs text-slate-400 truncate">
+                <p className="text-xs text-muted truncate">
                   {user?.role || "role"}
                 </p>
               </div>
             </div>
           )}
         </aside>
-
+        {/* Main content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/80 backdrop-blur">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          {/* Topbar */}
+          <header className="sticky top-0 z-10 border-b border-neutral-300 bg-white/80 backdrop-blur">
+            <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-muted">
                   SIGAP Malut
                 </p>
-                <h2 className="text-2xl font-display text-ink">
+                <h2 className="text-2xl font-display text-primary">
                   {location.pathname === "/dashboard"
                     ? "Dashboard Eksekutif"
                     : "Ruang Kerja Modul"}
@@ -606,16 +565,16 @@ export default function DashboardLayout({ children }) {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-muted shadow-soft-sm md:flex">
+                <div className="items-center gap-2 rounded-full border border-neutral-300 bg-white px-3 py-2 text-sm text-muted shadow-soft-sm hidden md:flex">
                   <span>Cari</span>
                   <input
                     type="text"
                     placeholder="modul, laporan, atau data"
-                    className="w-56 bg-transparent text-sm text-ink outline-none placeholder:text-muted"
+                    className="w-56 bg-transparent text-sm text-primary outline-none placeholder:text-muted"
                   />
                 </div>
-                <div className="hidden flex-col items-end text-right sm:flex">
-                  <span className="text-sm font-semibold text-ink">
+                <div className="flex-col items-end text-right hidden sm:flex">
+                  <span className="text-sm font-semibold text-primary">
                     {user?.nama_lengkap || "User"}
                   </span>
                   <span className="text-xs text-muted">
@@ -624,16 +583,165 @@ export default function DashboardLayout({ children }) {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                  className="rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-neutral-300"
                 >
                   Logout
                 </button>
               </div>
             </div>
           </header>
-
-          <main className="flex-1 overflow-y-auto px-6 py-6">
-            <div className="mx-auto max-w-7xl">{children}</div>
+          {/* Main grid content */}
+          <main className="flex-1 overflow-y-auto px-8 py-8">
+            {isFormMode ? (
+              <div className="mx-auto max-w-3xl bg-white rounded-xl shadow p-8">
+                {children}
+              </div>
+            ) : (
+              <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-8">
+                {/* Panel Ringkasan Eksekutif & Alert */}
+                <div className="md:col-span-8 col-span-1 flex flex-col gap-6">
+                  {/* Children (panel dinamis) */}
+                  <div>{children}</div>
+                  {/* Ringkasan Eksekutif */}
+                  <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-2">
+                    <h3 className="text-lg font-bold mb-2">
+                      Ringkasan Eksekutif
+                    </h3>
+                    <p className="text-sm text-muted mb-2">
+                      Dashboard Kendali SIGAP Malut
+                      <br />
+                      Pantau indikator kinerja utama, alur koordinasi, serta
+                      kesiapan data lintas bidang untuk keputusan cepat.
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">190+</span>
+                        <span className="text-xs text-muted">Modul</span>
+                      </div>
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">4</span>
+                        <span className="text-xs text-muted">Surat Masuk</span>
+                      </div>
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">5</span>
+                        <span className="text-xs text-muted">Surat Keluar</span>
+                      </div>
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">14</span>
+                        <span className="text-xs text-muted">Komoditas</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">15</span>
+                        <span className="text-xs text-muted">
+                          Pengguna Aktif
+                        </span>
+                      </div>
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">3 kasus</span>
+                        <span className="text-xs text-muted">
+                          Alert Prioritas
+                        </span>
+                      </div>
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">Kritis</span>
+                        <span className="text-xs text-muted">
+                          KGB Terlambat
+                        </span>
+                      </div>
+                      <div className="bg-neutral-100 rounded-lg p-4 flex flex-col items-center">
+                        <span className="text-2xl font-bold">Warning</span>
+                        <span className="text-xs text-muted">
+                          Compliance Koordinasi
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Alert Prioritas Minggu Ini */}
+                  <div className="bg-red-50 border-l-4 border-red-400 rounded-xl p-4 flex flex-col gap-1">
+                    <div className="font-bold text-red-700">
+                      Alert Prioritas Minggu Ini
+                    </div>
+                    <div className="text-sm text-red-800">
+                      1 pegawai melewati tenggat 30 hari.
+                    </div>
+                    <div className="text-xs text-red-600">
+                      2 bypass terdeteksi pada alur Sekretariat.
+                    </div>
+                    <div className="text-xs text-orange-600">
+                      Harga cabai naik 5% minggu ini.
+                    </div>
+                  </div>
+                  {/* Akses Cepat */}
+                  <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-2">
+                    <div className="font-bold mb-2">Akses Cepat</div>
+                    <div className="flex flex-wrap gap-2">
+                      <button className="bg-white text-primary border border-primary rounded px-4 py-2 text-xs font-semibold shadow hover:bg-primary hover:text-white transition">
+                        Dashboard Inflasi
+                      </button>
+                      <button className="bg-white text-primary border border-primary rounded px-4 py-2 text-xs font-semibold shadow hover:bg-primary hover:text-white transition">
+                        Ringkasan Kepegawaian
+                      </button>
+                      <button className="bg-white text-primary border border-primary rounded px-4 py-2 text-xs font-semibold shadow hover:bg-primary hover:text-white transition">
+                        Laporan Distribusi
+                      </button>
+                      <button className="bg-white text-primary border border-primary rounded px-4 py-2 text-xs font-semibold shadow hover:bg-primary hover:text-white transition">
+                        Data SPPG
+                      </button>
+                      <button className="bg-white text-primary border border-primary rounded px-4 py-2 text-xs font-semibold shadow hover:bg-primary hover:text-white transition">
+                        Portal Publik
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {/* Panel Kinerja Bulanan & Ringkasan Laporan Strategis */}
+                <div className="md:col-span-4 col-span-1 flex flex-col gap-6">
+                  {/* Kinerja Bulanan */}
+                  <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-2">
+                    <div className="font-bold mb-2">Kinerja Bulanan</div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span>Sekretariat</span>
+                        <span className="font-bold text-green-600">84%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Ketersediaan</span>
+                        <span className="font-bold text-green-600">78%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Distribusi</span>
+                        <span className="font-bold text-green-600">81%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Konsumsi</span>
+                        <span className="font-bold text-green-600">76%</span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Ringkasan Laporan Strategis */}
+                  <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-2">
+                    <div className="font-bold mb-2">
+                      Ringkasan Laporan Strategis
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div>
+                        <span className="font-semibold">Laporan Inflasi:</span>{" "}
+                        Siap untuk rapat TPID minggu ini.
+                      </div>
+                      <div>
+                        <span className="font-semibold">Rekap SPPG:</span> Data
+                        valid 100% untuk pelaporan nasional.
+                      </div>
+                      <div>
+                        <span className="font-semibold">Kinerja Bidang:</span>{" "}
+                        Ringkasan KPI bulanan sudah tersusun.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </main>
         </div>
       </div>
