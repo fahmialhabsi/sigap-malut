@@ -1,12 +1,14 @@
 import User from "../models/User.js";
 import sequelize from "../config/database.js"; // ← TAMBAHKAN INI
 import { Op } from "sequelize"; // ← TAMBAHKAN INI
+
 import {
   hashPassword,
   comparePassword,
   validatePassword,
 } from "../config/auth.js";
 import { generateToken, generateRefreshToken } from "../middleware/auth.js";
+import { logAudit } from "../services/auditLogService.js";
 
 // @desc    Register new user
 // @route   POST /api/auth/register
@@ -65,6 +67,16 @@ export const register = async (req, res) => {
       nip,
       jabatan,
       is_verified: true,
+    });
+
+    // Audit trail
+    await logAudit({
+      modul: "AUTH",
+      entitas_id: user.id,
+      aksi: "REGISTER",
+      data_lama: null,
+      data_baru: user,
+      pegawai_id: user.id,
     });
 
     // Generate tokens
@@ -173,6 +185,16 @@ export const login = async (req, res) => {
     const token = generateToken(user);
     const refreshToken = generateRefreshToken(user);
 
+    // Audit trail
+    await logAudit({
+      modul: "AUTH",
+      entitas_id: user.id,
+      aksi: "LOGIN",
+      data_lama: null,
+      data_baru: user,
+      pegawai_id: user.id,
+    });
+
     res.json({
       success: true,
       message: "Login berhasil",
@@ -265,6 +287,16 @@ export const changePassword = async (req, res) => {
     // Hash and save new password
     user.password = await hashPassword(new_password);
     await user.save();
+
+    // Audit trail
+    await logAudit({
+      modul: "AUTH",
+      entitas_id: user.id,
+      aksi: "CHANGE_PASSWORD",
+      data_lama: null,
+      data_baru: null,
+      pegawai_id: user.id,
+    });
 
     res.json({
       success: true,

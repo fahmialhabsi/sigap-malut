@@ -1,10 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
 export default function BDSCPDCreatePage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [existingRecords, setExistingRecords] = useState([]);
+  // Fetch all existing records for duplicate check
+  useEffect(() => {
+    api
+      .get("/bds-cpd")
+      .then((res) => {
+        if (res.data && res.data.data) setExistingRecords(res.data.data);
+      })
+      .catch(() => {});
+  }, []);
 
   const layananMap = {
     Perencanaan: "LY092",
@@ -41,6 +51,20 @@ export default function BDSCPDCreatePage() {
       if (!user || !user.id) {
         alert("Session expired. Silakan login ulang.");
         navigate("/login");
+        return;
+      }
+
+      // Prevent duplicate: periode + jenis_layanan_cppd
+      const isDuplicate = existingRecords.some(
+        (rec) =>
+          rec.periode === formData.periode &&
+          rec.jenis_layanan_cppd === formData.jenis_layanan_cppd,
+      );
+      if (isDuplicate) {
+        alert(
+          "Data untuk periode dan jenis layanan ini sudah ada di modul lain. Tidak boleh duplikasi!",
+        );
+        setLoading(false);
         return;
       }
 

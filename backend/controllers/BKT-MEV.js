@@ -4,7 +4,8 @@
 // Generated: 2026-02-17T19:24:48.402Z
 // =====================================================
 
-import BktMev from '../models/BKT-MEV.js';
+import BktMev from "../models/BKT-MEV.js";
+import { logAudit } from "../services/auditLogService.js";
 
 // @desc    Get all BktMev records
 // @route   GET /api/bkt-mev
@@ -12,18 +13,18 @@ import BktMev from '../models/BKT-MEV.js';
 export const getAllBktMev = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-    
+
     const offset = (page - 1) * limit;
-    
+
     const where = { ...filters };
-    
+
     const { count, rows } = await BktMev.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['created_at', 'DESC']]
+      order: [["created_at", "DESC"]],
     });
-    
+
     res.json({
       success: true,
       data: rows,
@@ -31,14 +32,14 @@ export const getAllBktMev = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit)
-      }
+        totalPages: Math.ceil(count / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching BktMev',
-      error: error.message
+      message: "Error fetching BktMev",
+      error: error.message,
     });
   }
 };
@@ -49,23 +50,23 @@ export const getAllBktMev = async (req, res) => {
 export const getBktMevById = async (req, res) => {
   try {
     const record = await BktMev.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'BktMev not found'
+        message: "BktMev not found",
       });
     }
-    
+
     res.json({
       success: true,
-      data: record
+      data: record,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching BktMev',
-      error: error.message
+      message: "Error fetching BktMev",
+      error: error.message,
     });
   }
 };
@@ -77,19 +78,26 @@ export const createBktMev = async (req, res) => {
   try {
     const record = await BktMev.create({
       ...req.body,
-      created_by: req.user?.id
+      created_by: req.user?.id,
     });
-    
+    await logAudit({
+      modul: "BKT-MEV",
+      entitas_id: record.id,
+      aksi: "CREATE",
+      data_lama: null,
+      data_baru: record,
+      pegawai_id: req.user?.id || null,
+    });
     res.status(201).json({
       success: true,
-      message: 'BktMev created successfully',
-      data: record
+      message: "BktMev created successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error creating BktMev',
-      error: error.message
+      message: "Error creating BktMev",
+      error: error.message,
     });
   }
 };
@@ -100,29 +108,35 @@ export const createBktMev = async (req, res) => {
 export const updateBktMev = async (req, res) => {
   try {
     const record = await BktMev.findByPk(req.params.id);
-    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'BktMev not found'
+        message: "BktMev not found",
       });
     }
-    
+    const dataLama = { ...record.get() };
     await record.update({
       ...req.body,
-      updated_by: req.user?.id
+      updated_by: req.user?.id,
     });
-    
+    await logAudit({
+      modul: "BKT-MEV",
+      entitas_id: record.id,
+      aksi: "UPDATE",
+      data_lama: dataLama,
+      data_baru: record,
+      pegawai_id: req.user?.id || null,
+    });
     res.json({
       success: true,
-      message: 'BktMev updated successfully',
-      data: record
+      message: "BktMev updated successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error updating BktMev',
-      error: error.message
+      message: "Error updating BktMev",
+      error: error.message,
     });
   }
 };
@@ -133,25 +147,31 @@ export const updateBktMev = async (req, res) => {
 export const deleteBktMev = async (req, res) => {
   try {
     const record = await BktMev.findByPk(req.params.id);
-    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'BktMev not found'
+        message: "BktMev not found",
       });
     }
-    
+    const dataLama = { ...record.get() };
     await record.destroy();
-    
+    await logAudit({
+      modul: "BKT-MEV",
+      entitas_id: req.params.id,
+      aksi: "DELETE",
+      data_lama: dataLama,
+      data_baru: null,
+      pegawai_id: req.user?.id || null,
+    });
     res.json({
       success: true,
-      message: 'BktMev deleted successfully'
+      message: "BktMev deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting BktMev',
-      error: error.message
+      message: "Error deleting BktMev",
+      error: error.message,
     });
   }
 };
