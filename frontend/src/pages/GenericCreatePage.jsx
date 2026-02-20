@@ -5,7 +5,7 @@ import api from "../utils/api";
 import React from "react";
 
 export default function GenericCreatePage() {
-  const { modul_id } = useParams();
+  const { moduleId } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ export default function GenericCreatePage() {
     setError("");
 
     try {
-      const moduleResponse = await api.get(`/modules/${modul_id}`);
+      const moduleResponse = await api.get(`/modules/${moduleId}`);
       const moduleData = moduleResponse.data?.data;
 
       if (!moduleData?.tabel_name) {
@@ -54,15 +54,15 @@ export default function GenericCreatePage() {
     } finally {
       setLoading(false);
     }
-  }, [modul_id]);
+  }, [moduleId]);
 
   useEffect(() => {
     loadFormConfig();
   }, [loadFormConfig]);
 
   const normalizedModuleId = useMemo(
-    () => String(modul_id || "").toLowerCase(),
-    [modul_id],
+    () => String(moduleId || "").toLowerCase(),
+    [moduleId],
   );
 
   const handleChange = (name, value) => {
