@@ -287,6 +287,8 @@ const renderModuleIcon = (iconValue) => {
 
 export default function DashboardLayout({ children }) {
   const location = useLocation();
+  // Hide sidebar if on main dashboard
+  const isMainDashboard = location.pathname === "/";
   const navigate = useNavigate();
 
   const user = useAuthStore((state) => state.user);
@@ -430,123 +432,124 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="min-h-screen bg-bg text-primary font-inter">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <aside
-          className={`transition-all duration-300 flex flex-col border-r border-neutral-300 bg-white shadow-sm ${sidebarOpen ? "w-[260px]" : "w-[64px]"}`}
-        >
-          <div className="px-4 py-5 border-b border-neutral-300 flex items-center justify-between">
-            {sidebarOpen ? (
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-muted">
-                  SIGAP
-                </p>
-                <h1 className="text-lg font-display text-primary">
-                  Malut Command
-                </h1>
-                <p className="text-xs text-muted">Dinas Pangan</p>
-              </div>
-            ) : (
-              <span className="text-xl font-bold text-primary">S</span>
-            )}
-            <button
-              onClick={() => setSidebarOpen((prev) => !prev)}
-              className="rounded-full border border-neutral-300 bg-bg p-2 text-primary transition hover:border-primary hover:text-primary"
-              title="Toggle Sidebar"
-            >
-              {sidebarOpen ? "◀" : "▶"}
-            </button>
-          </div>
-          {/* Sidebar nav */}
-          <nav className="flex-1 overflow-y-auto px-2 py-4">
-            <div className="mb-3 flex items-center gap-2">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari modul..."
-                className="w-full px-3 py-2 rounded bg-neutral-300 text-primary placeholder:text-muted border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
+        {/* Sidebar hanya tampil jika bukan dashboard utama */}
+        {!isMainDashboard && (
+          <aside
+            className={`transition-all duration-300 flex flex-col border-r border-neutral-300 bg-white shadow-sm w-[260px]`}
+          >
+            <div className="px-4 py-5 border-b border-neutral-300 flex items-center justify-between">
+              {sidebarOpen ? (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.4em] text-muted">
+                    SIGAP
+                  </p>
+                  <h1 className="text-lg font-display text-primary">
+                    Malut Command
+                  </h1>
+                  <p className="text-xs text-muted">Dinas Pangan</p>
+                </div>
+              ) : (
+                <span className="text-xl font-bold text-primary">S</span>
+              )}
+              <button
+                onClick={() => setSidebarOpen((prev) => !prev)}
+                className="rounded-full border border-neutral-300 bg-bg p-2 text-primary transition hover:border-primary hover:text-primary"
+                title="Toggle Sidebar"
+              >
+                {sidebarOpen ? "◀" : "▶"}
+              </button>
             </div>
-            <div className="flex flex-col gap-2">
-              {moduleGroups
-                .map((category) => {
-                  const filteredItems =
-                    search.trim() === ""
-                      ? category.items
-                      : category.items.filter((item) =>
-                          item.name
-                            .toLowerCase()
-                            .includes(search.trim().toLowerCase()),
-                        );
-                  if (filteredItems.length === 0) return null;
-                  return (
-                    <div key={category.category} className="mt-2">
-                      <div className="font-bold text-xs uppercase text-muted mb-1 flex items-center gap-2">
-                        {renderModuleIcon(filteredItems[0]?.icon)}
-                        {sidebarOpen && category.category}
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        {filteredItems.map((item) => (
-                          <Link
-                            key={item.id}
-                            to={
-                              item.id === "CHATBOT"
-                                ? "/chatbot-upload"
-                                : `/module/${item.id.toLowerCase()}`
-                            }
-                            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
-                              location.pathname ===
-                              (item.id === "CHATBOT"
-                                ? "/chatbot-upload"
-                                : `/module/${item.id.toLowerCase()}`)
-                                ? "bg-primary text-white shadow"
-                                : "text-primary hover:bg-neutral-200"
-                            }`}
-                            aria-label={item.name}
-                          >
-                            <span className="text-base">
-                              {renderModuleIcon(item.icon)}
-                            </span>
-                            {sidebarOpen && (
-                              <span className="truncate font-medium">
-                                {item.name}
+            {/* Sidebar nav */}
+            <nav className="flex-1 overflow-y-auto px-2 py-4">
+              <div className="mb-3 flex items-center gap-2">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Cari modul..."
+                  className="w-full px-3 py-2 rounded bg-neutral-300 text-primary placeholder:text-muted border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                {moduleGroups
+                  .map((category) => {
+                    const filteredItems =
+                      search.trim() === ""
+                        ? category.items
+                        : category.items.filter((item) =>
+                            item.name
+                              .toLowerCase()
+                              .includes(search.trim().toLowerCase()),
+                          );
+                    if (filteredItems.length === 0) return null;
+                    return (
+                      <div key={category.category} className="mt-2">
+                        <div className="font-bold text-xs uppercase text-muted mb-1 flex items-center gap-2">
+                          {renderModuleIcon(filteredItems[0]?.icon)}
+                          {sidebarOpen && category.category}
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          {filteredItems.map((item) => (
+                            <Link
+                              key={item.id}
+                              to={
+                                item.id === "CHATBOT"
+                                  ? "/chatbot-upload"
+                                  : `/module/${item.id.toLowerCase()}`
+                              }
+                              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
+                                location.pathname ===
+                                (item.id === "CHATBOT"
+                                  ? "/chatbot-upload"
+                                  : `/module/${item.id.toLowerCase()}`)
+                                  ? "bg-primary text-white shadow"
+                                  : "text-primary hover:bg-neutral-200"
+                              }`}
+                              aria-label={item.name}
+                            >
+                              <span className="text-base">
+                                {renderModuleIcon(item.icon)}
                               </span>
-                            )}
-                          </Link>
-                        ))}
+                              {sidebarOpen && (
+                                <span className="truncate font-medium">
+                                  {item.name}
+                                </span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })
-                .filter(Boolean)}
-            </div>
-            {/* Floating Action Button (FAB) */}
-            <button
-              className="fixed bottom-8 right-8 z-50 bg-primary hover:bg-primary-600 text-white rounded-full shadow-lg p-4 flex items-center gap-2 transition"
-              title="Tambah Data Baru"
-              onClick={() => {
-                navigate("/module/tambah");
-              }}
-              style={{ boxShadow: "0 4px 24px 0 rgba(24, 144, 255, 0.2)" }}
-            >
-              <span className="text-xl">＋</span>
-              <span className="hidden md:inline">Tambah Data</span>
-            </button>
-          </nav>
-          {sidebarOpen && (
-            <div className="px-4 py-4 border-t border-neutral-300">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-primary truncate">
-                  {user?.nama_lengkap || "User"}
-                </p>
-                <p className="text-xs text-muted truncate">
-                  {user?.role || "role"}
-                </p>
+                    );
+                  })
+                  .filter(Boolean)}
               </div>
-            </div>
-          )}
-        </aside>
-        {/* Main content */}
+              {/* Floating Action Button (FAB) */}
+              <button
+                className="fixed bottom-8 right-8 z-50 bg-primary hover:bg-primary-600 text-white rounded-full shadow-lg p-4 flex items-center gap-2 transition"
+                title="Tambah Data Baru"
+                onClick={() => {
+                  navigate("/module/tambah");
+                }}
+                style={{ boxShadow: "0 4px 24px 0 rgba(24, 144, 255, 0.2)" }}
+              >
+                <span className="text-xl">＋</span>
+                <span className="hidden md:inline">Tambah Data</span>
+              </button>
+            </nav>
+            {sidebarOpen && (
+              <div className="px-4 py-4 border-t border-neutral-300">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-primary truncate">
+                    {user?.nama_lengkap || "User"}
+                  </p>
+                  <p className="text-xs text-muted truncate">
+                    {user?.role || "role"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </aside>
+        )}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Topbar */}
           <header className="sticky top-0 z-10 border-b border-neutral-300 bg-white/80 backdrop-blur">

@@ -9,6 +9,13 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import useAuthStore from "./stores/authStore";
 import GeneratedRoutes from "./routes/generatedRoutes";
 import ChatbotUploadPage from "./pages/ChatbotUploadPage";
+import DashboardSekretariat from "./ui/dashboards/DashboardSekretariat";
+import DashboardKetersediaan from "./ui/dashboards/DashboardKetersediaan";
+import DashboardDistribusi from "./ui/dashboards/DashboardDistribusi";
+import DashboardKonsumsi from "./ui/dashboards/DashboardKonsumsi";
+import DashboardUPTD from "./ui/dashboards/DashboardUPTD";
+import LandingPage from "./pages/LandingPage";
+import DashboardSuperAdmin from "./ui/dashboards/DashboardSuperAdmin";
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -38,70 +45,110 @@ function App() {
   }, [initAuth]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <DashboardPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/module/:moduleId/create"
-          element={
-            <PrivateRoute>
-              <GenericCreatePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/module/:moduleId/view/:id"
-          element={
-            <PrivateRoute>
-              <ViewDetailPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/module/:moduleId/edit/:id"
-          element={
-            <PrivateRoute>
-              <EditPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/module/:moduleId/:id"
-          element={
-            <PrivateRoute>
-              <ViewDetailPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/module/:moduleId/:id/edit"
-          element={
-            <PrivateRoute>
-              <EditPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/chatbot-upload"
-          element={
-            <PrivateRoute>
-              <ChatbotUploadPage />
-            </PrivateRoute>
-          }
-        />
-        {GeneratedRoutes({ PrivateRoute })}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/dashboard/superadmin" element={<DashboardSuperAdmin />} />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <DashboardPage />
+          </PrivateRoute>
+        }
+      />
+      <Route path="/dashboard" element={<Navigate to="/" replace />} />
+      <Route
+        path="/dashboard/sekretariat"
+        element={
+          <PrivateRoute>
+            <DashboardSekretariat />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/dashboard/ketersediaan"
+        element={
+          <PrivateRoute>
+            <DashboardKetersediaan />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/dashboard/distribusi"
+        element={
+          <PrivateRoute>
+            <DashboardDistribusi />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/dashboard/konsumsi"
+        element={
+          <PrivateRoute>
+            <DashboardKonsumsi />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/dashboard/uptd"
+        element={
+          <PrivateRoute>
+            <DashboardUPTD />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/module/:moduleId/create"
+        element={
+          <PrivateRoute>
+            <GenericCreatePage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/module/:moduleId/view/:id"
+        element={
+          <PrivateRoute>
+            <ViewDetailPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/module/:moduleId/edit/:id"
+        element={
+          <PrivateRoute>
+            <EditPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/module/:moduleId/:id"
+        element={
+          <PrivateRoute>
+            <ViewDetailPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/module/:moduleId/:id/edit"
+        element={
+          <PrivateRoute>
+            <EditPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/chatbot-upload"
+        element={
+          <PrivateRoute>
+            <ChatbotUploadPage />
+          </PrivateRoute>
+        }
+      />
+      {GeneratedRoutes({ PrivateRoute })}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 }
 
