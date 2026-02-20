@@ -1,3 +1,35 @@
+---
+
+# BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
+
+## Struktur Peran dan Kewenangan Penilaian
+- Sekretaris menilai: Fungsional Perencanaan, Fungsional Keuangan, Kasubag, Bendahara, Staf Sekretariat
+- Kepala Bidang menilai: staf bidang masing-masing
+- Kepala UPTD menilai: staf UPTD masing-masing
+
+## Indikator Penilaian
+- SKP (Bobot %)
+- Perilaku Kerja (Bobot %)
+- Target Output/Kinerja Jabatan
+- Disiplin (absensi, keterlambatan)
+- Catatan Kualitatif
+
+## Formula Perhitungan Nilai Akhir
+Nilai akhir = (SKP x bobot) + (Perilaku x bobot) + (Output x bobot) + (Disiplin x bobot) + Catatan
+Bobot dapat disesuaikan sesuai kebijakan.
+
+## Mekanisme Validasi
+1. Input oleh atasan langsung
+2. Submit penilaian
+3. Review oleh reviewer (jika multi-level)
+4. Approve/Reject
+5. Audit trail aktif (semua proses tercatat)
+
+## Integrasi dengan Proses Lain
+- KGB
+- Kenaikan Pangkat
+- Promosi Jabatan
+- Dashboard Monitoring
 DOKUMEN KOMPREHENSIF: KONDISI DINAS PANGAN PROVINSI MALUKU UTARA
 
 ---

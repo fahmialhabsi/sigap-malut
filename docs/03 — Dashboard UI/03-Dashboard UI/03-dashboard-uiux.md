@@ -1,44 +1,71 @@
 ---
 
+# BAB KHUSUS: UI/UX SISTEM PENILAIAN KINERJA ASN
+
+## Wireframe Halaman
+- Input Penilaian: Form dinamis per indikator, dropdown ASN, catatan, submit.
+- Review & Approval: List penilaian, tombol approve/reject, kolom catatan reviewer.
+- Dashboard Rekap Kinerja: Tabel rekap nilai, filter periode, status badge.
+- Detail Histori Penilaian: Timeline audit trail, histori nilai, reviewer, status.
+
+## Data Contract
+- **POST /penilaian**: { asn_id, indikator_id, nilai, catatan, periode }
+- **GET /rekap-kinerja**: { asn_id, periode, nilai_akhir, status, histori }
+- **PUT /approval**: { penilaian_id, reviewer_id, action, catatan }
+
+## Status Badge
+- Draft
+- Submitted
+- Approved
+- Rejected
+---
+
 ## FIGMA STARTER — SIGAP MALUT (Design Handoff)
 
 Ringkasan:
+
 - Figma Starter adalah paket desain untuk tim desain/developer agar style, komponen, dan workflow konsisten dengan implementasi UI/UX SIGAP Malut.
 - Berisi: design tokens (warna, font, spacing, radius, shadow) dalam format JSON, struktur halaman & layer, inventory komponen, grid & breakpoints, panduan ekspor aset, accessibility, plugin rekomendasi, dan checklist handoff.
 
 ### Design Tokens (JSON)
+
 - Gunakan tokens JSON dari Figma Starter untuk plugin Figma Tokens dan Tailwind config.
 - Pastikan semua warna, font, spacing, radius, shadow di frontend dan Figma identik.
 
 ### Struktur Page & Layer
+
 - Ikuti naming convention: Pages (Tokens, Foundations, Components, Patterns, Layouts, Dashboards, Maps, Charts, Prototypes, Assets, Docs).
 - Komponen: c/{component-name}/variant, e/{element}, --state, i/{purpose}.
 
 ### Inventory Komponen
+
 - Semua komponen (button, input, table, card, sidebar, header, chart, map, modal, toast, module generator, dashboard) dideskripsikan variant, states, accessibility, auto-layout.
 
 ### Grid & Breakpoints
+
 - Desktop: 12 kolom, container 1280px, gutter 24px.
 - Tablet: 8 kolom, container 1024px, gutter 16px.
 - Mobile: 4 kolom, container 360-420px, gutter 12px.
 
 ### Accessibility & Export
+
 - Minimum contrast 4.5:1, focus ring, high-contrast theme, keyboard navigation.
 - Ekspor aset: SVG icons, PNG images, CSS variables dari tokens.
 
 ### Plugin & Checklist
+
 - Plugin: Figma Tokens, Content Reel, Iconify, Map Maker, Chart, Autolayout, Stark, FigJam.
 - Checklist: import tokens, buat page/frame, component library, responsive frames, dashboard templates, export icons/images, document states, accessibility check, handoff page.
 
 ### Instruksi Implementasi
+
 1. Import tokens JSON ke Figma Tokens dan Tailwind config.
 2. Bangun komponen di Figma sesuai inventory dan naming.
 3. Pastikan semua states, variant, dan responsive di Figma match dengan React/Tailwind.
 4. Ekspor aset dan CSS variables untuk dev.
 5. Dokumentasikan handoff dan QA checklist.
 
-Dengan Figma Starter, desain dan implementasi UI/UX SIGAP Malut akan konsisten, mudah diaudit, dan siap handoff ke tim dev/QA.
----
+## Dengan Figma Starter, desain dan implementasi UI/UX SIGAP Malut akan konsisten, mudah diaudit, dan siap handoff ke tim dev/QA.
 
 ## PRA-SYARAT IMPLEMENTASI (8 POINT PENTING)
 

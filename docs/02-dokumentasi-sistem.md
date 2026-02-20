@@ -1,3 +1,27 @@
+---
+
+# BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
+
+## Flowchart Logika Penilaian
+1. Atasan input penilaian → Submit
+2. Sistem simpan ke tabel_penilaian
+3. Reviewer (jika ada) review → Approve/Reject
+4. Audit trail tercatat di tabel_approval_log
+5. Nilai akhir otomatis direkap di dashboard
+
+## Skema Database
+- **tabel_penilaian**: id, asn_id, periode, indikator_id, nilai, catatan, status, created_by, created_at
+- **tabel_indikator**: id, nama_indikator, bobot, deskripsi
+- **tabel_approval_log**: id, penilaian_id, reviewer_id, action, catatan, timestamp
+
+## Role-Based Access Control
+- Sekretaris, Kepala Bidang, Kepala UPTD hanya dapat menilai bawahan sesuai struktur
+- Staf hanya dapat melihat hasil penilaian dirinya
+
+## Approval Workflow
+- Single-level: Atasan langsung → Approve
+- Multi-level: Atasan → Reviewer → Approve
+- Status: Draft, Submitted, Approved, Rejected
 # DOKUMENTASI RESMI
 
 # SISTEM INFORMASI TERINTEGRASI DINAS PANGAN PROVINSI MALUKU UTARA
