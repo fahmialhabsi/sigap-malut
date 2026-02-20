@@ -5,41 +5,32 @@ const users = [
   {
     username: "superadmin",
     email: "superadmin@dinpangan.go.id",
-    password: "Admin123",
+    password: "superadmin123",
     nama_lengkap: "Super Administrator",
     role: "super_admin",
     unit_kerja: "Sekretariat",
     jabatan: "Super Admin System",
     is_verified: true,
-  },
-  {
-    username: "kepala.dinas",
-    email: "kepala.dinas@dinpangan.go.id",
-    password: "Kadis123",
-    nama_lengkap: "Ir. Ahmad Hidayat, M.Si",
-    nip: "196501011990031001",
-    role: "kepala_dinas",
-    unit_kerja: "Sekretariat",
-    jabatan: "Kepala Dinas Pangan",
-    is_verified: true,
+    is_active: true,
   },
   {
     username: "sekretaris",
     email: "sekretaris@dinpangan.go.id",
-    password: "Sek123",
-    nama_lengkap: "Dra. Siti Aminah, M.AP",
-    nip: "196701011991032001",
+    password: "123",
+    nama_lengkap: "Sekretaris Dinas",
     role: "sekretaris",
     unit_kerja: "Sekretariat",
-    jabatan: "Sekretaris Dinas",
+    jabatan: "Sekretaris",
     is_verified: true,
-    // Pastikan role bukan super_admin
+    is_active: true,
   },
-  // ... (15 user total - akan saya lengkapi jika Anda setuju)
 ];
 
-export async function seedUsers() {
-  console.log("🌱 Seeding users...");
+async function seedUsers() {
+  console.log("🌱 Seeding users (superadmin only)...");
+
+  // Hapus semua user lama
+  await User.destroy({ where: {}, truncate: true });
 
   for (const userData of users) {
     try {
@@ -66,3 +57,5 @@ export async function seedUsers() {
 
   console.log("✅ User seeding complete!\n");
 }
+
+seedUsers();

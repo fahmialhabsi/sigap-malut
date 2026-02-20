@@ -49,6 +49,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<LandingPage />} />
       <Route path="/dashboard/superadmin" element={<DashboardSuperAdmin />} />
+      <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
       <Route
         path="/"
         element={

@@ -1,9 +1,11 @@
+// ...existing code...
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import React from "react";
 
 export default function GenericCreatePage() {
-  const { moduleId } = useParams();
+  const { modul_id } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ export default function GenericCreatePage() {
     setError("");
 
     try {
-      const moduleResponse = await api.get(`/modules/${moduleId}`);
+      const moduleResponse = await api.get(`/modules/${modul_id}`);
       const moduleData = moduleResponse.data?.data;
 
       if (!moduleData?.tabel_name) {
@@ -52,15 +54,15 @@ export default function GenericCreatePage() {
     } finally {
       setLoading(false);
     }
-  }, [moduleId]);
+  }, [modul_id]);
 
   useEffect(() => {
     loadFormConfig();
   }, [loadFormConfig]);
 
   const normalizedModuleId = useMemo(
-    () => String(moduleId || "").toLowerCase(),
-    [moduleId],
+    () => String(modul_id || "").toLowerCase(),
+    [modul_id],
   );
 
   const handleChange = (name, value) => {
@@ -239,9 +241,102 @@ function normalizeValueByType(value, columnType = "") {
 }
 
 function renderInputField(field, value, onChange) {
-  const controlType = inputTypeFromColumnType(field.type);
+  // Deklarasi hanya satu kali di awal
   const commonClassName =
     "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500";
+  const controlType = inputTypeFromColumnType(field.type);
+
+  // Dropdown enum untuk Unit Kerja
+  if (field.name === "unit_kerja") {
+    const unitKerjaOptions = [
+      "Sekretariat",
+      "UPTD",
+      "Bidang Ketersediaan",
+      "Bidang Distribusi",
+      "Bidang Konsumsi",
+    ];
+    return (
+      <select
+        value={value}
+        onChange={(event) => onChange(field.name, event.target.value)}
+        className={commonClassName}
+        required={!field.allowNull}
+      >
+        <option value="">-- Pilih Unit Kerja --</option>
+        {unitKerjaOptions.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  // Dropdown enum untuk Role
+  if (field.name === "role") {
+    const roleOptions = [
+      "super_admin",
+      "kepala_dinas",
+      "sekretaris",
+      "kepala_bidang",
+      "kepala_uptd",
+      "kasubbag",
+      "kasubbag_umum",
+      "kasubbag_kepegawaian",
+      "kasubbag_perencanaan",
+      "kasi_uptd",
+      "kasubbag_tu_uptd",
+      "kasi_mutu_uptd",
+      "kasi_teknis_uptd",
+      "fungsional",
+      "fungsional_perencana",
+      "fungsional_analis",
+      "pelaksana",
+      "guest",
+    ];
+    return (
+      <select
+        value={value}
+        onChange={(event) => onChange(field.name, event.target.value)}
+        className={commonClassName}
+        required={!field.allowNull}
+      >
+        <option value="">-- Pilih Role --</option>
+        {roleOptions.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt.replace(/_/g, " ")}
+          </option>
+        ))}
+      </select>
+    );
+  }
+  // Hapus deklarasi ulang, sudah ada di atas
+
+  // Patch: Dropdown enum untuk Unit Kerja
+  if (field.name === "unit_kerja") {
+    const unitKerjaOptions = [
+      "Sekretariat",
+      "UPTD",
+      "Bidang Ketersediaan",
+      "Bidang Distribusi",
+      "Bidang Konsumsi",
+    ];
+    return (
+      <select
+        value={value}
+        onChange={(event) => onChange(field.name, event.target.value)}
+        className={commonClassName}
+        required={!field.allowNull}
+      >
+        <option value="">-- Pilih Unit Kerja --</option>
+        {unitKerjaOptions.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+  }
 
   if (controlType === "textarea") {
     return (

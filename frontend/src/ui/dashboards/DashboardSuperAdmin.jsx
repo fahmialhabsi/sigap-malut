@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Helper untuk parse CSV sederhana
 function parseCSV(csv) {
@@ -26,11 +27,7 @@ import {
 function DashboardSuperAdmin() {
   const [modules, setModules] = useState([]);
   const [modal, setModal] = useState({ open: false, title: "", content: "" });
-  // Untuk navigasi
-  const navigate =
-    typeof window !== "undefined" && window.location
-      ? (path) => window.location.assign(path)
-      : () => {};
+  const navigate = useNavigate();
 
   // Fungsi download dummy PDF
   const handleDownloadReport = () => {
@@ -125,7 +122,9 @@ function DashboardSuperAdmin() {
           .map((modul) => (
             <div
               key={modul.modul_id}
-              className="bg-white rounded-xl shadow p-5 flex flex-col gap-2 border border-gray-100 hover:shadow-lg transition"
+              className="bg-white rounded-xl shadow p-5 flex flex-col gap-2 border border-gray-100 hover:shadow-lg transition cursor-pointer"
+              onClick={() => navigate(`/modul/${modul.modul_id}`)}
+              title={`Buka modul ${modul.nama_modul}`}
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">
@@ -172,7 +171,9 @@ function DashboardSuperAdmin() {
                 .map((modul) => (
                   <div
                     key={modul.modul_id}
-                    className="bg-white rounded-xl shadow p-5 flex flex-col gap-2 border border-gray-100 hover:shadow-lg transition"
+                    className="bg-white rounded-xl shadow p-5 flex flex-col gap-2 border border-gray-100 hover:shadow-lg transition cursor-pointer"
+                    onClick={() => navigate(`/modul/${modul.modul_id}`)}
+                    title={`Buka modul ${modul.nama_modul}`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">

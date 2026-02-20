@@ -4,7 +4,7 @@
 // Generated: 2026-02-17T19:24:48.417Z
 // =====================================================
 
-import UptMtu from '../models/UPT-MTU.js';
+import UptMtu from "../models/UPT-MTU.js";
 
 // @desc    Get all UptMtu records
 // @route   GET /api/upt-mtu
@@ -12,18 +12,18 @@ import UptMtu from '../models/UPT-MTU.js';
 export const getAllUptMtu = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-    
+
     const offset = (page - 1) * limit;
-    
+
     const where = { ...filters };
-    
+
     const { count, rows } = await UptMtu.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['created_at', 'DESC']]
+      order: [["created_at", "DESC"]],
     });
-    
+
     res.json({
       success: true,
       data: rows,
@@ -31,14 +31,14 @@ export const getAllUptMtu = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit)
-      }
+        totalPages: Math.ceil(count / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching UptMtu',
-      error: error.message
+      message: "Error fetching UptMtu",
+      error: error.message,
     });
   }
 };
@@ -49,23 +49,23 @@ export const getAllUptMtu = async (req, res) => {
 export const getUptMtuById = async (req, res) => {
   try {
     const record = await UptMtu.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptMtu not found'
+        message: "UptMtu not found",
       });
     }
-    
+
     res.json({
       success: true,
-      data: record
+      data: record,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching UptMtu',
-      error: error.message
+      message: "Error fetching UptMtu",
+      error: error.message,
     });
   }
 };
@@ -77,19 +77,27 @@ export const createUptMtu = async (req, res) => {
   try {
     const record = await UptMtu.create({
       ...req.body,
-      created_by: req.user?.id
+      created_by: req.user?.id,
     });
-    
+    // Audit trail
+    await logAudit({
+      action: "create",
+      module: "UPT-MTU",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Created UptMtu",
+      payload: req.body,
+    });
     res.status(201).json({
       success: true,
-      message: 'UptMtu created successfully',
-      data: record
+      message: "UptMtu created successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error creating UptMtu',
-      error: error.message
+      message: "Error creating UptMtu",
+      error: error.message,
     });
   }
 };
@@ -100,29 +108,37 @@ export const createUptMtu = async (req, res) => {
 export const updateUptMtu = async (req, res) => {
   try {
     const record = await UptMtu.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptMtu not found'
+        message: "UptMtu not found",
       });
     }
-    
+
     await record.update({
       ...req.body,
-      updated_by: req.user?.id
+      updated_by: req.user?.id,
     });
-    
+    // Audit trail
+    await logAudit({
+      action: "update",
+      module: "UPT-MTU",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Updated UptMtu",
+      payload: req.body,
+    });
     res.json({
       success: true,
-      message: 'UptMtu updated successfully',
-      data: record
+      message: "UptMtu updated successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error updating UptMtu',
-      error: error.message
+      message: "Error updating UptMtu",
+      error: error.message,
     });
   }
 };
@@ -133,25 +149,33 @@ export const updateUptMtu = async (req, res) => {
 export const deleteUptMtu = async (req, res) => {
   try {
     const record = await UptMtu.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptMtu not found'
+        message: "UptMtu not found",
       });
     }
-    
+
     await record.destroy();
-    
+    // Audit trail
+    await logAudit({
+      action: "delete",
+      module: "UPT-MTU",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Deleted UptMtu",
+      payload: record,
+    });
     res.json({
       success: true,
-      message: 'UptMtu deleted successfully'
+      message: "UptMtu deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting UptMtu',
-      error: error.message
+      message: "Error deleting UptMtu",
+      error: error.message,
     });
   }
 };

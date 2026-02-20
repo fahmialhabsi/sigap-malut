@@ -4,7 +4,7 @@
 // Generated: 2026-02-17T19:24:48.417Z
 // =====================================================
 
-import UptKeu from '../models/UPT-KEU.js';
+import UptKeu from "../models/UPT-KEU.js";
 
 // @desc    Get all UptKeu records
 // @route   GET /api/upt-keu
@@ -12,18 +12,18 @@ import UptKeu from '../models/UPT-KEU.js';
 export const getAllUptKeu = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-    
+
     const offset = (page - 1) * limit;
-    
+
     const where = { ...filters };
-    
+
     const { count, rows } = await UptKeu.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['created_at', 'DESC']]
+      order: [["created_at", "DESC"]],
     });
-    
+
     res.json({
       success: true,
       data: rows,
@@ -31,14 +31,14 @@ export const getAllUptKeu = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit)
-      }
+        totalPages: Math.ceil(count / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching UptKeu',
-      error: error.message
+      message: "Error fetching UptKeu",
+      error: error.message,
     });
   }
 };
@@ -49,23 +49,23 @@ export const getAllUptKeu = async (req, res) => {
 export const getUptKeuById = async (req, res) => {
   try {
     const record = await UptKeu.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptKeu not found'
+        message: "UptKeu not found",
       });
     }
-    
+
     res.json({
       success: true,
-      data: record
+      data: record,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching UptKeu',
-      error: error.message
+      message: "Error fetching UptKeu",
+      error: error.message,
     });
   }
 };
@@ -77,19 +77,27 @@ export const createUptKeu = async (req, res) => {
   try {
     const record = await UptKeu.create({
       ...req.body,
-      created_by: req.user?.id
+      created_by: req.user?.id,
     });
-    
+    // Audit trail
+    await logAudit({
+      action: "create",
+      module: "UPT-KEU",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Created UptKeu",
+      payload: req.body,
+    });
     res.status(201).json({
       success: true,
-      message: 'UptKeu created successfully',
-      data: record
+      message: "UptKeu created successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error creating UptKeu',
-      error: error.message
+      message: "Error creating UptKeu",
+      error: error.message,
     });
   }
 };
@@ -100,29 +108,37 @@ export const createUptKeu = async (req, res) => {
 export const updateUptKeu = async (req, res) => {
   try {
     const record = await UptKeu.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptKeu not found'
+        message: "UptKeu not found",
       });
     }
-    
+
     await record.update({
       ...req.body,
-      updated_by: req.user?.id
+      updated_by: req.user?.id,
     });
-    
+    // Audit trail
+    await logAudit({
+      action: "update",
+      module: "UPT-KEU",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Updated UptKeu",
+      payload: req.body,
+    });
     res.json({
       success: true,
-      message: 'UptKeu updated successfully',
-      data: record
+      message: "UptKeu updated successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error updating UptKeu',
-      error: error.message
+      message: "Error updating UptKeu",
+      error: error.message,
     });
   }
 };
@@ -133,25 +149,33 @@ export const updateUptKeu = async (req, res) => {
 export const deleteUptKeu = async (req, res) => {
   try {
     const record = await UptKeu.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptKeu not found'
+        message: "UptKeu not found",
       });
     }
-    
+
     await record.destroy();
-    
+    // Audit trail
+    await logAudit({
+      action: "delete",
+      module: "UPT-KEU",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Deleted UptKeu",
+      payload: record,
+    });
     res.json({
       success: true,
-      message: 'UptKeu deleted successfully'
+      message: "UptKeu deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting UptKeu',
-      error: error.message
+      message: "Error deleting UptKeu",
+      error: error.message,
     });
   }
 };

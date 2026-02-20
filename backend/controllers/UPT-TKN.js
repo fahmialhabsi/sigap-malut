@@ -4,7 +4,7 @@
 // Generated: 2026-02-17T19:24:48.418Z
 // =====================================================
 
-import UptTkn from '../models/UPT-TKN.js';
+import UptTkn from "../models/UPT-TKN.js";
 
 // @desc    Get all UptTkn records
 // @route   GET /api/upt-tkn
@@ -12,18 +12,18 @@ import UptTkn from '../models/UPT-TKN.js';
 export const getAllUptTkn = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-    
+
     const offset = (page - 1) * limit;
-    
+
     const where = { ...filters };
-    
+
     const { count, rows } = await UptTkn.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['created_at', 'DESC']]
+      order: [["created_at", "DESC"]],
     });
-    
+
     res.json({
       success: true,
       data: rows,
@@ -31,14 +31,14 @@ export const getAllUptTkn = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit)
-      }
+        totalPages: Math.ceil(count / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching UptTkn',
-      error: error.message
+      message: "Error fetching UptTkn",
+      error: error.message,
     });
   }
 };
@@ -49,23 +49,23 @@ export const getAllUptTkn = async (req, res) => {
 export const getUptTknById = async (req, res) => {
   try {
     const record = await UptTkn.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptTkn not found'
+        message: "UptTkn not found",
       });
     }
-    
+
     res.json({
       success: true,
-      data: record
+      data: record,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching UptTkn',
-      error: error.message
+      message: "Error fetching UptTkn",
+      error: error.message,
     });
   }
 };
@@ -77,19 +77,27 @@ export const createUptTkn = async (req, res) => {
   try {
     const record = await UptTkn.create({
       ...req.body,
-      created_by: req.user?.id
+      created_by: req.user?.id,
     });
-    
+    // Audit trail
+    await logAudit({
+      action: "create",
+      module: "UPT-TKN",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Created UptTkn",
+      payload: req.body,
+    });
     res.status(201).json({
       success: true,
-      message: 'UptTkn created successfully',
-      data: record
+      message: "UptTkn created successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error creating UptTkn',
-      error: error.message
+      message: "Error creating UptTkn",
+      error: error.message,
     });
   }
 };
@@ -100,29 +108,37 @@ export const createUptTkn = async (req, res) => {
 export const updateUptTkn = async (req, res) => {
   try {
     const record = await UptTkn.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptTkn not found'
+        message: "UptTkn not found",
       });
     }
-    
+
     await record.update({
       ...req.body,
-      updated_by: req.user?.id
+      updated_by: req.user?.id,
     });
-    
+    // Audit trail
+    await logAudit({
+      action: "update",
+      module: "UPT-TKN",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Updated UptTkn",
+      payload: req.body,
+    });
     res.json({
       success: true,
-      message: 'UptTkn updated successfully',
-      data: record
+      message: "UptTkn updated successfully",
+      data: record,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Error updating UptTkn',
-      error: error.message
+      message: "Error updating UptTkn",
+      error: error.message,
     });
   }
 };
@@ -133,25 +149,33 @@ export const updateUptTkn = async (req, res) => {
 export const deleteUptTkn = async (req, res) => {
   try {
     const record = await UptTkn.findByPk(req.params.id);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'UptTkn not found'
+        message: "UptTkn not found",
       });
     }
-    
+
     await record.destroy();
-    
+    // Audit trail
+    await logAudit({
+      action: "delete",
+      module: "UPT-TKN",
+      userId: req.user?.id,
+      recordId: record.id,
+      description: "Deleted UptTkn",
+      payload: record,
+    });
     res.json({
       success: true,
-      message: 'UptTkn deleted successfully'
+      message: "UptTkn deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting UptTkn',
-      error: error.message
+      message: "Error deleting UptTkn",
+      error: error.message,
     });
   }
 };
