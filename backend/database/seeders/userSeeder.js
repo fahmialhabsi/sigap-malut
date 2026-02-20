@@ -33,6 +33,7 @@ const users = [
     unit_kerja: "Sekretariat",
     jabatan: "Sekretaris Dinas",
     is_verified: true,
+    // Pastikan role bukan super_admin
   },
   // ... (15 user total - akan saya lengkapi jika Anda setuju)
 ];

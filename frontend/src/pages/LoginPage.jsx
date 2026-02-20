@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 
 export default function LoginPage() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const roleParam = params.get("role");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,7 +22,31 @@ export default function LoginPage() {
     const result = await login(username, password);
 
     if (result.success) {
-      navigate("/dashboard");
+      // Ambil user dari localStorage (atau bisa dari result jika login mengembalikan user)
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem("user"));
+      } catch {}
+
+      if (user) {
+        if (user.role === "super_admin") {
+          navigate("/dashboard/superadmin");
+        } else if (user.unit_kerja === "Sekretariat") {
+          navigate("/dashboard/sekretariat");
+        } else if (user.unit_kerja === "Bidang Ketersediaan") {
+          navigate("/dashboard/ketersediaan");
+        } else if (user.unit_kerja === "Bidang Distribusi") {
+          navigate("/dashboard/distribusi");
+        } else if (user.unit_kerja === "Bidang Konsumsi") {
+          navigate("/dashboard/konsumsi");
+        } else if (user.unit_kerja === "UPTD") {
+          navigate("/dashboard/uptd");
+        } else {
+          navigate("/dashboard");
+        }
+      } else {
+        navigate("/dashboard");
+      }
     } else {
       setError(result.message);
     }
