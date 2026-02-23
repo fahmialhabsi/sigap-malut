@@ -1,3 +1,14 @@
+// Fungsi approve untuk approval multi-level
+export function approve(doc, level) {
+  doc.approvals[level] = true;
+  return doc;
+}
+
+// Fungsi transition untuk workflow state
+export function transition(from, to) {
+  if (from === "draft" && to === "submitted") return "submitted";
+  throw new Error("invalid transition");
+}
 class WorkflowService {
   // Get workflow path for a module
   getWorkflowPath(unitKerja, modulId) {
@@ -90,8 +101,9 @@ class WorkflowService {
 
   // Create workflow instance
   async createWorkflow(data) {
-    // TODO: Save to approval_workflow table
-    const workflow = {
+    // Save to approval_workflow table
+    const ApprovalWorkflow = require("../models/approvalWorkflow.js");
+    const workflow = await ApprovalWorkflow.create({
       modul_id: data.modul_id,
       record_id: data.record_id,
       unit_kerja: data.unit_kerja,
@@ -102,16 +114,15 @@ class WorkflowService {
       status: "pending",
       submitted_by: data.user_id,
       submitted_at: new Date(),
-    };
-
-    console.log("Workflow created:", workflow);
+    });
     return workflow;
   }
 
   // Log approval action
   async logApproval(workflowId, data) {
-    // TODO: Save to approval_log table
-    const log = {
+    // Save to approval_log table
+    const ApprovalLog = require("../models/approvalLog.js");
+    const log = await ApprovalLog.create({
       workflow_id: workflowId,
       approver_id: data.user_id,
       approver_role: data.user_role,
@@ -119,16 +130,15 @@ class WorkflowService {
       action: data.action, // 'approve', 'reject', 'bypass'
       notes: data.notes,
       created_at: new Date(),
-    };
-
-    console.log("Approval logged:", log);
+    });
     return log;
   }
 
   // Detect and log bypass
   async detectBypass(data) {
-    // TODO: Save to bypass_detection table
-    const bypass = {
+    // Save to bypass_detection table
+    const BypassDetection = require("../models/bypassDetection.js");
+    const bypass = await BypassDetection.create({
       workflow_id: data.workflow_id,
       user_id: data.user_id,
       user_role: data.user_role,
@@ -136,13 +146,8 @@ class WorkflowService {
       attempted_action: data.attempted_action,
       detected_at: new Date(),
       severity: data.severity || "high",
-    };
-
-    console.error("🚨 BYPASS DETECTED:", bypass);
-
-    // TODO: Send alert
+    });
     await this.sendBypassAlert(bypass);
-
     return bypass;
   }
 

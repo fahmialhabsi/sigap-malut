@@ -12,11 +12,24 @@ export default {
         accent: "#0f766e",
         accentDark: "#0b4f4a",
         accentSoft: "#e7f5f2",
-        warning: "#d97706",
-        danger: "#b91c1c",
+        warning: "#F59E0B", // from design-tokens.json
+        danger: "#EF4444", // from design-tokens.json
         info: "#0ea5e9",
+        primary: "#0B5FFF", // from design-tokens.json
+        success: "#06A657", // from design-tokens.json
+        bg: "#F6F7FB", // from design-tokens.json
+        card: "#FFFFFF", // from design-tokens.json
+      },
+      spacing: {
+        1: "4px",
+        2: "8px",
+        3: "12px",
+        4: "16px",
+        6: "24px",
+        8: "32px",
       },
       fontFamily: {
+        inter: ["Inter", "ui-sans-serif", "system-ui"], // from design-tokens.json
         sans: ["Source Sans 3", "ui-sans-serif", "system-ui", "sans-serif"],
         display: ["Fraunces", "ui-serif", "Georgia", "serif"],
         mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],

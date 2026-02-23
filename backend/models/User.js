@@ -2,6 +2,10 @@
 // MODEL: User
 // TABLE: users
 // =====================================================
+// =====================================================
+// MODEL: User
+// TABLE: users
+// =====================================================
 
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
@@ -110,6 +114,11 @@ const User = sequelize.define(
     locked_until: {
       type: DataTypes.DATE,
     },
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: "Soft delete timestamp",
+    },
   },
   {
     tableName: "users",
@@ -117,7 +126,14 @@ const User = sequelize.define(
     underscored: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
+    paranoid: true,
+    deletedAt: "deleted_at",
   },
 );
+
+// Tambahkan method softDelete pada User
+User.prototype.softDelete = async function () {
+  await this.destroy();
+};
 
 export default User;

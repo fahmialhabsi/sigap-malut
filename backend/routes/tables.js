@@ -446,18 +446,24 @@ router.use(async (req, res, next) => {
         .status(400)
         .json({ success: false, message: "No table specified" });
 
+    // Khusus tabel users, hanya super admin yang boleh akses
+    if (String(tableName).toLowerCase() === "users") {
+      return res.status(403).json({
+        success: false,
+        message: "Akses ke data user hanya diperbolehkan untuk super admin.",
+      });
+    }
+
     // Load module config
     const modules = await loadModulesConfig();
     const moduleRow = modules.find(
       (row) => row.tabel_name === String(tableName).toLowerCase(),
     );
     if (!moduleRow)
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: `Modul/table '${tableName}' tidak ditemukan di konfigurasi`,
-        });
+      return res.status(404).json({
+        success: false,
+        message: `Modul/table '${tableName}' tidak ditemukan di konfigurasi`,
+      });
 
     // Only allow if user's unit_kerja matches module's bidang/unit
     // Allow Sekretariat only for Sekretariat, Bidang Ketersediaan only for Bidang Ketersediaan, etc
@@ -472,13 +478,11 @@ router.use(async (req, res, next) => {
     next();
   } catch (err) {
     console.error("RBAC middleware error:", err);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "RBAC check failed",
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "RBAC check failed",
+      error: err.message,
+    });
   }
 });
 

@@ -12,26 +12,82 @@ import Table, {
 
 export default function BaseTable({ endpoint, title, icon, moduleId }) {
   const [search, setSearch] = useState("");
-  const [data] = useState([
-    {
-      id: 1,
-      username: "admin",
-      email: "admin@mail.com",
-      role: "Admin",
-      unit_kerja: "IT",
-      is_active: true,
-      created_at: "2026-02-20",
-    },
-    {
-      id: 2,
-      username: "user",
-      email: "user@mail.com",
-      role: "User",
-      unit_kerja: "Finance",
-      is_active: false,
-      created_at: "2026-02-19",
-    },
-  ]);
+  // Validasi agar tidak render HTML fallback/error dari Vite
+  // Fallback data per modul, agar tidak render data user generic atau HTML error
+  const fallbackData =
+    moduleId === "sa01"
+      ? [
+          {
+            id: 1,
+            indikator: "Kepatuhan Laporan Harian",
+            nilai: 100,
+            target: 100,
+            status: "Tercapai",
+          },
+          {
+            id: 2,
+            indikator: "Bypass Terdeteksi",
+            nilai: 0,
+            target: 0,
+            status: "Aman",
+          },
+          {
+            id: 3,
+            indikator: "Validasi Data",
+            nilai: 99,
+            target: 100,
+            status: "Valid",
+          },
+        ]
+      : [
+          {
+            id: 1,
+            username: "admin",
+            email: "admin@mail.com",
+            role: "Admin",
+            unit_kerja: "IT",
+            is_active: true,
+            created_at: "2026-02-20",
+          },
+          {
+            id: 2,
+            username: "user",
+            email: "user@mail.com",
+            role: "User",
+            unit_kerja: "Finance",
+            is_active: false,
+            created_at: "2026-02-19",
+          },
+        ];
+  const [data, setData] = useState(fallbackData);
+
+  // Jika data/error response berupa HTML (misal: fallback Vite), tampilkan error friendly
+  const isHtmlError = (arr) => {
+    if (!Array.isArray(arr)) return false;
+    if (arr.length === 0) return false;
+    // Cek jika properti/prototype string mengandung tag HTML
+    return (
+      typeof arr[0] === "string" &&
+      (arr[0].includes("<!doctype html") || arr[0].includes("<html"))
+    );
+  };
+
+  if (isHtmlError(data)) {
+    return (
+      <div className="p-8 text-center text-danger">
+        <h2 className="text-2xl font-bold mb-4">
+          Terjadi Error pada Dashboard Modul
+        </h2>
+        <p>
+          Response backend berupa HTML, kemungkinan backend tidak berjalan atau
+          endpoint salah.
+        </p>
+        <pre className="bg-slate-100 text-xs p-4 mt-4 rounded overflow-x-auto max-w-xl mx-auto">
+          {data[0]}
+        </pre>
+      </div>
+    );
+  }
   const filteredData = data.filter(
     (item) =>
       item.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -48,6 +104,78 @@ export default function BaseTable({ endpoint, title, icon, moduleId }) {
   async function handleDelete(id) {
     try {
       await api.delete(`${endpoint}/${id}`);
+      // Tambahan: KPI, Alert, Audit, AI, Feedback, Export, Analytics
+      // Mockup KPI
+      const kpi = {
+        compliance: 0.94,
+        bypass_count: 3,
+        avg_approval_time: 12,
+        kgb_alerts: 5,
+        komoditas_consistency: 1.0,
+        inflasi: 2.35,
+      };
+      // Mockup Alert
+      const alerts = [
+        {
+          id: "a1",
+          severity: "critical",
+          title: "KGB Terlambat: Siti",
+          summary: "Terlewat 59 hari",
+        },
+        {
+          id: "a2",
+          severity: "warning",
+          title: "Bypass detected",
+          summary: "Bendahara submit SPJ langsung ke Kadis",
+        },
+      ];
+      // Mockup Audit
+      const auditLog = [
+        {
+          id: 1,
+          action: "approve",
+          user: "sekretaris",
+          timestamp: "2026-02-19T10:00:00Z",
+          record: "SPJ #123",
+        },
+        {
+          id: 2,
+          action: "submit",
+          user: "bendahara",
+          timestamp: "2026-02-18T09:00:00Z",
+          record: "SPJ #124",
+        },
+      ];
+      // Mockup AI Recommendation
+      const aiRecommendation = {
+        analysis: "Inflasi naik 0.25 poin ...",
+        recommendations: [
+          {
+            id: "r1",
+            title: "Operasi Pasar Beras",
+            impact_est: "-0.3 poin",
+            cost_est: "Rp X",
+            actions: ["Request BULOG 50 ton", "Schedule 3 pasar"],
+          },
+        ],
+      };
+      // Mockup Feedback
+      const feedback = [
+        {
+          id: "f1",
+          user: "masyarakat",
+          message: "Harga beras naik di pasar A",
+          status: "open",
+        },
+      ];
+      // Export/report handler (mock)
+      function handleExport(type) {
+        alert(`Export ${type} berhasil (mock)`);
+      }
+      // Self-service analytics builder (mock)
+      function handleAnalyticsBuilder() {
+        alert("Analytics builder dibuka (mock)");
+      }
       // fetchData();
     } catch (err) {
       console.error(err);

@@ -3,59 +3,84 @@
 # BAB KHUSUS: UI/UX SISTEM PENILAIAN KINERJA ASN
 
 ## Wireframe Halaman
-- Input Penilaian: Form dinamis per indikator, dropdown ASN, catatan, submit.
-- Review & Approval: List penilaian, tombol approve/reject, kolom catatan reviewer.
-- Dashboard Rekap Kinerja: Tabel rekap nilai, filter periode, status badge.
-- Detail Histori Penilaian: Timeline audit trail, histori nilai, reviewer, status.
+
+# STANDAR DASHBOARD PEMERINTAHAN MODERN (SIGAP-MALUT)
+
+## Standar Dashboard Pemerintahan Level Super Lengkap
+
+### Fitur Wajib (Best Practice Nasional/Internasional)
+1. Executive Summary Panel: KPI utama, compliance, alert, tren, rekomendasi AI, drilldown, audit log, quick action.
+2. Role-based & Personalized: Navigasi dan akses dinamis sesuai peran/otoritas.
+3. Real-time Data & Alerting: Data update otomatis, alert live, compliance monitoring.
+4. Data Visualization & Analytics: Chart, map, trend, export PDF/Excel/PPTX, API publik.
+5. Audit Trail & Compliance: Semua aksi tercatat, timeline aktivitas, compliance monitoring.
+6. Open Data & Transparency Portal: Data publik, download dataset, API terbuka, visualisasi publik.
+7. Self-service Analytics: Filter, pivot, custom report/dashboard builder.
+8. Integrated Feedback & Complaint System: Laporan masyarakat, tracking status, notifikasi.
+9. AI & Automation: Rekomendasi otomatis, prediksi, chatbot, auto-routing.
+10. Mobile-first & Accessibility: Responsive, ARIA, high-contrast, keyboard navigation.
+
+### Standar Teknis & Implementasi
+## PREFERENSI VISUAL, INTEGRASI AI/FEEDBACK, DAN FITUR PENDUKUNG
+
+### Preferensi Visual
+- Gunakan layout grid responsif (12 kolom desktop, 8 tablet, 4 mobile).
+- Semua warna, font, spacing, radius, dan shadow mengikuti design tokens.
+- Komponen utama (KpiTile, AlertList, DataTable, Map, Chart, Timeline, ApprovalCard) wajib memiliki states, variant, dan auto-layout.
+- Setiap KPI dan alert memiliki tooltip definisi dan sumber data.
+- Gunakan iconografi Heroicons/Feather, mapping token untuk setiap aksi.
+- High-contrast mode dan ARIA label untuk aksesibilitas.
+
+### Integrasi AI & Feedback
+- Panel rekomendasi AI: prediksi, anomaly detection, auto-routing, chatbot.
+- Widget feedback masyarakat: pelaporan, tracking status, notifikasi.
+- AI Inbox: list item, confidence score, quick-correct, retrain AI.
+- Rekomendasi otomatis untuk tindakan (drilldown KPI, alert, audit).
+- Integrasi chatbot WhatsApp gateway untuk inbox surat.
+
+### Fitur Pendukung Lain
+- Export PDF, Excel, PPTX, CSV, PNG untuk semua data dan visual.
+- Audit trail: semua aksi tercatat, filterable, exportable.
+- RBAC: role-aware UI, backend authoritative, hide controls jika tidak punya izin.
+- WebSocket/polling untuk data real-time (alert, inflasi, audit).
+- Self-service analytics: filter, pivot, custom dashboard builder.
+- Storybook environment untuk preview dan QA komponen.
+- Test coverage (Jest/RTL, Cypress) dan acceptance criteria di setiap page.
+- OpenAPI/Swagger untuk validasi kontrak data.
+- Figma handoff: link, asset, checklist, states, variant.
+
+### Roadmap Implementasi Dashboard SIGAP-MALUT
+1. Refactor komponen dashboard: KPI row, alert panel, trend chart, data table, activity feed, quick action.
+2. Integrasi data real-time & drilldown: websocket/polling, drilldown KPI/alert.
+3. Export & reporting: Export PDF, Excel, PPTX, template laporan siap pakai.
+4. Open data & public portal: Halaman publik, data terbuka, API, visualisasi.
+5. Self-service analytics: Filter, pivot, custom dashboard builder.
+6. Feedback & complaint system: Modul pelaporan masyarakat, tracking status, notifikasi.
+7. AI & automation: Rekomendasi otomatis, prediksi, chatbot, anomaly detection.
+8. QA & documentation: Storybook, test coverage, dokumentasi API & user, acceptance checklist.
+
+### Referensi Dashboard Pemerintahan Kelas Dunia
+
 
 ## Data Contract
-- **POST /penilaian**: { asn_id, indikator_id, nilai, catatan, periode }
-- **GET /rekap-kinerja**: { asn_id, periode, nilai_akhir, status, histori }
-- **PUT /approval**: { penilaian_id, reviewer_id, action, catatan }
 
 ## Status Badge
-- Draft
-- Submitted
-- Approved
-- Rejected
----
 
 ## FIGMA STARTER — SIGAP MALUT (Design Handoff)
 
 Ringkasan:
 
-- Figma Starter adalah paket desain untuk tim desain/developer agar style, komponen, dan workflow konsisten dengan implementasi UI/UX SIGAP Malut.
-- Berisi: design tokens (warna, font, spacing, radius, shadow) dalam format JSON, struktur halaman & layer, inventory komponen, grid & breakpoints, panduan ekspor aset, accessibility, plugin rekomendasi, dan checklist handoff.
-
 ### Design Tokens (JSON)
-
-- Gunakan tokens JSON dari Figma Starter untuk plugin Figma Tokens dan Tailwind config.
-- Pastikan semua warna, font, spacing, radius, shadow di frontend dan Figma identik.
 
 ### Struktur Page & Layer
 
-- Ikuti naming convention: Pages (Tokens, Foundations, Components, Patterns, Layouts, Dashboards, Maps, Charts, Prototypes, Assets, Docs).
-- Komponen: c/{component-name}/variant, e/{element}, --state, i/{purpose}.
-
 ### Inventory Komponen
-
-- Semua komponen (button, input, table, card, sidebar, header, chart, map, modal, toast, module generator, dashboard) dideskripsikan variant, states, accessibility, auto-layout.
 
 ### Grid & Breakpoints
 
-- Desktop: 12 kolom, container 1280px, gutter 24px.
-- Tablet: 8 kolom, container 1024px, gutter 16px.
-- Mobile: 4 kolom, container 360-420px, gutter 12px.
-
 ### Accessibility & Export
 
-- Minimum contrast 4.5:1, focus ring, high-contrast theme, keyboard navigation.
-- Ekspor aset: SVG icons, PNG images, CSS variables dari tokens.
-
 ### Plugin & Checklist
-
-- Plugin: Figma Tokens, Content Reel, Iconify, Map Maker, Chart, Autolayout, Stark, FigJam.
-- Checklist: import tokens, buat page/frame, component library, responsive frames, dashboard templates, export icons/images, document states, accessibility check, handoff page.
 
 ### Instruksi Implementasi
 
@@ -66,6 +91,242 @@ Ringkasan:
 5. Dokumentasikan handoff dan QA checklist.
 
 ## Dengan Figma Starter, desain dan implementasi UI/UX SIGAP Malut akan konsisten, mudah diaudit, dan siap handoff ke tim dev/QA.
+
+## CONTOH FILE TEST/UNIT TEST (COVERAGE & QA)
+
+Berikut adalah contoh file test/unit test untuk coverage dan QA dashboard SIGAP Malut:
+
+### KpiTile.test.jsx
+```jsx
+import { render, screen } from '@testing-library/react';
+import KpiTile from '../components/KpiTile';
+
+describe('KpiTile', () => {
+  it('renders KPI label and value', () => {
+    render(<KpiTile label="Compliance Alur Koordinasi" value={0.94} unit="ratio" />);
+    expect(screen.getByText('Compliance Alur Koordinasi')).toBeInTheDocument();
+    expect(screen.getByText('0.94')).toBeInTheDocument();
+  });
+
+  it('shows danger variant', () => {
+    render(<KpiTile label="Bypass Violations" value={3} unit="count" variant="danger" />);
+    expect(screen.getByText('Bypass Violations')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
+    // Add more assertions for danger styling
+  });
+});
+```
+
+### AlertList.test.jsx
+```jsx
+import { render, screen } from '@testing-library/react';
+import AlertList from '../components/AlertList';
+
+describe('AlertList', () => {
+  it('renders alert titles', () => {
+    render(<AlertList alerts={[{ id: 'a1', severity: 'critical', title: 'KGB Terlambat: Siti', summary: 'Terlewat 59 hari' }]} />);
+    expect(screen.getByText('KGB Terlambat: Siti')).toBeInTheDocument();
+    expect(screen.getByText('Terlewat 59 hari')).toBeInTheDocument();
+  });
+});
+```
+
+### DataTable.test.jsx
+```jsx
+import { render, screen } from '@testing-library/react';
+import DataTable from '../components/DataTable';
+
+describe('DataTable', () => {
+  it('renders table rows', () => {
+    render(<DataTable columns={[{ Header: 'Nama', accessor: 'name' }]} data={[{ name: 'DPA Uploaded' }]} />);
+    expect(screen.getByText('DPA Uploaded')).toBeInTheDocument();
+  });
+});
+```
+## CONTOH FILE STORYBOOK (PREVIEW KOMPONEN UI)
+
+Berikut adalah contoh file Storybook untuk preview komponen utama dashboard SIGAP Malut:
+
+## DOKUMENTASI API (OPENAPI/SWAGGER)
+
+Berikut adalah contoh dokumentasi API (OpenAPI/Swagger) untuk validasi kontrak data dashboard SIGAP Malut:
+
+### openapi.yaml (snippet)
+```yaml
+openapi: 3.0.0
+info:
+  title: SIGAP Malut Dashboard API
+  version: 1.0.0
+paths:
+  /api/kpi:
+    get:
+      summary: Get KPI summary
+      responses:
+        '200':
+          description: KPI summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kpis:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Kpi'
+  /api/alerts:
+    get:
+      summary: Get alerts
+      responses:
+        '200':
+          description: Alerts list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  alerts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Alert'
+components:
+  schemas:
+    Kpi:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        value:
+          type: number
+        unit:
+          type: string
+        trend:
+          type: array
+          items:
+            type: number
+        source:
+          type: string
+    Alert:
+      type: object
+      properties:
+        id:
+          type: string
+        severity:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        link:
+          type: string
+```
+### KpiTile.stories.jsx
+
+```jsx
+import KpiTile from "../components/KpiTile";
+
+export default {
+  title: "Dashboard/KpiTile",
+  component: KpiTile,
+};
+
+const Template = (args) => <KpiTile {...args} />;
+
+      ## REFERENSI SCREENSHOT/MOCKUP DASHBOARD IDEAL
+
+      Berikut adalah referensi visual dashboard ideal yang dapat digunakan sebagai acuan desain dan implementasi:
+
+      - [data.go.id](https://data.go.id/dashboard) — Dashboard Data Nasional Indonesia
+      - [dashboard.bps.go.id](https://dashboard.bps.go.id/) — Dashboard Statistik BPS
+      - [data.gov.sg](https://data.gov.sg/dashboard) — Singapore Open Data Dashboard
+      - [data.gov.uk](https://data.gov.uk/dashboard) — UK Open Data Portal
+      - [NYC Open Data](https://opendata.cityofnewyork.us/) — New York City Open Data
+      - [Smart City Dashboard Barcelona](https://smartcity.bcn.cat/en/dashboard.html)
+      - [Smart City Dashboard Dubai](https://www.smartdubai.ae/)
+      - [World Bank Data Portal](https://databank.worldbank.org/source/world-development-indicators)
+
+      Jika ada referensi visual dari pimpinan/desainer (misal: screenshot, Figma, PDF), lampirkan di sini atau tautkan ke file di repo:
+
+      - Figma: [SIGAP Malut Dashboard](https://www.figma.com/file/xxxxxx/SIGAP-Malut-Dashboard)
+      - PDF: [Contoh Dashboard Sekretaris](docs/Contoh_Dashboard_Sekretaris.pdf)
+      - PNG: [Mockup Dashboard Komoditas](docs/Mockup_Dashboard_Komoditas.png)
+export const Default = Template.bind({});
+Default.args = {
+  label: "Compliance Alur Koordinasi",
+  value: 0.94,
+  unit: "ratio",
+  trend: [0.85, 0.88, 0.92, 0.94],
+  source: "audit_log",
+};
+
+export const Danger = Template.bind({});
+Danger.args = {
+  label: "Bypass Violations",
+  value: 3,
+  unit: "count",
+  trend: [2, 3, 4],
+  source: "audit_log",
+  variant: "danger",
+};
+```
+
+### AlertList.stories.jsx
+
+```jsx
+import AlertList from "../components/AlertList";
+
+export default {
+  title: "Dashboard/AlertList",
+  component: AlertList,
+};
+
+const Template = (args) => <AlertList {...args} />;
+
+export const Default = Template.bind({});
+Default.args = {
+  alerts: [
+    {
+      id: "a1",
+      severity: "critical",
+      title: "KGB Terlambat: Siti",
+      summary: "Terlewat 59 hari",
+    },
+    {
+      id: "a2",
+      severity: "warning",
+      title: "Bypass detected",
+      summary: "Bendahara submit SPJ langsung ke Kadis",
+    },
+  ],
+};
+```
+
+### DataTable.stories.jsx
+
+```jsx
+import DataTable from "../components/DataTable";
+
+export default {
+  title: "Dashboard/DataTable",
+  component: DataTable,
+};
+
+const Template = (args) => <DataTable {...args} />;
+
+export const Default = Template.bind({});
+Default.args = {
+  columns: [
+    { Header: "Nama", accessor: "name" },
+    { Header: "Status", accessor: "status" },
+    { Header: "Tanggal", accessor: "date" },
+  ],
+  data: [
+    { name: "DPA Uploaded", status: "approved", date: "2026-02-18" },
+    { name: "SPJ Approved", status: "approved", date: "2026-02-19" },
+  ],
+};
+```
 
 ## PRA-SYARAT IMPLEMENTASI (8 POINT PENTING)
 
@@ -686,6 +947,41 @@ module.exports = {
   plugins: [],
 };
 ```
+
+### **Komponen UI Khusus: Modul Perintah & Workflow**
+
+#### **Fitur di Halaman Dashboard Terkait**
+
+- **Tombol Buat Perintah:**
+  - Wajib ada di setiap dashboard level kepala dinas, sekretaris, kabid, UPTD, dan sub-unit yang punya hak atur workflow.
+- **Tampilan Daftar Perintah (Inbox/Outbox):**
+  - Perintah masuk (perintah diterima user tsb), perintah keluar (yang pernah diberikan user ke bawahannya).
+- **Status Box / Timeline Progress:**
+  - Setiap perintah memiliki badge status: Draft, Diterima, Sedang Ditindaklanjuti, Selesai, Feedback, Revisi.
+- **Tombol Forward/Delegasi:**
+  - Penerima perintah dapat me-limpahkan ke bawahannya, dengan catatan atau penyesuaian target tugas, tetap ter-log di chain.
+- **Tombol Feedback/revisi/closing:**
+  - Bila ada kendala, penerima dapat feedback langsung ke pemberi dan seluruh balasan, revisi, sampai closing wajib terekam.
+- **Tombol View & Edit:**
+  - Semua pengguna dapat memonitor progress, melihat seluruh riwayat aksi, serta mengedit perintah (bila role mengizinkan).
+- **Notifikasi Proaktif:**
+  - Setiap perubahan status ataupun feedback muncul sebagai alert/notification di dashboard penerima & pemberi.
+- **Audit Trail & Export:**
+  - Jejak perintah dapat diekspor (PDF, Excel) untuk keperluan audit, BPK, atau Inspektorat.
+
+#### **Mockup Flow UI**
+
+- Flow standar:
+  1. Buat Perintah → Pilih Penerima → Isi perintah & deadline → Kirim
+  2. Penerima masuk dashboard (inbox perintah masuk) → Terima/forward/tindaklanjuti
+  3. Progres dan feedback naik ke pemberi perintah langsung (realtime)
+  4. Semua progress dan revisi ter-log, siap untuk monitoring atasan dan pengawasan eksternal
+- Setiap role/unit akan melihat history dan progress perintah pada dashboard masing-masing.
+
+#### **Layout**
+
+- Di setiap dashboard, wajib ada section/inbox perintah, tombol aksi (buat, view, feedback, forward, selesai)
+- Warna/status badge visual jelas sesuai progress: draft (abu), aktif (biru), feedback/kendala (kuning/oranye), selesai (hijau), revisi/ditolak (merah).
 
 ---
 

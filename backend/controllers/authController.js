@@ -1,3 +1,190 @@
+// @desc    Delete user
+// @route   DELETE /api/auth/users/:id
+// @access  Private (Admin)
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User tidak ditemukan" });
+    }
+    await user.destroy();
+    // Audit trail
+    await logAudit({
+      modul: "AUTH",
+      entitas_id: user.id,
+      aksi: "DELETE",
+      data_lama: user,
+      data_baru: null,
+      pegawai_id: req.user?.id || null,
+    });
+    res.json({ success: true, message: "User berhasil dihapus" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error menghapus user",
+        error: error.message,
+      });
+  }
+};
+// @desc    Create new user (Admin)
+// @route   POST /api/auth/users
+// @access  Private (Admin)
+export const createUser = async (req, res) => {
+  try {
+    const {
+      username,
+      email,
+      password,
+      nama_lengkap,
+      role,
+      unit_kerja,
+      nip,
+      jabatan,
+    } = req.body;
+
+    // Validate password
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Password tidak valid",
+        errors: passwordValidation.errors,
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [{ username }, { email }],
+      },
+    });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message:
+          existingUser.username === username
+            ? "Username sudah digunakan"
+            : "Email sudah digunakan",
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await hashPassword(password);
+
+    // Create user
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      nama_lengkap,
+      role: role || "pelaksana",
+      unit_kerja,
+      nip,
+      jabatan,
+      is_verified: true,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User berhasil ditambahkan",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error menambah user",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Update user (Admin)
+// @route   PUT /api/auth/users/:id
+// @access  Private (Admin)
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      username,
+      email,
+      password,
+      nama_lengkap,
+      role,
+      unit_kerja,
+      nip,
+      jabatan,
+    } = req.body;
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User tidak ditemukan",
+      });
+    }
+
+    // Update fields
+    user.username = username ?? user.username;
+    user.email = email ?? user.email;
+    user.nama_lengkap = nama_lengkap ?? user.nama_lengkap;
+    user.role = role ?? user.role;
+    user.unit_kerja = unit_kerja ?? user.unit_kerja;
+    user.nip = nip ?? user.nip;
+    user.jabatan = jabatan ?? user.jabatan;
+
+    // Update password jika ada
+    if (password) {
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: "Password tidak valid",
+          errors: passwordValidation.errors,
+        });
+      }
+      user.password = await hashPassword(password);
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "User berhasil diupdate",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error mengupdate user",
+      error: error.message,
+    });
+  }
+};
+// @desc    Get all users
+// @route   GET /api/auth/users
+// @access  Private (atau sesuaikan kebutuhan)
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: { exclude: ["password"] },
+      order: [["created_at", "ASC"]],
+    });
+    res.json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error mengambil data users",
+      error: error.message,
+    });
+  }
+};
 import User from "../models/User.js";
 import sequelize from "../config/database.js"; // ← TAMBAHKAN INI
 import { Op } from "sequelize"; // ← TAMBAHKAN INI

@@ -1,5 +1,10 @@
+import ReportingWorkflowPage from "./pages/ReportingWorkflowPage";
+import CommentWorkflowPage from "./pages/CommentWorkflowPage";
+import CaseWorkflowPage from "./pages/CaseWorkflowPage";
+import ReminderPage from "./pages/ReminderPage";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
+const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import GenericCreatePage from "./pages/GenericCreatePage";
@@ -16,6 +21,9 @@ import DashboardKonsumsi from "./ui/dashboards/DashboardKonsumsi";
 import DashboardUPTD from "./ui/dashboards/DashboardUPTD";
 import LandingPage from "./pages/LandingPage";
 import DashboardSuperAdmin from "./ui/dashboards/DashboardSuperAdmin";
+import AuditTrailPage from "./pages/AuditTrailPage";
+import WorkflowStatusPage from "./pages/WorkflowStatusPage";
+import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -44,21 +52,43 @@ function App() {
     initAuth();
   }, [initAuth]);
 
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<LandingPage />} />
-      <Route path="/dashboard/superadmin" element={<DashboardSuperAdmin />} />
-      <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
       <Route
-        path="/"
+        path="/user-management"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <PrivateRoute>
+              <UserManagementPage />
+            </PrivateRoute>
+          </Suspense>
+        }
+      />
+      <Route
+        path="/dashboard/superadmin"
         element={
           <PrivateRoute>
-            <DashboardPage />
+            <DashboardSuperAdmin />
           </PrivateRoute>
         }
       />
-      <Route path="/dashboard" element={<Navigate to="/" replace />} />
+      <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
+      <Route
+        path="/dashboard"
+        element={
+          isAuthenticated ? (
+            <PrivateRoute>
+              <DashboardPage />
+            </PrivateRoute>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
       <Route
         path="/dashboard/sekretariat"
         element={
@@ -96,6 +126,39 @@ function App() {
         element={
           <PrivateRoute>
             <DashboardUPTD />
+          </PrivateRoute>
+        }
+      />
+      {/* Workflow and Reminder routes */}
+      <Route
+        path="/reporting-workflow"
+        element={
+          <PrivateRoute>
+            <ReportingWorkflowPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/comment-workflow"
+        element={
+          <PrivateRoute>
+            <CommentWorkflowPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/case-workflow"
+        element={
+          <PrivateRoute>
+            <CaseWorkflowPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/reminder"
+        element={
+          <PrivateRoute>
+            <ReminderPage />
           </PrivateRoute>
         }
       />
@@ -148,6 +211,30 @@ function App() {
         }
       />
       {GeneratedRoutes({ PrivateRoute })}
+      <Route
+        path="/audit-trail"
+        element={
+          <PrivateRoute>
+            <AuditTrailPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/workflow-status"
+        element={
+          <PrivateRoute>
+            <WorkflowStatusPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/approval-workflow"
+        element={
+          <PrivateRoute>
+            <ApprovalWorkflowPage />
+          </PrivateRoute>
+        }
+      />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
