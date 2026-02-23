@@ -1,27 +1,47 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../stores/authStore";
 
-// Kategori utama
+// Kategori utama dan role mapping
 const categories = [
-  { key: "Sekretariat", label: "Sekretariat" },
-  { key: "Bidang Ketersediaan", label: "Ketersediaan" },
-  { key: "Bidang Distribusi", label: "Distribusi" },
-  { key: "Bidang Konsumsi", label: "Konsumsi" },
-  { key: "UPTD", label: "UPTD" },
+  {
+    key: "Sekretariat",
+    label: "Sekretariat",
+    roles: ["super_admin", "sekretaris"],
+  },
+  {
+    key: "Bidang Ketersediaan",
+    label: "Ketersediaan",
+    roles: ["super_admin", "kepala_bidang_ketersediaan"],
+  },
+  {
+    key: "Bidang Distribusi",
+    label: "Distribusi",
+    roles: ["super_admin", "kepala_bidang_distribusi"],
+  },
+  {
+    key: "Bidang Konsumsi",
+    label: "Konsumsi",
+    roles: ["super_admin", "kepala_bidang_konsumsi"],
+  },
+  { key: "UPTD", label: "UPTD", roles: ["super_admin", "kepala_uptd"] },
 ];
 
 // Modul per kategori (contoh, tambahkan sesuai kebutuhan)
 const modulesByCategory = {
   Sekretariat: [
-    { id: "SA01", name: "Monitoring 50 indikator" },
-    { id: "SA02", name: "Tool modul tanpa coding" },
-    {
-      id: "SA03",
-      name: "Tata Naskah Dinas",
-      approval: true,
-    },
-    { id: "SA04", name: "Database peraturan", publik: true },
-    // ...tambahkan modul lain...
+    { id: "SEK-ADM", name: "Administrasi Umum & Persuratan" },
+    { id: "SEK-KEP", name: "Kepegawaian" },
+    { id: "SEK-KEU", name: "Keuangan & Anggaran" },
+    { id: "SEK-AST", name: "Aset & BMD" },
+    { id: "SEK-RMH", name: "Rumah Tangga & Umum" },
+    { id: "SEK-HUM", name: "Protokol & Kehumasan" },
+    { id: "SEK-REN", name: "Perencanaan & Evaluasi" },
+    { id: "SEK-KBJ", name: "Kebijakan & Koordinasi" },
+    { id: "SEK-LKT", name: "Laporan Ketersediaan Pangan" },
+    { id: "SEK-LDS", name: "Laporan Distribusi Pangan" },
+    { id: "SEK-LKS", name: "Laporan Konsumsi & Keamanan Pangan" },
+    { id: "SEK-LUP", name: "Laporan UPTD" },
   ],
   "Bidang Ketersediaan": [
     { id: "K001", name: "Master data komoditas", publik: true },
@@ -51,34 +71,12 @@ export default function DashboardLayout({ children }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dark] = useState(() => localStorage.getItem("darkMode") === "true");
   const dropdownRef = useRef(null);
-
-  // Handle click kategori
-  const handleCategoryClick = (catKey) => {
-    setActiveCategory(catKey === activeCategory ? null : catKey);
-    setDropdownOpen(catKey !== activeCategory);
-  };
+  const user = useAuthStore((state) => state.user);
 
   // Handle click modul
   const handleModuleClick = (modulId) => {
-    setDropdownOpen(false);
-    setActiveCategory(null);
     navigate(`/module/${modulId.toLowerCase()}`);
   };
-
-  // Close dropdown when click outside
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-        setActiveCategory(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownOpen]);
 
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
@@ -87,78 +85,70 @@ export default function DashboardLayout({ children }) {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-4">
           <div>
             <h2 className="text-2xl font-display text-primary">
-              Dashboard Super Admin
+              {user && user.role === "super_admin"
+                ? "Dashboard Super Admin"
+                : user && user.role === "sekretaris"
+                  ? "Dashboard Sekretariat"
+                  : user && user.role === "kepala_bidang_ketersediaan"
+                    ? "Dashboard Ketersediaan"
+                    : user && user.role === "kepala_bidang_distribusi"
+                      ? "Dashboard Distribusi"
+                      : user && user.role === "kepala_bidang_konsumsi"
+                        ? "Dashboard Konsumsi"
+                        : user && user.role === "kepala_uptd"
+                          ? "Dashboard UPTD"
+                          : "Dashboard"}
             </h2>
             <p className="text-sm text-muted">
-              Executive Control Center — Semua Modul, KPI, dan Alert
+              {user && user.role === "super_admin"
+                ? "Executive Control Center — Semua Modul, KPI, dan Alert"
+                : user && user.role === "sekretaris"
+                  ? "Ringkasan Sekretariat dan Monitoring"
+                  : user && user.role === "kepala_bidang_ketersediaan"
+                    ? "Ringkasan Ketersediaan dan Monitoring"
+                    : user && user.role === "kepala_bidang_distribusi"
+                      ? "Ringkasan Distribusi dan Monitoring"
+                      : user && user.role === "kepala_bidang_konsumsi"
+                        ? "Ringkasan Konsumsi dan Monitoring"
+                        : user && user.role === "kepala_uptd"
+                          ? "Ringkasan UPTD dan Monitoring"
+                          : "Ringkasan Dashboard"}
             </p>
-          </div>
-          <div className="flex gap-2">
-            <button className="bg-blue-700 text-white px-4 py-2 rounded font-semibold shadow">
-              Generate Mendagri Report
-            </button>
-            <button className="bg-gray-100 text-blue-700 px-4 py-2 rounded font-semibold shadow">
-              Open AI Inbox
-            </button>
           </div>
         </div>
       </header>
-      {/* Sidebar horizontal kategori */}
-      <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
-        <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
-          {categories.map((cat) => (
-            <div key={cat.key} className="relative">
+      {/* Navbar horizontal modul Sekretariat */}
+      {user && user.role === "sekretaris" ? (
+        <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
+          <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
+            {modulesByCategory["Sekretariat"].map((modul) => (
               <button
-                className={`px-4 py-2 rounded font-semibold flex items-center gap-2 transition ${
-                  activeCategory === cat.key
-                    ? "bg-accent text-surface"
-                    : "bg-ink text-accent hover:bg-accentDark"
-                }`}
-                onClick={() => handleCategoryClick(cat.key)}
+                key={modul.id}
+                className="px-4 py-2 rounded font-semibold flex items-center gap-2 transition bg-ink text-accent hover:bg-accentDark"
+                onClick={() => handleModuleClick(modul.id)}
               >
-                <span>{cat.badge}</span>
-                <span>{cat.label}</span>
+                <span>{modul.name}</span>
               </button>
-              {/* Dropdown modul */}
-              {activeCategory === cat.key && dropdownOpen && (
-                <div
-                  ref={dropdownRef}
-                  className={`absolute left-0 mt-2 rounded shadow-lg z-20 min-w-[260px] ${dark ? "bg-ink text-surface" : "bg-white text-ink"}`}
+            ))}
+          </div>
+        </nav>
+      ) : (
+        <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
+          <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
+            {categories
+              .filter((cat) => user && cat.roles.includes(user.role))
+              .map((cat) => (
+                <button
+                  key={cat.key}
+                  className="px-4 py-2 rounded font-semibold flex items-center gap-2 transition bg-ink text-accent hover:bg-accentDark"
+                  onClick={() => setActiveCategory(cat.key)}
                 >
-                  {modulesByCategory[cat.key]?.map((modul) => (
-                    <button
-                      key={modul.id}
-                      className={`w-full text-left px-4 py-2 flex items-center gap-2 rounded transition ${
-                        dark
-                          ? "hover:bg-accentDark hover:text-accent"
-                          : "hover:bg-neutral-200 hover:text-primary"
-                      }`}
-                      onClick={() => handleModuleClick(modul.id)}
-                    >
-                      <span>{modul.badge}</span>
-                      <span className="truncate">{modul.name}</span>
-                      {modul.approval && (
-                        <span
-                          className={`ml-auto text-xs px-2 py-1 rounded ${dark ? "bg-yellow-700 text-yellow-100" : "bg-yellow-200 text-yellow-800"}`}
-                        >
-                          Approval
-                        </span>
-                      )}
-                      {modul.publik && (
-                        <span
-                          className={`ml-auto text-xs px-2 py-1 rounded ${dark ? "bg-blue-700 text-blue-100" : "bg-blue-100 text-blue-700"}`}
-                        >
-                          Publik
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </nav>
+                  <span>{cat.label}</span>
+                </button>
+              ))}
+          </div>
+        </nav>
+      )}
       {/* Konten utama dashboard */}
       <main className="flex-1 px-8 py-8 mx-auto max-w-6xl">{children}</main>
     </div>

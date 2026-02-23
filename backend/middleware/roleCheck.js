@@ -188,3 +188,12 @@ export const requireMinLevel = (minLevel) => {
     next();
   };
 };
+export default {
+  authorize,
+  checkUnit,
+  requireVerifikator,
+  requireApprover,
+  canAccessUnit,
+  getRoleLevel,
+  requireMinLevel,
+};

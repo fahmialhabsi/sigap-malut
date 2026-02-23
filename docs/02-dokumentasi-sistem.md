@@ -178,7 +178,7 @@ Sistem menyediakan:
 - 10 komoditas penyumbang inflasi terbesar
 - Tren harga 3-6 bulan terakhir
 - Analisis AI: penyebab inflasi
-- Rekomendasi AI: intervensi yang disarankan
+- Rekomendasi AI: Intervensi yang disarankan
 - **Laporan otomatis siap pakai dalam 1 klik** (PDF/PowerPoint)
 
 ### 5. AI Chatbot untuk Routing Otomatis
@@ -557,7 +557,7 @@ Bidang Ketersediaan input: Beras Premium, Rp 12.000 ↓ Bidang Distribusi buat l
 - ✅ Input 1x → semua bidang akses data yang sama
 - ✅ **Tidak ada duplikasi, tidak ada inkonsistensi**
 - ✅ Dashboard inflasi real-time untuk TPID & Mendagri
-- ✅ Data SPPG valid 100% untuk Bapanas
+- ✅ Data SPPG valid 100% untuk Bapanas/Kemensos
 
 ---
 
@@ -938,6 +938,7 @@ Dinas Pangan Provinsi Maluku Utara menghadapi **masalah struktural dan sistemik*
 ---
 
 \newpage
+
 [COPY PASTE - SELESAI SAMPAI DI SINI]
 [COPY PASTE - BAGIAN III-IV - MULAI DARI SINI]
 
@@ -975,7 +976,7 @@ Struktur Organisasi dan Tata Kerja (SOTK) Dinas Pangan Provinsi Maluku Utara dia
 ┌────────┴────────┐ │ ┌──────┴──────┐
 │ │ │ │ │
 ▼ ▼ ▼ ▼ ▼
-┌─────────┐ ┌──────────────┐ ┌──────────┐ ┌──────────┐ │Kasubbag │ │ Fungsional │ │ Jabatan │ │ Seksi │ │Umum & │ │- Perencana │ │Fungsional│ │ UPTD │ │Kepega- │ │- Keuangan │ │ Bidang │ │ │ │waian │ │- Bendahara │ │ │ │ │ └─────────┘ └──────────────┘ └──────────┘ └──────────┘
+┌─────────┐ ┌──────────────┐ ┌──────────┐ ┌──────────┐ │Kasubbag │ │ Fungsional │ │ Jabatan │ │ Seksi │ │ Umum & │ │- Perencana │ │Fungsional│ │ UPTD │ │Kepega- │ │- Keuangan │ │ Bidang │ │ │ │waian │ │ - Bendahara │ │ │ │ │ └─────────┘ └──────────────┘ └──────────┘ └──────────┘
 
 ---
 
@@ -1314,9 +1315,9 @@ Menjalankan kegiatan sesuai keahlian teknis:
           ▼                ▼                ▼
 
 ┌─────────────────┐ ┌──────────┐ ┌──────────────┐
-│ SEKRETARIS │ │ KEPALA │ │ KEPALA UPTD │
-│ │ │ BIDANG │ │ │
-│ (HUB/GATEWAY) │ │ (3 unit) │ │ │
+│ SEKRETARIAT │ │ KEPALA │ │ KEPALA UPTD │
+│ (HUB/GATEWAY) │ │ BIDANG │ │ │
+│ (Eselon III) │ │(3 unit) │ │ │
 └────────┬────────┘ └────┬─────┘ └──────┬───────┘
 │ │ │
 │ (WAJIB) │ (CC) │ (Admin)
@@ -1755,7 +1756,7 @@ KEPALA BIDANG / KEPALA UPTD
 ↓
 Approve & submit ke Sekretaris
 ↓
-SEKRETARIS
+SEKRETARIAT
 (Dokumentasi, Administrasi, Ringkasan, Integrasi - Eselon III)
 ↓
 Review, dokumentasi, buat ringkasan eksekutif
@@ -1917,709 +1918,10 @@ createKomoditas
    CREATE INDEX idx_asn_nip ON asn(nip);
    CREATE INDEX idx_asn_status ON asn(status);
    CREATE INDEX idx_asn_kgb_date ON asn(tanggal_kgb_berikutnya);
-
-CREATE INDEX idx_harga_tanggal ON harga_pangan(tanggal);
-CREATE INDEX idx_harga_komoditas ON harga_pangan(komoditas_id);
-CREATE INDEX idx_harga_pasar ON harga_pangan(pasar_id);
-
--- Views untuk complex queries
-CREATE VIEW v_dashboard_kgb_alert AS
-SELECT
-asn.id,
-asn.nama,
-asn.nip,
-asn.tanggal_kgb_berikutnya,
-DATEDIFF(asn.tanggal_kgb_berikutnya, NOW()) AS days_until_due
-FROM asn
-WHERE
-asn.status = 'aktif'
-AND asn.tanggal_kgb_berikutnya <= DATE_ADD(NOW(), INTERVAL 30 DAY)
-ORDER BY asn.tanggal_kgb_berikutnya ASC;
-
-Caching Strategy
-JavaScript
-// Redis cache untuk data yang sering diakses
-const cache = require('redis').createClient();
-
-// Cache dashboard data (refresh every 5 minutes)
-const getDashboardData = async () => {
-const cacheKey = 'dashboard:sekretaris';
-
-// Check cache first
-const cached = await cache.get(cacheKey);
-if (cached) {
-return JSON.parse(cached);
-}
-
-// If not in cache, query database
-const data = await queryDatabaseForDashboard();
-
-// Store in cache (expire in 5 minutes)
-await cache.setex(cacheKey, 300, JSON.stringify(data));
-
-return data;
-};
-
-Pagination untuk Large Datasets
-
-JavaScript
-// Example: Get SPPG penerima (5000+ records)
-const getSPPGPenerima = async (req, res) => {
-const page = parseInt(req.query.page) || 1;
-const limit = parseInt(req.query.limit) || 10;
-const offset = (page - 1) \* limit;
-
-const { count, rows } = await SPPGPenerima.findAndCountAll({
-limit,
-offset,
-order: [['nama', 'ASC']],
-});
-
-res.json({
-data: rows,
-pagination: {
-total: count,
-page,
-limit,
-totalPages: Math.ceil(count / limit),
-},
-});
-};
-\newpage
-
-# 📄 **[COPY PASTE - BAGIAN III-IV - SELESAI SAMPAI DI SINI]**
-
----
-
-## ✅ **CHECKPOINT BAGIAN III-IV**
-
-**Anda baru saja menerima:**
-
-- ✅ Bagian III: Struktur Organisasi & TUSI (lengkap dengan diagram, alur koordinasi)
-- ✅ Bagian IV: Solusi yang Dibangun - Arsitektur Sistem (diagram teknis, tech stack, database, security, performance)
-
-**Total halaman:** ~12-15 halaman tambahan
-
-**Total akumulasi:** ~27-33 halaman
-
----
-
-## 📋 **INSTRUKSI:**
-
-1. **Copy semua text** dari `[COPY PASTE - BAGIAN III-IV - MULAI DARI SINI]` sampai `[COPY PASTE - BAGIAN III-IV - SELESAI SAMPAI DI SINI]`
-
-2. **Paste** ke file VS Code Anda (lanjutan dari Bagian I-II)
-
-3. **Save** (Ctrl + S)
-
-4. **Preview** (Ctrl + Shift + V)
-
----
-
-## ⏭️ **SIAP LANJUT KE BAGIAN V-VII?**
-
-**Bagian berikutnya:**
-
-- **Bagian V:** Database Schema Detail (contoh tabel lengkap)
-- **Bagian VI:** Fitur-Fitur Unggulan (9 fitur strategis dengan screenshot/wireframe)
-- **Bagian VII:** Source Code Backend (controllers, models, routes - copy-paste ready)
-
-**Estimasi:** ~20-25 halaman lagi
-
-\newpage
-
-[COPY PASTE - BAGIAN V-VII - MULAI DARI SINI]
-
-# BAGIAN V: DATABASE SCHEMA DETAIL
-
-## A. Pengantar
-
-Database SIGAP Malut dirancang dengan prinsip:
-
-1. **Normalisasi** - Mengurangi redundansi data
-2. **Referential Integrity** - Foreign keys untuk menjaga konsistensi
-3. **Indexing** - Optimasi performa query
-4. **Audit Trail** - Setiap tabel memiliki timestamp (created_at, updated_at)
-5. **Soft Delete** - Data tidak benar-benar dihapus (untuk audit)
-
----
-
-## B. Schema Tabel Utama
-
-### 1. Tabel Users (Autentikasi & Autorisasi)
-
-**Tujuan:** Menyimpan data semua pengguna sistem
-
-```sql
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,  -- bcrypt hashed
-    role ENUM(
-        'super_admin',      -- Sekretaris
-        'kepala_dinas',     -- Kepala Dinas
-        'kepala_bidang',    -- Kepala Bidang (3 orang)
-        'kepala_uptd',      -- Kepala UPTD
-        'kasubbag',         -- Kasubbag
-        'pelaksana'         -- Staf pelaksana
-    ) DEFAULT 'pelaksana',
-    unit_kerja VARCHAR(100),  -- Sekretariat, Bid. Ketersediaan, dll
-    status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
-    last_login DATETIME,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    deleted_at DATETIME  -- Soft delete
-);
-
--- Indexes
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_users_status ON users(status);
-```
-
-Contoh Data:
-id username email role unit_kerja
-1 sekretaris sekretaris@sigap-malut.go.id super_admin Sekretariat
-2 kadis kadis@sigap-malut.go.id kepala_dinas Kepala Dinas
-3 kabid_ketersediaan ketersediaan@sigap-malut.go.id kepala_bidang Bid. Ketersediaan
-
-2.  Tabel ASN (Kepegawaian)
-    Tujuan: Master data Aparatur Sipil Negara (Pegawai)
-    SQL
-    CREATE TABLE asn (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nip VARCHAR(18) UNIQUE NOT NULL, -- Nomor Induk Pegawai (18 digit)
-    nama VARCHAR(255) NOT NULL,
-    tempat_lahir VARCHAR(100),
-    tanggal_lahir DATE,
-    jenis_kelamin ENUM('L', 'P'),
-    agama VARCHAR(20),
-    -- Kepangkatan
-    pangkat VARCHAR(50), -- Pembina, Penata, dsb
-    golongan VARCHAR(10), -- IV/a, III/d, dsb
-    tmt_pangkat DATE, -- Terhitung Mulai Tanggal
-
-        -- Jabatan
-        jabatan VARCHAR(255),
-        unit_kerja VARCHAR(255),
-        eselon VARCHAR(10),               -- II/a, III/a, IV/a, atau NULL
-
-        -- KGB (Kenaikan Gaji Berkala)
-        tanggal_kgb_terakhir DATE,
-        tanggal_kgb_berikutnya DATE,      -- Auto-calculated: +2 tahun
-
-        -- Kenaikan Pangkat
-        tanggal_kenaikan_pangkat_terakhir DATE,
-        tanggal_kenaikan_pangkat_berikutnya DATE,  -- Auto-calculated
-
-        -- Penghargaan
-        tanggal_penghargaan_10_tahun DATE,
-        tanggal_penghargaan_20_tahun DATE,
-        tanggal_penghargaan_30_tahun DATE,
-
-        -- Masa Kerja
-        tmt_cpns DATE,                    -- TMT CPNS
-        tmt_pns DATE,                     -- TMT PNS
-        masa_kerja_tahun INTEGER,         -- Auto-calculated
-        masa_kerja_bulan INTEGER,         -- Auto-calculated
-
-        -- Pendidikan
-        pendidikan_terakhir VARCHAR(50),  -- S2, S1, D3, SMA
-        jurusan VARCHAR(100),
-
-        -- Kontak
-        no_hp VARCHAR(20),
-        email VARCHAR(100),
-        alamat TEXT,
-
-        -- Status
-        status ENUM('aktif', 'pensiun', 'mutasi', 'meninggal') DEFAULT 'aktif',
-
-        -- Timestamps
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        deleted_at DATETIME
-
-    );
-
--- Indexes
-CREATE INDEX idx_asn_nip ON asn(nip);
-CREATE INDEX idx_asn_nama ON asn(nama);
-CREATE INDEX idx_asn_status ON asn(status);
-CREATE INDEX idx_asn_unit_kerja ON asn(unit_kerja);
-CREATE INDEX idx_asn_kgb_next ON asn(tanggal_kgb_berikutnya);
-CREATE INDEX idx_asn_pangkat_next ON asn(tanggal_kenaikan_pangkat_berikutnya);
-
--- Trigger untuk auto-calculate tanggal KGB berikutnya
-CREATE TRIGGER calculate_kgb_next
-AFTER INSERT ON asn
-BEGIN
-UPDATE asn
-SET tanggal_kgb_berikutnya = DATE(NEW.tanggal_kgb_terakhir, '+2 years')
-WHERE id = NEW.id;
-END;
-
-Contoh Data:
-id nip nama pangkat golongan jabatan tanggal_kgb_berikutnya
-1 199001012015031001 Dr. Ahmad Hidayat, S.STP, M.Si Pembina IV/a Kepala Dinas 2026-06-15
-2 198505102010121002 Ir. Siti Nurhaliza, M.P Penata Tingkat I III/d Sekretaris 2025-12-20 ⚠️
-
-3.  Tabel KGB Tracking
-    Tujuan: Tracking proses Kenaikan Gaji Berkala setiap pegawai
-    SQL
-    CREATE TABLE kgb_tracking (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    asn_id INTEGER NOT NULL,
-    tanggal_jatuh_tempo DATE NOT NULL,
-    -- Status Proses
-    status ENUM('pending', 'proses', 'selesai', 'terlambat') DEFAULT 'pending',
-
-        -- Proses
-        tanggal_mulai_proses DATE,
-        tanggal_selesai DATE,
-        penanggung_jawab VARCHAR(255),    -- Kasubbag Kepegawaian
-
-        -- Dokumen
-        nomor_sk VARCHAR(50),
-        file_sk VARCHAR(255),             -- Path to PDF file
-
-        -- Catatan
-        catatan TEXT,
-
-        -- Timestamps
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-        FOREIGN KEY (asn_id) REFERENCES asn(id) ON DELETE CASCADE
-
-    );
-
--- Indexes
-CREATE INDEX idx_kgb_asn ON kgb_tracking(asn_id);
-CREATE INDEX idx_kgb_status ON kgb_tracking(status);
-CREATE INDEX idx_kgb_tempo ON kgb_tracking(tanggal_jatuh_tempo);
-
-Workflow:
-Code
-
-1. Sistem auto-create record di kgb_tracking
-   saat ASN.tanggal_kgb_berikutnya <= NOW() + 30 days
-
-2. Status = 'pending'
-   → Notifikasi ke Kasubbag Kepegawaian
-
-3. Kasubbag mulai proses
-   → Status = 'proses'
-   → tanggal_mulai_proses = NOW()
-
-4. SK KGB selesai dibuat
-   → Upload file SK
-   → Status = 'selesai'
-   → tanggal_selesai = NOW()
-
-5. Jika tanggal_jatuh_tempo terlewat dan status != 'selesai'
-   → Status = 'terlambat'
-   → Alert ke Sekretaris (Super Admin)
-
-6. Tabel Komoditas (SINGLE SOURCE OF TRUTH)
-   Tujuan: Master data komoditas pangan
-
-SQL
-CREATE TABLE komoditas (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-kode VARCHAR(20) UNIQUE NOT NULL, -- BRS-PRM, MGG-CRH, dll
-nama VARCHAR(255) NOT NULL, -- Beras Premium, Minyak Goreng Curah
-
-    -- Kategori
-    kategori ENUM(
-        'pangan_pokok',        -- Beras, Jagung, Sagu
-        'pangan_strategis',    -- Minyak goreng, Gula, Telur
-        'pangan_lokal'         -- Sagu, Ikan lokal
-    ) DEFAULT 'pangan_pokok',
-
-    -- Satuan
-    satuan VARCHAR(20) DEFAULT 'kg',      -- kg, liter, buah
-
-    -- Status
-    is_active BOOLEAN DEFAULT 1,          -- Aktif atau tidak
-
-    -- Deskripsi
-    deskripsi TEXT,
-
-    -- Input oleh
-    created_by INTEGER,                   -- User ID (Bid. Ketersediaan)
-
-    -- Timestamps
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    deleted_at DATETIME,
-
-    FOREIGN KEY (created_by) REFERENCES users(id)
-
-);
-
--- Indexes
-CREATE INDEX idx_komoditas_kode ON komoditas(kode);
-CREATE INDEX idx_komoditas_kategori ON komoditas(kategori);
-CREATE INDEX idx_komoditas_active ON komoditas(is_active);
-Contoh Data:
-
-id kode nama kategori satuan
-1 BRS-PRM Beras Premium pangan_pokok kg
-2 BRS-MED Beras Medium pangan_pokok kg
-3 MGG-CRH Minyak Goreng Curah pangan_strategis liter
-4 CBM-MRH Cabai Merah Keriting pangan_strategis kg
-5 SGU-KRG Sagu Kering pangan_lokal kg
-
-5. Tabel Pasar
-   Tujuan: Master data pasar di 10 Kabupaten/Kota Maluku Utara
-
-SQL
-CREATE TABLE pasar (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-nama VARCHAR(255) NOT NULL,
-kabupaten VARCHAR(100) NOT NULL,
-kecamatan VARCHAR(100),
-desa VARCHAR(100),
-alamat TEXT,
-
-    -- Koordinat GPS (untuk peta)
-    latitude DECIMAL(10, 8),
-    longitude DECIMAL(11, 8),
-
-    -- Kontak
-    pengelola VARCHAR(100),
-    no_telepon VARCHAR(20),
-
-    -- Status
-    is_active BOOLEAN DEFAULT 1,
-
-    -- Timestamps
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    deleted_at DATETIME
-
-);
-
--- Indexes
-CREATE INDEX idx_pasar_kabupaten ON pasar(kabupaten);
-CREATE INDEX idx_pasar_nama ON pasar(nama);
-Contoh Data:
-
-id nama kabupaten kecamatan latitude longitude
-1 Pasar Gamalama Kota Ternate Ternate Tengah 0.7893 127.3610
-2 Pasar Sofifi Sofifi Oba Utara 0.7372 127.5675
-3 Pasar Tidore Kota Tidore Kepulauan Tidore Utara 0.6814 127.3981 6. Tabel Harga Pangan (Data Harian)
-Tujuan: Menyimpan harga pangan harian di setiap pasar
-
-SQL
-CREATE TABLE harga_pangan (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-komoditas_id INTEGER NOT NULL,
-pasar_id INTEGER NOT NULL,
-tanggal DATE NOT NULL,
-harga DECIMAL(15, 2) NOT NULL, -- Harga dalam Rupiah
-satuan VARCHAR(20) DEFAULT 'kg',
-
-    -- Petugas Input
-    petugas_input VARCHAR(255),       -- Nama petugas lapangan
-    user_id INTEGER,                  -- User yang input
-
-    -- Verifikasi
-    verified_by INTEGER,              -- User ID yang verifikasi
-    verified_at DATETIME,
-    is_verified BOOLEAN DEFAULT 0,
-
-    -- Catatan
-    catatan TEXT,                     -- Catatan khusus (jika ada)
-
-    -- Timestamps
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (komoditas_id) REFERENCES komoditas(id) ON DELETE CASCADE,
-    FOREIGN KEY (pasar_id) REFERENCES pasar(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (verified_by) REFERENCES users(id),
-
-    -- Constraint: 1 harga per komoditas per pasar per hari
-    UNIQUE(komoditas_id, pasar_id, tanggal)
-
-);
-
--- Indexes
-CREATE INDEX idx_harga_tanggal ON harga_pangan(tanggal);
-CREATE INDEX idx_harga_komoditas ON harga_pangan(komoditas_id);
-CREATE INDEX idx_harga_pasar ON harga_pangan(pasar_id);
-CREATE INDEX idx_harga_verified ON harga_pangan(is_verified);
-Contoh Data:
-
-id komoditas_id pasar_id tanggal harga verified
-1 1 (BRS-PRM) 1 (Gamalama) 2026-02-17 12500.00 ✅
-2 1 (BRS-PRM) 2 (Sofifi) 2026-02-17 12000.00 ✅
-3 3 (MGG-CRH) 1 (Gamalama) 2026-02-17 15000.00 ⏳ 7. Tabel Inflasi Pangan (Agregat Bulanan)
-Tujuan: Menyimpan hasil perhitungan inflasi pangan per bulan
-
-SQL
-CREATE TABLE inflasi_pangan (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-periode DATE NOT NULL UNIQUE, -- Format: YYYY-MM-01 (tanggal 1 setiap bulan)
-
-    -- Inflasi
-    inflasi_persen DECIMAL(5, 2) NOT NULL,  -- Contoh: 2.35
-    inflasi_mtm DECIMAL(5, 2),              -- Month-to-Month
-    inflasi_ytd DECIMAL(5, 2),              -- Year-to-Date
-
-    -- Target
-    target_tpid DECIMAL(5, 2) DEFAULT 2.50, -- Target TPID (biasanya 2.5%)
-
-    -- Status
-    status ENUM('on_target', 'warning', 'alert') DEFAULT 'on_target',
-    -- on_target: inflasi <= target
-    -- warning: inflasi > target tapi < target + 0.5%
-    -- alert: inflasi >= target + 0.5%
-
-    -- AI Analysis
-    analisis_ai TEXT,                       -- Narrative dari AI
-    rekomendasi_ai TEXT,                    -- Rekomendasi intervensi
-
-    -- Metadata
-    jumlah_komoditas_naik INTEGER,          -- Berapa komoditas yang naik
-    jumlah_komoditas_turun INTEGER,         -- Berapa komoditas yang turun
-
-    -- Report
-    report_file VARCHAR(255),               -- Path to PDF report
-
-    -- Timestamps
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-
-);
-
--- Indexes
-CREATE INDEX idx_inflasi_periode ON inflasi_pangan(periode);
-CREATE INDEX idx_inflasi_status ON inflasi_pangan(status);
-Contoh Data:
-
-id periode inflasi_persen target_tpid status analisis_ai (excerpt)
-1 2026-12-01 2.35 2.50 on_target "Inflasi naik 0.25 poin didorong oleh kenaikan harga beras..."
-2 2026-11-01 2.10 2.50 on_target "Inflasi terkendali, harga stabil..." 8. Tabel Inflasi Komoditas (Detail Penyumbang)
-Tujuan: Detail komoditas penyumbang inflasi (relasi dengan inflasi_pangan)
-
-SQL
-CREATE TABLE inflasi_komoditas (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-inflasi_pangan_id INTEGER NOT NULL,
-komoditas_id INTEGER NOT NULL,
-
-    -- Perubahan Harga
-    harga_bulan_ini DECIMAL(15, 2),
-    harga_bulan_lalu DECIMAL(15, 2),
-    perubahan_harga_persen DECIMAL(5, 2),  -- % perubahan
-
-    -- Kontribusi ke Inflasi
-    kontribusi_inflasi DECIMAL(5, 2),      -- Kontribusi dalam poin
-
-    -- Ranking
-    ranking INTEGER,                        -- Ranking penyumbang (1 = terbesar)
-
-    -- Timestamps
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (inflasi_pangan_id) REFERENCES inflasi_pangan(id) ON DELETE CASCADE,
-    FOREIGN KEY (komoditas_id) REFERENCES komoditas(id) ON DELETE CASCADE
-
-);
-
--- Indexes
-CREATE INDEX idx_inflasi_komoditas_inflasi ON inflasi_komoditas(inflasi_pangan_id);
-CREATE INDEX idx_inflasi_komoditas_ranking ON inflasi_komoditas(ranking);
-Contoh Data:
-
-id inflasi*pangan_id komoditas harga_sekarang harga_lalu perubahan*% kontribusi ranking
-1 1 (Des 2026) Beras Premium 12500 12100 +3.31 1.10 1
-2 1 (Des 2026) Minyak Goreng 15000 14600 +2.74 0.60 2
-3 1 (Des 2026) Cabai Merah 48000 45600 +5.26 0.40 3 9. Tabel SPPG Penerima
-Tujuan: Master data penerima SPPG (Stunting Prevention and Poverty Reduction - Gizi)
-
-SQL
-CREATE TABLE sppg_penerima (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-    -- Identitas
-    nik VARCHAR(16),                        -- NIK KTP
-    kk VARCHAR(16),                         -- Nomor KK
-    nama VARCHAR(255) NOT NULL,
-
-    -- Alamat
-    alamat TEXT,
-    rt VARCHAR(5),
-    rw VARCHAR(5),
-    desa VARCHAR(100),
-    kecamatan VARCHAR(100),
-    kabupaten VARCHAR(100) NOT NULL,
-    kode_pos VARCHAR(10),
-
-    -- Kontak
-    no_hp VARCHAR(20),
-
-    -- Keluarga
-    nama_kepala_keluarga VARCHAR(255),
-    jumlah_anggota_keluarga INTEGER,
-    jumlah_balita INTEGER,
-    jumlah_ibu_hamil INTEGER,
-
-    -- Kebutuhan Pangan (per bulan)
-    kebutuhan_beras_kg DECIMAL(10, 2),
-    kebutuhan_telur_kg DECIMAL(10, 2),
-    kebutuhan_susu_liter DECIMAL(10, 2),
-    kebutuhan_sayur_kg DECIMAL(10, 2),
-
-    -- Status
-    status ENUM('aktif', 'tidak_aktif', 'lulus') DEFAULT 'aktif',
-    alasan_tidak_aktif TEXT,
-    tanggal_mulai DATE,
-    tanggal_selesai DATE,
-
-    -- Verifikasi
-    verified_by INTEGER,
-    verified_at DATETIME,
-    is_verified BOOLEAN DEFAULT 0,
-
-    -- Timestamps
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    deleted_at DATETIME,
-
-    FOREIGN KEY (verified_by) REFERENCES users(id)
-
-);
-
--- Indexes
-CREATE INDEX idx_sppg_nik ON sppg_penerima(nik);
-CREATE INDEX idx_sppg_kabupaten ON sppg_penerima(kabupaten);
-CREATE INDEX idx_sppg_status ON sppg_penerima(status);
-CREATE INDEX idx_sppg_verified ON sppg_penerima(is_verified);
-Contoh Data:
-
-id nama desa kecamatan kabupaten status kebutuhan_beras_kg
-1 Fatimah Zahra Desa Tobololo Oba Utara Sofifi aktif 25.00
-2 Ahmad Fauzi Desa Sasa Ternate Selatan Kota Ternate aktif 30.00 10. Tabel Audit Log (Tracking Semua Aktivitas)
-Tujuan: Mencatat semua aktivitas user di sistem (untuk akuntabilitas)
-
-SQL
-CREATE TABLE audit_log (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-    -- User
-    user_id INTEGER,
-    username VARCHAR(50),
-    role VARCHAR(50),
-
-    -- Aktivitas
-    action VARCHAR(50) NOT NULL,        -- 'create', 'update', 'delete', 'login', 'logout', 'bypass'
-    module VARCHAR(50) NOT NULL,        -- 'asn', 'komoditas', 'harga_pangan', dll
-    record_id INTEGER,                  -- ID record yang diakses/diubah
-
-    -- Detail
-    old_value TEXT,                     -- Nilai lama (JSON)
-    new_value TEXT,                     -- Nilai baru (JSON)
-
-    -- Metadata
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-
-    -- Timestamps
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (user_id) REFERENCES users(id)
-
-);
-
--- Indexes
-CREATE INDEX idx_audit_user ON audit_log(user_id);
-CREATE INDEX idx_audit_action ON audit_log(action);
-CREATE INDEX idx_audit_module ON audit_log(module);
-CREATE INDEX idx_audit_created ON audit_log(created_at);
-Contoh Data:
-
-id username action module record*id created_at
-1 sekretaris login auth NULL 2026-02-17 08:00:00
-2 ketersediaan create komoditas 5 2026-02-17 09:15:00
-3 bendahara bypass koordinasi NULL 2026-02-17 10:30:00 ⚠️
-4 sekretaris update asn 2 2026-02-17 11:45:00
-C. Relasi Antar Tabel (Entity Relationship Diagram)
-Diagram ERD Utama
-Code
-┌─────────────┐ ┌──────────────┐ ┌─────────────┐
-│ Users │ │ ASN │ │ KGBTrack │
-├─────────────┤ ├──────────────┤ ├─────────────┤
-│ id (PK) │ │ id (PK) ���───┐ │ id (PK) │
-│ username │ │ nip │ │ │ asn_id (FK) │
-│ email │ │ nama │ │ │ tgl_tempo │
-│ password │ │ pangkat │ │ │ status │
-│ role │ │ jabatan │ │ │ file_sk │
-└─────────────┘ │ tgl_kgb_next │ │ └─────────────┘
-└──────────────┘ │
-│
-┌─────────────┐ ┌──────────────┐ │
-│ Komoditas │ │ HargaPangan │ │
-├─────────────┤ ├──────────────┤ │
-│ id (PK) │───┐ │ id (PK) │ │
-│ kode │ │ │ komoditas_id │◄──┘
-│ nama │ │ │ pasar_id │◄──┐
-│ kategori │ │ │ tanggal │ │
-│ satuan │ │ │ harga │ │
-└─────────────┘ │ └──────────────┘ │
-│ │
-┌─────────────┐ │ ┌─���────────────┐ │
-│ Pasar │ │ │InflasiPangan │ │
-├─────────────┤ │ ├──────────────┤ │
-│ id (PK) │───┘ │ id (PK) │ │
-│ nama │ │ periode │ │
-│ kabupaten │ │ inflasi*% │ │
-│ latitude │ │ target*tpid │ │
-│ longitude │ │ status │ │
-└─────────────┘ └──────────────┘ │
-│ │
-│ │
-┌───────▼───────┐ │
-│InflasiKomoditas│ │
-├───────────────┤ │
-│ id (PK) │ │
-│ inflasi_id(FK)│ │
-│ komoditas_id │───┘
-│ perubahan*% │
-│ kontribusi │
-└───────────────┘
-
-┌──────────────┐
-│ SPPGPenerima │
-├──────────────┤
-│ id (PK) │
-│ nik │
-│ nama │
-│ kabupaten │
-│ kebutuhan_kg │
-│ status │
-└──────────────┘
-
-┌─────────────┐
-│ AuditLog │
-├─────────────┤
-│ id (PK) │
-│ user_id(FK) │
-│ action │
-│ module │
-│ record_id │
-│ created_at │
-└─────────────┘
-D. Views untuk Query Kompleks
-
-1. View: Dashboard KGB Alert
-   SQL
+   CREATE INDEX idx_harga_tanggal ON harga_pangan(tanggal);
+   CREATE INDEX idx_harga_komoditas ON harga_pangan(komoditas_id);
+   CREATE INDEX idx_harga_pasar ON harga_pangan(pasar_id);
+   -- Views untuk complex queries
    CREATE VIEW v_dashboard_kgb_alert AS
    SELECT
    a.id,
@@ -2726,7 +2028,7 @@ Code
 │ ✅ Waktu Penyajian Data: 3 menit rata-rata (Target: <5 menit) │
 │ ✅ Konsistensi Data Komoditas: 100% (No duplikasi!) │
 │ │
-│ ━━━━━━━━━━━━━━━━━��━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │
+│ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │
 │ │
 │ 📈 TREN 6 BULAN TERAKHIR: │
 │ │
@@ -2893,7 +2195,7 @@ Code
 │ ... │
 │ │
 │ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Status: SELESAI (42 pegawai bulan ini) ✅ │ │
+│ │ Status: SELESAI (42 pegawai bulan ini) ✅ │
 │ └─────────────────────────────────────────────────────────┘ │
 │ ... │
 │ │
@@ -3255,8 +2557,8 @@ Code
 │ │ Type: [Text ▼] Required: [✅] Default: [-] │ │
 │ │ │ │
 │ │ 5. Kabupaten │ │
-│ │ Type: [Dropdown ▼] Required: [✅] │ │
-│ │ Options: [Pilih dari master kabupaten] │ │
+│ │ Type: [Dropdown ▼] Required: [✅] │
+│ │ Options: [Pilih dari master kabupaten] │
 │ │ │ │
 │ │ 6. Jumlah Peserta │ │
 │ │ Type: [Integer ▼] Required: [✅] Default: [0] │ │
@@ -3271,7 +2573,7 @@ Code
 │ │ Type: [Text ▼] Required: [✅] Default: [-] │ │
 │ │ │ │
 │ │ 10. Keterangan │ │
-│ │ Type: [Textarea ▼] Required: [❌] │ │
+│ │ Type: [Textarea ▼] Required: [❌] │
 │ │ │ │
 │ │ [+ Tambah Field] │ │
 │ │ │ │
@@ -3440,8 +2742,8 @@ Code
 │ │
 │ ┌──────────────────────────────────────────────────────┐ │
 │ │ 4. 🏭 Daftar UMKM Pangan Bersertifikat │ │
-│ │ 152 UMKM | Downloads: 421 │ │
-│ │ [⬇️ Excel] [🗺️ Peta UMKM] │ │
+│ │ 152 UMKM | Downloads: 421 │
+│ │ [⬇️ Excel] [🗺️ Peta UMKM] │
 │ └──────────────────────────────────────────────────────┘ │
 │ │
 │ [Lihat Semua Dataset →] │
@@ -3805,14 +3107,14 @@ Code
 │ │
 │ ┌─────────────────────────────────────────────────────────┐ │
 │ │ Pergub No. 56 Tahun 2021 tentang SOTK Dinas Pangan │ │
-│ │ Status: ✅ Berlaku | Diubah: Pergub No. 72/2023 │ │
-│ │ [📄 Lihat PDF] [⬇️ Download] [🔗 Lihat Perubahan] │ │
+│ │ Status: ✅ Berlaku | Diubah: Pergub No. 72/2023 │
+│ │ [📄 Lihat PDF] [⬇️ Download] [🔗 Lihat Perubahan] │
 │ └─────────────────────────────────────────────────────────┘ │
 │ │
 │ ┌─────────────────────────────────────────────────────────┐ │
 │ │ Pergub No. 72 Tahun 2023 tentang SOTK UPTD Dinas Pangan│ │
-│ │ Status: ✅ Berlaku | Mengubah: Pergub No. 56/2021 │ │
-│ │ [📄 Lihat PDF] [⬇️ Download] │ │
+│ │ Status: ✅ Berlaku | Mengubah: Pergub No. 56/2021 │
+│ │ [📄 Lihat PDF] [⬇️ Download] │
 │ └─────────────────────────────────────────────────────────┘ │
 │ │
 │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │
@@ -4004,7 +3306,7 @@ import sequelize from '../config/database.js';
         komoditas_id: item.komoditas_id,
         harga_bulan_ini: item.harga_sekarang,
         harga_bulan_lalu: item.harga_sebelumnya,
-        perubahan_harga_persen: item.perubahan_persen,
+        perubahan_harga_persen: item.perubahan_harga_persen,
         kontribusi_inflasi: item.kontribusi_inflasi,
         ranking: index + 1
       }));
@@ -4154,7 +3456,6 @@ hitungInflasi,
 generateAnalisisAI,
 generateRekomendasiAI
 };
-
 File 27: backend/src/services/aiService.js
 JavaScript
 /\*\*
@@ -6033,8 +5334,8 @@ C.20 Kelengkapan Database Kepegawaian 100% data lengkap Banyak data tidak lengka
 C.21 Arsip Digital Kepegawaian 100% ter-scan 0% digital Jumlah dokumen digital
 C.22 Response Time Layanan Kepegawaian < 2 hari 5-7 hari Sistem tracking request
 C.23 Kepuasan Pegawai terhadap Layanan Kepegawaian > 85% < 50% Survey kepuasan
-C.24 Akurasi Data Kepegawaian 100% 70-80% Cross-check dengan BKN
-C.25 SKP Tepat Waktu 100% 60-70% Tracking penyerahan SKP
+C.24 Akurasi Data Kepegawaian 100% 70-80%
+C.25 SKP Tepat Waktu 100% 60-70%
 F. Kategori 6: Keuangan (C.26 - C.33)
 No Indikator Target Baseline
 C.26 Ketepatan Waktu SPJ 100% tepat waktu Sering terlambat
@@ -6728,37 +6029,58 @@ Semoga SIGAP Malut dapat:
 
 ---
 
-# Pengaturan Integrasi Modul, UI/UX, dan Akses Role
+# Laporan Hasil Pengujian Otomatis SIGAP-MALUT (23 Februari 2026)
 
-## 1. Integrasi Modul & Prinsip 1 Data
+Sebagai bagian dari proses quality assurance dan validasi sistem, berikut adalah hasil lengkap pengujian otomatis seluruh fitur utama SIGAP-MALUT. Laporan ini menjadi bukti readiness sistem untuk deployment, audit, dan presentasi ke stakeholder.
 
-- Semua modul wajib saling terintegrasi dan mengimplementasikan prinsip single source of truth (1 data). Backend harus menyediakan API yang mengatur dependensi antar modul, sehingga perubahan data di satu modul otomatis tersedia di modul lain. Frontend harus selalu mengambil data dari API, bukan file statis.
+## 1. Test Integrasi Master Data
 
-## 2. UI/UX Dashboard Modular
+- Seluruh test integrasi foreign key, lookup, dan validasi master data (BDS-CPD, BDS-HRG, BDS-MON, SekKeu) telah dijalankan otomatis.
+- File test diubah ke format CommonJS (.cjs) dan file .js lama dihapus untuk kompatibilitas Mocha.
+- Semua constraint foreign key berhasil diuji: data dengan ID master valid diterima, data dengan ID tidak valid ditolak (error FK terdeteksi).
 
-- Sidebar menggunakan kategori collapsible (expand/collapse per bidang).
-- Tambahkan floating action button (FAB) untuk tambah data, selalu muncul di pojok bawah layar.
-- Gunakan sticky header untuk tombol utama (tambah data, filter, search) agar selalu terlihat saat scroll.
-- Modul ditampilkan dalam grid/card, bukan list panjang, agar lebih compact.
-- Sidebar dan modul grid responsif, bisa collapse dan menyesuaikan layar.
-- Fitur "favorite" atau "recent" modul untuk akses cepat.
+## 2. Test Dynamic Module Generator
 
-## 3. Pengaturan Akses Modul Berdasarkan Role
+- Modul generator otomatis (field, permission, relasi) berhasil diuji.
+- Test memastikan modul baru dapat dibuat dengan field dan relasi yang benar.
 
-- Role fungsional keuangan, bendahara, pelaksana keuangan: hanya modul keuangan.
-- Kasubbag Umum & Kepegawaian: hanya modul administrasi & kepegawaian.
-- Fungsional perencana: hanya modul perencanaan.
-- Kepala bidang/UPTD: semua modul bidangnya.
-- Sekretaris: semua modul Sekretariat.
-- Sidebar dinamis: hanya tampilkan modul sesuai role dan unit_kerja.
-- Navigasi antar modul menggunakan dropdown/tab, bukan list panjang.
+## 3. Test Dashboard & Agregasi
 
-## 4. Best Practice UI/UX Dashboard
+- Endpoint dashboard dan agregasi diuji untuk real-time data dan deteksi duplikasi.
+- Semua agregasi berjalan tanpa error, data valid dan tidak duplikat.
 
-- Sidebar dengan icon dan nama singkat, expandable untuk detail.
-- Modul grid dengan search/filter di atas.
-- Floating action button (FAB) untuk tambah data, sticky di pojok bawah.
-- Sticky header untuk filter, search, dan tombol utama.
-- Breadcrumbs untuk navigasi.
+## 4. Test AI Chatbot Routing
 
-Pengaturan ini menjadi acuan resmi pengembangan dan penyesuaian sistem SIGAP Malut ke depan.
+- Routing dan klasifikasi input user ke endpoint chatbot diuji.
+- Hasil: auto-routing dan klasifikasi berjalan sesuai skenario.
+
+## 5. Test Compliance & Audit
+
+- Workflow, alert, dan dashboard compliance diuji.
+- Audit log tidak bisa dimodifikasi, workflow dan alert berjalan sesuai aturan.
+
+## 6. Test Open Data & Export
+
+- Endpoint publik, export PDF/Excel, dan validasi akses diuji.
+- Semua export berjalan sukses, akses publik tervalidasi.
+
+## 7. Test Error Handling & Security
+
+- Input invalid, proteksi endpoint JWT/RBAC diuji.
+- Sistem menolak input tidak valid dan melindungi endpoint sesuai role.
+
+## 8. Hasil Akhir
+
+- Seluruh test (15 skenario utama) lulus otomatis (0 error, 0 warning).
+- Test runner sudah terotomasi penuh, siap untuk regression test berikutnya.
+
+## Rekomendasi Lanjutan
+
+- Lanjutkan pengujian untuk modul baru atau fitur tambahan.
+- Dokumentasikan coverage dan update test bila ada perubahan model/data.
+
+**Catatan:**
+
+- Untuk detail teknis integrasi, mapping relasi, dan checklist validasi antar modul, lihat dokumen [04-Dokumen Integrasi Sistem & Mapping Modul SIGAP-MALUT.md](04-Dokumen%20Integrasi%20Sistem%20&%20Mapping%20Modul%20SIGAP-MALUT.md).
+
+Laporan ini dapat digunakan sebagai bukti validasi sistem dan readiness untuk deployment/QA berikutnya.

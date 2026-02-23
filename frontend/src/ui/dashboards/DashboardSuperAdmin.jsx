@@ -1,28 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 
-function parseCSV(csv) {
-  const [header, ...lines] = csv.trim().split(/\r?\n/);
-  const keys = header.split(",");
-  return lines.map((line) => {
-    const values = line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/); // handle koma dalam kutip
-    const obj = {};
-    keys.forEach(
-      (k, i) =>
-        (obj[k.trim()] = (values[i] || "").replace(/^"|"$/g, "").trim()),
-    );
-    return obj;
-  });
-}
-
 import DashboardHeader from "../components/DashboardHeader";
-import DashboardKpiRow from "../components/DashboardKpiRow";
-import AlertRail from "../components/AlertRail";
-import {
-  superAdminKpis,
-  superAdminAlerts,
-} from "../components/SuperAdminKpiMock";
 
 // Modal component (didefinisikan di luar fungsi utama)
 function Modal({ open, title, content, onClose }) {
@@ -43,178 +22,134 @@ function Modal({ open, title, content, onClose }) {
   );
 }
 
+import useAuthStore from "../../stores/authStore";
+import { Navigate } from "react-router-dom";
+
 function DashboardSuperAdmin() {
-  const [modules, setModules] = useState([]);
-  const [modal, setModal] = useState({ open: false, title: "", content: "" });
-  const navigate = useNavigate();
-
-  // Fungsi download dummy PDF
-  const handleDownloadReport = () => {
-    const pdfBase64 =
-      "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHMgWzMgMCBSXS9Db3VudCAxPj4KZW5kb2JqCjMgMCBvYmoKPDwvVHlwZS9QYWdlL1BhcmVudCAyIDAgUi9NZWRpYUJveCBbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDQgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvTGVuZ3RoIDQzPj4Kc3RyZWFtCkJUIAovRjEgMjQgVGYKMTAgNzAwIFRECi9IZWxsbywgTWVuZGFncmkgUmVwb3J0IQplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA1CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxMCAwMDAwMCBuIAowMDAwMDAwMDYwIDAwMDAwIG4gCjAwMDAwMDAxMTAgMDAwMDAgbiAKMDAwMDAwMDE2MCAwMDAwMCBuIAp0cmFpbGVyCjw8L1Jvb3QgMSAwIFIvU2l6ZSA1Pj4Kc3RhcnR4cmVmCjE3OQolJUVPRgo=";
-    const link = document.createElement("a");
-    link.href = "data:application/pdf;base64," + pdfBase64;
-    link.download = "Laporan_Mendagri_SIGAP.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setModal({
-      open: true,
-      title: "Laporan Diunduh",
-      content: "File dummy laporan Mendagri berhasil diunduh.",
-    });
-  };
-
-  const handleOpenInbox = () => {
-    if (window && window.location && window.location.pathname !== "/ai-inbox") {
-      navigate("/ai-inbox");
-    } else {
-      setModal({
-        open: true,
-        title: "AI Inbox",
-        content: "Fitur AI Inbox akan segera tersedia.",
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetch("/master-data/00_MASTER_MODUL_CONFIG.csv")
-      .then((res) => res.text())
-      .then((text) => setModules(parseCSV(text)));
-  }, []);
-
+  const user = useAuthStore((state) => state.user);
+  const hasRole = (role) => user && user.role === role;
+  if (!hasRole("super_admin")) return <Navigate to="/" replace />;
+  // Dummy Super Admin modules
+  const superAdminModules = [
+    { id: "SA01", name: "Monitoring 50 indikator" },
+    { id: "SA02", name: "Tool modul tanpa coding" },
+    { id: "SA03", name: "Tata Naskah Dinas" },
+    { id: "SA04", name: "Database peraturan" },
+    { id: "SA05", name: "Manajemen User", isUserManagement: true },
+    // Tambahkan modul lain sesuai kebutuhan
+  ];
   return (
-    <DashboardLayout>
-      <div className="max-w-7xl mx-auto p-8">
-        <Modal
-          open={modal.open}
-          title={modal.title}
-          content={modal.content}
-          onClose={() => setModal({ ...modal, open: false })}
-        />
-        <DashboardHeader
-          title="Dashboard Super Admin"
-          subtitle="Executive Control Center — Semua Modul, KPI, dan Alert"
-          actions={[
-            <button
-              key="gen-report"
-              className="bg-blue-700 text-white px-4 py-2 rounded font-semibold shadow hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              onClick={handleDownloadReport}
-            >
-              Generate Mendagri Report
-            </button>,
-            <button
-              key="open-inbox"
-              className="bg-gray-100 text-blue-700 px-4 py-2 rounded font-semibold shadow hover:bg-blue-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              onClick={handleOpenInbox}
-            >
-              Open AI Inbox
-            </button>,
-          ]}
-        />
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 py-4">
-          {modules
-            .filter((m) => m.is_active === "true")
-            .map((modul) => (
-              <div
-                key={modul.modul_id}
-                className="bg-white dark:bg-muted rounded-2xl shadow-lg p-6 min-h-[220px] flex flex-col justify-between border border-gray-100 dark:border-muted hover:shadow-xl hover:scale-[1.03] transition cursor-pointer"
-                onClick={() => navigate(`/modul/${modul.modul_id}`)}
-                title={`Buka modul ${modul.nama_modul}`}
-              >
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">
-                      <i className={`ph ph-${modul.icon || "app-window"}`}></i>
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-accent mb-1">
-                    {modul.kategori} &middot; {modul.bidang}
-                  </div>
-                  <div className="text-sm text-gray-700 dark:text-surface mb-2 line-clamp-3">
-                    {modul.deskripsi}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {modul.has_approval === "true" && (
-                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs dark:bg-yellow-900 dark:text-yellow-200">
-                      Approval
-                    </span>
-                  )}
-                  {modul.has_file_upload === "true" && (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs dark:bg-green-900 dark:text-green-200">
-                      File Upload
-                    </span>
-                  )}
-                  {modul.is_public === "true" && (
-                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs dark:bg-blue-900 dark:text-blue-200">
-                      Publik
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+    <div className="max-w-[1400px] mx-auto px-2 sm:px-6 py-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 rounded-2xl shadow-lg px-6 py-6 flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-1 tracking-tight drop-shadow">
+            Dashboard Super Admin
+          </h1>
+          <div className="text-blue-200 text-base md:text-lg font-medium">
+            Executive Control Center — Semua Modul, KPI, dan Alert
+          </div>
         </div>
-        <DashboardKpiRow kpis={superAdminKpis} />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          <div className="md:col-span-2">
-            <div className="mb-6">
-              <div className="font-bold text-lg mb-2 dark:text-surface">
-                Semua Modul Aktif
-              </div>
-              <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-                {modules
-                  .filter((m) => m.is_active === "true")
-                  .map((modul) => (
-                    <div
-                      key={modul.modul_id}
-                      className="bg-white dark:bg-muted rounded-2xl shadow-lg p-6 min-h-[220px] flex flex-col justify-between border border-gray-100 dark:border-muted hover:shadow-xl hover:scale-[1.03] transition cursor-pointer"
-                      onClick={() => navigate(`/modul/${modul.modul_id}`)}
-                      title={`Buka modul ${modul.nama_modul}`}
-                    >
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">
-                            <i
-                              className={`ph ph-${modul.icon || "app-window"}`}
-                            ></i>
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-accent mb-1">
-                          {modul.kategori} &middot; {modul.bidang}
-                        </div>
-                        <div className="text-sm text-gray-700 dark:text-surface mb-2 line-clamp-3">
-                          {modul.deskripsi}
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {modul.has_approval === "true" && (
-                          <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs dark:bg-yellow-900 dark:text-yellow-200">
-                            Approval
-                          </span>
-                        )}
-                        {modul.has_file_upload === "true" && (
-                          <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs dark:bg-green-900 dark:text-green-200">
-                            File Upload
-                          </span>
-                        )}
-                        {modul.is_public === "true" && (
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs dark:bg-blue-900 dark:text-blue-200">
-                            Publik
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          </div>
-          <div>
-            <AlertRail alerts={superAdminAlerts} />
-          </div>
+        <div className="flex gap-2 mt-4 md:mt-0">
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold shadow transition"
+            onClick={() => alert("Generate Mendagri Report")}
+          >
+            <span className="inline-block align-middle mr-2">📄</span> Generate
+            Mendagri Report
+          </button>
+          <button
+            className="bg-white text-blue-700 px-5 py-2 rounded-lg font-semibold shadow border border-blue-200 hover:bg-blue-50 transition"
+            onClick={() => alert("Open AI Inbox")}
+          >
+            <span className="inline-block align-middle mr-2">🤖</span> Open AI
+            Inbox
+          </button>
         </div>
       </div>
-    </DashboardLayout>
+
+      {/* KPI Section */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 flex flex-col items-center shadow border-b-4 border-blue-400">
+          <span className="text-3xl font-extrabold text-blue-700 dark:text-blue-300">
+            50
+          </span>
+          <span className="text-xs mt-1 font-semibold text-blue-700 dark:text-blue-200 tracking-wide">
+            Indikator Monitoring
+          </span>
+        </div>
+        <div className="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 flex flex-col items-center shadow border-b-4 border-green-400">
+          <span className="text-3xl font-extrabold text-green-700 dark:text-green-300">
+            100%
+          </span>
+          <span className="text-xs mt-1 font-semibold text-green-700 dark:text-green-200 tracking-wide">
+            Compliance Alur
+          </span>
+        </div>
+        <div className="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 flex flex-col items-center shadow border-b-4 border-yellow-400">
+          <span className="text-3xl font-extrabold text-yellow-700 dark:text-yellow-200">
+            0
+          </span>
+          <span className="text-xs mt-1 font-semibold text-yellow-700 dark:text-yellow-200 tracking-wide">
+            Bypass Terdeteksi
+          </span>
+        </div>
+        <div className="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 flex flex-col items-center shadow border-b-4 border-indigo-400">
+          <span className="text-3xl font-extrabold text-indigo-700 dark:text-indigo-200">
+            99%
+          </span>
+          <span className="text-xs mt-1 font-semibold text-indigo-700 dark:text-indigo-200 tracking-wide">
+            Data Valid
+          </span>
+        </div>
+      </div>
+
+      {/* Modul Section */}
+      <div className="font-bold text-lg mb-3 text-blue-900 dark:text-blue-200">
+        Modul Super Admin
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {superAdminModules.map((modul, idx) =>
+          modul.isUserManagement ? (
+            <div
+              key={modul.id}
+              className="bg-white dark:bg-background-card border border-blue-100 dark:border-blue-900 rounded-2xl shadow-lg p-6 flex flex-col gap-2 hover:scale-[1.03] hover:shadow-xl transition cursor-pointer min-h-[120px] items-center justify-center"
+              onClick={() => (window.location.href = "/user-management")}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">👤</span>
+                <span className="font-semibold text-blue-700 dark:text-blue-200 text-base">
+                  {modul.name}
+                </span>
+              </div>
+              <button className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded font-semibold text-sm shadow">
+                Tambah User
+              </button>
+              <div className="text-xs text-muted dark:text-text-muted">
+                ID: {modul.id}
+              </div>
+            </div>
+          ) : (
+            <div
+              key={modul.id}
+              className="bg-white dark:bg-background-card border border-blue-100 dark:border-blue-900 rounded-2xl shadow-lg p-6 flex flex-col gap-2 hover:scale-[1.03] hover:shadow-xl transition cursor-pointer min-h-[120px]"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">
+                  {["📊", "🛠️", "📄", "🗄️"][idx % 4]}
+                </span>
+                <span className="font-semibold text-blue-700 dark:text-blue-200 text-base">
+                  {modul.name}
+                </span>
+              </div>
+              <div className="text-xs text-muted dark:text-text-muted">
+                ID: {modul.id}
+              </div>
+            </div>
+          ),
+        )}
+      </div>
+    </div>
   );
 }
 

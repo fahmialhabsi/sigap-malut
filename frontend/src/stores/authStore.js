@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import api from "../utils/api";
+import { logAuditTrail } from "../utils/auditTrail";
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -22,8 +23,23 @@ const useAuthStore = create((set) => ({
         isInitialized: true,
       });
 
+      logAuditTrail({ user, action: "login", detail: "User login" });
       return { success: true };
     } catch (error) {
+      // Reset state on failed login
+      set({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isInitialized: true,
+      });
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      logAuditTrail({
+        user: null,
+        action: "login_failed",
+        detail: "Login gagal",
+      });
       console.error("Login error:", error);
       return {
         success: false,
@@ -32,7 +48,9 @@ const useAuthStore = create((set) => ({
     }
   },
 
-  logout: () => {
+  logout: async () => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    logAuditTrail({ user, action: "logout", detail: "User logout" });
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     set({

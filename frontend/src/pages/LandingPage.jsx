@@ -26,13 +26,14 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    console.log("handleContinue dipanggil, selectedRole:", selectedRole);
     if (!selectedRole) return;
-    if (selectedRole === "publik") {
-      console.log("Navigasi ke /dashboard-publik");
+    if (selectedRole === "super_admin") {
+      navigate("/login?role=super_admin");
+    } else if (selectedRole === "gubernur") {
+      navigate("/login?role=gubernur");
+    } else if (selectedRole === "publik") {
       navigate("/dashboard-publik");
     } else {
-      console.log(`Navigasi ke /login?role=${selectedRole}`);
       navigate(`/login?role=${selectedRole}`);
     }
   };

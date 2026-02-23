@@ -4989,3 +4989,29 @@ BEYOND (1-2 Tahun):
 ├─ Metaverse Food Security Center
 └─ Level: 40/30 (BEYOND THE SCALE!) 🔮
 ═══════════════════════════════════════════════════════════
+
+### **Permasalahan Akar: Lemahnya Jejak dan Pertanggungjawaban Perintah Kerja**
+
+Masalah strategis yang selama ini menjadi sumber risiko dalam tata kelola organisasi yaitu:
+
+- Tidak adanya rekam jejak sistematis untuk setiap perintah dinas dari atasan ke bawahan.
+- Sulitnya pengendalian, audit, serta evaluasi kinerja berbasis tindak lanjut atas perintah/kebijakan.
+- Banyak perintah yang _hilang_ di tengah jalan, _tidak terdokumentasi_, atau tidak bisa dipertanggungjawabkan saat pemeriksaan oleh BPK / Inspektorat karena prosesnya tidak digital.
+
+**Dampaknya:**
+
+- Penilaian kinerja dan penanggungjawaban terlambat atau tidak objektif.
+- Informasi kemajuan sulit dipantau, perintah tidak termonitor statusnya, _bottle-neck_, dan kendala lapangan tidak langsung terdeteksi.
+
+### **Rekomendasi Solusi: Modul Perintah Terintegrasi SIGAP-MALUT**
+
+Mengingat urgensinya, perlu **modul “Perintah Kerja Digital”** di SIGAP Malut:
+
+- Setiap perintah, baik dari Kepala Dinas, Sekretariat, Kepala Bidang, ataupun UPTD, diwajibkan via sistem modul perintah.
+- Setiap perintah memiliki:
+  - Pemberi perintah, penerima perintah, isi perintah, _timestamp_, status tindak lanjut, feedback/revisi, dan jejak digital siapa yang sudah/belum menindaklanjuti.
+- Alur distribusi: **Hierarkis, berjenjang**. Penerima perintah bisa me-limpah-kan ke bawahannya berikut dengan alasan & catatan.
+- **Status progress dan kendala** wajib dilaporkan via sistem; bila perlu dilakukan feedback/perbaikan, seluruh history dan balasan terekam otomatis.
+- Semua data siap untuk _audit_ BPK, _pengawasan_ Inspektorat, serta dasar _penilaian kinerja pegawai_.
+
+Solusi ini akan _mengakhiri_ masalah “perintah hilang”, “aksi tidak terkendali”, serta memudahkan akuntabilitas publik.

@@ -43,6 +43,17 @@ import UPTKEPRoutes from "./UPT-KEP.js";
 import UPTKEURoutes from "./UPT-KEU.js";
 import UPTMTURoutes from "./UPT-MTU.js";
 import UPTTKNRoutes from "./UPT-TKN.js";
+import approvalRoutes from "./approval.js";
+import reminderRoutes from "./reminder.js";
+import caseRoutes from "./case.js";
+import commentRoutes from "./comment.js";
+import reportRoutes from "./report.js";
+import auditTrailRoutes from "./audit-trail.js";
+import workflowStatusRoutes from "./workflow-status.js";
+import notificationRoutes from "./notification.js";
+import perintahRoutes from "./perintah.js";
+import pegawaiRoutes from "./pegawai.js";
+import komoditasRoutes from "./komoditas.js";
 
 export default function registerRoutes(app) {
   console.log("📡 Registering API routes...\n");
@@ -86,6 +97,19 @@ export default function registerRoutes(app) {
   app.use("/api/upt-keu", UPTKEURoutes);
   app.use("/api/upt-mtu", UPTMTURoutes);
   app.use("/api/upt-tkn", UPTTKNRoutes);
+  app.use("/approval", approvalRoutes);
+  app.use("/reminder", reminderRoutes);
+  app.use("/case", caseRoutes);
+  app.use("/comment", commentRoutes);
+  app.use("/report", reportRoutes);
+  app.use("/audit-trail", auditTrailRoutes);
+  app.use("/workflow-status", workflowStatusRoutes);
+  app.use("/notification", notificationRoutes);
+  app.use("/perintah", perintahRoutes);
+
+  // Master Data Lookup
+  app.use("/api/pegawai", pegawaiRoutes);
+  app.use("/api/komoditas", komoditasRoutes);
 
   console.log("✅ 38 API routes registered\n");
 }

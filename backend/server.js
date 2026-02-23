@@ -11,6 +11,9 @@ import bktPgdRoutes from "./routes/BKT-PGD.js";
 import tablesRoutes from "./routes/tables.js";
 import modulesRoutes from "./routes/modules.js";
 
+import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
+import workflowStatusRouter from "./routes/workflow-status.js";
+
 dotenv.config();
 
 const app = express();
@@ -84,8 +87,9 @@ app.use("/api/modules", modulesRoutes);
 registerRoutes(app);
 
 // Dynamic table routes (must be after specific routes)
+app.use("/api/workflow-status", workflowStatusRouter);
 app.use("/api", tablesRoutes);
-
+app.use("/api", workflowRoutes);
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
@@ -115,11 +119,11 @@ async function startServer() {
 
     app.listen(PORT, () => {
       console.log(`\n${"=".repeat(60)}`);
-      console.log(`🚀 SIGAP Malut Backend Server`);
+      console.log(`SIGAP Malut Backend Server`);
       console.log(`${"=".repeat(60)}`);
-      console.log(`📡 Server running on: http://localhost:${PORT}`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`💾 Database: ${sequelize.getDialect()}`);
+      console.log(`Server running on: http://localhost:${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`Database: ${sequelize.getDialect()}`);
       console.log(`${"=".repeat(60)}\n`);
     });
   } catch (error) {

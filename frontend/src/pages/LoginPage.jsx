@@ -4,8 +4,8 @@ import useAuthStore from "../stores/authStore";
 
 export default function LoginPage() {
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const roleParam = params.get("role");
+  // const params = new URLSearchParams(location.search);
+  // Hapus roleParam karena tidak digunakan
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,7 +26,9 @@ export default function LoginPage() {
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem("user"));
-      } catch {}
+      } catch (e) {
+        // ignore JSON parse error
+      }
 
       if (user) {
         if (user.role === "super_admin") {

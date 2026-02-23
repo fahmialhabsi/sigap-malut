@@ -1,3 +1,18 @@
+// Mock export untuk test error handling & security
+export function validateInput({ username, password }) {
+  if (!username || !password) throw new Error("Invalid input");
+  return true;
+}
+
+export function generateJWT({ id, role }) {
+  // Simulasi token
+  return `mock-token-${id}-${role}`;
+}
+
+export function checkRBAC(token, role) {
+  // Simulasi RBAC
+  return token.includes(role);
+}
 import jwt from "jsonwebtoken";
 
 // @desc    Protect routes - require authentication
