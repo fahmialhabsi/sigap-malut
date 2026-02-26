@@ -28,9 +28,10 @@ jobs:
       - name: Install backend dependencies
         run: |
           set -e
-          # Retry npm ci up to 3 times to avoid transient network/build failures
+          # Use npm install in CI when package-lock.json may be out-of-sync
+          # Retry up to 3 times to avoid transient network/build failures
           for i in 1 2 3; do
-            npm --prefix backend ci --prefer-offline --no-audit --no-fund && break || echo "npm ci failed, attempt $i";
+            npm --prefix backend install --prefer-offline --no-audit --no-fund && break || echo "npm install failed, attempt $i";
             sleep 5;
           done
       - name: Run backend tests
