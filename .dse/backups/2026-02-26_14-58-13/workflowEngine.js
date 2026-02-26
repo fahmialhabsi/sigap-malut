@@ -1,4 +1,27 @@
 const { v4: uuidv4 } = require("uuid");
+const fs = require("fs");
+const path = require("path");
+
+// Normalize roles against canonical registry if available
+let _roleAliasMap = null;
+try {
+  const rolesFile = path.join(__dirname, "..", "..", "roles.json");
+  const rolesData = JSON.parse(fs.readFileSync(rolesFile, "utf8"));
+  _roleAliasMap = {};
+  if (Array.isArray(rolesData.roles)) {
+    rolesData.roles.forEach((r) => {
+      if (Array.isArray(r.aliases)) {
+        r.aliases.forEach((a) => {
+          _roleAliasMap[String(a).toLowerCase()] = r.code;
+        });
+      }
+      // also map the canonical code to itself
+      if (r.code) _roleAliasMap[String(r.code).toLowerCase()] = r.code;
+    });
+  }
+} catch (e) {
+  // roles registry not available; continue without normalization
+}
 
 /**
  * Workflow engine (single workflows object)
@@ -68,6 +91,37 @@ const workflows = {
     },
   },
 };
+
+// If alias map exists, normalize role names in workflows
+if (_roleAliasMap) {
+  Object.keys(workflows).forEach((wk) => {
+    const wf = workflows[wk];
+    if (wf && wf.roles) {
+      Object.keys(wf.roles).forEach((state) => {
+        wf.roles[state] = (wf.roles[state] || []).map((r) => {
+          const key = String(r).toLowerCase();
+          return _roleAliasMap[key] || r;
+        });
+      });
+    }
+    // normalize approval_policy verifiers
+    if (
+      wf &&
+      wf.approval_policy &&
+      Array.isArray(wf.approval_policy.verifiers)
+    ) {
+      wf.approval_policy.verifiers = wf.approval_policy.verifiers.map((r) => {
+        const key = String(r).toLowerCase();
+        return _roleAliasMap[key] || r;
+      });
+    }
+    if (wf && wf.approval_policy && wf.approval_policy.escalation_to) {
+      const key = String(wf.approval_policy.escalation_to).toLowerCase();
+      wf.approval_policy.escalation_to =
+        _roleAliasMap[key] || wf.approval_policy.escalation_to;
+    }
+  });
+}
 
 async function performTransition({
   app,
