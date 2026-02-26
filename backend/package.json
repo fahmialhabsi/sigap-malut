@@ -15,7 +15,7 @@
     "generate:all": "npm run generate:schema && npm run generate:models && npm run generate:controllers && npm run generate:routes && npm run generate:route-index",
     "seed": "node database/seeders/seed.js",
     "migrate": "node database/migrations/migrate.js",
-    "test": "node --experimental-vm-modules ./node_modules/mocha/bin/_mocha --timeout 60000 ./tests/*.test.js"
+    "test": "node --experimental-vm-modules tests/testAllModules.js"
   },
   "dependencies": {
     "axios": "^1.6.2",
