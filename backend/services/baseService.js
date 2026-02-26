@@ -27,5 +27,4 @@ class BaseService {
     return instance.destroy();
   }
 }
-
-module.exports = BaseService;
+export default BaseService;

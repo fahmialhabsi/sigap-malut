@@ -1,0 +1,276 @@
+{
+  "services": [
+    {
+      "kode_layanan": "KGB",
+      "nama_layanan": "Kenaikan Gaji Berkala",
+      "bidang": "Sekretariat",
+      "model": "SEK-KEP",
+      "workflow": "kgb_workflow",
+      "roles": ["staf", "atasan", "sekretaris", "kepala_dinas"],
+      "SLA": 14,
+      "kpi_reference": ["Keterlambatan KGB", "SLA Compliance"],
+      "endpoints": {
+        "api": "/api/kgb",
+        "openapi_ref": null
+      },
+      "integrations": [],
+      "observability": { "metrics": [], "logs": true },
+      "description": "KGB service — target zero keterlambatan hak pegawai; KPI sumber: layanan_kgb, approval_log (lihat 11-KPI-Definition-Sheet.md). Evidence: dokumenSistem/01-kondisi-dinas-pangan.md, 11-KPI-Definition-Sheet.md",
+      "schema_reference": "schema-snapshots/2026-02-26-baseline.json"
+    },
+    {
+      "kode_layanan": "STOK",
+      "nama_layanan": "Stok Pangan",
+      "bidang": "Bidang Ketersediaan",
+      "model": "BDS-CPD",
+      "workflow": "stok_workflow",
+      "roles": ["pelaksana", "fungsional", "kepala_bidang"],
+      "SLA": null,
+      "kpi_reference": ["Keterlambatan KGB", "SLA Compliance"],
+        "Jumlah Permohonan Layanan",
+        "Waktu Penyelesaian Rata2"
+      "observability": {"metrics": [], "logs": true},
+      "description": "Model referenced by KGB service — propagate KGB KPIs here (evidence: 11-KPI-Definition-Sheet.md, 01-kondisi-dinas-pangan.md)",
+      "integrations": [],
+      "observability": { "metrics": [], "logs": true },
+      "description": "Stok Pangan service — KPI sumber: layanan, approval_log (lihat 11-KPI-Definition-Sheet.md). Evidence: dokumenSistem/01-kondisi-dinas-pangan.md, dokumenSistem/02-dokumentasi-sistem.md",
+      "schema_reference": "schema-snapshots/2026-02-26-baseline.json"
+    },
+    {
+      "kode_layanan": "SEK-ADM",
+      "nama_layanan": "SEK-ADM (Sekretariat - Administrasi)",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "SEK-ADM.js",
+      "workflow": null,
+      "roles": [],
+      "SLA": null,
+      "kpi_reference": [],
+      "endpoints": {},
+      "integrations": [],
+      "observability": { "metrics": [], "logs": false },
+      "description": "Skeleton for model SEK-ADM (from models-list)",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "SEK-AST",
+      "nama_layanan": "SEK-AST (Sekretariat - Aset)",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "SEK-AST.js",
+      "workflow": null,
+      "roles": [],
+      "SLA": null,
+      "kpi_reference": [],
+      "endpoints": {},
+      "integrations": [],
+      "observability": { "metrics": [], "logs": false },
+      "description": "Skeleton for model SEK-AST",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "SEK-HUM",
+      "nama_layanan": "SEK-HUM (Sekretariat - Kepegawaian/Humanis)",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "SEK-HUM.js",
+      "workflow": null,
+      "roles": [],
+      "SLA": null,
+      "kpi_reference": [],
+      "endpoints": {},
+      "integrations": [],
+      "observability": { "metrics": [], "logs": false },
+      "description": "Skeleton for model SEK-HUM",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "SEK-KEP",
+      "nama_layanan": "SEK-KEP (Sekretariat - Kepegawaian/Keputusan)",
+      "bidang": "Sekretariat",
+      "model": "SEK-KEP.js",
+      "workflow": "kgb_workflow",
+      "roles": ["staf", "atasan", "sekretaris", "kepala_dinas"],
+      "SLA": null,
+      "kpi_reference": [],
+      "endpoints": { "api": "/api/sek/kep" },
+      "integrations": [],
+      "observability": { "metrics": [], "logs": true },
+      "description": "Model referenced by KGB service",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "SEK-KEU",
+      "nama_layanan": "SEK-KEU (Sekretariat - Keuangan)",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "SEK-KEU.js",
+      "workflow": null,
+      "roles": ["bendahara"],
+      "SLA": null,
+      "kpi_reference": [],
+      "endpoints": {},
+      "integrations": [],
+      "observability": { "metrics": [], "logs": false },
+      "description": "Skeleton for model SEK-KEU",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "BDS-CPD",
+      "nama_layanan": "BDS-CPD (Bidang - Cadangan/Distribusi)",
+      "bidang": "Bidang Ketersediaan",
+      "model": "BDS-CPD.js",
+      "workflow": "stok_workflow",
+      "roles": ["pelaksana", "fungsional", "kepala_bidang"],
+      "SLA": null,
+      "kpi_reference": ["Jumlah Permohonan Layanan", "Waktu Penyelesaian Rata2"],
+      "endpoints": { "api": "/api/bds/cpd" },
+      "integrations": [],
+      "observability": {"metrics": [], "logs": true},
+      "description": "Model referenced by STOK service — propagate STOK KPIs here (evidence: 11-KPI-Definition-Sheet.md, 03-dashboard-uiux.md)",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "komoditas",
+      "nama_layanan": "Komoditas",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "komoditas.js",
+      "workflow": null,
+      "roles": [],
+      "SLA": null,
+      "kpi_reference": ["Harga Rata-Rata Komoditas", "Inflasi Pangan"],
+      "endpoints": { "api": "/api/komoditas" },
+      "integrations": ["BPS", "BPOM", "Bapanas"],
+      "observability": { "metrics": ["komoditas_price_feed"], "logs": true },
+      "description": "Master data Komoditas — digunakan untuk inflasi pangan dan dashboard inflasi (evidence: dokumenSistem/01-kondisi-dinas-pangan.md, dokumenSistem/02-dokumentasi-sistem.md)",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "KPI",
+      "nama_layanan": "KPI Service / Aggregator",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "BDS-MON.js",
+      "workflow": null,
+      "roles": [],
+      "SLA": null,
+      "kpi_reference": [
+        "Keterlambatan KGB",
+        "SLA Compliance",
+        "Jumlah Permohonan Layanan",
+        "Waktu Penyelesaian Rata2"
+      ],
+      "endpoints": { "api": "/api/kpi" },
+      "integrations": [],
+      "observability": { "metrics": ["kpi_aggregate"], "logs": true },
+      "description": "Aggregator service for KPI calculations (evidence: 03-dashboard-uiux.md, 11-KPI-Definition-Sheet.md)",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "ALERTS",
+      "nama_layanan": "Alerts / Notification Service",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "alerts.js",
+      "workflow": null,
+      "roles": [],
+      "SLA": null,
+      "kpi_reference": ["Keterlambatan KGB"],
+      "endpoints": { "api": "/api/alerts" },
+      "integrations": ["WhatsAppGateway"],
+      "observability": { "metrics": ["alert_rate"], "logs": true },
+      "description": "Notification/alerts API referenced by dashboard (evidence: 03-dashboard-uiux.md)",
+      "schema_reference": null
+    },
+    {
+      "kode_layanan": "EXPORT",
+      "nama_layanan": "Export Service (Excel/PDF)",
+      "bidang": "TIDAK_TERDOKUMENTASI",
+      "model": "exportService.js",
+      "workflow": null,
+      "roles": [],
+      "SLA": null,
+      "kpi_reference": [],
+      "endpoints": { "api": "/api/export" },
+      "integrations": [],
+      "observability": { "metrics": [], "logs": true },
+      "description": "Service for exporting dashboard reports to Excel/PDF (evidence: 03-dashboard-uiux.md, 05-Dashboard-Template-Standar.md)",
+      "schema_reference": null
+    }
+  ],
+  "roles": [
+    "kepala_dinas",
+    "sekretaris",
+    "kepala_bidang",
+    "kepala_uptd",
+    "atasan",
+    "staf",
+    "pelaksana",
+    "fungsional",
+    "bendahara",
+    "data_steward",
+    "sysadmin",
+    "auditor"
+  ],
+  "workflows": {
+    "kgb_workflow": {
+      "states": [
+        "draft",
+        "diajukan",
+        "diverifikasi",
+        "disetujui",
+        "selesai",
+        "arsip"
+      ],
+      "transitions": {},
+      "roles": { "draft": ["staf"] }
+    },
+    "stok_workflow": {
+      "states": [
+        "draft",
+        "diajukan",
+        "dianalisa",
+        "diverifikasi",
+        "disetujui",
+        "selesai",
+        "arsip"
+      ],
+      "transitions": {},
+      "roles": { "draft": ["pelaksana"] }
+    }
+  },
+  "integrations": [
+    {
+      "name": "OpenAI",
+      "type": "AI_API",
+      "evidence": "mentioned in 02-dokumentasi-sistem.md",
+      "configured": false,
+      "notes": "credentials and endpoints not present in .dse backups"
+    },
+    {
+      "name": "WhatsAppGateway",
+      "type": "Messaging",
+      "evidence": "mentioned in 02-dokumentasi-sistem.md",
+      "configured": false
+    },
+    {
+      "name": "Bapanas",
+      "type": "ExternalDataFeed",
+      "evidence": "referenced in 01-kondisi-dinas-pangan.md",
+      "configured": false
+    },
+    {
+      "name": "BPOM",
+      "type": "ExternalDataFeed",
+      "evidence": "referenced in 01-kondisi-dinas-pangan.md",
+      "configured": false
+    },
+    {
+      "name": "BPS",
+      "type": "ExternalDataFeed",
+      "evidence": "referenced in 01-kondisi-dinas-pangan.md",
+      "configured": false
+    }
+  ],
+  "metadata": {
+    "generated_by": "skeleton-generator",
+    "generated_at": "2026-02-26T00:00:00Z",
+    "roles_normalized": true,
+    "roles_source": "roles.json",
+    "notes": "Skeleton service registry generated from dokumenSistem and .dse backups. Roles normalized against .dse/roles.json. Populate remaining endpoints, SLA, kpi_reference, workflow bindings, and schema_reference per service. Do not assume fields not present in source documents."
+  }
+}

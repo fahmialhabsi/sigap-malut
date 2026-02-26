@@ -1,6 +1,6 @@
-const { expect } = require("chai");
-const BDSCPD = require("../models/BDS-CPD.js");
-const Komoditas = require("../models/komoditas.js");
+import { expect } from "chai";
+import BDSCPD from "../models/BDS-CPD.js";
+import Komoditas from "../models/komoditas.js";
 
 describe("Integrasi Master Data: BDS-CPD", () => {
   it("should only accept valid komoditas_id from master Komoditas", function (done) {
@@ -30,7 +30,9 @@ describe("Integrasi Master Data: BDS-CPD", () => {
       .then(() => done(new Error("Should fail with FK constraint error")))
       .catch((error) => {
         expect(error).to.not.be.null;
-        expect(error.name).to.match(/SequelizeForeignKeyConstraintError|ValidationError/);
+        expect(error.name).to.match(
+          /SequelizeForeignKeyConstraintError|ValidationError/,
+        );
         done();
       });
   });

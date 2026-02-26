@@ -14,7 +14,8 @@
     "generate:route-index": "node scripts/generateRouteIndex.js",
     "generate:all": "npm run generate:schema && npm run generate:models && npm run generate:controllers && npm run generate:routes && npm run generate:route-index",
     "seed": "node database/seeders/seed.js",
-    "migrate": "node database/migrations/migrate.js"
+    "migrate": "node database/migrations/migrate.js",
+    "test": "node --experimental-vm-modules tests/testAllModules.js"
   },
   "dependencies": {
     "axios": "^1.6.2",
@@ -37,7 +38,10 @@
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "mocha": "^10.2.0",
+    "chai": "^4.3.8",
+    "cross-env": "^7.0.3"
   },
   "keywords": [],
   "author": "",

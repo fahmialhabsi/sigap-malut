@@ -1,0 +1,115 @@
+{
+  "integrations": [
+    {
+      "name": "OpenAI",
+      "type": "AI_API",
+      "evidence": "02-dokumentasi-sistem.md (AI Integration: OpenAI GPT-4)",
+      "configured": false,
+      "auth": {
+        "auth_type": "apiKey",
+        "env_vars": ["OPENAI_API_KEY"],
+        "vault_path": "secret/integrations/openai"
+      },
+      "endpoints": {
+        "base_url": "https://api.openai.com/v1",
+        "examples": {
+          "chat_completion": "/chat/completions",
+          "embeddings": "/embeddings"
+        }
+      },
+      "rate_limit": {
+        "requests_per_minute": 60,
+        "notes": "Adjust according to subscription plan"
+      },
+      "webhook_supported": false,
+      "polling": null,
+      "owner_role": "sysadmin",
+      "notes": "Populate `env_vars` and/or configure Vault. No credentials found in .dse backups."
+    },
+    {
+      "name": "WhatsAppGateway",
+      "type": "Messaging",
+      "evidence": "02-dokumentasi-sistem.md, 03-dashboard-uiux.md (WhatsApp gateway for AI Inbox and routing)",
+      "configured": false,
+      "auth": {
+        "auth_type": "token",
+        "env_vars": ["WHATSAPP_API_TOKEN"],
+        "vault_path": "secret/integrations/whatsapp"
+      },
+      "endpoints": {
+        "base_url": "https://api.whatsapp.example",
+        "examples": { "send_message": "/messages" }
+      },
+      "rate_limit": { "requests_per_minute": 120 },
+      "webhook_supported": true,
+      "polling": null,
+      "owner_role": "sysadmin",
+      "notes": "Configure webhook URL in gateway and set secret in Vault."
+    },
+    {
+      "name": "Bapanas",
+      "type": "ExternalDataFeed",
+      "evidence": "01-kondisi-dinas-pangan.md (data inflasi / stok)",
+      "configured": false,
+      "auth": {
+        "auth_type": "apiKey_or_none",
+        "env_vars": ["BAPANAS_API_KEY"],
+        "vault_path": "secret/integrations/bapanas"
+      },
+      "endpoints": {
+        "base_url": "https://data.bapanas.example/api",
+        "examples": { "price_feed": "/commodities/prices" }
+      },
+      "rate_limit": { "requests_per_minute": 30 },
+      "webhook_supported": false,
+      "polling": { "interval_hours": 6 },
+      "owner_role": "data_steward",
+      "notes": "Used for komoditas price feed; implement retry/backoff and data validation."
+    },
+    {
+      "name": "BPOM",
+      "type": "ExternalDataFeed",
+      "evidence": "01-kondisi-dinas-pangan.md",
+      "configured": false,
+      "auth": {
+        "auth_type": "apiKey_or_none",
+        "env_vars": ["BPOM_API_KEY"],
+        "vault_path": "secret/integrations/bpom"
+      },
+      "endpoints": {
+        "base_url": "https://api.bpom.example",
+        "examples": { "product_lookup": "/products/{id}" }
+      },
+      "rate_limit": { "requests_per_minute": 20 },
+      "webhook_supported": false,
+      "polling": { "interval_hours": 24 },
+      "owner_role": "data_steward",
+      "notes": "External product safety reference."
+    },
+    {
+      "name": "BPS",
+      "type": "ExternalDataFeed",
+      "evidence": "01-kondisi-dinas-pangan.md",
+      "configured": false,
+      "auth": {
+        "auth_type": "apiKey_or_none",
+        "env_vars": ["BPS_API_KEY"],
+        "vault_path": "secret/integrations/bps"
+      },
+      "endpoints": {
+        "base_url": "https://data.bps.example",
+        "examples": { "inflation_index": "/inflation" }
+      },
+      "rate_limit": { "requests_per_minute": 10 },
+      "webhook_supported": false,
+      "polling": { "interval_hours": 24 },
+      "owner_role": "data_steward",
+      "notes": "National statistics feed; ensure license and attribution."
+    }
+  ],
+  "metadata": {
+    "generated_by": "skeleton-generator",
+    "generated_at": "2026-02-26T00:00:00Z",
+    "notes": "Populate `auth.env_vars` with real environment variable names or configure Vault paths. All `configured` fields are false pending operator input."
+  }
+}

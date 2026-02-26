@@ -2,9 +2,9 @@
  * Simple audit logger service: writes audit records to DB if model exists,
  * otherwise logs to console. Fields: id, user_id, action, entity, entity_id, meta, timestamp
  */
-const { v4: uuidv4 } = require("uuid");
+import { v4 as uuidv4 } from "uuid";
 
-async function log(app, { userId, action, entity, entityId, meta }) {
+export async function log(app, { userId, action, entity, entityId, meta }) {
   const models = app.get("models") || {};
   if (models.AuditLog) {
     return models.AuditLog.create({
@@ -20,5 +20,3 @@ async function log(app, { userId, action, entity, entityId, meta }) {
   console.info("audit", { userId, action, entity, entityId, meta });
   return true;
 }
-
-module.exports = { log };
