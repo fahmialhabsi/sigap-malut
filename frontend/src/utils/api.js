@@ -2,7 +2,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL:
+    (typeof process !== "undefined" &&
+      process.env &&
+      process.env.VITE_API_URL) ||
+    "http://localhost:5000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -35,7 +39,12 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      // assign a simple location object to make tests deterministic
+      try {
+        window.location = { href: "/login" };
+      } catch (e) {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   },

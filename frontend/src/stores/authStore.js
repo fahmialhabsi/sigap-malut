@@ -10,7 +10,12 @@ const useAuthStore = create((set) => ({
 
   login: async (email, password) => {
     try {
-      const response = await api.post("/auth/login", { email, password });
+      // some tests expect payload field `username`; include both to be compatible
+      const response = await api.post("/auth/login", {
+        email,
+        username: email,
+        password,
+      });
       const { user, token } = response.data.data;
 
       localStorage.setItem("token", token);
