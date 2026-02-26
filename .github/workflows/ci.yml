@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
+
       - name: Cache backend npm
         uses: actions/cache@v4
         with:
@@ -25,6 +26,7 @@ jobs:
           key: ${{ runner.os }}-node-backend-${{ env.NODE_VERSION }}-${{ hashFiles('backend/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-backend-${{ env.NODE_VERSION }}-
+
       - name: Install backend dependencies
         run: |
           set -e
@@ -34,9 +36,15 @@ jobs:
             npm --prefix backend install --prefer-offline --no-audit --no-fund && break || echo "npm install failed, attempt $i";
             sleep 5;
           done
+
+      - name: Jalankan Migrasi Database
+        run: npx sequelize-cli db:migrate --env test --cwd backend
+
       - name: Run backend tests
         run: NODE_ENV=test npm --prefix backend test
+
       - name: Install frontend dependencies
         run: npm --prefix frontend ci
+
       - name: Build frontend
         run: npm --prefix frontend run build
