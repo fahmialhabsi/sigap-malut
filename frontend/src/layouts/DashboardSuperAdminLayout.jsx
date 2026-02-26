@@ -1,24 +1,61 @@
-import React from "react";
+import React, { useEffect } from "react";
+import SidebarMenu from "../components/dashboard-superadmin/SidebarMenu";
+import HeaderBar from "../components/dashboard-superadmin/HeaderBar";
+import HeroRow from "../components/dashboard-superadmin/HeroRow";
+import MissionControlPanels from "../components/dashboard-superadmin/MissionControlPanels";
+import TimelinePanel from "../components/dashboard-superadmin/TimelinePanel";
+import PerformancePanel from "../components/dashboard-superadmin/PerformancePanel";
+import CacheQueuePanel from "../components/dashboard-superadmin/CacheQueuePanel";
+import QuickActionPanel from "../components/dashboard-superadmin/QuickActionPanel";
+import FooterBar from "../components/dashboard-superadmin/FooterBar";
+import { roleIdToName } from "../utils/roleMap";
+import useAuthStore from "../stores/authStore";
 
-export default function DashboardSuperAdminLayout({ children }) {
-  // Layout khusus super admin
+export default function DashboardSuperAdminLayout() {
+  const user = useAuthStore((state) => state.user);
+  const roleName = user ? roleIdToName[user.role_id] : null;
+
+  useEffect(() => {
+    if (
+      !user ||
+      !(
+        roleName === "super_admin" ||
+        user.unit_kerja === "Sekretariat Dinas" ||
+        user.unit_kerja === "Bidang Distribusi" ||
+        user.unit_kerja === "Bidang Konsumsi" ||
+        user.unit_kerja === "Publik" ||
+        user.unit_kerja === "UPTD" ||
+        user.unit_kerja === "Kepala Dinas"
+      )
+    ) {
+      window.location.href = "/landing";
+    }
+  }, [user, roleName]);
+
   return (
-    <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
-      {/* Header Super Admin */}
-      <header className="sticky top-0 z-10 border-b border-muted bg-ink/80 backdrop-blur text-surface">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-4">
-          <div>
-            <h2 className="text-2xl font-display text-primary">
-              Dashboard Super Admin
-            </h2>
-            <p className="text-sm text-muted">
-              Executive Control Center — Semua Modul, KPI, dan Alert
-            </p>
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-600 to-green-800 font-inter">
+      {/* Sidebar */}
+      <SidebarMenu />
+      {/* Header */}
+      <HeaderBar />
+      {/* Main Content */}
+      <main className="pl-20 pt-16 pb-8 pr-0 min-h-[calc(100vh-2rem)]">
+        {/* Hero Row */}
+        <HeroRow />
+        {/* Mission Control Panels */}
+        <MissionControlPanels />
+        {/* Panel bawah: Timeline, Performance, Cache/Queue, QuickAction */}
+        <div className="flex gap-6 px-8 mt-2">
+          <TimelinePanel />
+          <PerformancePanel />
+          <CacheQueuePanel />
+          <div className="flex flex-col justify-end">
+            <QuickActionPanel />
           </div>
         </div>
-      </header>
-      {/* Konten utama dashboard */}
-      <main className="flex-1 px-8 py-8 mx-auto max-w-6xl">{children}</main>
+      </main>
+      {/* Footer */}
+      <FooterBar />
     </div>
   );
 }

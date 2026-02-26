@@ -78,45 +78,22 @@ export default function DashboardLayout({ children }) {
     navigate(`/module/${modulId.toLowerCase()}`);
   };
 
+  // Cek apakah children adalah layout bidang (khusus distribusi)
+  const isDistribusiLayout =
+    children &&
+    children.type &&
+    (children.type.name === "DashboardDistribusiLayout" ||
+      children.type.displayName === "DashboardDistribusiLayout");
+
+  if (isDistribusiLayout) {
+    // Untuk distribusi, render children saja tanpa header/nav/main
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-muted bg-ink/80 backdrop-blur text-surface">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-4">
-          <div>
-            <h2 className="text-2xl font-display text-primary">
-              {user && user.role === "super_admin"
-                ? "Dashboard Super Admin"
-                : user && user.role === "sekretaris"
-                  ? "Dashboard Sekretariat"
-                  : user && user.role === "kepala_bidang_ketersediaan"
-                    ? "Dashboard Ketersediaan"
-                    : user && user.role === "kepala_bidang_distribusi"
-                      ? "Dashboard Distribusi"
-                      : user && user.role === "kepala_bidang_konsumsi"
-                        ? "Dashboard Konsumsi"
-                        : user && user.role === "kepala_uptd"
-                          ? "Dashboard UPTD"
-                          : "Dashboard"}
-            </h2>
-            <p className="text-sm text-muted">
-              {user && user.role === "super_admin"
-                ? "Executive Control Center — Semua Modul, KPI, dan Alert"
-                : user && user.role === "sekretaris"
-                  ? "Ringkasan Sekretariat dan Monitoring"
-                  : user && user.role === "kepala_bidang_ketersediaan"
-                    ? "Ringkasan Ketersediaan dan Monitoring"
-                    : user && user.role === "kepala_bidang_distribusi"
-                      ? "Ringkasan Distribusi dan Monitoring"
-                      : user && user.role === "kepala_bidang_konsumsi"
-                        ? "Ringkasan Konsumsi dan Monitoring"
-                        : user && user.role === "kepala_uptd"
-                          ? "Ringkasan UPTD dan Monitoring"
-                          : "Ringkasan Dashboard"}
-            </p>
-          </div>
-        </div>
-      </header>
+      {/* Header hanya jika bukan distribusi */}
+      {/* Hapus header dan ringkasan dashboard jika bukan distribusi */}
       {/* Navbar horizontal modul Sekretariat */}
       {user && user.role === "sekretaris" ? (
         <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">

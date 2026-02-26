@@ -1,0 +1,34 @@
+<svg width="1200" height="820" viewBox="0 0 1200 820" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="72" height="820" fill="#F59E0B"/>
+  <rect x="72" y="0" width="1128" height="60" fill="#FFA726"/>
+  <rect x="88" y="10" width="36" height="36" rx="8" fill="#FFF"/>
+  <text x="112" y="34" font-size="10" fill="#FFA726" text-anchor="middle">LOGO</text>
+  <text x="190" y="38" font-size="20" fill="#FFF" font-family="Inter" font-weight="bold">Konsumsi</text>
+  <circle cx="1150" cy="30" r="18" fill="#FACC15"/>
+  <rect x="16" y="80" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="107" font-size="8" fill="#F59E0B" text-anchor="middle">Dash</text>
+  <rect x="16" y="130" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="157" font-size="8" fill="#F59E0B" text-anchor="middle">Data</text>
+  <rect x="16" y="180" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="207" font-size="8" fill="#06A657" text-anchor="middle">Survey</text>
+  <rect x="16" y="230" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="257" font-size="8" fill="#0B5FFF" text-anchor="middle">Analisis</text>
+  <rect x="16" y="280" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="307" font-size="8" fill="#FACC15" text-anchor="middle">Tren</text>
+  <rect x="16" y="330" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="357" font-size="8" fill="#EF4444" text-anchor="middle">Approve</text>
+  <rect x="16" y="380" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="407" font-size="8" fill="#06A657" text-anchor="middle">Laporan</text>
+  <rect x="16" y="430" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="457" font-size="8" fill="#0B5FFF" text-anchor="middle">Agenda</text>
+  <rect x="110" y="80" width="200" height="60" rx="12" fill="#fff" stroke="#F59E0B" stroke-width="2"/>
+  <rect x="330" y="80" width="200" height="60" rx="12" fill="#fff" stroke="#06A657" stroke-width="2"/>
+  <rect x="550" y="80" width="200" height="60" rx="12" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <rect x="770" y="80" width="200" height="60" rx="12" fill="#fff" stroke="#EF4444" stroke-width="2"/>
+  <rect x="990" y="80" width="180" height="60" rx="12" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <text x="210" y="115" font-size="11" fill="#F59E0B" text-anchor="middle">Konsumsi</text>
+  <text x="430" y="115" font-size="11" fill="#06A657" text-anchor="middle">Survey</text>
+  <text x="650" y="115" font-size="11" fill="#0B5FFF" text-anchor="middle">Analisis</text>
+  <text x="880" y="115" font-size="11" fill="#EF4444" text-anchor="middle">Tren</text>
+  <text x="1080" y="115" font-size="11" fill="#0B5FFF" text-anchor="middle">Approval</text>
+  <rect x="110" y="160" width="500" height="120" rx="12" fill="#fff" stroke="#F59E0B" stroke-width="2"/>
+  <text x="360" y="190" font-size="12" fill="#F59E0B" text-anchor="middle">Tabel Data Konsumsi</text>
+  <rect x="630" y="160" width="520" height="120" rx="12" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <text x="890" y="190" font-size="12" fill="#0B5FFF" text-anchor="middle">Grafik Tren Konsumsi</text>
+  <rect x="110" y="300" width="1040" height="90" rx="12" fill="#fff" stroke="#06A657" stroke-width="2"/>
+  <text x="630" y="340" font-size="12" fill="#06A657" text-anchor="middle">Approval Konsumsi/Notifikasi</text>
+  <rect x="72" y="790" width="1128" height="30" fill="#FFA726"/>
+  <text x="140" y="810" font-size="11" fill="#FFF" font-family="Inter">SIGAP Malut v1 | Bidang Konsumsi</text>
+</svg>

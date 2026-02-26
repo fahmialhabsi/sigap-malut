@@ -1,0 +1,9 @@
+{
+  "roles": {
+    "superadmin": { "permissions": ["*"] },
+    "sekretaris": { "permissions": ["layanan:kgb:create","layanan:kgb:read","layanan:kgb:approve"] },
+    "kepala_bidang": { "permissions": ["layanan:stok:create","layanan:stok:read","layanan:stok:approve"] },
+    "staf": { "permissions": ["layanan:kgb:create","layanan:kgb:read"] },
+    "pelaksana": { "permissions": ["layanan:stok:create","layanan:stok:read"] }
+  }
+}

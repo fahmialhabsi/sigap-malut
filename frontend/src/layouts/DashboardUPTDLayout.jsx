@@ -1,7 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { roleIdToName } from "../utils/roleMap";
+import useAuthStore from "../stores/authStore";
 
 export default function DashboardUPTDLayout({ children }) {
-  // Layout khusus UPTD
+  const user = useAuthStore((state) => state.user);
+  const roleName = user ? roleIdToName[user.role_id] : null;
+
+  useEffect(() => {
+    if (
+      !user ||
+      !(
+        roleName === "kepala_uptd" ||
+        roleName === "super_admin" ||
+        user.unit_kerja === "UPTD Balai Pengawasan Mutu Pangan dan Obat Hewan"
+      )
+    ) {
+      window.location.href = "/landing";
+    }
+  }, [user, roleName]);
+
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
       {/* Header UPTD */}

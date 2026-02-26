@@ -1,0 +1,33 @@
+[
+  {
+    "id": "dashboard_superadmin",
+    "label": "Dashboard Super Admin",
+    "icon": "HiUserGroup",
+    "route": "/dashboard/superadmin"
+  },
+  {
+    "id": "kepegawaian",
+    "label": "Kepegawaian",
+    "icon": "HiUsers",
+    "route": "/dashboard/kepegawaian"
+  },
+  {
+    "id": "keuangan",
+    "label": "Keuangan",
+    "icon": "HiCurrencyDollar",
+    "route": "/dashboard/keuangan"
+  },
+  {
+    "id": "komoditas",
+    "label": "Komoditas",
+    "icon": "HiTrendingUp",
+    "route": "/dashboard/komoditas"
+  },
+  {
+    "id": "audit_log",
+    "label": "Audit Log",
+    "icon": "HiClipboardCheck",
+    "route": "/audit-trail"
+  }
+  // dst...
+]

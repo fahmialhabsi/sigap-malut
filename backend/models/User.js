@@ -1,12 +1,4 @@
-// =====================================================
-// MODEL: User
-// TABLE: users
-// =====================================================
-// =====================================================
-// MODEL: User
-// TABLE: users
-// =====================================================
-
+// File: backend/models/User.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
@@ -15,78 +7,50 @@ const User = sequelize.define(
   {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
     },
     username: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: {
-        isEmail: true,
-      },
     },
     password: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    nama_lengkap: {
-      type: DataTypes.STRING(255),
+    role_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    unit_id: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     nip: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    role: {
-      type: DataTypes.ENUM(
-        "super_admin",
-        "kepala_dinas",
-        "sekretaris",
-        "kepala_bidang",
-        "kepala_uptd",
-        "kasubbag",
-        "kasubbag_umum",
-        "kasubbag_kepegawaian",
-        "kasubbag_perencanaan",
-        "kasi_uptd",
-        "kasubbag_tu_uptd",
-        "kasi_mutu_uptd",
-        "kasi_teknis_uptd",
-        "fungsional",
-        "fungsional_perencana",
-        "fungsional_analis",
-        "pelaksana",
-        "guest",
-      ),
-      allowNull: false,
-      defaultValue: "pelaksana",
+    nama_lengkap: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     unit_kerja: {
-      type: DataTypes.ENUM(
-        "Sekretariat",
-        "UPTD",
-        "Bidang Ketersediaan",
-        "Bidang Distribusi",
-        "Bidang Konsumsi",
-      ),
-      allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     jabatan: {
-      type: DataTypes.STRING(255),
-    },
-    foto: {
-      type: DataTypes.STRING(255),
-    },
-    telepon: {
-      type: DataTypes.STRING(20),
-    },
-    alamat: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     is_active: {
       type: DataTypes.BOOLEAN,
@@ -95,29 +59,25 @@ const User = sequelize.define(
     },
     is_verified: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    email_verified_at: {
-      type: DataTypes.DATE,
+      allowNull: true,
     },
     last_login_at: {
       type: DataTypes.DATE,
+      allowNull: true,
     },
-    last_login_ip: {
-      type: DataTypes.STRING(45),
-    },
-    failed_login_attempts: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    locked_until: {
+    created_at: {
       type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     deleted_at: {
       type: DataTypes.DATE,
       allowNull: true,
-      comment: "Soft delete timestamp",
     },
   },
   {
@@ -130,10 +90,5 @@ const User = sequelize.define(
     deletedAt: "deleted_at",
   },
 );
-
-// Tambahkan method softDelete pada User
-User.prototype.softDelete = async function () {
-  await this.destroy();
-};
 
 export default User;

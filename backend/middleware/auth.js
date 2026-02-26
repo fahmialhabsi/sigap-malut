@@ -1,3 +1,4 @@
+// File: backend/middleware/auth.js
 // Mock export untuk test error handling & security
 export function validateInput({ username, password }) {
   if (!username || !password) throw new Error("Invalid input");

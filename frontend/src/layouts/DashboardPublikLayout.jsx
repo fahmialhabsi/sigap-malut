@@ -1,7 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
+import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
 
 export default function DashboardPublikLayout({ children }) {
-  // Layout khusus publik
+  const user = useAuthStore((state) => state.user);
+  const roleName = user ? roleIdToName[user.role_id] : null;
+
+  useEffect(() => {
+    if (
+      !user ||
+      !(
+        roleName === "viewer" ||
+        roleName === "super_admin" ||
+        user.unit_kerja === "Publik"
+      )
+    ) {
+      window.location.href = "/landing";
+    }
+  }, [user, roleName]);
+
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
       {/* Header Publik */}

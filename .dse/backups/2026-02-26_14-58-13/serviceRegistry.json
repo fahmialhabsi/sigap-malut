@@ -1,0 +1,22 @@
+[
+  {
+    "kode_layanan": "KGB",
+    "nama_layanan": "Kenaikan Gaji Berkala",
+    "bidang": "Sekretariat",
+    "workflow": "kgb_workflow",
+    "model": "SEK-KEP",
+    "roles": ["staf", "atasan", "sekretaris", "kepala_dinas"],
+    "SLA": 14,
+    "kpi_reference": ["Keterlambatan KGB", "SLA Compliance"]
+  },
+  {
+    "kode_layanan": "STOK",
+    "nama_layanan": "Stok Pangan",
+    "bidang": "Bidang Ketersediaan",
+    "workflow": "stok_workflow",
+    "model": "BDS-CPD",
+    "roles": ["pelaksana", "fungsional", "kepala_bidang"],
+    "SLA": 7,
+    "kpi_reference": ["Jumlah Permohonan Layanan", "Waktu Penyelesaian Rata2"]
+  }
+]

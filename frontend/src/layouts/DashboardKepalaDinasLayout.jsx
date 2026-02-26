@@ -1,7 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
+import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
 
 export default function DashboardKepalaDinasLayout({ children }) {
-  // Layout khusus kepala dinas/gubernur
+  // Ambil user dari store
+  const user = useAuthStore((state) => state.user);
+  const roleName = user ? roleIdToName[user.role_id] : null;
+
+  useEffect(() => {
+    // PATCH: Pindahkan redirect ke useEffect!
+    if (
+      !user ||
+      !(
+        roleName === "kepala_dinas" ||
+        roleName === "super_admin" ||
+        user.unit_kerja === "Sekretariat Dinas"
+      )
+    ) {
+      window.location.href = "/landing";
+    }
+  }, [user, roleName]);
+
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
       {/* Header Kepala Dinas/Gubernur */}
