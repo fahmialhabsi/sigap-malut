@@ -1,0 +1,75 @@
+-- =====================================================
+-- TABLE: upt_tkn
+-- MODULE: UPT-TKN
+-- Generated: 2026-02-17T19:24:46.527Z
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS upt_tkn (
+  id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+  layanan_id VARCHAR(10) NOT NULL,
+  jenis_layanan_teknis VARCHAR(100) CHECK(jenis_layanan_teknis IN ('Pengujian Sampel Pangan Berisiko', 'Hasil Pengujian GMP/GHP/NKV', 'Audit Produk', 'Pelaporan Teknis')) NOT NULL,
+  nomor_pengujian VARCHAR(100),
+  nomor_audit VARCHAR(100),
+  tanggal_pengujian DATE,
+  pemohon VARCHAR(255),
+  instansi_pemohon VARCHAR(255),
+  jenis_sampel VARCHAR(255),
+  jumlah_sampel INTEGER,
+  parameter_uji TEXT,
+  metode_uji VARCHAR(255),
+  hasil_uji TEXT,
+  kesimpulan_uji VARCHAR(100) CHECK(kesimpulan_uji IN ('Memenuhi Syarat', 'Tidak Memenuhi Syarat', 'Perlu Uji Lanjutan')),
+  rekomendasi_uji TEXT,
+  standar_acuan VARCHAR(255),
+  analis VARCHAR(255),
+  verifikator VARCHAR(255),
+  tanggal_verifikasi DATE,
+  jenis_sertifikasi VARCHAR(100) CHECK(jenis_sertifikasi IN ('GMP', 'GHP', 'NKV', 'Prima 1', 'Prima 2', 'Prima 3', 'GFP', 'Lainnya')),
+  nama_usaha VARCHAR(255),
+  jenis_usaha VARCHAR(255),
+  alamat_usaha TEXT,
+  pemilik_usaha VARCHAR(255),
+  kontak_usaha VARCHAR(50),
+  tanggal_audit DATE,
+  tim_auditor TEXT,
+  checklist_audit JSON,
+  skor_audit DECIMAL(5,2),
+  hasil_audit VARCHAR(100) CHECK(hasil_audit IN ('Lulus', 'Tidak Lulus', 'Lulus Bersyarat')),
+  catatan_audit TEXT,
+  tindakan_korektif TEXT,
+  batas_waktu_perbaikan DATE,
+  status_sertifikat VARCHAR(100) CHECK(status_sertifikat IN ('Proses', 'Diterbitkan', 'Ditolak', 'Dicabut')),
+  nomor_sertifikat VARCHAR(100),
+  tanggal_terbit_sertifikat DATE,
+  masa_berlaku_sertifikat DATE,
+  jenis_produk_audit VARCHAR(100) CHECK(jenis_produk_audit IN ('Domestik', 'Impor')),
+  negara_asal VARCHAR(100) DEFAULT 'Indonesia',
+  dokumen_pendukung JSON,
+  periode_laporan DATE,
+  jenis_laporan VARCHAR(100) CHECK(jenis_laporan IN ('Bulanan', 'Triwulanan', 'Semesteran', 'Tahunan')),
+  total_pengujian INTEGER,
+  total_audit INTEGER,
+  total_sertifikat INTEGER,
+  persentase_kelulusan DECIMAL(5,2),
+  ringkasan_laporan TEXT,
+  file_hasil_uji VARCHAR(255),
+  file_sertifikat VARCHAR(255),
+  file_laporan_audit VARCHAR(255),
+  file_laporan_teknis VARCHAR(255),
+  rincian_layanan TEXT,
+  penanggung_jawab VARCHAR(255) NOT NULL DEFAULT 'Kepala UPTD',
+  pelaksana VARCHAR(255) NOT NULL,
+  kelompok_penerima VARCHAR(255),
+  jenis_data VARCHAR(255),
+  is_sensitive VARCHAR(100) CHECK(is_sensitive IN ('Biasa', 'Sensitif')) NOT NULL DEFAULT 'Sensitif',
+  status VARCHAR(100) CHECK(status IN ('pending', 'proses', 'selesai', 'verifikasi', 'approved')) NOT NULL DEFAULT 'pending',
+  keterangan TEXT,
+  created_by INTEGER NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_upt_tkn_layanan_id ON upt_tkn(layanan_id);
+CREATE INDEX IF NOT EXISTS idx_upt_tkn_status ON upt_tkn(status);
+CREATE INDEX IF NOT EXISTS idx_upt_tkn_created_at ON upt_tkn(created_at);
+

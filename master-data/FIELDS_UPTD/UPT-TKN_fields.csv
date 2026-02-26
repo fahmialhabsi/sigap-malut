@@ -1,0 +1,63 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY132-LY135)
+jenis_layanan_teknis,Jenis Layanan,enum,NULL,true,false,NULL,none,"Pengujian Sampel Pangan Berisiko,Hasil Pengujian GMP/GHP/NKV,Audit Produk,Pelaporan Teknis",Jenis layanan teknis
+nomor_pengujian,Nomor Pengujian,varchar,100,false,false,NULL,none,NULL,Nomor registrasi pengujian
+nomor_audit,Nomor Audit,varchar,100,false,false,NULL,none,NULL,Nomor audit
+tanggal_pengujian,Tanggal Pengujian,date,NULL,false,false,NULL,none,NULL,Tanggal pengujian dilakukan
+pemohon,Pemohon,varchar,255,false,false,NULL,none,NULL,Nama pemohon uji/audit
+instansi_pemohon,Instansi Pemohon,varchar,255,false,false,NULL,none,NULL,Asal instansi
+jenis_sampel,Jenis Sampel,varchar,255,false,false,NULL,none,NULL,Jenis sampel pangan
+jumlah_sampel,Jumlah Sampel,int,11,false,false,NULL,none,NULL,Jumlah sampel yang diuji
+parameter_uji,Parameter Uji,text,NULL,false,false,NULL,none,NULL,Parameter yang diuji (kimia mikrobiologi fisik)
+metode_uji,Metode Uji,varchar,255,false,false,NULL,none,NULL,Metode pengujian yang digunakan
+hasil_uji,Hasil Uji,text,NULL,false,false,NULL,none,NULL,Hasil pengujian
+kesimpulan_uji,Kesimpulan,enum,NULL,false,false,NULL,none,"Memenuhi Syarat,Tidak Memenuhi Syarat,Perlu Uji Lanjutan",Kesimpulan hasil uji
+rekomendasi_uji,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi tindak lanjut
+standar_acuan,Standar Acuan,varchar,255,false,false,NULL,none,NULL,Standar yang digunakan (SNI dll)
+analis,Analis,varchar,255,false,false,NULL,none,NULL,Nama analis laboratorium
+verifikator,Verifikator,varchar,255,false,false,NULL,none,NULL,Nama verifikator hasil
+tanggal_verifikasi,Tanggal Verifikasi,date,NULL,false,false,NULL,none,NULL,Tanggal verifikasi
+jenis_sertifikasi,Jenis Sertifikasi,enum,NULL,false,false,NULL,none,"GMP,GHP,NKV,Prima 1,Prima 2,Prima 3,GFP,Lainnya",Jenis sertifikasi
+nama_usaha,Nama Usaha,varchar,255,false,false,NULL,none,NULL,Nama usaha yang diaudit
+jenis_usaha,Jenis Usaha,varchar,255,false,false,NULL,none,NULL,Jenis usaha pangan
+alamat_usaha,Alamat Usaha,text,NULL,false,false,NULL,none,NULL,Alamat lokasi usaha
+pemilik_usaha,Pemilik Usaha,varchar,255,false,false,NULL,none,NULL,Nama pemilik
+kontak_usaha,Kontak,varchar,50,false,false,NULL,none,NULL,Nomor telepon/HP
+tanggal_audit,Tanggal Audit,date,NULL,false,false,NULL,none,NULL,Tanggal audit dilakukan
+tim_auditor,Tim Auditor,text,NULL,false,false,NULL,none,NULL,Nama-nama tim auditor
+checklist_audit,Checklist Audit,json,NULL,false,false,NULL,none,NULL,JSON checklist audit
+skor_audit,Skor Audit,decimal,"5,2",false,false,NULL,none,NULL,Skor hasil audit
+hasil_audit,Hasil Audit,enum,NULL,false,false,NULL,none,"Lulus,Tidak Lulus,Lulus Bersyarat",Hasil audit
+catatan_audit,Catatan Audit,text,NULL,false,false,NULL,none,NULL,Catatan hasil audit
+tindakan_korektif,Tindakan Korektif,text,NULL,false,false,NULL,none,NULL,Tindakan korektif yang diperlukan
+batas_waktu_perbaikan,Batas Waktu Perbaikan,date,NULL,false,false,NULL,none,NULL,Deadline perbaikan
+status_sertifikat,Status Sertifikat,enum,NULL,false,false,NULL,none,"Proses,Diterbitkan,Ditolak,Dicabut",Status penerbitan sertifikat
+nomor_sertifikat,Nomor Sertifikat,varchar,100,false,false,NULL,none,NULL,Nomor sertifikat yang diterbitkan
+tanggal_terbit_sertifikat,Tanggal Terbit,date,NULL,false,false,NULL,none,NULL,Tanggal sertifikat diterbitkan
+masa_berlaku_sertifikat,Masa Berlaku,date,NULL,false,false,NULL,none,NULL,Tanggal kadaluarsa sertifikat
+jenis_produk_audit,Jenis Produk,enum,NULL,false,false,NULL,none,"Domestik,Impor",Produk domestik atau impor
+negara_asal,Negara Asal,varchar,100,false,false,Indonesia,none,NULL,Negara asal produk (untuk impor)
+dokumen_pendukung,Dokumen Pendukung,json,NULL,false,false,NULL,none,NULL,Array file dokumen (CoA invoice dll)
+periode_laporan,Periode Laporan,date,NULL,false,false,NULL,none,NULL,Periode laporan teknis
+jenis_laporan,Jenis Laporan,enum,NULL,false,false,NULL,none,"Bulanan,Triwulanan,Semesteran,Tahunan",Jenis laporan
+total_pengujian,Total Pengujian,int,11,false,false,NULL,none,NULL,Total pengujian dalam periode
+total_audit,Total Audit,int,11,false,false,NULL,none,NULL,Total audit dalam periode
+total_sertifikat,Total Sertifikat Diterbitkan,int,11,false,false,NULL,none,NULL,Total sertifikat diterbitkan
+persentase_kelulusan,Persentase Kelulusan (%),decimal,"5,2",false,false,NULL,none,NULL,Persentase kelulusan uji/audit
+ringkasan_laporan,Ringkasan Laporan,text,NULL,false,false,NULL,none,NULL,Ringkasan laporan teknis
+file_hasil_uji,File Hasil Uji,varchar,255,false,false,NULL,none,NULL,Upload hasil uji PDF
+file_sertifikat,File Sertifikat,varchar,255,false,false,NULL,none,NULL,Upload sertifikat PDF
+file_laporan_audit,File Laporan Audit,varchar,255,false,false,NULL,none,NULL,Upload laporan audit
+file_laporan_teknis,File Laporan Teknis,varchar,255,false,false,NULL,none,NULL,Upload laporan teknis
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala UPTD,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,NULL,none,NULL,Siapa yang terima layanan
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data teknis UPTD sensitif
+status,Status,enum,NULL,true,false,pending,none,"pending,proses,selesai,verifikasi,approved",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

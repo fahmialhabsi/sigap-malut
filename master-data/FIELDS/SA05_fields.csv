@@ -1,0 +1,18 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+username,Username,varchar,50,true,true,NULL,lowercase_alphanumeric,NULL,Username login
+email,Email,varchar,100,true,true,NULL,email,NULL,Email resmi
+password,Password,varchar,255,true,false,NULL,none,NULL,Encrypted password
+role,Role,enum,NULL,true,false,pelaksana,none,"super_admin,kepala_dinas,kepala_bidang,kepala_uptd,kasubbag,pelaksana",Hak akses
+unit_kerja,Unit Kerja,varchar,255,true,false,NULL,none,NULL,Unit kerja
+nama_lengkap,Nama Lengkap,varchar,255,false,false,NULL,none,NULL,Nama lengkap
+nip,NIP,varchar,18,false,false,NULL,nip_18_digit,NULL,NIP jika ASN
+no_hp,No HP,varchar,20,false,false,NULL,phone,NULL,Nomor HP
+foto_profil,Foto Profil,varchar,255,false,false,NULL,none,NULL,Path foto
+status,Status,enum,NULL,true,false,aktif,none,"aktif,nonaktif,suspended",Status akun
+last_login,Login Terakhir,timestamp,NULL,false,false,NULL,none,NULL,Terakhir login
+login_count,Jumlah Login,int,11,true,false,0,none,NULL,Tracking
+created_by,Dibuat Oleh,int,11,false,false,NULL,none,NULL,User ID pembuat
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+deleted_at,Dihapus Pada,timestamp,NULL,false,false,NULL,none,NULL,Soft delete

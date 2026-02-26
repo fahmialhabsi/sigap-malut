@@ -1,0 +1,7 @@
+modul_id,nama_modul,kategori,bidang,icon,has_approval,has_file_upload,is_public,menu_order,is_active,total_layanan
+BKS-KBJ,Kebijakan Konsumsi Pangan,Bidang Konsumsi,Bidang Konsumsi & Keamanan Pangan,document-chart-bar,true,true,false,1,true,5
+BKS-DVR,Penganekaragaman Pangan,Bidang Konsumsi,Bidang Konsumsi & Keamanan Pangan,arrows-pointing-out,false,true,false,2,true,5
+BKS-KMN,Keamanan Pangan,Bidang Konsumsi,Bidang Konsumsi & Keamanan Pangan,shield-check,true,true,false,3,true,5
+BKS-BMB,Bimbingan & Pelatihan,Bidang Konsumsi,Bidang Konsumsi & Keamanan Pangan,academic-cap,false,true,false,4,true,5
+BKS-EVL,Evaluasi & Monitoring,Bidang Konsumsi,Bidang Konsumsi & Keamanan Pangan,clipboard-document-check,false,true,false,5,true,3
+BKS-LAP,Pelaporan Kinerja,Bidang Konsumsi,Bidang Konsumsi & Keamanan Pangan,document-text,false,true,false,6,true,2

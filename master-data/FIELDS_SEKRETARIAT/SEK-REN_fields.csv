@@ -1,0 +1,43 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY040-LY045)
+jenis_layanan_perencanaan,Jenis Layanan,enum,NULL,true,false,NULL,none,"Renstra,Renja,Fasilitasi Program,Sinkronisasi,LKJIP/LAKIP,Laporan Kinerja",Jenis layanan perencanaan
+tahun_perencanaan,Tahun,int,4,true,false,NULL,none,NULL,Tahun perencanaan
+periode_renstra,Periode Renstra,varchar,20,false,false,NULL,none,NULL,Contoh: 2024-2029
+visi,Visi,text,NULL,false,false,NULL,none,NULL,Visi organisasi
+misi,Misi,text,NULL,false,false,NULL,none,NULL,Misi organisasi
+tujuan,Tujuan,text,NULL,false,false,NULL,none,NULL,Tujuan strategis
+sasaran,Sasaran,text,NULL,false,false,NULL,none,NULL,Sasaran
+strategi,Strategi,text,NULL,false,false,NULL,none,NULL,Strategi pencapaian
+kode_program,Kode Program,varchar,50,false,false,NULL,none,NULL,Kode program
+nama_program,Nama Program,varchar,255,false,false,NULL,none,NULL,Nama program
+kode_kegiatan,Kode Kegiatan,varchar,50,false,false,NULL,none,NULL,Kode kegiatan
+nama_kegiatan,Nama Kegiatan,varchar,255,false,false,NULL,none,NULL,Nama kegiatan
+indikator_kinerja,Indikator Kinerja,text,NULL,false,false,NULL,none,NULL,Indikator keberhasilan
+target_kinerja,Target Kinerja,varchar,255,false,false,NULL,none,NULL,Target yang ingin dicapai
+satuan_target,Satuan,varchar,50,false,false,NULL,none,NULL,Satuan target
+realisasi_kinerja,Realisasi,varchar,255,false,false,NULL,none,NULL,Realisasi pencapaian
+persentase_capaian,Persentase Capaian,decimal,"5,2",false,false,NULL,none,NULL,Persen capaian target
+pagu_anggaran,Pagu Anggaran,decimal,"15,2",false,false,NULL,none,NULL,Pagu anggaran program/kegiatan
+bidang_pelaksana,Bidang Pelaksana,varchar,255,false,false,NULL,none,NULL,Bidang yang melaksanakan
+penanggung_jawab_kegiatan,PJ Kegiatan,varchar,255,false,false,NULL,none,NULL,Penanggung jawab kegiatan
+waktu_pelaksanaan,Waktu Pelaksanaan,varchar,100,false,false,NULL,none,NULL,Kapan dilaksanakan
+output,Output,text,NULL,false,false,NULL,none,NULL,Output kegiatan
+outcome,Outcome,text,NULL,false,false,NULL,none,NULL,Outcome program
+kendala,Kendala,text,NULL,false,false,NULL,none,NULL,Kendala yang dihadapi
+solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi atas kendala
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi perbaikan
+status_sinkronisasi,Status Sinkronisasi,enum,NULL,false,false,NULL,none,"Belum,Proses,Sesuai,Tidak Sesuai",Sinkronisasi dengan RPJMD/RKPD
+file_renstra,File Renstra,varchar,255,false,false,NULL,none,NULL,Upload Renstra PDF
+file_renja,File Renja,varchar,255,false,false,NULL,none,NULL,Upload Renja PDF
+file_lakip,File LAKIP,varchar,255,false,false,NULL,none,NULL,Upload LAKIP PDF
+file_laporan_kinerja,File Laporan Kinerja,varchar,255,false,false,NULL,none,NULL,Upload laporan PDF
+file_pendukung,File Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Fungsional Perencana,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data perencanaan sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,finalisasi,disetujui,final",Status dokumen
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

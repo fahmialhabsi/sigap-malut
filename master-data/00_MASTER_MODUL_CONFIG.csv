@@ -1,0 +1,95 @@
+modul_id,nama_modul,kategori,bidang,tabel_name,deskripsi,icon,has_approval,has_file_upload,is_public,menu_order,is_active
+SA01,Dashboard KPI 50 Indikator,Super Admin,Sekretariat,kpi_tracking,Monitoring 50 indikator keberhasilan sistem secara real-time,chart-bar-square,false,false,false,1,true
+SA02,Dynamic Module Generator,Super Admin,Sekretariat,dynamic_modules,Tool untuk membuat modul baru tanpa coding,puzzle-piece,true,false,false,2,true
+SA03,Template Tata Naskah Dinas,Super Admin,Sekretariat,tata_naskah_templates,Manajemen template surat resmi (SK SE ST SU ND dll),document-text,true,true,false,3,true
+SA04,Repositori Peraturan,Super Admin,Sekretariat,peraturan,Database peraturan perundang-undangan (UU PP Pergub dll),book-open,false,true,true,4,true
+SA05,User Management,Super Admin,Sekretariat,users,Kelola user akun dan hak akses sistem,users,false,false,false,5,true
+SA06,Audit Trail,Super Admin,Sekretariat,audit_log,Log tracking semua aktivitas user di sistem,clipboard-document-list,false,false,false,6,true
+SA07,System Configuration,Super Admin,Sekretariat,system_config,Pengaturan konfigurasi aplikasi (email notif dll),cog-6-tooth,false,false,false,7,true
+SA08,Backup & Restore,Super Admin,Sekretariat,backups,Backup dan restore database sistem,cloud-arrow-down,false,true,false,8,true
+SA09,Dashboard Compliance,Super Admin,Sekretariat,compliance_tracking,Monitor alur koordinasi dan deteksi bypass,shield-check,false,false,false,9,true
+SA10,AI Configuration,Super Admin,Sekretariat,ai_config,Konfigurasi AI Chatbot dan analisis,sparkles,false,false,false,10,true
+M001,Data ASN,Kepegawaian,Sekretariat,asn,Master data Aparatur Sipil Negara,user-group,false,true,false,11,true
+M002,Tracking KGB,Kepegawaian,Sekretariat,kgb_tracking,Tracking Kenaikan Gaji Berkala,calendar-days,true,true,false,12,true
+M003,Tracking Kenaikan Pangkat,Kepegawaian,Sekretariat,pangkat_tracking,Tracking kenaikan pangkat ASN,arrow-trending-up,true,true,false,13,true
+M004,Tracking Penghargaan,Kepegawaian,Sekretariat,penghargaan_tracking,Tracking penghargaan 10 20 30 tahun,trophy,true,true,false,14,true
+M005,Data Cuti,Kepegawaian,Sekretariat,cuti,Pengajuan dan approval cuti pegawai,calendar,true,true,false,15,true
+M006,Perjalanan Dinas,Kepegawaian,Sekretariat,perjalanan_dinas,Surat tugas dan SPD,map,true,true,false,16,true
+M007,Diklat & Pelatihan,Kepegawaian,Sekretariat,diklat,Data diklat dan pelatihan ASN,academic-cap,false,true,false,17,true
+M008,SKP (Sasaran Kinerja Pegawai),Kepegawaian,Sekretariat,skp,Penilaian kinerja pegawai,clipboard-document-check,true,true,false,18,true
+M009,Database Kepegawaian,Kepegawaian,Sekretariat,kepegawaian_detail,Data lengkap kepegawaian ASN,folder-open,false,true,false,19,true
+M010,Arsip Digital Kepegawaian,Kepegawaian,Sekretariat,arsip_kepegawaian,Arsip dokumen kepegawaian (scan),archive-box,false,true,false,20,true
+M011,Surat Masuk,Administrasi Umum,Sekretariat,surat_masuk,Pengelolaan surat masuk,inbox-arrow-down,false,true,false,21,true
+M012,Surat Keluar,Administrasi Umum,Sekretariat,surat_keluar,Pengelolaan surat keluar,paper-airplane,false,true,false,22,true
+M013,Disposisi Surat,Administrasi Umum,Sekretariat,disposisi,Disposisi dan tindak lanjut surat,arrow-path,true,false,false,23,true
+M014,Agenda Kegiatan,Administrasi Umum,Sekretariat,agenda,Agenda rapat dan kegiatan dinas,calendar-days,false,false,false,24,true
+M015,Notulensi Rapat,Administrasi Umum,Sekretariat,notulensi,Catatan hasil rapat,document-text,true,true,false,25,true
+M016,Data Aset Barang,Aset,Sekretariat,aset_barang,Inventaris barang kantor,cube,false,true,false,26,true
+M017,Data Kendaraan Dinas,Aset,Sekretariat,aset_kendaraan,Data kendaraan operasional,truck,false,true,false,27,true
+M018,Pemeliharaan Aset,Aset,Sekretariat,pemeliharaan_aset,Jadwal dan riwayat pemeliharaan aset,wrench-screwdriver,true,true,false,28,true
+M019,Mutasi Aset,Aset,Sekretariat,mutasi_aset,Perpindahan dan pelepasan aset,arrow-right-circle,true,true,false,29,true
+M020,DPA (Dokumen Pelaksanaan Anggaran),Keuangan,Sekretariat,dpa,DPA tahunan,banknotes,true,true,false,30,true
+M021,RKA (Rencana Kerja dan Anggaran),Keuangan,Sekretariat,rka,Penyusunan RKA,document-chart-bar,true,true,false,31,true
+M022,SPJ (Surat Pertanggungjawaban),Keuangan,Sekretariat,spj,Pertanggungjawaban keuangan,receipt-percent,true,true,false,32,true
+M023,Realisasi Anggaran,Keuangan,Sekretariat,realisasi_anggaran,Monitoring realisasi vs pagu,chart-pie,false,false,false,33,true
+M024,Belanja Pegawai,Keuangan,Sekretariat,belanja_pegawai,Gaji honorarium tunjangan,banknotes,false,false,false,34,true
+M025,Belanja Barang,Keuangan,Sekretariat,belanja_barang,Belanja operasional ATK dll,shopping-cart,true,true,false,35,true
+M026,Belanja Modal,Keuangan,Sekretariat,belanja_modal,Pengadaan aset,building-office,true,true,false,36,true
+M027,Renstra (Rencana Strategis),Perencanaan,Sekretariat,renstra,Dokumen Renstra 5 tahunan,map,true,true,false,37,true
+M028,Renja (Rencana Kerja),Perencanaan,Sekretariat,renja,Rencana Kerja tahunan,clipboard-document-list,true,true,false,38,true
+M029,RKPD,Perencanaan,Sekretariat,rkpd,Rencana Kerja Pemerintah Daerah,building-office-2,false,true,false,39,true
+M030,LAKIP (Laporan Akuntabilitas Kinerja),Perencanaan,Sekretariat,lakip,Laporan kinerja tahunan,document-chart-bar,true,true,false,40,true
+M031,Monitoring & Evaluasi,Perencanaan,Sekretariat,monev,Monev program dan kegiatan,magnifying-glass-chart,false,false,false,41,true
+M032,Data Komoditas Pangan,Ketersediaan,Bidang Ketersediaan,komoditas,Master data komoditas pangan,shopping-bag,false,false,true,42,true
+M033,Data Produksi Pangan,Ketersediaan,Bidang Ketersediaan,produksi_pangan,Produksi pangan per kabupaten,chart-bar,false,false,true,43,true
+M034,Stok Pangan Gudang,Ketersediaan,Bidang Ketersediaan,stok_pangan,Monitoring stok di gudang,archive-box,false,false,false,44,true
+M035,Neraca Pangan,Ketersediaan,Bidang Ketersediaan,neraca_pangan,Neraca Bahan Makanan (NBM),scale,false,true,true,45,true
+M036,Peta Kerawanan Pangan,Kerawanan,Bidang Ketersediaan,kerawanan_pangan,Wilayah rawan pangan,map-pin,false,false,true,46,true
+M037,Indeks Ketahanan Pangan,Kerawanan,Bidang Ketersediaan,indeks_ketahanan,Indeks ketahanan pangan daerah,chart-bar-square,false,false,true,47,true
+M038,Early Warning Ketersediaan,Kerawanan,Bidang Ketersediaan,early_warning_ketersediaan,Sistem peringatan dini kelangkaan,bell-alert,false,false,false,48,true
+M039,Data Bencana Dampak Pangan,Kerawanan,Bidang Ketersediaan,dampak_bencana,Dampak bencana terhadap pangan,exclamation-triangle,true,true,false,49,true
+M040,Luas Panen,Ketersediaan,Bidang Ketersediaan,luas_panen,Data luas panen komoditas,arrows-pointing-out,false,false,true,50,true
+M041,Produktivitas Pangan,Ketersediaan,Bidang Ketersediaan,produktivitas,Produktivitas per hektar,chart-bar,false,false,true,51,true
+M042,Data Pasar,Distribusi,Bidang Distribusi,pasar,Master data pasar tradisional,building-storefront,false,false,true,52,true
+M043,Harga Pangan Harian,Distribusi,Bidang Distribusi,harga_pangan,Harga pangan harian per pasar,currency-dollar,false,false,true,53,true
+M044,Inflasi Pangan Bulanan,Distribusi,Bidang Distribusi,inflasi_pangan,Inflasi pangan agregat,arrow-trending-up,false,false,true,54,true
+M045,Inflasi per Komoditas,Distribusi,Bidang Distribusi,inflasi_komoditas,Detail penyumbang inflasi,list-bullet,false,false,true,55,true
+M046,Dashboard Inflasi TPID,Distribusi,Bidang Distribusi,dashboard_inflasi,Dashboard untuk rapat Mendagri,presentation-chart-line,false,false,false,56,true
+M047,Distribusi Pangan,Distribusi,Bidang Distribusi,distribusi_pangan,Distribusi antar wilayah,truck,false,false,false,57,true
+M048,CPPD (Cadangan Pangan Pemerintah Daerah),Cadangan,Bidang Distribusi,cppd,Pengelolaan CPPD,archive-box-arrow-down,false,false,false,58,true
+M049,CBP BULOG,Cadangan,Bidang Distribusi,cbp_bulog,Cadangan Beras Pemerintah,building-library,false,false,false,59,true
+M050,Pelepasan Cadangan,Cadangan,Bidang Distribusi,pelepasan_cadangan,Pelepasan CPPD untuk stabilisasi,arrow-up-tray,true,true,false,60,true
+M051,Operasi Pasar,Distribusi,Bidang Distribusi,operasi_pasar,Operasi pasar murah,shopping-cart,true,true,false,61,true
+M052,Gerakan Pangan Murah,Distribusi,Bidang Distribusi,gerakan_pangan_murah,Program GPM,hand-raised,true,true,false,62,true
+M053,Bantuan Pangan Pemerintah,Distribusi,Bidang Distribusi,bantuan_pangan,Bantuan dari pusat (Rastra dll),gift,false,true,false,63,true
+M054,Rapat TPID,Distribusi,Bidang Distribusi,tpid_rapat,Notulensi rapat TPID,users,false,true,false,64,true
+M055,Analisis Pasokan,Distribusi,Bidang Distribusi,analisis_pasokan,Analisis pasokan vs kebutuhan,chart-pie,false,false,false,65,true
+M056,Data Konsumsi Pangan,Konsumsi,Bidang Konsumsi,konsumsi_pangan,Konsumsi pangan per kapita,utensils,false,false,true,66,true
+M057,Pola Pangan Harapan (PPH),Konsumsi,Bidang Konsumsi,pph,Skor PPH daerah,chart-bar,false,false,true,67,true
+M058,Data SPPG Penerima,SPPG,Bidang Konsumsi,sppg_penerima,Master data penerima SPPG,user-group,false,true,false,68,true
+M059,SPPG Distribusi,SPPG,Bidang Konsumsi,sppg_distribusi,Distribusi pangan SPPG,truck,false,false,false,69,true
+M060,Program Makan Bergizi Gratis,SPPG,Bidang Konsumsi,program_mbg,Koordinasi program MBG nasional,heart,false,true,false,70,true
+M061,Program B2SA,Konsumsi,Bidang Konsumsi,program_b2sa,Beragam Bergizi Seimbang Aman,shield-check,false,true,false,71,true
+M062,Diversifikasi Pangan,Konsumsi,Bidang Konsumsi,diversifikasi,Program diversifikasi konsumsi,arrows-pointing-out,false,true,false,72,true
+M063,Inspeksi Keamanan Pangan,Keamanan,Bidang Konsumsi,inspeksi_keamanan,Inspeksi pangan berisiko,magnifying-glass,false,true,false,73,true
+M064,Data Keracunan Pangan,Keamanan,Bidang Konsumsi,keracunan_pangan,Laporan keracunan pangan,exclamation-circle,true,true,true,74,true
+M065,Edukasi Konsumsi Pangan,Konsumsi,Bidang Konsumsi,edukasi_konsumsi,Program edukasi masyarakat,academic-cap,false,true,false,75,true
+M066,Data UMKM Pangan,UMKM,Bidang Konsumsi,umkm_pangan,Database UMKM pangan,building-storefront,false,true,true,76,true
+M067,Pembinaan UMKM,UMKM,Bidang Konsumsi,pembinaan_umkm,Program pembinaan UMKM,hand-raised,false,true,false,77,true
+M068,Sertifikasi Prima,Sertifikasi,UPTD,sertifikasi_prima,Sertifikasi Prima 1 2 3,shield-check,true,true,false,78,true
+M069,Sertifikasi GMP/NKV,Sertifikasi,UPTD,sertifikasi_gmp,Good Manufacturing Practices,check-badge,true,true,false,79,true
+M070,Sertifikasi GFP,Sertifikasi,UPTD,sertifikasi_gfp,Good Farming Practices,globe-alt,true,true,false,80,true
+M071,Sertifikasi GHP,Sertifikasi,UPTD,sertifikasi_ghp,Good Handling Practices,hand-thumb-up,true,true,false,81,true
+M072,Audit Pangan,Audit,UPTD,audit_pangan,Audit pangan domestik & impor,clipboard-document-check,true,true,false,82,true
+M073,Registrasi Produk,Registrasi,UPTD,registrasi_produk,Registrasi produk pangan,document-plus,true,true,false,83,true
+M074,Uji Laboratorium,Lab,UPTD,uji_laboratorium,Request uji lab,beaker,false,false,false,84,true
+M075,Hasil Uji Kimia,Lab,UPTD,hasil_uji_kimia,Hasil uji kimia pangan,test-tube,false,true,false,85,true
+M076,Hasil Uji Mikrobiologi,Lab,UPTD,hasil_uji_mikrobiologi,Hasil uji mikrobiologi,virus,false,true,false,86,true
+M077,Hasil Uji Fisik,Lab,UPTD,hasil_uji_fisik,Hasil uji fisik (tekstur kadar air),scale,false,true,false,87,true
+M078,Pengawasan Pangan Berisiko,Pengawasan,UPTD,pengawasan_berisiko,Pengawasan pangan berisiko tinggi,eye,false,true,false,88,true
+M079,Sampling Pangan,Pengawasan,UPTD,sampling,Pengambilan sampel pangan,cube,false,false,false,89,true
+M080,Database UMKM Tersertifikasi,Sertifikasi,UPTD,umkm_tersertifikasi,UMKM yang sudah dapat sertifikat,building-office,false,false,true,90,true
+M081,Laporan Masyarakat,Partisipasi,Sekretariat,laporan_masyarakat,Laporan masalah pangan dari masyarakat,chat-bubble-left-right,false,true,true,91,true
+M082,Portal Data Terbuka,Open Data,Sekretariat,portal_data,Portal data pangan untuk publik,globe-alt,false,false,true,92,true
+M083,Dataset Publik,Open Data,Sekretariat,dataset_publik,Dataset yang bisa didownload publik,folder-arrow-down,false,true,true,93,true
+M084,Request Data Peneliti,Open Data,Sekretariat,request_data,Request data khusus untuk peneliti,document-magnifying-glass,true,false,true,94,true

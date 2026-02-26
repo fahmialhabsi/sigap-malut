@@ -1,0 +1,45 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,LY106,none,NULL,FK ke layanan_menpanrb
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Periode laporan
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+bulan,Bulan,int,2,false,false,NULL,none,NULL,Bulan (jika bulanan)
+triwulan,Triwulan,int,1,false,false,NULL,none,NULL,Triwulan (1-4)
+semester,Semester,int,1,false,false,NULL,none,NULL,Semester (1-2)
+judul_laporan,Judul Laporan,varchar,255,true,false,NULL,none,NULL,Judul laporan kinerja
+ringkasan_eksekutif,Ringkasan Eksekutif,text,NULL,false,false,NULL,none,NULL,Ringkasan untuk pimpinan
+capaian_distribusi,Capaian Distribusi,text,NULL,false,false,NULL,none,NULL,Capaian distribusi pangan
+capaian_stabilisasi_harga,Capaian Stabilisasi Harga,text,NULL,false,false,NULL,none,NULL,Capaian stabilisasi harga
+capaian_cppd,Capaian CPPD,text,NULL,false,false,NULL,none,NULL,Capaian pengelolaan CPPD
+inflasi_pangan,Inflasi Pangan (%),decimal,"5,2",false,false,NULL,none,NULL,Inflasi periode ini
+target_inflasi,Target Inflasi (%),decimal,"5,2",false,false,2.50,none,NULL,Target TPID
+status_inflasi,Status Inflasi,enum,NULL,false,false,NULL,none,"On Target,Warning,Alert",Status vs target
+volume_distribusi_total,Volume Distribusi Total (Ton),decimal,"15,2",false,false,NULL,none,NULL,Total distribusi
+stok_cppd,Stok CPPD (Ton),decimal,"15,2",false,false,NULL,none,NULL,Stok CPPD akhir periode
+operasi_pasar_dilakukan,Operasi Pasar Dilakukan,int,11,false,false,NULL,none,NULL,Jumlah operasi pasar
+rapat_tpid_dilakukan,Rapat TPID Dilakukan,int,11,false,false,NULL,none,NULL,Jumlah rapat TPID
+anggaran_program,Anggaran (Rp),decimal,"15,2",false,false,NULL,none,NULL,Pagu anggaran
+realisasi_anggaran,Realisasi (Rp),decimal,"15,2",false,false,NULL,none,NULL,Realisasi anggaran
+persentase_serapan,Serapan Anggaran (%),decimal,"5,2",false,false,NULL,none,NULL,Auto-calculate
+permasalahan,Permasalahan,text,NULL,false,false,NULL,none,NULL,Masalah yang dihadapi
+solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi yang ditempuh
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi
+tindak_lanjut,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Rencana tindak lanjut
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan PDF
+file_data_pendukung,File Data Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,Sekretariat,none,NULL,Kepada siapa
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Distribusi,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang menyusun
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Sekretariat/Pimpinan,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Laporan kinerja sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

@@ -1,0 +1,8 @@
+modul_id,nama_modul,kategori,bidang,icon,has_approval,has_file_upload,is_public,menu_order,is_active,total_layanan
+UPT-TKN,Layanan Teknis UPTD,UPTD,UPTD Balai Pengawasan Mutu,beaker,true,true,false,1,true,4
+UPT-ADM,Administrasi Umum UPTD,UPTD,UPTD Balai Pengawasan Mutu,document-text,false,true,false,2,true,9
+UPT-KEU,Keuangan UPTD,UPTD,UPTD Balai Pengawasan Mutu,banknotes,true,true,false,3,true,5
+UPT-KEP,Kepegawaian UPTD,UPTD,UPTD Balai Pengawasan Mutu,users,false,true,false,4,true,5
+UPT-AST,Aset & Perlengkapan UPTD,UPTD,UPTD Balai Pengawasan Mutu,cube,false,true,false,5,true,6
+UPT-MTU,Manajemen Mutu & SOP,UPTD,UPTD Balai Pengawasan Mutu,shield-check,true,true,false,6,true,17
+UPT-INS,Inspeksi & Pengawasan,UPTD,UPTD Balai Pengawasan Mutu,magnifying-glass,true,true,false,7,true,15

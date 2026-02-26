@@ -1,0 +1,32 @@
+// =====================================================
+// MODEL: UptAdm
+// TABLE: upt_adm
+// MODULE: UPT-ADM
+// Generated: 2026-02-17T19:24:47.465Z
+// =====================================================
+
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
+
+const UptAdm = sequelize.define('UptAdm', {
+  unit_kerja: {
+    type: DataTypes.ENUM('Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi'),
+    allowNull: false,
+    defaultValue: 'UPTD',
+    comment: 'AUTO-SET ke UPTD (field khusus UPTD)',
+  },
+  akses_terbatas: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+    comment: 'UPTD hanya bisa akses data sendiri (field khusus UPTD)',
+  }
+}, {
+  tableName: 'upt_adm',
+  timestamps: true,
+  underscored: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
+});
+
+export default UptAdm;

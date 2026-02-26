@@ -1,0 +1,24 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,Sekretariat,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang mengelola surat (BARU - untuk integrasi multi-unit)
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY001-LY006)
+nomor_surat,Nomor Surat,varchar,100,false,false,NULL,none,NULL,Nomor surat/dokumen
+jenis_naskah,Jenis Naskah,enum,NULL,false,false,NULL,none,"Surat Masuk,Surat Keluar,SK,SE,ST,SU,ND,MEMO,BA,Nota Dinas,Lainnya",Jenis naskah dinas
+tanggal_surat,Tanggal Surat,date,NULL,true,false,NULL,none,NULL,Tanggal surat dibuat
+pengirim_penerima,Pengirim/Penerima,varchar,255,false,false,NULL,none,NULL,Dari atau kepada siapa
+perihal,Perihal,text,NULL,true,false,NULL,none,NULL,Perihal/subjek surat
+isi_ringkas,Isi Ringkas,text,NULL,false,false,NULL,none,NULL,Ringkasan isi surat
+disposisi,Disposisi,text,NULL,false,false,NULL,none,NULL,Instruksi disposisi pimpinan
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,NULL,none,NULL,Unit/bidang tujuan
+file_surat,File Surat,varchar,255,false,false,NULL,none,NULL,Upload file PDF/scan
+file_lampiran,File Lampiran,json,NULL,false,false,NULL,none,NULL,Array path file lampiran
+arsip_code,Kode Arsip,varchar,50,false,false,NULL,none,NULL,Kode klasifikasi arsip
+is_rahasia,Rahasia,boolean,NULL,true,false,0,none,NULL,Surat rahasia atau tidak
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,NULL,none,NULL,PIC layanan
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi data
+status,Status,enum,NULL,true,false,pending,none,"pending,proses,selesai,arsip",Status proses
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

@@ -1,0 +1,31 @@
+layanan_id,layanan_code,layanan_name,modul_ui_id,is_sensitive,penanggung_jawab,pelaksana,status_aktif,menu_order
+LY077,kebijakan_distribusi_pangan,Kebijakan Distribusi Pangan,BDS-KBJ,Sensitif,Kepala Bidang Distribusi,Fungsional Analis,true,1
+LY078,peta_distribusi_pangan,Peta Distribusi Pangan,BDS-KBJ,Sensitif,Kepala Bidang Distribusi,Staff GIS,true,2
+LY079,penetapan_jalur_distribusi,Penetapan Jalur Distribusi,BDS-KBJ,Sensitif,Kepala Bidang Distribusi,Fungsional Analis,true,3
+LY080,sinkronisasi_kebijakan_distribusi,Sinkronisasi Kebijakan Distribusi,BDS-KBJ,Sensitif,Kepala Bidang Distribusi,Fungsional Analis,true,4
+LY081,pedoman_teknis_distribusi,Pedoman Teknis Distribusi,BDS-KBJ,Sensitif,Kepala Bidang Distribusi,Fungsional Analis,true,5
+LY082,pemantauan_arus_distribusi,Pemantauan Arus Distribusi,BDS-MON,Sensitif,Kepala Bidang Distribusi,Staff Distribusi,true,1
+LY083,pemantauan_stok_pasar,Pemantauan Stok Pasar,BDS-MON,Sensitif,Kepala Bidang Distribusi,Staff Distribusi,true,2
+LY084,hambatan_distribusi,Identifikasi Hambatan Distribusi,BDS-MON,Sensitif,Kepala Bidang Distribusi,Staff Distribusi,true,3
+LY085,fasilitasi_kelancaran_distribusi,Fasilitasi Kelancaran Distribusi,BDS-MON,Biasa,Kepala Bidang Distribusi,Staff Distribusi,true,4
+LY086,koordinasi_distribusi_wilayah,Koordinasi Distribusi Antar Wilayah,BDS-MON,Sensitif,Kepala Bidang Distribusi,Staff Distribusi,true,5
+LY087,pemantauan_harga_pangan,Pemantauan Harga Pangan,BDS-HRG,Sensitif,Kepala Bidang Distribusi,Petugas Harga,true,1
+LY088,analisis_fluktuasi_harga,Analisis Fluktuasi Harga,BDS-HRG,Sensitif,Kepala Bidang Distribusi,Fungsional Analis,true,2
+LY089,rekomendasi_stabilisasi_harga,Rekomendasi Stabilisasi Harga,BDS-HRG,Sensitif,Kepala Bidang Distribusi,Fungsional Analis,true,3
+LY090,operasi_pasar,Operasi Pasar,BDS-HRG,Biasa,Kepala Bidang Distribusi,Staff Operasi Pasar,true,4
+LY091,koordinasi_tpid,Koordinasi TPID,BDS-HRG,Sensitif,Kepala Bidang Distribusi,Staff TPID,true,5
+LY092,perencanaan_cppd,Perencanaan CPPD,BDS-CPD,Sensitif,Kepala Bidang Distribusi,Staff CPPD,true,1
+LY093,pengadaan_cppd,Pengadaan CPPD,BDS-CPD,Sensitif,Kepala Bidang Distribusi,Staff CPPD,true,2
+LY094,pengelolaan_stok_cppd,Pengelolaan Stok CPPD,BDS-CPD,Sensitif,Kepala Bidang Distribusi,Staff CPPD,true,3
+LY095,penyaluran_cppd_darurat,Penyaluran CPPD Darurat,BDS-CPD,Biasa,Kepala Bidang Distribusi,Staff CPPD,true,4
+LY096,evaluasi_cppd,Evaluasi CPPD,BDS-CPD,Sensitif,Kepala Bidang Distribusi,Staff CPPD,true,5
+LY097,bimtek_distribusi_pangan,Bimtek Distribusi Pangan,BDS-BMB,Biasa,Kepala Bidang Distribusi,Staff Bimtek,true,1
+LY098,bimtek_cppd,Bimtek CPPD,BDS-BMB,Biasa,Kepala Bidang Distribusi,Staff Bimtek,true,2
+LY099,supervisi_lapangan_distribusi,Supervisi Lapangan Distribusi,BDS-BMB,Biasa,Kepala Bidang Distribusi,Staff Supervisi,true,3
+LY100,konsultasi_teknis_distribusi,Konsultasi Teknis Distribusi,BDS-BMB,Biasa,Kepala Bidang Distribusi,Fungsional Analis,true,4
+LY101,fasilitasi_stakeholder_distribusi,Fasilitasi Stakeholder Distribusi,BDS-BMB,Biasa,Kepala Bidang Distribusi,Staff Fasilitasi,true,5
+LY102,evaluasi_distribusi_pangan,Evaluasi Distribusi Pangan,BDS-EVL,Sensitif,Kepala Bidang Distribusi,Staff Monev,true,1
+LY103,evaluasi_stabilisasi_harga,Evaluasi Stabilisasi Harga,BDS-EVL,Sensitif,Kepala Bidang Distribusi,Staff Monev,true,2
+LY104,evaluasi_cppd_lanjutan,Evaluasi CPPD Lanjutan,BDS-EVL,Sensitif,Kepala Bidang Distribusi,Staff Monev,true,3
+LY105,data_dukung_sakip_distribusi,Data Dukung SAKIP Distribusi,BDS-EVL,Sensitif,Kepala Bidang Distribusi,Staff Perencanaan,true,4
+LY106,laporan_kinerja_distribusi,Laporan Kinerja Distribusi,BDS-LAP,Sensitif,Kepala Bidang Distribusi,Staff Pelaporan,true,1

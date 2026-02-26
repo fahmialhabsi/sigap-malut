@@ -1,0 +1,62 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY112-LY116)
+jenis_kegiatan,Jenis Kegiatan,enum,NULL,true,false,NULL,none,"Pengembangan Pangan Lokal,Pemanfaatan Pekarangan,Kampanye,Edukasi B2SA,Pendampingan Kelompok",Jenis kegiatan penganekaragaman
+nama_kegiatan,Nama Kegiatan,varchar,255,true,false,NULL,none,NULL,Nama kegiatan/program
+tanggal_kegiatan,Tanggal Kegiatan,date,NULL,false,false,NULL,none,NULL,Tanggal pelaksanaan
+lokasi_kegiatan,Lokasi,varchar,255,false,false,NULL,none,NULL,Lokasi kegiatan
+kabupaten,Kabupaten,varchar,100,false,false,NULL,none,NULL,Kabupaten
+kecamatan,Kecamatan,varchar,100,false,false,NULL,none,NULL,Kecamatan
+desa,Desa,varchar,100,false,false,NULL,none,NULL,Desa
+jenis_pangan_lokal,Jenis Pangan Lokal,text,NULL,false,false,NULL,none,NULL,Pangan lokal yang dikembangkan
+potensi_pangan_lokal,Potensi Pangan Lokal,text,NULL,false,false,NULL,none,NULL,Potensi yang ada di wilayah
+pengembangan_dilakukan,Pengembangan,text,NULL,false,false,NULL,none,NULL,Bentuk pengembangan
+hasil_pengembangan,Hasil Pengembangan,text,NULL,false,false,NULL,none,NULL,Hasil yang dicapai
+jumlah_kk_pekarangan,Jumlah KK Pekarangan,int,11,false,false,NULL,none,NULL,KK yang memanfaatkan pekarangan
+luas_pekarangan_total,Luas Pekarangan (m²),decimal,"15,2",false,false,NULL,none,NULL,Total luas pekarangan
+jenis_tanaman,Jenis Tanaman,text,NULL,false,false,NULL,none,NULL,Tanaman yang ditanam
+hasil_panen_pekarangan,Hasil Panen (kg),decimal,"15,2",false,false,NULL,none,NULL,Hasil panen dari pekarangan
+nilai_ekonomi,Nilai Ekonomi (Rp),decimal,"15,2",false,false,NULL,none,NULL,Nilai ekonomi hasil pekarangan
+jenis_kampanye,Jenis Kampanye,enum,NULL,false,false,NULL,none,"Media Massa,Media Sosial,Spanduk,Leaflet,Event,Lainnya",Jenis kampanye
+tema_kampanye,Tema Kampanye,varchar,255,false,false,NULL,none,NULL,Tema kampanye
+pesan_kampanye,Pesan Kampanye,text,NULL,false,false,NULL,none,NULL,Pesan yang disampaikan
+media_kampanye,Media Kampanye,text,NULL,false,false,NULL,none,NULL,Media yang digunakan
+jangkauan_kampanye,Jangkauan,int,11,false,false,NULL,none,NULL,Estimasi jangkauan orang
+materi_edukasi_b2sa,Materi Edukasi B2SA,text,NULL,false,false,NULL,none,NULL,Materi edukasi B2SA
+metode_edukasi,Metode Edukasi,enum,NULL,false,false,NULL,none,"Penyuluhan,Pelatihan,Demo Masak,Lomba,Lainnya",Metode edukasi
+sasaran_edukasi,Sasaran Edukasi,varchar,255,false,false,NULL,none,NULL,Ibu rumah tangga/pelajar/dll
+jumlah_peserta_edukasi,Jumlah Peserta,int,11,false,false,NULL,none,NULL,Total peserta edukasi
+nama_kelompok_pangan,Nama Kelompok Pangan,varchar,255,false,false,NULL,none,NULL,Nama kelompok yang didampingi
+jenis_kelompok,Jenis Kelompok,enum,NULL,false,false,NULL,none,"Kelompok Tani,Kelompok Wanita,PKK,UMKM,Lainnya",Jenis kelompok
+jumlah_anggota_kelompok,Jumlah Anggota,int,11,false,false,NULL,none,NULL,Jumlah anggota kelompok
+kegiatan_kelompok,Kegiatan Kelompok,text,NULL,false,false,NULL,none,NULL,Kegiatan yang dilakukan
+frekuensi_pendampingan,Frekuensi Pendampingan,int,11,false,false,NULL,none,NULL,Berapa kali pendampingan
+materi_pendampingan,Materi Pendampingan,text,NULL,false,false,NULL,none,NULL,Materi yang diberikan
+produk_kelompok,Produk Kelompok,text,NULL,false,false,NULL,none,NULL,Produk yang dihasilkan
+omzet_kelompok,Omzet Kelompok (Rp),decimal,"15,2",false,false,NULL,none,NULL,Omzet per bulan
+bantuan_diberikan,Bantuan Diberikan,text,NULL,false,false,NULL,none,NULL,Bantuan yang diberikan
+nilai_bantuan,Nilai Bantuan (Rp),decimal,"15,2",false,false,NULL,none,NULL,Nilai bantuan
+output_kegiatan,Output Kegiatan,text,NULL,false,false,NULL,none,NULL,Output yang dihasilkan
+outcome_kegiatan,Outcome Kegiatan,text,NULL,false,false,NULL,none,NULL,Outcome yang dicapai
+dampak,Dampak,text,NULL,false,false,NULL,none,NULL,Dampak yang dirasakan
+kendala,Kendala,text,NULL,false,false,NULL,none,NULL,Kendala yang dihadapi
+solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi atas kendala
+biaya_kegiatan,Biaya Kegiatan (Rp),decimal,"15,2",false,false,NULL,none,NULL,Biaya pelaksanaan
+sumber_anggaran,Sumber Anggaran,varchar,255,false,false,NULL,none,NULL,APBD/APBN/Swadaya
+file_dokumentasi,File Dokumentasi,json,NULL,false,false,NULL,none,NULL,Array foto kegiatan
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Laporan kegiatan PDF
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Konsumsi,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Masyarakat,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Data penganekaragaman biasa
+status,Status,enum,NULL,true,false,perencanaan,none,"perencanaan,pelaksanaan,selesai",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

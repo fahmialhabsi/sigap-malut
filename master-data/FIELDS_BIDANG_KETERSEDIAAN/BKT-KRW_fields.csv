@@ -1,0 +1,59 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY062-LY065)
+jenis_kerawanan,Jenis Kerawanan,enum,NULL,true,false,NULL,none,"Identifikasi,Peta Kerawanan,Rencana Aksi,Koordinasi Lintas Sektor",Jenis kerawanan
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Periode pemetaan/identifikasi
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+kabupaten,Kabupaten,varchar,100,true,false,NULL,none,NULL,Kabupaten
+kecamatan,Kecamatan,varchar,100,false,false,NULL,none,NULL,Kecamatan
+desa,Desa,varchar,100,false,false,NULL,none,NULL,Desa
+latitude,Latitude,decimal,"10,8",false,false,NULL,none,NULL,Koordinat GPS latitude
+longitude,Longitude,decimal,"11,8",false,false,NULL,none,NULL,Koordinat GPS longitude
+tingkat_kerawanan,Tingkat Kerawanan,enum,NULL,true,false,NULL,none,"Prioritas 1,Prioritas 2,Prioritas 3,Prioritas 4,Prioritas 5,Prioritas 6",Prioritas kerawanan (1=paling rawan)
+skor_kerawanan,Skor Kerawanan,decimal,"5,2",false,false,NULL,none,NULL,Skor hasil perhitungan
+indikator_ketersediaan_pangan,Indikator Ketersediaan Pangan,decimal,"5,2",false,false,NULL,none,NULL,Skor indikator ketersediaan
+indikator_akses_pangan,Indikator Akses Pangan,decimal,"5,2",false,false,NULL,none,NULL,Skor indikator akses
+indikator_pemanfaatan_pangan,Indikator Pemanfaatan Pangan,decimal,"5,2",false,false,NULL,none,NULL,Skor indikator pemanfaatan
+indikator_kerawanan_kesehatan,Indikator Kesehatan,decimal,"5,2",false,false,NULL,none,NULL,Skor indikator kesehatan
+jumlah_penduduk,Jumlah Penduduk,int,11,false,false,NULL,none,NULL,Total penduduk wilayah
+jumlah_kk,Jumlah KK,int,11,false,false,NULL,none,NULL,Jumlah kepala keluarga
+jumlah_kk_miskin,Jumlah KK Miskin,int,11,false,false,NULL,none,NULL,KK miskin
+persentase_kemiskinan,Persentase Kemiskinan,decimal,"5,2",false,false,NULL,none,NULL,Persen kemiskinan
+stunting_prevalensi,Prevalensi Stunting,decimal,"5,2",false,false,NULL,none,NULL,Persentase stunting
+wasting_prevalensi,Prevalensi Wasting,decimal,"5,2",false,false,NULL,none,NULL,Persentase wasting
+underweight_prevalensi,Prevalensi Underweight,decimal,"5,2",false,false,NULL,none,NULL,Persentase underweight
+jenis_pangan_rawan,Jenis Pangan Rawan,text,NULL,false,false,NULL,none,NULL,Komoditas yang rawan
+stok_pangan,Stok Pangan (Ton),decimal,"15,2",false,false,NULL,none,NULL,Stok pangan di wilayah
+satuan_stok,Satuan,varchar,20,false,false,kg,none,NULL,Satuan stok
+tanggal_update_stok,Tanggal Update Stok,date,NULL,false,false,NULL,none,NULL,Kapan data di-update
+status_ketersediaan,Status Ketersediaan,enum,NULL,false,false,NULL,none,"Aman,Waspada,Rawan,Sangat Rawan",Status ketersediaan wilayah
+penyebab_kerawanan,Penyebab Kerawanan,text,NULL,false,false,NULL,none,NULL,Faktor penyebab
+dampak_kerawanan,Dampak Kerawanan,text,NULL,false,false,NULL,none,NULL,Dampak yang terjadi
+rencana_aksi,Rencana Aksi,text,NULL,false,false,NULL,none,NULL,Rencana penanganan
+target_intervensi,Target Intervensi,text,NULL,false,false,NULL,none,NULL,Target yang ingin dicapai
+waktu_pelaksanaan,Waktu Pelaksanaan,varchar,100,false,false,NULL,none,NULL,Kapan dilaksanakan
+anggaran_kebutuhan,Kebutuhan Anggaran,decimal,"15,2",false,false,NULL,none,NULL,Estimasi anggaran
+sumber_anggaran,Sumber Anggaran,varchar,255,false,false,NULL,none,NULL,Dari mana anggarannya
+instansi_terkait,Instansi Terkait,text,NULL,false,false,NULL,none,NULL,Instansi yang terlibat koordinasi
+koordinasi_dengan,Koordinasi Dengan,text,NULL,false,false,NULL,none,NULL,Lintas sektor mana
+hasil_koordinasi,Hasil Koordinasi,text,NULL,false,false,NULL,none,NULL,Hasil rapat koordinasi
+tindak_lanjut_koordinasi,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Tindak lanjut koordinasi
+file_peta,File Peta,varchar,255,false,false,NULL,none,NULL,Upload peta kerawanan (PNG/PDF)
+file_data_gis,File Data GIS,varchar,255,false,false,NULL,none,NULL,Upload shapefile (ZIP)
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Laporan identifikasi PDF
+file_rencana_aksi,File Rencana Aksi,varchar,255,false,false,NULL,none,NULL,Dokumen rencana aksi
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Ketersediaan,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Pemerintah Daerah/Masyarakat,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data kerawanan sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final,publish",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

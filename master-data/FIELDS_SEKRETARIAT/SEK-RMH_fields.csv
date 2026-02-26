@@ -1,0 +1,48 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY007,LY030-LY034)
+jenis_layanan_rumah_tangga,Jenis Layanan,enum,NULL,true,false,NULL,none,"Perjalanan Dinas,Kebersihan,Keamanan,Fasilitas,Ruang Rapat,Kendaraan",Jenis layanan RT
+nomor_sppd,Nomor SPPD,varchar,100,false,false,NULL,none,NULL,Untuk perjalanan dinas
+nomor_st,Nomor ST,varchar,100,false,false,NULL,none,NULL,Nomor Surat Tugas
+nama_pegawai,Nama Pegawai,varchar,255,false,false,NULL,none,NULL,Yang perjalanan dinas
+nip_pegawai,NIP,varchar,18,false,false,NULL,none,NULL,NIP pegawai
+tujuan,Tujuan,varchar,255,false,false,NULL,none,NULL,Tujuan perjalanan
+keperluan,Keperluan,text,NULL,false,false,NULL,none,NULL,Keperluan perjalanan
+tanggal_berangkat,Tanggal Berangkat,date,NULL,false,false,NULL,none,NULL,Berangkat
+tanggal_kembali,Tanggal Kembali,date,NULL,false,false,NULL,none,NULL,Kembali
+lama_hari,Lama Hari,int,11,false,false,NULL,none,NULL,Jumlah hari
+biaya_transport,Biaya Transport,decimal,"15,2",false,false,NULL,none,NULL,Biaya transportasi
+biaya_penginapan,Biaya Penginapan,decimal,"15,2",false,false,NULL,none,NULL,Biaya hotel
+uang_harian,Uang Harian,decimal,"15,2",false,false,NULL,none,NULL,Per hari
+total_biaya,Total Biaya,decimal,"15,2",false,false,NULL,none,NULL,Total perjalanan dinas
+area_kebersihan,Area Kebersihan,varchar,255,false,false,NULL,none,NULL,Area yang dibersihkan
+jadwal_kebersihan,Jadwal,enum,NULL,false,false,NULL,none,"Harian,Mingguan,Bulanan",Jadwal kebersihan
+petugas_kebersihan,Petugas,varchar,255,false,false,NULL,none,NULL,Petugas cleaning
+pos_keamanan,Pos Keamanan,varchar,100,false,false,NULL,none,NULL,Pos security
+shift_keamanan,Shift,enum,NULL,false,false,NULL,none,"Pagi,Siang,Malam",Shift keamanan
+petugas_keamanan,Petugas Keamanan,varchar,255,false,false,NULL,none,NULL,Nama security
+jenis_fasilitas,Jenis Fasilitas,varchar,255,false,false,NULL,none,NULL,AC printer dll
+kondisi_fasilitas,Kondisi,enum,NULL,false,false,Baik,none,"Baik,Rusak,Perlu Perbaikan",Kondisi fasilitas
+nama_ruang_rapat,Nama Ruang Rapat,varchar,255,false,false,NULL,none,NULL,Ruang rapat A/B/C
+kapasitas,Kapasitas,int,11,false,false,NULL,none,NULL,Kapasitas orang
+tanggal_pemesanan,Tanggal Pemesanan,date,NULL,false,false,NULL,none,NULL,Booking ruang rapat
+jam_mulai,Jam Mulai,time,NULL,false,false,NULL,none,NULL,Jam mulai pakai
+jam_selesai,Jam Selesai,time,NULL,false,false,NULL,none,NULL,Jam selesai pakai
+pemesan,Pemesan,varchar,255,false,false,NULL,none,NULL,Yang memesan
+nomor_polisi,Nomor Polisi,varchar,20,false,false,NULL,none,NULL,Kendaraan dinas
+jenis_kendaraan,Jenis Kendaraan,enum,NULL,false,false,NULL,none,"Mobil Dinas,Motor Dinas,Mobil Operasional",Jenis kendaraan
+driver,Driver,varchar,255,false,false,NULL,none,NULL,Nama driver
+tanggal_pakai,Tanggal Pakai,date,NULL,false,false,NULL,none,NULL,Tanggal kendaraan dipakai
+km_awal,KM Awal,int,11,false,false,NULL,none,NULL,Odometer awal
+km_akhir,KM Akhir,int,11,false,false,NULL,none,NULL,Odometer akhir
+bbm_liter,BBM (Liter),decimal,"10,2",false,false,NULL,none,NULL,Pengisian BBM
+file_sppd,File SPPD,varchar,255,false,false,NULL,none,NULL,Upload SPPD
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Laporan perjalanan dinas
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kasubbag Umum,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi (perjalanan dinas = sensitif)
+status,Status,enum,NULL,true,false,pending,none,"pending,disetujui,ditolak,selesai",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

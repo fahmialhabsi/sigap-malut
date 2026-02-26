@@ -1,0 +1,43 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY052-LY056)
+jenis_kebijakan,Jenis Kebijakan,enum,NULL,true,false,NULL,none,"Analisis Ketersediaan,Rekomendasi,Penetapan Komoditas Strategis,Pedoman Teknis,Sinkronisasi Pusat-Daerah",Jenis kebijakan
+nomor_dokumen,Nomor Dokumen,varchar,100,false,false,NULL,none,NULL,Nomor dokumen kebijakan
+tanggal_dokumen,Tanggal Dokumen,date,NULL,true,false,NULL,none,NULL,Tanggal ditetapkan
+periode_analisis,Periode Analisis,varchar,50,false,false,NULL,none,NULL,Periode yang dianalisis
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+judul_kebijakan,Judul Kebijakan,varchar,255,true,false,NULL,none,NULL,Judul dokumen kebijakan
+latar_belakang,Latar Belakang,text,NULL,false,false,NULL,none,NULL,Background kebijakan
+ruang_lingkup,Ruang Lingkup,text,NULL,false,false,NULL,none,NULL,Cakupan kebijakan
+data_ketersediaan,Data Ketersediaan,text,NULL,false,false,NULL,none,NULL,Data ketersediaan pangan
+data_produksi,Data Produksi,text,NULL,false,false,NULL,none,NULL,Data produksi pangan
+data_pasokan,Data Pasokan,text,NULL,false,false,NULL,none,NULL,Data pasokan pangan
+analisis_situasi,Analisis Situasi,text,NULL,false,false,NULL,none,NULL,Analisis kondisi saat ini
+permasalahan,Permasalahan,text,NULL,false,false,NULL,none,NULL,Masalah yang dihadapi
+opsi_solusi,Opsi Solusi,text,NULL,false,false,NULL,none,NULL,Alternatif solusi
+rekomendasi,Rekomendasi,text,NULL,true,false,NULL,none,NULL,Rekomendasi kebijakan
+komoditas_strategis,Komoditas Strategis,json,NULL,false,false,NULL,none,NULL,Array komoditas yang ditetapkan strategis
+target_pencapaian,Target Pencapaian,text,NULL,false,false,NULL,none,NULL,Target yang ingin dicapai
+indikator_keberhasilan,Indikator Keberhasilan,text,NULL,false,false,NULL,none,NULL,Indikator keberhasilan kebijakan
+dasar_hukum,Dasar Hukum,text,NULL,false,false,NULL,none,NULL,Landasan hukum
+instansi_terkait,Instansi Terkait,text,NULL,false,false,NULL,none,NULL,Instansi yang terlibat
+koordinasi_dengan,Koordinasi Dengan,text,NULL,false,false,NULL,none,NULL,Koordinasi dengan siapa
+hasil_sinkronisasi,Hasil Sinkronisasi,text,NULL,false,false,NULL,none,NULL,Hasil sinkronisasi pusat-daerah
+tindak_lanjut,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Rencana tindak lanjut
+file_dokumen,File Dokumen,varchar,255,false,false,NULL,none,NULL,Upload dokumen kebijakan PDF
+file_lampiran,File Lampiran,json,NULL,false,false,NULL,none,NULL,Array file lampiran
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Ketersediaan,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,NULL,none,NULL,Siapa yang menerima layanan
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data yang diproses
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Semua kebijakan sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,finalisasi,disetujui,final",Status dokumen
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

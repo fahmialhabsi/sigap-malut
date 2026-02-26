@@ -1,0 +1,32 @@
+# Node
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.*
+
+# Build outputs
+/dist/
+/build/
+
+# Vite
+.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# Coverage
+coverage/
+
+# Temporary
+.tmp/
+.cache/

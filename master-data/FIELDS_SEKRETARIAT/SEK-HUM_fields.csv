@@ -1,0 +1,41 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY035-LY039)
+jenis_layanan_humas,Jenis Layanan,enum,NULL,true,false,NULL,none,"Protokol,Acara Resmi,Penerimaan Tamu,Publikasi,Dokumentasi",Jenis layanan humas
+nama_kegiatan,Nama Kegiatan,varchar,255,false,false,NULL,none,NULL,Nama acara/kegiatan
+jenis_acara,Jenis Acara,enum,NULL,false,false,NULL,none,"Rapat,Upacara,Kunjungan,Sosialisasi,Workshop,Launching,Lainnya",Jenis acara
+tanggal_acara,Tanggal Acara,date,NULL,false,false,NULL,none,NULL,Tanggal pelaksanaan
+waktu_mulai,Waktu Mulai,time,NULL,false,false,NULL,none,NULL,Jam mulai
+waktu_selesai,Waktu Selesai,time,NULL,false,false,NULL,none,NULL,Jam selesai
+tempat,Tempat,varchar,255,false,false,NULL,none,NULL,Lokasi acara
+pimpinan_hadir,Pimpinan Hadir,varchar,255,false,false,NULL,none,NULL,Pimpinan yang hadir
+tamu_vip,Tamu VIP,text,NULL,false,false,NULL,none,NULL,Daftar tamu VIP
+jumlah_peserta,Jumlah Peserta,int,11,false,false,NULL,none,NULL,Total peserta
+rundown_acara,Rundown Acara,text,NULL,false,false,NULL,none,NULL,Susunan acara
+mc,MC,varchar,255,false,false,NULL,none,NULL,Pembawa acara
+protokoler,Protokoler,varchar,255,false,false,NULL,none,NULL,Petugas protokol
+nama_tamu,Nama Tamu,varchar,255,false,false,NULL,none,NULL,Untuk penerimaan tamu
+instansi_tamu,Instansi Tamu,varchar,255,false,false,NULL,none,NULL,Asal instansi tamu
+keperluan_kunjungan,Keperluan Kunjungan,text,NULL,false,false,NULL,none,NULL,Maksud kunjungan
+penerima_tamu,Penerima Tamu,varchar,255,false,false,NULL,none,NULL,Pejabat yang menerima
+judul_publikasi,Judul Publikasi,varchar,255,false,false,NULL,none,NULL,Judul berita/publikasi
+jenis_publikasi,Jenis Publikasi,enum,NULL,false,false,NULL,none,"Berita,Press Release,Artikel,Video,Foto,Infografis",Jenis publikasi
+media_publikasi,Media Publikasi,enum,NULL,false,false,NULL,none,"Website,Media Sosial,Media Massa,Buletin,Lainnya",Media yang digunakan
+link_publikasi,Link Publikasi,varchar,255,false,false,NULL,url,NULL,URL publikasi
+isi_publikasi,Isi Publikasi,text,NULL,false,false,NULL,none,NULL,Konten publikasi
+fotografer,Fotografer,varchar,255,false,false,NULL,none,NULL,Nama fotografer
+videografer,Videografer,varchar,255,false,false,NULL,none,NULL,Nama videografer
+jumlah_foto,Jumlah Foto,int,11,false,false,NULL,none,NULL,Total foto dihasilkan
+jumlah_video,Jumlah Video,int,11,false,false,NULL,none,NULL,Total video dihasilkan
+file_foto,File Foto,json,NULL,false,false,NULL,none,NULL,Array path foto
+file_video,File Video,json,NULL,false,false,NULL,none,NULL,Array path video
+file_rundown,File Rundown,varchar,255,false,false,NULL,none,NULL,Upload rundown PDF
+file_undangan,File Undangan,varchar,255,false,false,NULL,none,NULL,Surat undangan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kasubbag Umum,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi data
+status,Status,enum,NULL,true,false,pending,none,"pending,persiapan,berlangsung,selesai",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

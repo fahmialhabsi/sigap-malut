@@ -1,0 +1,57 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY072-LY076)
+jenis_monev,Jenis Monev,enum,NULL,true,false,NULL,none,"Monev Pelaporan,Monev Penanganan Kerawanan,Laporan Kinerja,Laporan Teknis,Data SAKIP",Jenis monev
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Periode monev/laporan
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+bulan,Bulan,int,2,false,false,NULL,none,NULL,Bulan (1-12) jika bulanan
+triwulan,Triwulan,int,1,false,false,NULL,none,NULL,Triwulan (1-4) jika triwulanan
+semester,Semester,int,1,false,false,NULL,none,NULL,Semester (1-2) jika semesteran
+judul_laporan,Judul Laporan,varchar,255,true,false,NULL,none,NULL,Judul laporan
+objek_monev,Objek Monev,varchar,255,false,false,NULL,none,NULL,Apa yang di-monev
+lokasi_monev,Lokasi Monev,varchar,255,false,false,NULL,none,NULL,Dimana monev dilakukan
+tanggal_monev,Tanggal Monev,date,NULL,false,false,NULL,none,NULL,Kapan monev dilakukan
+metode_monev,Metode Monev,enum,NULL,false,false,NULL,none,"Desk Evaluation,Field Visit,Survey,Interview,FGD,Lainnya",Metode monev
+tim_monev,Tim Monev,text,NULL,false,false,NULL,none,NULL,Anggota tim monev
+program_yang_dimonev,Program,text,NULL,false,false,NULL,none,NULL,Program/kegiatan yang di-monev
+target_kinerja,Target Kinerja,text,NULL,false,false,NULL,none,NULL,Target yang ditetapkan
+realisasi_kinerja,Realisasi Kinerja,text,NULL,false,false,NULL,none,NULL,Realisasi pencapaian
+persentase_capaian,Persentase Capaian,decimal,"5,2",false,false,NULL,none,NULL,Persen capaian
+indikator_kinerja,Indikator Kinerja,text,NULL,false,false,NULL,none,NULL,Indikator yang digunakan
+temuan_monev,Temuan Monev,text,NULL,false,false,NULL,none,NULL,Temuan hasil monev
+analisis_capaian,Analisis Capaian,text,NULL,false,false,NULL,none,NULL,Analisis pencapaian
+permasalahan,Permasalahan,text,NULL,false,false,NULL,none,NULL,Masalah yang dihadapi
+kendala,Kendala,text,NULL,false,false,NULL,none,NULL,Kendala pelaksanaan
+solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi yang diambil
+best_practice,Best Practice,text,NULL,false,false,NULL,none,NULL,Praktik baik yang ditemukan
+lesson_learned,Lesson Learned,text,NULL,false,false,NULL,none,NULL,Pelajaran yang didapat
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi perbaikan
+tindak_lanjut,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Rencana tindak lanjut
+data_sakip_ikk,Data IKK SAKIP,text,NULL,false,false,NULL,none,NULL,Indikator Kinerja Kunci
+data_sakip_capaian,Capaian IKK,decimal,"5,2",false,false,NULL,none,NULL,Persentase capaian IKK
+data_sakip_target,Target IKK,decimal,"5,2",false,false,NULL,none,NULL,Target IKK
+anggaran_program,Anggaran Program,decimal,"15,2",false,false,NULL,none,NULL,Pagu anggaran
+realisasi_anggaran,Realisasi Anggaran,decimal,"15,2",false,false,NULL,none,NULL,Realisasi anggaran
+persentase_serapan,Persentase Serapan,decimal,"5,2",false,false,NULL,none,NULL,Auto-calculate
+output_program,Output Program,text,NULL,false,false,NULL,none,NULL,Output yang dihasilkan
+outcome_program,Outcome Program,text,NULL,false,false,NULL,none,NULL,Outcome yang dicapai
+dampak_program,Dampak Program,text,NULL,false,false,NULL,none,NULL,Dampak program
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan PDF
+file_data_pendukung,File Data Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+file_foto_monev,File Foto Monev,json,NULL,false,false,NULL,none,NULL,Array foto dokumentasi monev
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,NULL,none,NULL,Sekretariat/Kepala Dinas
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Ketersediaan,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Sekretariat/Pimpinan,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data monev sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

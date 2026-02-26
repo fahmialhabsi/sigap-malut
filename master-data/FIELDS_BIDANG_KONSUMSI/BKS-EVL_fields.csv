@@ -1,0 +1,64 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY127-LY129)
+jenis_evaluasi,Jenis Evaluasi,enum,NULL,true,false,NULL,none,"Evaluasi Program Konsumsi,Evaluasi Penganekaragaman,Evaluasi Keamanan Pangan",Jenis evaluasi
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Periode evaluasi
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+bulan,Bulan,int,2,false,false,NULL,none,NULL,Bulan (jika bulanan)
+triwulan,Triwulan,int,1,false,false,NULL,none,NULL,Triwulan (1-4)
+semester,Semester,int,1,false,false,NULL,none,NULL,Semester (1-2)
+judul_evaluasi,Judul Evaluasi,varchar,255,true,false,NULL,none,NULL,Judul laporan evaluasi
+objek_evaluasi,Objek Evaluasi,varchar,255,false,false,NULL,none,NULL,Apa yang dievaluasi
+tujuan_evaluasi,Tujuan Evaluasi,text,NULL,false,false,NULL,none,NULL,Tujuan evaluasi
+metode_evaluasi,Metode Evaluasi,enum,NULL,false,false,NULL,none,"Desk Evaluation,Field Visit,Survey,Interview,FGD,Kombinasi",Metode evaluasi
+tim_evaluasi,Tim Evaluasi,text,NULL,false,false,NULL,none,NULL,Anggota tim evaluasi
+tanggal_evaluasi,Tanggal Evaluasi,date,NULL,false,false,NULL,none,NULL,Kapan evaluasi dilakukan
+lokasi_evaluasi,Lokasi Evaluasi,varchar,255,false,false,NULL,none,NULL,Dimana evaluasi
+program_dievaluasi,Program,text,NULL,false,false,NULL,none,NULL,Program yang dievaluasi
+target_program,Target Program,text,NULL,false,false,NULL,none,NULL,Target yang ditetapkan
+realisasi_program,Realisasi Program,text,NULL,false,false,NULL,none,NULL,Realisasi pencapaian
+persentase_capaian,Persentase Capaian (%),decimal,"5,2",false,false,NULL,none,NULL,Persen capaian
+indikator_kinerja,Indikator Kinerja,text,NULL,false,false,NULL,none,NULL,Indikator yang digunakan
+skor_pph_capaian,Skor PPH Capaian,decimal,"5,2",false,false,NULL,none,NULL,Skor PPH yang dicapai
+skor_pph_target,Skor PPH Target,decimal,"5,2",false,false,90,none,NULL,Target skor PPH
+konsumsi_energi_per_kapita,Konsumsi Energi (Kkal),decimal,"10,2",false,false,NULL,none,NULL,Konsumsi energi per kapita per hari
+konsumsi_protein_per_kapita,Konsumsi Protein (g),decimal,"10,2",false,false,NULL,none,NULL,Konsumsi protein per kapita per hari
+jumlah_kelompok_dibina,Jumlah Kelompok Dibina,int,11,false,false,NULL,none,NULL,Jumlah kelompok yang dibina
+jumlah_psat_fasilitasi,Jumlah PSAT Difasilitasi,int,11,false,false,NULL,none,NULL,PSAT yang difasilitasi
+jumlah_psat_tersertifikasi,Jumlah PSAT Tersertifikasi,int,11,false,false,NULL,none,NULL,PSAT yang sudah sertifikat
+kasus_keracunan_pangan,Kasus Keracunan,int,11,false,false,0,none,NULL,Jumlah kasus keracunan pangan
+penanganan_keracunan,Penanganan Keracunan,text,NULL,false,false,NULL,none,NULL,Penanganan yang dilakukan
+temuan_evaluasi,Temuan Evaluasi,text,NULL,false,false,NULL,none,NULL,Temuan hasil evaluasi
+analisis_capaian,Analisis Capaian,text,NULL,false,false,NULL,none,NULL,Analisis pencapaian
+permasalahan,Permasalahan,text,NULL,false,false,NULL,none,NULL,Masalah yang dihadapi
+kendala,Kendala,text,NULL,false,false,NULL,none,NULL,Kendala pelaksanaan
+solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi yang diambil
+best_practice,Best Practice,text,NULL,false,false,NULL,none,NULL,Praktik baik
+lesson_learned,Lesson Learned,text,NULL,false,false,NULL,none,NULL,Pelajaran yang didapat
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi perbaikan
+tindak_lanjut,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Rencana tindak lanjut
+anggaran_program,Anggaran (Rp),decimal,"15,2",false,false,NULL,none,NULL,Pagu anggaran
+realisasi_anggaran,Realisasi (Rp),decimal,"15,2",false,false,NULL,none,NULL,Realisasi anggaran
+persentase_serapan,Serapan Anggaran (%),decimal,"5,2",false,false,NULL,none,NULL,Auto-calculate
+output_program,Output Program,text,NULL,false,false,NULL,none,NULL,Output yang dihasilkan
+outcome_program,Outcome Program,text,NULL,false,false,NULL,none,NULL,Outcome yang dicapai
+dampak_program,Dampak Program,text,NULL,false,false,NULL,none,NULL,Dampak program
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan evaluasi PDF
+file_data_pendukung,File Data Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+file_foto,File Foto,json,NULL,false,false,NULL,none,NULL,Foto dokumentasi
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,Sekretariat,none,NULL,Kepada siapa laporan
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Konsumsi,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Sekretariat/Pimpinan,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data evaluasi sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

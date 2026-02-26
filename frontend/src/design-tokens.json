@@ -1,0 +1,22 @@
+{
+  "colors": {
+    "primary": "#0B5FFF",
+    "success": "#06A657",
+    "warning": "#F59E0B",
+    "danger": "#EF4444",
+    "bg": "#F6F7FB",
+    "card": "#FFFFFF",
+    "muted": "#64748B"
+  },
+  "spacing": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "6": "24px",
+    "8": "32px"
+  },
+  "fontFamily": {
+    "inter": ["Inter", "ui-sans-serif", "system-ui"]
+  }
+}
