@@ -15,9 +15,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18"
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm test
+      - name: Install backend dependencies
+        run: npm --prefix backend ci
+      - name: Run backend tests
+        run: npm --prefix backend test
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
       - name: Build frontend
-        run: npm run build
+        run: npm --prefix frontend run build
