@@ -6,7 +6,7 @@ export default function LoginPage() {
   const location = useLocation();
   // const params = new URLSearchParams(location.search);
   // Hapus roleParam karena tidak digunakan
-  const [username, setUsername] = useState("");
+  const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,15 +14,30 @@ export default function LoginPage() {
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
 
+  // Mapping role/unit_kerja ke dashboard
+  const dashboardMapping = {
+    super_admin: "/dashboard/superadmin",
+    kepala_dinas: "/dashboard/superadmin",
+    Sekretariat: "/dashboard/sekretariat",
+    "Bidang Ketersediaan": "/dashboard/ketersediaan",
+    "Bidang Distribusi": "/dashboard/distribusi",
+    "Bidang Konsumsi": "/dashboard/konsumsi",
+    UPTD: "/dashboard/uptd",
+    kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
+    kepala_bidang_distribusi: "/dashboard/distribusi",
+    kepala_bidang_konsumsi: "/dashboard/konsumsi",
+    "Bidang Distribusi dan Cadangan Pangan": "/dashboard/distribusi",
+    // Tambahkan mapping lain jika diperlukan
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const result = await login(username, password);
+    const result = await login(email, password);
 
     if (result.success) {
-      // Ambil user dari localStorage (atau bisa dari result jika login mengembalikan user)
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem("user"));
@@ -30,22 +45,20 @@ export default function LoginPage() {
         // ignore JSON parse error
       }
 
+      const roleIdToName = {
+        "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
+        // ... tambahkan lainnya
+      };
+
       if (user) {
-        if (user.role === "super_admin") {
-          navigate("/dashboard/superadmin");
-        } else if (user.unit_kerja === "Sekretariat") {
-          navigate("/dashboard/sekretariat");
-        } else if (user.unit_kerja === "Bidang Ketersediaan") {
-          navigate("/dashboard/ketersediaan");
-        } else if (user.unit_kerja === "Bidang Distribusi") {
-          navigate("/dashboard/distribusi");
-        } else if (user.unit_kerja === "Bidang Konsumsi") {
-          navigate("/dashboard/konsumsi");
-        } else if (user.unit_kerja === "UPTD") {
-          navigate("/dashboard/uptd");
-        } else {
-          navigate("/dashboard");
+        // Prioritaskan role, lalu unit_kerja
+        let dashboardPath = null;
+        if (user.role && dashboardMapping[user.role]) {
+          dashboardPath = dashboardMapping[user.role];
+        } else if (user.unit_kerja && dashboardMapping[user.unit_kerja]) {
+          dashboardPath = dashboardMapping[user.unit_kerja];
         }
+        navigate(dashboardPath || "/dashboard");
       } else {
         navigate("/dashboard");
       }
@@ -91,14 +104,14 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Username
+              email
             </label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Masukkan username"
+              placeholder="Masukkan email"
               required
             />
           </div>
@@ -133,9 +146,10 @@ export default function LoginPage() {
           </p>
           <div className="text-xs text-gray-500 space-y-1">
             <p>
-              • Super Admin:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                superadmin / Admin123
+              • Super Admin:
+              <code>
+                super_admin-sekretariat-dinas-pangan-maluku-utara@dinpangan.go.id
+                / Admin123
               </code>
             </p>
             <p>

@@ -1,278 +1,498 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title as ChartTitle,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import { roleIdToName } from "../utils/roleMap";
 
-export default function DashboardDistribusiLayout() {
-  // Data dummy modul distribusi
-  const distribusiModules = [
-    {
-      modul: "Kebijakan Distribusi",
-      status: "Valid",
-      lastUpdate: "2026-02-22",
-      penanggungJawab: "Kabid Distribusi",
-      color: "bg-yellow-900 text-yellow-100",
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ChartTitle,
+  Tooltip,
+  Legend,
+);
+
+export default function DashboardDistribusiSuperModern() {
+  // State
+  const sidebarOpen = window.innerWidth > 768;
+  const [avatarOpen, setAvatarOpen] = useState(false);
+  const [modules, setModules] = useState([]);
+  const [menuAktif, setMenuAktif] = useState("");
+  const [user, setUser] = useState(null);
+  const [tableRows, setTableRows] = useState([]);
+  const [kpi, setKpi] = useState([]); // PATCH: Digunakan!
+  const [chart, setChart] = useState({ labels: [], datasets: [] }); // PATCH: Digunakan!
+  const [notifikasi, setNotifikasi] = useState([]); // PATCH: Digunakan!
+  const [authChecked, setAuthChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Ambil info user & role dari backend
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        setUser(data.data);
+        setAuthChecked(true);
+        const roleName = data.data ? roleIdToName[data.data.role_id] : null;
+        if (
+          !data.data ||
+          !(
+            roleName === "kepala_bidang_distribusi" ||
+            roleName === "super_admin" ||
+            data.data.unit_kerja === "Bidang Distribusi"
+          )
+        ) {
+          window.location.href = "/landing";
+        }
+      })
+      .catch(() => {
+        setAuthChecked(true);
+        window.location.href = "/landing";
+      });
+  }, []);
+
+  // Ambil modul sidebar bidang distribusi
+  useEffect(() => {
+    if (!authChecked) return;
+    fetch("/api/modules")
+      .then((res) => res.json())
+      .then((data) => {
+        const distribusi = data.data?.filter(
+          (row) => row.bidang === "Bidang Distribusi" && row.is_active,
+        );
+        setModules(distribusi || []);
+        if (distribusi?.length) setMenuAktif(distribusi[0].nama_modul);
+      });
+  }, [authChecked]);
+
+  // Ambil data utama sesuai modul aktif
+  useEffect(() => {
+    if (!menuAktif) return;
+    const active = modules.find((m) => m.nama_modul === menuAktif);
+    if (!active) return;
+
+    // Fetch tableRows
+    fetch(`/api/tables/${active.tabel_name}`)
+      .then((res) => res.json())
+      .then((data) => setTableRows(data.data || []))
+      .finally(() => setLoading(false));
+
+    // Fetch KPI
+    fetch(`/api/tables/${active.tabel_name}`)
+      .then((res) => res.json())
+      .then((data) =>
+        setKpi([
+          {
+            title: "Total Data",
+            value: data.count || (data.data ? data.data.length : 0),
+            color: "blue",
+          },
+        ]),
+      );
+
+    // Fetch Chart
+    fetch(`/api/tables/${active.tabel_name}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.data || !Array.isArray(data.data)) return;
+        const perBulan = {};
+        data.data.forEach((row) => {
+          const bln = row.bulan || "Jan";
+          perBulan[bln] = (perBulan[bln] || 0) + (row.jumlah || 1);
+        });
+        setChart({
+          labels: Object.keys(perBulan),
+          datasets: [
+            {
+              label: "Trend",
+              data: Object.values(perBulan),
+              borderColor: "#38bdf8",
+              backgroundColor: "#38bdf844",
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: "#60a5fa",
+              pointRadius: 5,
+            },
+          ],
+        });
+      });
+
+    // Notifikasi
+    fetch("/api/notification")
+      .then((res) => res.json())
+      .then((data) => setNotifikasi(data || []));
+  }, [menuAktif, modules]);
+
+  // Avatar logic
+  const avatarRef = useRef();
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (avatarRef.current && !avatarRef.current.contains(e.target))
+        setAvatarOpen(false);
+    };
+    if (avatarOpen) window.addEventListener("mousedown", handleClick);
+    return () => window.removeEventListener("mousedown", handleClick);
+  }, [avatarOpen]);
+
+  // Waktu real-time
+  const [waktu, setWaktu] = useState(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setWaktu(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Chart options
+  const chartOptions = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: "#33415566" }, ticks: { color: "#f1f5f9" } },
+      y: { grid: { color: "#33415544" }, ticks: { color: "#f1f5f9" } },
     },
-    {
-      modul: "Monitoring Distribusi",
-      status: "Valid",
-      lastUpdate: "2026-02-22",
-      penanggungJawab: "Staff Distribusi",
-      color: "bg-yellow-800 text-yellow-100",
-    },
-    {
-      modul: "Harga & Stabilisasi",
-      status: "Perlu Validasi",
-      lastUpdate: "2026-02-21",
-      penanggungJawab: "Petugas Harga",
-      color: "bg-yellow-700 text-yellow-100",
-    },
-    {
-      modul: "Cadangan Pangan Daerah (CPPD)",
-      status: "Valid",
-      lastUpdate: "2026-02-20",
-      penanggungJawab: "Staff CPPD",
-      color: "bg-yellow-600 text-yellow-100",
-    },
-    {
-      modul: "Bimbingan & Pendampingan",
-      status: "Valid",
-      lastUpdate: "2026-02-19",
-      penanggungJawab: "Staff Bimtek",
-      color: "bg-yellow-500 text-yellow-100",
-    },
-    {
-      modul: "Evaluasi & Monitoring",
-      status: "Revisi",
-      lastUpdate: "2026-02-18",
-      penanggungJawab: "Staff Monev",
-      color: "bg-yellow-400 text-yellow-900",
-    },
-    {
-      modul: "Pelaporan Kinerja",
-      status: "Valid",
-      lastUpdate: "2026-02-17",
-      penanggungJawab: "Staff Pelaporan",
-      color: "bg-yellow-300 text-yellow-900",
-    },
-  ];
+  };
 
   return (
-    <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
-      {/* Modul Distribusi */}
-      <section className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-6 px-8 py-8">
-        {distribusiModules.map((modul, idx) => (
-          <div
-            key={modul.modul}
-            className={`rounded-xl shadow p-6 flex flex-col gap-2 ${modul.color}`}
-          >
-            <div className="font-bold text-xl mb-2">{modul.modul}</div>
-            <div className="flex flex-row gap-4 items-center mb-2">
-              <span className="text-sm font-semibold">Status:</span>
-              <span className="text-base font-bold">{modul.status}</span>
-            </div>
-            <div className="flex flex-row gap-4 items-center mb-2">
-              <span className="text-sm font-semibold">Update Terakhir:</span>
-              <span className="text-base">{modul.lastUpdate}</span>
-            </div>
-            <div className="flex flex-row gap-4 items-center">
-              <span className="text-sm font-semibold">Penanggung Jawab:</span>
-              <span className="text-base">{modul.penanggungJawab}</span>
-            </div>
-          </div>
-        ))}
-      </section>
-    </div>
-  );
-}
-    </div>
-  );
-}
-
-function ExecutiveSummaryPanel({ kpiData }) {
-  return (
-    <div className="col-span-2 bg-white rounded-xl shadow p-6 flex flex-col gap-4">
-      <h3 className="font-bold text-lg mb-2">Executive Summary</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {kpiData.map((kpi) => (
-          <div
-            key={kpi.label}
-            className="bg-yellow-50 rounded-lg p-4 flex flex-col items-center"
-          >
-            <span className="text-2xl font-bold">{kpi.value}</span>
-            <span className="text-xs text-yellow-700">{kpi.label}</span>
-            <span className="text-xs text-muted mt-1">{kpi.info}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ComplianceAlertPanel({ alertData }) {
-  return (
-    <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-2">
-      <h3 className="font-bold text-lg mb-2">Compliance & Alert</h3>
-      <ul className="space-y-2">
-        {alertData.map((alert, idx) => (
-          <li
-            key={idx}
-            className={`p-2 rounded ${alert.type === "danger" ? "bg-red-100 text-red-700" : alert.type === "warning" ? "bg-yellow-100 text-yellow-800" : "bg-yellow-50 text-yellow-700"}`}
-          >
-            <div className="flex justify-between items-center">
-              <span>{alert.message}</span>
-              <span className="text-xs text-muted">{alert.time}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function DataFlowChart() {
-  return (
-    <div className="bg-white rounded-xl shadow p-6">
-      <h3 className="font-bold text-lg mb-4">Alur Data Distribusi</h3>
-      <div className="flex flex-col items-center">
-        <div className="flex flex-row items-center gap-4">
-          {[
-            {
-              label: "Pelaksana",
-              color: "bg-yellow-200 text-yellow-800",
-              desc: "Input Data",
-            },
-            {
-              label: "Fungsional",
-              color: "bg-yellow-200 text-yellow-800",
-              desc: "Validasi Teknis",
-            },
-            {
-              label: "Staff Distribusi",
-              color: "bg-yellow-200 text-yellow-800",
-              desc: "Distribusi Lapangan",
-            },
-            {
-              label: "Kabid Distribusi",
-              color: "bg-yellow-500 text-white",
-              desc: "Koordinasi & Monitoring",
-            },
-            {
-              label: "Kepala Dinas",
-              color: "bg-green-500 text-white",
-              desc: "Keputusan",
-            },
-          ].map((node, idx, arr) => (
-            <React.Fragment key={node.label}>
-              <div className="flex flex-col items-center">
-                <div
-                  className={`rounded-full px-4 py-2 font-semibold ${node.color}`}
-                >
-                  {node.label}
-                </div>
-                <span className="text-xs mt-1">{node.desc}</span>
-              </div>
-              {idx < arr.length - 1 && <span className="mx-2 text-xl">→</span>}
-            </React.Fragment>
-          ))}
+    <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-blue-900 via-blue-800 to-slate-800 text-slate-100 select-none">
+      <aside
+        className={`h-full bg-blue-950/95 z-30 flex flex-col items-center 
+        transition-all duration-300 ${sidebarOpen ? "w-[275px] min-w-[275px]" : "w-[60px] min-w-[60px]"}
+        border-r border-blue-900/60 shadow-xl`}
+      >
+        <div className="flex items-center justify-center w-full py-8">
+          <img
+            src="/Logo.png"
+            alt="logo"
+            className={`object-contain ${sidebarOpen ? "w-24 h-24" : "w-10 h-10"}`}
+          />
         </div>
-      </div>
-    </div>
-  );
-}
-
-function ModulDistribusiTable({ tableData }) {
-  return (
-    <div className="bg-white rounded-xl shadow p-6">
-      <h3 className="font-bold text-lg mb-4">
-        Modul & Status Layanan Distribusi
-      </h3>
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="bg-yellow-50 text-yellow-700">
-              <th className="px-4 py-2 text-left">Modul</th>
-              <th className="px-4 py-2 text-left">Status</th>
-              <th className="px-4 py-2 text-left">Update Terakhir</th>
-              <th className="px-4 py-2 text-left">Penanggung Jawab</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((row, idx) => (
-              <tr key={idx} className="border-b last:border-none">
-                <td className="px-4 py-2">{row.modul}</td>
-                <td
-                  className={`px-4 py-2 font-semibold ${row.status === "Valid" ? "text-green-600" : row.status === "Revisi" ? "text-yellow-700" : "text-red-600"}`}
-                >
-                  {row.status}
-                </td>
-                <td className="px-4 py-2">{row.lastUpdate}</td>
-                <td className="px-4 py-2">{row.penanggungJawab}</td>
-              </tr>
+        <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
+          {modules.map((modul) => (
+            <SidebarItem
+              key={modul.modul_id}
+              label={modul.nama_modul}
+              active={menuAktif === modul.nama_modul}
+              sidebarOpen={sidebarOpen}
+              onClick={() => setMenuAktif(modul.nama_modul)}
+            />
+          ))}
+        </nav>
+        <div className="py-6 w-full text-xs text-blue-100/70 text-center tracking-wide">
+          {sidebarOpen ? "SIGAP Malut" : "SIGAP"}
+        </div>
+      </aside>
+      <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col bg-blue-950/80 backdrop-blur">
+        <header className="flex-none w-full h-[75px] bg-blue-900/80 flex items-center px-12 shadow-sm z-10 sticky top-0">
+          <div className="text-2xl text-white font-bold tracking-wide flex-1">
+            SIGAP <span className="font-light">·</span> Bidang Distribusi
+          </div>
+          <div className="mr-8 hidden md:block font-mono text-sm blur-none select-text opacity-75">
+            {waktu.toLocaleString("id-ID", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </div>
+          <div className="relative mr-5">
+            <NotificationBell />
+            {notifikasi.length > 0 && (
+              <span className="absolute -top-1 -right-1 rounded-full w-4 h-4 bg-red-500 flex items-center justify-center text-xs text-white animate-bounce">
+                !
+              </span>
+            )}
+          </div>
+          <div className="relative" ref={avatarRef}>
+            <button onClick={() => setAvatarOpen(!avatarOpen)}>
+              <ProfileAvatar
+                sidebarOpen={true}
+                userName={user?.nama_lengkap || "User"}
+              />
+            </button>
+            {avatarOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-slate-900/95 rounded-xl shadow-lg border border-blue-950 p-3 flex flex-col text-sm animate-fade-in-up">
+                <div className="font-bold mb-2">
+                  {user?.nama_lengkap || "Pengguna"}
+                </div>
+                <div className="mb-2 text-blue-200 text-xs">
+                  {user?.unit_kerja || ""}
+                </div>
+                <button className="py-1 w-full rounded text-left hover:bg-blue-800/60 px-2">
+                  Profil Saya
+                </button>
+                <button className="py-1 w-full rounded text-left hover:bg-blue-800/60 px-2">
+                  Pengaturan
+                </button>
+                <button className="py-1 w-full rounded text-left hover:bg-blue-800/60 px-2 text-red-400">
+                  Keluar
+                </button>
+              </div>
+            )}
+          </div>
+        </header>
+        <main
+          className={`flex-1 min-h-0 min-w-0 flex flex-col gap-9 py-8 overflow-auto bg-transparent`}
+        >
+          {/* Loading Spinner */}
+          {loading && (
+            <div className="w-full text-center py-6">
+              <span className="text-blue-200 font-bold text-lg">
+                Memuat Data...
+              </span>
+            </div>
+          )}
+          <div className="w-full max-w-7xl mx-auto flex flex-row flex-wrap gap-x-8 gap-y-4 items-stretch justify-between px-2">
+            {kpi.map((item, idx) => (
+              <KpiCard
+                key={idx}
+                title={item.title}
+                value={item.value}
+                color={item.color}
+              />
             ))}
-          </tbody>
-        </table>
+          </div>
+          <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
+            <PanelBox title={`Tabel ${menuAktif}`}>
+              <DataTable data={tableRows} />
+            </PanelBox>
+            <PanelBox title="Grafik Tren Distribusi">
+              <div className="h-56 flex items-center justify-center">
+                <Line data={chart} options={chartOptions} />
+              </div>
+            </PanelBox>
+          </div>
+          <div className="w-full max-w-7xl mx-auto px-2">
+            <PanelBox
+              title="Notifikasi Kritis"
+              customClass="!bg-gradient-to-r !from-blue-900/95 !to-slate-900/80"
+            >
+              <ul className="space-y-2 text-sm">
+                {(Array.isArray(notifikasi) && notifikasi.length
+                  ? notifikasi
+                  : []
+                ).map((n, idx) => (
+                  <li
+                    key={idx}
+                    className={`flex items-center gap-2 text-yellow-300`}
+                  >
+                    <span className="text-lg">{n.icon ?? "⚠️"}</span>
+                    {n.message || n.text || ""}
+                  </li>
+                ))}
+              </ul>
+            </PanelBox>
+          </div>
+        </main>
+
+        <footer className="flex-none h-10 flex items-center text-xs justify-between px-10 w-full bg-gradient-to-r from-blue-900 to-blue-800/70 text-blue-100/80">
+          <span>SIGAP Malut</span>
+          <span>SIGAP Malut v1 | Bidang Distribusi</span>
+        </footer>
       </div>
     </div>
   );
 }
 
-function QuickActionBar() {
+function SidebarItem({ label, active, sidebarOpen, badge, onClick }) {
   return (
-    <div className="flex flex-wrap gap-4 justify-end">
-      <button className="bg-yellow-700 text-white px-4 py-2 rounded font-semibold shadow hover:bg-yellow-800">
-        Upload Dokumen
-      </button>
-      <button className="bg-green-600 text-white px-4 py-2 rounded font-semibold shadow hover:bg-green-700">
-        Generate Laporan
-      </button>
-      <button className="bg-yellow-500 text-white px-4 py-2 rounded font-semibold shadow hover:bg-yellow-600">
-        Broadcast
-      </button>
-      <button className="bg-gray-100 text-yellow-700 px-4 py-2 rounded font-semibold shadow hover:bg-yellow-50 border border-yellow-200">
-        Export Data
+    <div className="relative w-full flex items-center group transition">
+      {active && (
+        <div className="absolute left-2 h-[52px] w-2 bg-gradient-to-b from-yellow-400 to-yellow-200 rounded-r-lg scale-105 shadow-lg transition"></div>
+      )}
+      <button
+        className={`
+          h-[52px] w-full pl-10 pr-5 text-lg flex items-center rounded-2xl font-semibold
+          ${active ? "bg-blue-800/90 text-yellow-300" : "bg-blue-700/85 text-blue-100 hover:bg-blue-800/85"}
+          shadow group-hover:scale-105
+          transition-all
+          relative
+        `}
+        onClick={onClick}
+      >
+        <span className="flex-1 text-left">
+          {sidebarOpen ? label : label[0]}
+        </span>
+        {badge && (
+          <span className="ml-2 w-6 h-6 text-[13px] bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-blue-900 animate-pulse">
+            {badge}
+          </span>
+        )}
       </button>
     </div>
   );
 }
 
-function AIFeedbackPanel() {
+function KpiCard({ title, value, color }) {
+  let bg, border, txt, shadow;
+  switch (color) {
+    case "green":
+      bg =
+        "bg-gradient-to-t from-green-900/80 to-green-700/60 backdrop-blur-md";
+      border = "border-green-700";
+      txt = "text-green-100";
+      shadow = "shadow-green-800/10";
+      break;
+    case "blue":
+      bg = "bg-gradient-to-t from-blue-900/80 to-blue-700/60 backdrop-blur-md";
+      border = "border-blue-700";
+      txt = "text-blue-100";
+      shadow = "shadow-blue-900/10";
+      break;
+    case "yellow":
+      bg =
+        "bg-gradient-to-t from-yellow-700/80 to-yellow-600/70 backdrop-blur-md";
+      border = "border-yellow-600";
+      txt = "text-yellow-50";
+      shadow = "shadow-yellow-800/10";
+      break;
+    case "red":
+      bg = "bg-gradient-to-t from-red-900/80 to-red-700/60 backdrop-blur-md";
+      border = "border-red-900";
+      txt = "text-red-100";
+      shadow = "shadow-red-800/10";
+      break;
+    default:
+      bg = "bg-slate-800/80";
+      border = "border-slate-700";
+      txt = "text-slate-100";
+      shadow = "shadow-slate-800/10";
+  }
   return (
-    <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-2">
-      <h3 className="font-bold text-lg mb-2">AI & Feedback</h3>
-      <div className="mb-2 text-sm text-muted">
-        Rekomendasi AI: Distribusi berjalan normal. Tidak ada hambatan kritis.
-      </div>
-      <div className="mb-2">
-        <label className="block text-xs mb-1">Laporan Masalah/Feedback:</label>
-        <textarea
-          className="w-full border rounded p-2 text-sm"
-          rows={2}
-          placeholder="Tulis feedback atau masalah di sini..."
-        />
-        <button className="mt-2 bg-yellow-700 text-white px-3 py-1 rounded font-semibold hover:bg-yellow-800">
-          Kirim
-        </button>
-      </div>
+    <div
+      className={`
+        rounded-2xl border-2 px-8 py-7 flex flex-col justify-between min-w-[210px] max-w-[250px]
+        ${bg} ${border} ${txt} ${shadow}
+        shadow-lg cursor-pointer
+        hover:scale-105 hover:shadow-2xl transition-all duration-200
+        glassmorph-card
+      `}
+      style={{
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+      }}
+    >
+      <div className="font-semibold mb-2 text-base">{title}</div>
+      <div className="text-4xl font-extrabold tracking-wider">{value}</div>
     </div>
   );
 }
 
-function OpenDataPortal() {
+function PanelBox({ title, children, customClass }) {
   return (
-    <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-2">
-      <h3 className="font-bold text-lg mb-2">Open Data Portal</h3>
-      <div className="mb-2 text-sm text-muted">
-        Ringkasan data publik distribusi tersedia untuk diunduh:
-      </div>
-      <div className="flex gap-2">
-        <button className="bg-gray-100 text-yellow-700 px-4 py-2 rounded font-semibold shadow hover:bg-yellow-50 border border-yellow-200">
-          Download Excel
-        </button>
-        <button className="bg-gray-100 text-yellow-700 px-4 py-2 rounded font-semibold shadow hover:bg-yellow-50 border border-yellow-200">
-          Download PDF
-        </button>
-        <button className="bg-gray-100 text-yellow-700 px-4 py-2 rounded font-semibold shadow hover:bg-yellow-50 border border-yellow-200">
-          Download CSV
-        </button>
-      </div>
+    <section
+      className={`
+        rounded-2xl p-7 flex flex-col border border-blue-900/60 shadow-md flex-1
+        bg-blue-900/80 glassmorph-card
+        ${customClass ? customClass : ""}
+      `}
+      style={{
+        backdropFilter: "blur(17px)",
+        WebkitBackdropFilter: "blur(17px)",
+      }}
+    >
+      <h2 className="font-bold text-blue-200 mb-4 text-xl flex items-center gap-2">
+        {title}
+      </h2>
+      <div>{children}</div>
+    </section>
+  );
+}
+
+function DataTable({ data }) {
+  if (!data || !data.length)
+    return <div className="text-center text-blue-100">Tidak ada data.</div>;
+  const columns = Object.keys(data[0]);
+  return (
+    <div className="overflow-auto max-h-[320px]">
+      <table className="w-full text-base">
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th
+                key={col}
+                className="text-left text-blue-300 font-semibold pr-4"
+              >
+                {col}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.slice(0, 10).map((row, idx) => (
+            <tr key={idx} className="text-blue-100 font-medium">
+              {columns.map((col) => (
+                <td key={col} className="pr-4">
+                  {row[col]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
+}
+
+function NotificationBell() {
+  return (
+    <span
+      className="w-10 h-10 bg-gradient-to-br from-yellow-300 to-yellow-200 rounded-full flex items-center justify-center text-yellow-900 text-2xl shadow-md ring-2 ring-yellow-100 animate-spin-slow"
+      title="Notifikasi"
+    >
+      🔔
+    </span>
+  );
+}
+
+function ProfileAvatar({ userName = "User" }) {
+  return (
+    <span className="flex w-10 h-10 rounded-full bg-blue-700 border-2 border-blue-400 items-center justify-center text-white text-lg font-bold shadow-xl hover:ring-2 hover:ring-blue-500 transition">
+      {userName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)}
+    </span>
+  );
+}
+
+/* ==== Animasi CSS ==== */
+const style = document.createElement("style");
+style.textContent = `
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(30px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s cubic-bezier(0.4,0,0.2,1) both;
+}
+@keyframes spin-slow {
+  0% {transform: rotate(0);}
+  100% {transform: rotate(360deg);}
+}
+.animate-spin-slow {
+  animation: spin-slow 2.8s linear infinite;
+}
+.glassmorph-card {
+  background-clip: padding-box;
+  box-shadow:
+    0 4px 32px 0 rgba(30,64,175,0.14),
+    0 1.5px 9px 0 rgba(0,0,0,0.16);
+}
+`;
+if (typeof document !== "undefined" && !document.getElementById("sigap-anim")) {
+  style.id = "sigap-anim";
+  document.head.appendChild(style);
 }

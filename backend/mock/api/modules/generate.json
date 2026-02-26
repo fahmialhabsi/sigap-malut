@@ -1,0 +1,17 @@
+{
+  "success": true,
+  "message": "Module generated!",
+  "endpoint": "/api/dynamic-module/",
+  "generatedModule": {
+    "id": "mod_2302xyz",
+    "label": "Sistem Monitoring SPJ",
+    "schema": [
+      /*...*/
+    ],
+    "api": {
+      "base": "/api/mod_2302xyz",
+      "endpoints": ["/list", "/create", "/update/:id", "/delete/:id"]
+    },
+    "permissions": ["super_admin", "bendahara"]
+  }
+}

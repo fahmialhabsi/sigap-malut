@@ -1,3 +1,38 @@
+const bcrypt = require('bcrypt');
+const { signAccess, signRefresh } = require('../utils/jwt');
+
+// NOTE: This controller expects a User model available via req.app.get('models')
+module.exports = {
+  async login(req, res, next){
+    try{
+      const { username, password } = req.body;
+      const { User } = req.app.get('models') || {};
+      if(!User) return res.status(500).json({error:'models not initialized'});
+      const user = await User.findOne({ where: { username } });
+      if(!user) return res.status(401).json({error:'invalid credentials'});
+      const ok = await bcrypt.compare(password, user.password_hash);
+      if(!ok) return res.status(401).json({error:'invalid credentials'});
+      const claims = { sub: user.id, role: user.role, bidang: user.bidang };
+      const access = signAccess(claims);
+      const refresh = signRefresh({ sub: user.id });
+      return res.json({ access, refresh, user: { id: user.id, username: user.username, role: user.role } });
+    }catch(err){ next(err); }
+  },
+
+  async refresh(req, res, next){
+    try{
+      const { token } = req.body;
+      const { verifyRefresh, signAccess } = require('../utils/jwt');
+      const payload = verifyRefresh(token);
+      const { User } = req.app.get('models') || {};
+      const user = await User.findByPk(payload.sub);
+      if(!user) return res.status(401).json({error:'invalid refresh token'});
+      const access = signAccess({ sub: user.id, role: user.role, bidang: user.bidang });
+      return res.json({ access });
+    }catch(err){ return res.status(401).json({ error: 'invalid token' }); }
+  }
+}
+// File: backend/controllers/authController.js
 // @desc    Delete user
 // @route   DELETE /api/auth/users/:id
 // @access  Private (Admin)
@@ -21,13 +56,11 @@ export const deleteUser = async (req, res) => {
     });
     res.json({ success: true, message: "User berhasil dihapus" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error menghapus user",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error menghapus user",
+      error: error.message,
+    });
   }
 };
 // @desc    Create new user (Admin)
@@ -200,18 +233,25 @@ import { logAudit } from "../services/auditLogService.js";
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
+// REGISTER (POST /api/auth/register)
 export const register = async (req, res) => {
   try {
     const {
-      username,
+      name,
       email,
       password,
-      nama_lengkap,
-      role,
-      unit_kerja,
-      nip,
-      jabatan,
+      role_id,
+      unit_id,
+      position_id, // optional
     } = req.body;
+
+    // Validasi wajib
+    if (!name || !email || !password || !role_id || !unit_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Nama, email, password, role_id, unit_id wajib diisi",
+      });
+    }
 
     // Validate password
     const passwordValidation = validatePassword(password);
@@ -223,20 +263,12 @@ export const register = async (req, res) => {
       });
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({
-      where: {
-        [Op.or]: [{ username }, { email }],
-      },
-    });
-
+    // Check if user already exists (by email)
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message:
-          existingUser.username === username
-            ? "Username sudah digunakan"
-            : "Email sudah digunakan",
+        message: "Email sudah digunakan",
       });
     }
 
@@ -245,19 +277,17 @@ export const register = async (req, res) => {
 
     // Create user
     const user = await User.create({
-      username,
+      name,
       email,
       password: hashedPassword,
-      nama_lengkap,
-      role: role || "pelaksana",
-      unit_kerja,
-      nip,
-      jabatan,
-      is_verified: true,
+      role_id,
+      unit_id,
+      position_id,
+      is_active: true,
     });
 
-    // Audit trail
-    await logAudit({
+    // Audit trail (opsional)
+    await logAudit?.({
       modul: "AUTH",
       entitas_id: user.id,
       aksi: "REGISTER",
@@ -276,11 +306,12 @@ export const register = async (req, res) => {
       data: {
         user: {
           id: user.id,
-          username: user.username,
+          name: user.name,
           email: user.email,
-          nama_lengkap: user.nama_lengkap,
-          role: user.role,
-          unit_kerja: user.unit_kerja,
+          role_id: user.role_id,
+          unit_id: user.unit_id,
+          position_id: user.position_id,
+          is_active: user.is_active,
         },
         token,
         refreshToken,
@@ -299,40 +330,28 @@ export const register = async (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
+// LOGIN (POST /api/auth/login)
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Username dan password wajib diisi",
+        message: "Email dan password wajib diisi",
       });
     }
 
-    // Find user
-    const user = await User.findOne({
-      where: {
-        [Op.or]: [{ username }, { email: username }],
-      },
-    });
-
+    // Find user by email
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Username atau password salah",
+        message: "Email atau password salah",
       });
     }
 
-    // Check if account is locked
-    if (user.locked_until && new Date() < new Date(user.locked_until)) {
-      return res.status(403).json({
-        success: false,
-        message: "Akun terkunci. Silakan coba lagi nanti.",
-      });
-    }
-
-    // Check if account is active
+    // Akun tidak aktif
     if (!user.is_active) {
       return res.status(403).json({
         success: false,
@@ -342,30 +361,24 @@ export const login = async (req, res) => {
 
     // Verify password
     const isPasswordValid = await comparePassword(password, user.password);
-
     if (!isPasswordValid) {
-      // Increment failed attempts
-      user.failed_login_attempts += 1;
-
-      // Lock account after 5 failed attempts
+      // Optional: increment failed attempt + lock account
+      user.failed_login_attempts = (user.failed_login_attempts || 0) + 1;
       if (user.failed_login_attempts >= 5) {
-        user.locked_until = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        user.locked_until = new Date(Date.now() + 15 * 60 * 1000); // 15 menit
       }
-
       await user.save();
-
       return res.status(401).json({
         success: false,
-        message: "Username atau password salah",
+        message: "Email atau password salah",
         attempts_remaining: Math.max(0, 5 - user.failed_login_attempts),
       });
     }
 
-    // Reset failed attempts
+    // Jika sukses, reset log attempt
     user.failed_login_attempts = 0;
     user.locked_until = null;
-    user.last_login_at = new Date();
-    user.last_login_ip = req.ip;
+    user.last_login = new Date();
     await user.save();
 
     // Generate tokens
@@ -373,7 +386,7 @@ export const login = async (req, res) => {
     const refreshToken = generateRefreshToken(user);
 
     // Audit trail
-    await logAudit({
+    await logAudit?.({
       modul: "AUTH",
       entitas_id: user.id,
       aksi: "LOGIN",
@@ -388,13 +401,12 @@ export const login = async (req, res) => {
       data: {
         user: {
           id: user.id,
-          username: user.username,
+          name: user.name,
           email: user.email,
-          nama_lengkap: user.nama_lengkap,
-          role: user.role,
-          unit_kerja: user.unit_kerja,
-          jabatan: user.jabatan,
-          foto: user.foto,
+          role_id: user.role_id,
+          unit_id: user.unit_id,
+          position_id: user.position_id,
+          is_active: user.is_active,
         },
         token,
         refreshToken,

@@ -192,7 +192,7 @@ const SekKeu = sequelize.define(
       comment: "Catatan",
     },
     created_by: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       comment: "User ID",
       references: {
