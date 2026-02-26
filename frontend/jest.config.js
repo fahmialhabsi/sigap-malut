@@ -5,6 +5,6 @@ export default {
   testEnvironment: "jsdom",
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json"],
   roots: ["<rootDir>"],
-  setupFiles: ["<rootDir>/src/setupTests.js"],
-  setupFilesAfterEnv: ["@testing-library/jest-dom"],
+  setupFiles: ["<rootDir>/src/jest.setup.js"],
+  setupFilesAfterEnv: ["<rootDir>/setupTests.js", "@testing-library/jest-dom"],
 };
