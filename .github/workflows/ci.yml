@@ -18,7 +18,7 @@ jobs:
       - name: Install backend dependencies
         run: npm --prefix backend ci
       - name: Run backend tests
-        run: npm --prefix backend test
+        run: NODE_ENV=test npm --prefix backend test
       - name: Install frontend dependencies
         run: npm --prefix frontend ci
       - name: Build frontend

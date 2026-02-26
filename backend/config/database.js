@@ -12,7 +12,10 @@ const sequelize = new Sequelize({
   dialect: process.env.DB_DIALECT || "sqlite",
   storage:
     process.env.DB_STORAGE ||
-    path.join(__dirname, "../database/database.sqlite"),
+    // Use in-memory SQLite for tests to avoid native binary issues in CI/runners
+    (process.env.NODE_ENV === "test"
+      ? ":memory:"
+      : path.join(__dirname, "../database/database.sqlite")),
 
   // PostgreSQL config (for production)
   ...(process.env.DB_DIALECT === "postgres" && {

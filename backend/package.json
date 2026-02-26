@@ -15,7 +15,7 @@
     "generate:all": "npm run generate:schema && npm run generate:models && npm run generate:controllers && npm run generate:routes && npm run generate:route-index",
     "seed": "node database/seeders/seed.js",
     "migrate": "node database/migrations/migrate.js",
-    "test": "node tests/testAllModules.js"
+    "test": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/mocha/bin/_mocha --timeout 60000 ./tests/*.test.js"
   },
   "dependencies": {
     "axios": "^1.6.2",
@@ -40,7 +40,8 @@
   "devDependencies": {
     "nodemon": "^3.0.2",
     "mocha": "^10.2.0",
-    "chai": "^4.3.8"
+    "chai": "^4.3.8",
+    "cross-env": "^7.0.3"
   },
   "keywords": [],
   "author": "",
