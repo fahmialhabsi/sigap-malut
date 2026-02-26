@@ -38,8 +38,10 @@ jobs:
           done
 
       - name: Jalankan Migrasi Database
-        # gunakan npx yang dijalankan dari folder backend sehingga menemukan paket lokal
-        run: npx --prefix backend sequelize-cli db:migrate --env test --cwd backend
+        # Jalankan skrip migrate yang ada di backend/package.json dari root CI
+        run: |
+          set -e
+          npm --prefix backend run migrate
 
       - name: Run backend tests
         run: NODE_ENV=test npm --prefix backend test
