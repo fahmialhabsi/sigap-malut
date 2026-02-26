@@ -1,7 +1,7 @@
 import Mocha from "mocha";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import sequelize from "../config/database.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +12,16 @@ const mocha = new Mocha({ timeout: 60000, reporter: "spec" });
 
 (async () => {
   // Reset database for tests to avoid unique/index conflicts
+  // Ensure all model definitions are loaded before syncing the DB
+  const modelsDir = path.join(__dirname, "..", "models");
+  if (fs.existsSync(modelsDir)) {
+    const modelFiles = fs.readdirSync(modelsDir).filter((f) => f.endsWith(".js"));
+    for (const mf of modelFiles) {
+      const p = path.join(modelsDir, mf);
+      await import(pathToFileURL(p).href);
+    }
+  }
+
   await sequelize.sync({ force: true });
 
   fs.readdirSync(testDir)
