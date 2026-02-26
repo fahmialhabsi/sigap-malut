@@ -1,4 +1,4 @@
-function errorHandler(err, req, res, next) {
+export default function errorHandler(err, req, res, next) {
   if (!err) return next();
   console.error(err);
   if (err.message === "not_found")
@@ -9,5 +9,3 @@ function errorHandler(err, req, res, next) {
     return res.status(400).json({ error: err.errors.map((e) => e.message) });
   return res.status(500).json({ error: "internal_server_error" });
 }
-
-module.exports = errorHandler;

@@ -1,6 +1,6 @@
-const { expect } = require("chai");
-const SekKeu = require("../models/SEK-KEU.js");
-const User = require("../models/User.js");
+import { expect } from "chai";
+import SekKeu from "../models/SEK-KEU.js";
+import User from "../models/User.js";
 
 describe("Integrasi Master Data: SekKeu", () => {
   it("should only accept valid created_by from master User", function (done) {

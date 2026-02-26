@@ -1,6 +1,6 @@
-const { expect } = require("chai");
-const BDSMON = require("../models/BDS-MON.js");
-const Komoditas = require("../models/komoditas.js");
+import { expect } from "chai";
+import BDSMON from "../models/BDS-MON.js";
+import Komoditas from "../models/komoditas.js";
 
 describe("Integrasi Master Data: BDS-MON", () => {
   it("should only accept valid komoditas_id from master Komoditas", function (done) {

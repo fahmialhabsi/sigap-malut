@@ -1,5 +1,9 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * serviceCrudGenerator
@@ -28,7 +32,7 @@ async function generate(projectRoot) {
     if (!fs.existsSync(modelFile)) {
       fs.writeFileSync(
         modelFile,
-        `module.exports = (sequelize, DataTypes) => {
+        `export default (sequelize, DataTypes) => {
   const ${code} = sequelize.define('${code}', {
     id: { type: DataTypes.UUID, primaryKey: true },
     layanan_id: { type: DataTypes.STRING },
@@ -44,8 +48,8 @@ async function generate(projectRoot) {
     if (!fs.existsSync(controllerFile)) {
       fs.writeFileSync(
         controllerFile,
-        `const BaseService = require('../services/baseService');
-module.exports = function(models){
+        `import BaseService from '../services/baseService.js';
+export default function(models){
   const svc = new BaseService(models['${code}']);
   return {
     create: async (req,res,next)=>{ try{ const r=await svc.create(req.body); return res.json(r);}catch(e){next(e)} },
@@ -60,11 +64,11 @@ module.exports = function(models){
     if (!fs.existsSync(routeFile)) {
       fs.writeFileSync(
         routeFile,
-        `const express = require('express');
+        `import express from 'express';
 const router = express.Router();
-module.exports = (app) => {
+export default (app) => {
   const models = app.get('models');
-  const ctrl = require('../controllers/${code}Controller')(models);
+  const ctrl = (await import('../controllers/${code}Controller.js')).default(models);
   router.post('/', ctrl.create);
   router.get('/', ctrl.list);
   router.get('/:id', ctrl.get);

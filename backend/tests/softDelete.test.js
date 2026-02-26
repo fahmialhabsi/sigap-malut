@@ -6,14 +6,16 @@ describe("Soft Delete Behavior", () => {
     const uniq = Date.now();
     const user = await User.create({
       username: `softdelete${uniq}`,
+      name: "SoftDelete",
       password: "password123",
-      nama_lengkap: "SoftDelete",
+      unit_id: "unit-1",
+      role_id: "pelaksana",
+      nama_lengkap: "Soft Delete",
       unit_kerja: "Sekretariat",
       email: `soft${uniq}@delete.com`,
-      role: "pelaksana",
       jabatan: "Staff",
     });
-    await user.softDelete();
+    await user.destroy();
     const found = await User.findByPk(user.id, { paranoid: false });
     expect(found.deleted_at).to.not.be.null;
   });

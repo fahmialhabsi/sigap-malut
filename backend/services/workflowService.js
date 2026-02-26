@@ -102,7 +102,8 @@ class WorkflowService {
   // Create workflow instance
   async createWorkflow(data) {
     // Save to approval_workflow table
-    const ApprovalWorkflow = require("../models/approvalWorkflow.js");
+    const { default: ApprovalWorkflow } =
+      await import("../models/approvalWorkflow.js");
     const workflow = await ApprovalWorkflow.create({
       modul_id: data.modul_id,
       record_id: data.record_id,
@@ -121,7 +122,7 @@ class WorkflowService {
   // Log approval action
   async logApproval(workflowId, data) {
     // Save to approval_log table
-    const ApprovalLog = require("../models/approvalLog.js");
+    const { default: ApprovalLog } = await import("../models/approvalLog.js");
     const log = await ApprovalLog.create({
       workflow_id: workflowId,
       approver_id: data.user_id,
@@ -137,7 +138,8 @@ class WorkflowService {
   // Detect and log bypass
   async detectBypass(data) {
     // Save to bypass_detection table
-    const BypassDetection = require("../models/bypassDetection.js");
+    const { default: BypassDetection } =
+      await import("../models/bypassDetection.js");
     const bypass = await BypassDetection.create({
       workflow_id: data.workflow_id,
       user_id: data.user_id,
@@ -155,8 +157,23 @@ class WorkflowService {
   async sendBypassAlert(bypass) {
     console.log("📧 Sending bypass alert to Sekretaris and Kepala Dinas");
     // Implementasi notifikasi email/WhatsApp
-    const emailService = require("../utils/emailService");
-    const whatsappService = require("../utils/whatsappService");
+    let emailService;
+    let whatsappService;
+    try {
+      ({ default: emailService } = await import("../utils/emailService.js"));
+    } catch (e) {
+      emailService = {
+        sendEmail: () => console.warn("emailService not available"),
+      };
+    }
+    try {
+      ({ default: whatsappService } =
+        await import("../utils/whatsappService.js"));
+    } catch (e) {
+      whatsappService = {
+        sendMessage: () => console.warn("whatsappService not available"),
+      };
+    }
     const recipients = [bypass.sekretarisEmail, bypass.kepalaDinasEmail];
     const subject = `ALERT: BYPASS KOORDINASI oleh ${bypass.namaStaf}`;
     const message = `BYPASS terdeteksi pada workflow: ${bypass.workflowId}\n\nDetail:\n${JSON.stringify(bypass, null, 2)}`;
