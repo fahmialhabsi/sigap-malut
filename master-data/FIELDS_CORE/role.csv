@@ -1,0 +1,6 @@
+id_role,kode_role,nama_role,permission,level,created_at
+SEK,SEK,Sekretaris,"read:kgb,create:kgb,approve:kgb,finalize:kgb,read:all",2,2020-01-01T00:00:00Z
+BND,BND,Bendahara,"read:financial_records,verify:payments",2,2020-01-01T00:00:00Z
+KEP,KEP,Kepala UPTD,"create:uptd,approve:uptd_requests,finalize:uptd",1,2020-01-01T00:00:00Z
+STF,STF,Staf,"create:requests,read:own_records",3,2020-01-01T00:00:00Z
+AUD,AUD,Auditor,"read:audit_log,read:compliance_reports",5,2020-01-01T00:00:00Z

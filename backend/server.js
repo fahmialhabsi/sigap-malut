@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import { sequelize, testConnection } from "./config/database.js";
+import { initModels } from "./models/index.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
 import sekAdmRoutes from "./routes/SEK-ADM.js";
@@ -11,7 +12,8 @@ import bktPgdRoutes from "./routes/BKT-PGD.js";
 import tablesRoutes from "./routes/tables.js";
 import modulesRoutes from "./routes/modules.js";
 
-import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
+import workflowRoutes from "./routes/index.js"; // existing index router
+import workflowRouter from "./routes/workflow.js";
 import workflowStatusRouter from "./routes/workflow-status.js";
 
 dotenv.config();
@@ -89,7 +91,7 @@ registerRoutes(app);
 // Dynamic table routes (must be after specific routes)
 app.use("/api/workflow-status", workflowStatusRouter);
 app.use("/api", tablesRoutes);
-app.use("/api", workflowRoutes);
+app.use("/api/workflows", workflowRouter);
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
@@ -114,7 +116,8 @@ async function startServer() {
   try {
     await testConnection();
 
-    // Sync database models (only create tables if not exist)
+    // Initialize and sync database models (only create tables if not exist)
+    await initModels(sequelize);
     await sequelize.sync();
 
     app.listen(PORT, () => {
@@ -132,4 +135,9 @@ async function startServer() {
   }
 }
 
-startServer();
+// Only start server when not running tests
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+export { app, startServer };

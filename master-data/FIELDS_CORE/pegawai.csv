@@ -1,0 +1,3 @@
+id_pegawai,nama_lengkap,nip,jabatan,grade,role_id,bidang_id,status,jenis_kelamin,alamat,email,no_hp,created_at,updated_at
+PGW001,Andi Siregar,19860520202011003,Kasubbag Kepegawaian,IIIb,SEK,SEK,aktif,laki-laki,Jl. Ahmad Yani 10,andi@sigap.com,08123456789,2026-02-27T08:00:00Z,2026-02-27T08:00:00Z
+PGW002,Budi Sakti,19781219002001001,Bendahara,IIIc,BND,KEU,aktif,laki-laki,Jl. Ternate 50,budi@sigap.com,081540123456,2026-02-24T07:00:00Z,2026-02-26T10:00:00Z

@@ -1,3 +1,39 @@
+import create from 'zustand';
+import axios from 'axios';
+import { saveToken, clearToken, initAuth as initAuthUtil } from '../utils/auth';
+
+const useAuthStore = create((set, get) => ({
+  isAuthenticated: false,
+  isInitialized: false,
+  user: null,
+  initAuth: () => {
+    initAuthUtil();
+    const token = localStorage.getItem('sigap_token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    set({ isInitialized: true, isAuthenticated: !!token, user });
+  },
+  login: async (email, password) => {
+    try {
+      const res = await axios.post('/api/auth/login', { email, password });
+      if (res.data && res.data.token) {
+        saveToken(res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user || {}));
+        set({ isAuthenticated: true, user: res.data.user || {} });
+        return { success: true };
+      }
+      return { success: false, message: res.data?.message || 'Login failed' };
+    } catch (err) {
+      return { success: false, message: err?.response?.data?.message || err.message };
+    }
+  },
+  logout: async () => {
+    clearToken();
+    localStorage.removeItem('user');
+    set({ isAuthenticated: false, user: null });
+  },
+}));
+
+export default useAuthStore;
 import { create } from "zustand";
 import api from "../utils/api";
 import { logAuditTrail } from "../utils/auditTrail";

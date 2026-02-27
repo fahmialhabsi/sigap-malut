@@ -22,6 +22,124 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Alert"
+  /api/rbac/permissions:
+    get:
+      summary: List permissions (paginated)
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 25 }
+        - in: query
+          name: q
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated permissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Permission"
+                  meta:
+                    type: object
+                    properties:
+                      total: { type: integer }
+                      page: { type: integer }
+                      limit: { type: integer }
+                      pages: { type: integer }
+    post:
+      summary: Create permission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PermissionCreate"
+      responses:
+        "201":
+          description: Permission created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+
+  /api/rbac/roles:
+    get:
+      summary: List roles (paginated)
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 25 }
+        - in: query
+          name: q
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Role"
+                  meta:
+                    type: object
+                    properties:
+                      total: { type: integer }
+                      page: { type: integer }
+                      limit: { type: integer }
+                      pages: { type: integer }
+    post:
+      summary: Create role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleCreate"
+      responses:
+        "201":
+          description: Role created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+
+  /api/rbac/roles/{id}/permissions:
+    post:
+      summary: Assign permissions to role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissionIds:
+                  type: array
+                  items: { type: integer }
+      responses:
+        "200":
+          description: Assigned
+
 components:
   schemas:
     Kpi:
@@ -39,3 +157,29 @@ components:
         severity: { type: string }
         title: { type: string }
         summary: { type: string }
+    Permission:
+      type: object
+      properties:
+        id: { type: integer }
+        key: { type: string }
+        description: { type: string }
+        createdAt: { type: string, format: date-time }
+    PermissionCreate:
+      type: object
+      required: [key]
+      properties:
+        key: { type: string }
+        description: { type: string }
+    Role:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        createdAt: { type: string, format: date-time }
+    RoleCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string }

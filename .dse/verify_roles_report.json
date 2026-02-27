@@ -1,4 +1,113 @@
 {
-  "generated_at": "2026-02-26T12:45:35.559Z",
-  "findings": []
+  "generated_at": "2026-02-27T11:07:28.796Z",
+  "findings": [
+    {
+      "file": "backend\\generators\\generateWorkflowsFromRegistry.js",
+      "location": "js_roles",
+      "token": "creator",
+      "value": "creator"
+    },
+    {
+      "file": "backend\\generators\\generateWorkflowsFromRegistry.js",
+      "location": "js_roles",
+      "token": "reviewer",
+      "value": "reviewer"
+    },
+    {
+      "file": "backend\\generators\\generateWorkflowsFromRegistry.js",
+      "location": "js_roles",
+      "token": "approver",
+      "value": "approver"
+    },
+    {
+      "file": "backend\\generators\\generateWorkflowsFromRegistry.js",
+      "location": "js_roles",
+      "token": "admin",
+      "value": "admin"
+    },
+    {
+      "file": "backend\\generators\\runWorkflowEngineTest.js",
+      "location": "js_roles",
+      "token": "creator",
+      "value": "creator"
+    },
+    {
+      "file": "backend\\generators\\testAuthMiddleware.js",
+      "location": "js_roles",
+      "token": "creator",
+      "value": "creator"
+    },
+    {
+      "file": "backend\\generators\\testWorkflowRouteRunner.js",
+      "location": "js_roles",
+      "token": "creator",
+      "value": "creator"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "kepala_bidang_ketersediaan",
+      "value": "kepala_bidang_ketersediaan"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "kepala_bidang_distribusi",
+      "value": "kepala_bidang_distribusi"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "kepala_bidang_konsumsi",
+      "value": "kepala_bidang_konsumsi"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "super_admin",
+      "value": "super_admin"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "super_admin",
+      "value": "super_admin"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "kepala_bidang_ketersediaan",
+      "value": "kepala_bidang_ketersediaan"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "super_admin",
+      "value": "super_admin"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "kepala_bidang_distribusi",
+      "value": "kepala_bidang_distribusi"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "super_admin",
+      "value": "super_admin"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "kepala_bidang_konsumsi",
+      "value": "kepala_bidang_konsumsi"
+    },
+    {
+      "file": "frontend\\dist\\assets\\index-Btu1okZz.js",
+      "location": "js_roles",
+      "token": "super_admin",
+      "value": "super_admin"
+    }
+  ]
 }

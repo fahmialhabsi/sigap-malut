@@ -7,11 +7,17 @@ async function runSeeders() {
   console.log("🌱 Starting Database Seeding...\n");
 
   try {
+    console.log("Sequelize dialect:", sequelize.getDialect());
+    console.log("Sequelize storage:", sequelize.options.storage);
     await sequelize.authenticate();
     console.log("✅ Database connection established\n");
 
     // 1. Seed Users
-    await seedUsers();
+    if (process.env.SKIP_USERS_SEED !== "1") {
+      await seedUsers();
+    } else {
+      console.log("⏭️  Skipping users seeding (SKIP_USERS_SEED=1)");
+    }
 
     // 2. Seed Master Data
     await seedMasterData();

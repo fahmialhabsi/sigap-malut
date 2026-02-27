@@ -1,3 +1,12 @@
+import React, { useContext } from 'react';
+import { AuthContext } from '../auth/AuthContext';
+
+export default function PermissionGuard({ permission, children, fallback = null }) {
+  const { user } = useContext(AuthContext);
+  const perms = user && user.permissions ? user.permissions : [];
+  if (perms.includes(permission)) return children;
+  return fallback;
+}
 import React, { useContext } from "react";
 import { AuthContext } from "../auth/AuthContext";
 

@@ -1,0 +1,3 @@
+id_user,kode_user,username,email,password,role_id,bidang_id,nama_lengkap,nip,no_hp,foto_profil,status,created_at,updated_at,last_login
+uuidv4-1,USR001,andi.siregar,andi.siregar@sigap.com,$2b$hash,SEK,SEK,Andi Siregar,19860520202011003,08123456789,/img/andi.jpg,aktif,2026-02-27T08:00:00Z,2026-02-27T08:00:00Z,2026-02-27T09:11:21Z
+uuidv4-2,USR002,budi.sakti,budi.sakti@sigap.com,$2b$hash,BND,KEU,Budi Sakti,19781219002001001,081540123456,/img/budi.jpg,aktif,2026-02-24T07:00:00Z,2026-02-27T08:10:00Z,2026-02-26T13:12:00Z

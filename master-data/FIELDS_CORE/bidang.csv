@@ -1,0 +1,5 @@
+id_bidang,kode_bidang,nama_bidang,jenis,unit_eselon,created_at
+SEK,SEK,Sekretariat,Struktural,Eselon III,2020-01-01T00:00:00Z
+KEU,KEU,Keuangan,Struktural,Eselon IV,2020-01-01T00:00:00Z
+BKS,BKS,Bidang Konsumsi,Fungsional,Eselon III,2020-01-01T00:00:00Z
+UPTD,UPT,UPTD Balai Mutu,Fungsional,Eselon III,2022-01-01T00:00:00Z

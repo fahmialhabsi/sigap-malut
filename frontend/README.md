@@ -1,3 +1,11 @@
+Frontend skeleton: AuthContext, ProtectedRoute, PermissionGuard, DynamicForm generator.
+
+Next steps:
+
+- Hook AuthContext to API login endpoint.
+- Implement permission mapping from backend into user object.
+- Build dynamic form schemas from `master-data` and `config/serviceRegistry.json`.
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

@@ -1,5 +1,6 @@
 import User from "../../models/User.js";
 import { hashPassword } from "../../config/auth.js";
+import sequelize from "../../config/database.js";
 
 const users = [
   {
@@ -46,10 +47,11 @@ const users = [
   },
 ];
 
-async function seedUsers() {
+export async function seedUsers() {
   console.log("🌱 Seeding ALL USERS (setiap kombinasi role-unit)...");
 
-  await User.destroy({ where: {}, truncate: true });
+  // Use raw DELETE to avoid dialect-specific bulkUpdate/truncate quirks
+  await sequelize.query(`DELETE FROM users`);
 
   for (const userData of users) {
     try {
@@ -67,5 +69,3 @@ async function seedUsers() {
 
   console.log("✅ All user seeding complete!\n");
 }
-
-seedUsers();

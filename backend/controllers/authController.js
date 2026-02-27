@@ -71,21 +71,19 @@ export async function register(req, res) {
     });
     const access = signAccess({ sub: user.id, role: user.role });
     const refresh = signRefresh({ sub: user.id });
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: {
-          user: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            role: user.role,
-          },
-          token: access,
-          refreshToken: refresh,
+    res.status(201).json({
+      success: true,
+      data: {
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
         },
-      });
+        token: access,
+        refreshToken: refresh,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

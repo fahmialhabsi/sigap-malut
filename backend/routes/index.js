@@ -49,11 +49,22 @@ import caseRoutes from "./case.js";
 import commentRoutes from "./comment.js";
 import reportRoutes from "./report.js";
 import auditTrailRoutes from "./audit-trail.js";
+import moduleGeneratorRoutes from "./moduleGenerator.js";
+import SA01routes from "./SA01.js";
+import SA03routes from "./SA03.js";
+import SA04routes from "./SA04.js";
+import SA05routes from "./SA05.js";
+import SA06routes from "./SA06.js";
+import SA07routes from "./SA07.js";
+import SA08routes from "./SA08.js";
+import SA09routes from "./SA09.js";
+import SA10routes from "./SA10.js";
 import workflowStatusRoutes from "./workflow-status.js";
 import notificationRoutes from "./notification.js";
 import perintahRoutes from "./perintah.js";
 import pegawaiRoutes from "./pegawai.js";
 import komoditasRoutes from "./komoditas.js";
+import rbacRoutes from "./rbac.js";
 
 export default function registerRoutes(app) {
   console.log("📡 Registering API routes...\n");
@@ -99,6 +110,16 @@ export default function registerRoutes(app) {
   app.use("/api/upt-tkn", UPTTKNRoutes);
   app.use("/approval", approvalRoutes);
   app.use("/reminder", reminderRoutes);
+  app.use("/api/sa01", SA01routes);
+  app.use("/api/sa02", moduleGeneratorRoutes);
+  app.use("/api/sa03", SA03routes);
+  app.use("/api/sa04", SA04routes);
+  app.use("/api/sa05", SA05routes);
+  app.use("/api/sa06", SA06routes);
+  app.use("/api/sa07", SA07routes);
+  app.use("/api/sa08", SA08routes);
+  app.use("/api/sa09", SA09routes);
+  app.use("/api/sa10", SA10routes);
   app.use("/case", caseRoutes);
   app.use("/comment", commentRoutes);
   app.use("/report", reportRoutes);
@@ -110,6 +131,8 @@ export default function registerRoutes(app) {
   // Master Data Lookup
   app.use("/api/pegawai", pegawaiRoutes);
   app.use("/api/komoditas", komoditasRoutes);
+  // RBAC management
+  app.use("/api/rbac", rbacRoutes);
 
   console.log("✅ 38 API routes registered\n");
 }

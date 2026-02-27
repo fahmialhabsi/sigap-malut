@@ -1,0 +1,96 @@
+{
+  "name": "rekomendasi_perbaikan_mutu_workflow",
+  "description": "Auto-generated workflow for rekomendasi_perbaikan_mutu_workflow",
+  "states": [
+    "draft",
+    "diajukan",
+    "diverifikasi",
+    "disetujui",
+    "selesai",
+    "arsip"
+  ],
+  "transitions": [
+    {
+      "from": "draft",
+      "to": "diajukan",
+      "allowedRoles": [
+        "creator"
+      ],
+      "requiredPermissions": [
+        "workflow:rekomendasi_perbaikan_mutu_workflow:submit"
+      ],
+      "audit": true,
+      "notify": [
+        "reviewer"
+      ]
+    },
+    {
+      "from": "diajukan",
+      "to": "diverifikasi",
+      "allowedRoles": [
+        "reviewer"
+      ],
+      "requiredPermissions": [
+        "workflow:rekomendasi_perbaikan_mutu_workflow:verify"
+      ],
+      "audit": true,
+      "notify": [
+        "approver"
+      ]
+    },
+    {
+      "from": "diverifikasi",
+      "to": "disetujui",
+      "allowedRoles": [
+        "approver"
+      ],
+      "requiredPermissions": [
+        "workflow:rekomendasi_perbaikan_mutu_workflow:approve"
+      ],
+      "audit": true,
+      "notify": [
+        "creator"
+      ]
+    },
+    {
+      "from": "disetujui",
+      "to": "selesai",
+      "allowedRoles": [
+        "approver"
+      ],
+      "requiredPermissions": [
+        "workflow:rekomendasi_perbaikan_mutu_workflow:complete"
+      ],
+      "audit": true
+    },
+    {
+      "from": "*",
+      "to": "arsip",
+      "allowedRoles": [
+        "admin"
+      ],
+      "requiredPermissions": [
+        "workflow:archive"
+      ],
+      "audit": true
+    }
+  ],
+  "roles": {
+    "creator": [
+      "creator"
+    ],
+    "reviewer": [
+      "reviewer"
+    ],
+    "approver": [
+      "approver"
+    ],
+    "admin": [
+      "admin"
+    ]
+  },
+  "metadata": {
+    "audit_enabled": true,
+    "notify_on_transition": true
+  }
+}

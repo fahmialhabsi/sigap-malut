@@ -2,6 +2,30 @@ class BaseService {
   constructor(model) {
     this.model = model;
   }
+  async create(payload) {
+    return this.model.create(payload);
+  }
+  async findById(id) {
+    return this.model.findByPk(id);
+  }
+  async update(id, payload) {
+    const item = await this.findById(id);
+    if (!item) return null;
+    return item.update(payload);
+  }
+  async delete(id) {
+    const item = await this.findById(id);
+    if (!item) return null;
+    await item.destroy();
+    return true;
+  }
+}
+
+module.exports = BaseService;
+class BaseService {
+  constructor(model) {
+    this.model = model;
+  }
 
   async create(payload, opts = {}) {
     return this.model.create(payload, opts);

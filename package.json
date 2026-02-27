@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "joi": "^18.0.2",
     "papaparse": "^5.5.3",
     "pdf-parse": "^2.4.5",
     "react-icons": "^5.5.0",
@@ -13,10 +14,13 @@
     "@testing-library/jest-dom": "^6.9.1",
     "babel-jest": "^30.2.0",
     "chai": "^6.2.2",
-    "mocha": "^11.7.5"
+    "mocha": "^11.7.5",
+    "supertest": "^7.2.2"
   },
   "scripts": {
     "test:backend": "node backend/tests/testAllModules.js",
-    "test": "npm --prefix backend test"
+    "smoke:rbac": "node backend/tests/runRbacSmoke.mjs",
+    "test": "npm --prefix backend test",
+    "test:ci": "npm --prefix backend run test:ci"
   }
 }

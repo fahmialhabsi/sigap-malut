@@ -3,16 +3,26 @@
 
 export async function fetchFieldMapping(modulId) {
   // Asumsi: file CSV field mapping disimpan di /master-data/FIELDS/ atau subfolder
-  // dan penamaan file: FIELDS_<MODULID>.csv atau FIELDS_<BIDANG>/<MODULID>.csv
-  // Untuk demo, hanya fetch satu file statis. Untuk produksi, bisa pakai API/backend.
-  try {
-    const res = await fetch(`/master-data/FIELDS/FIELDS_${modulId}.csv`);
-    if (!res.ok) return null;
-    const text = await res.text();
-    return parseCsvFields(text);
-  } catch (e) {
-    return null;
+  // Preferensi: file bernama `SA09_fields.csv` / `SA10_fields.csv` (moduleId like 'sa09')
+  // Fallback: older pattern `FIELDS_<modulId>.csv`.
+  const candidates = [
+    `/master-data/FIELDS/${modulId.toUpperCase()}_fields.csv`,
+    `/master-data/FIELDS/FIELDS_${modulId}.csv`,
+  ];
+
+  for (const path of candidates) {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) continue;
+      const text = await res.text();
+      return parseCsvFields(text);
+    } catch (e) {
+      // try next candidate
+      continue;
+    }
   }
+
+  return null;
 }
 
 function parseCsvFields(csv) {

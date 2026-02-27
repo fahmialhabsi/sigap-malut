@@ -93,6 +93,15 @@ import M081ListPage from "../pages/sekretariat/M081ListPage";
 import M082ListPage from "../pages/sekretariat/M082ListPage";
 import M083ListPage from "../pages/sekretariat/M083ListPage";
 import M084ListPage from "../pages/sekretariat/M084ListPage";
+import PermissionsList from "../pages/Rbac/PermissionsList";
+import RolesList from "../pages/Rbac/RolesList";
+import PermissionCreate from "../pages/Rbac/PermissionCreate";
+import PermissionEdit from "../pages/Rbac/PermissionEdit";
+import PermissionDetail from "../pages/Rbac/PermissionDetail";
+import RoleCreate from "../pages/Rbac/RoleCreate";
+import RoleEdit from "../pages/Rbac/RoleEdit";
+import RoleDetail from "../pages/Rbac/RoleDetail";
+import RoleAssignPermissions from "../pages/Rbac/RoleAssignPermissions";
 
 // eslint-disable-next-line no-unused-vars
 export default function GeneratedRoutes({ PrivateRoute }) {
@@ -184,6 +193,87 @@ export default function GeneratedRoutes({ PrivateRoute }) {
       element={
         <PrivateRoute>
           <SA10ListPage />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-permissions"
+      path="/rbac/permissions"
+      element={
+        <PrivateRoute>
+          <PermissionsList />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-permissions-create"
+      path="/rbac/permissions/create"
+      element={
+        <PrivateRoute>
+          <PermissionCreate />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-permissions-detail"
+      path="/rbac/permissions/:id"
+      element={
+        <PrivateRoute>
+          <PermissionDetail />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-permissions-edit"
+      path="/rbac/permissions/:id/edit"
+      element={
+        <PrivateRoute>
+          <PermissionEdit />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-roles"
+      path="/rbac/roles"
+      element={
+        <PrivateRoute>
+          <RolesList />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-roles-create"
+      path="/rbac/roles/create"
+      element={
+        <PrivateRoute>
+          <RoleCreate />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-roles-detail"
+      path="/rbac/roles/:id"
+      element={
+        <PrivateRoute>
+          <RoleDetail />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-roles-edit"
+      path="/rbac/roles/:id/edit"
+      element={
+        <PrivateRoute>
+          <RoleEdit />
+        </PrivateRoute>
+      }
+    />,
+    <Route
+      key="rbac-roles-assign"
+      path="/rbac/roles/:id/assign"
+      element={
+        <PrivateRoute>
+          <RoleAssignPermissions />
         </PrivateRoute>
       }
     />,

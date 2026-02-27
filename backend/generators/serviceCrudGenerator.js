@@ -6,13 +6,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * serviceCrudGenerator
+ * serviceCrudGenerator (ESM)
  * - reads config/serviceRegistry.json
  * - generates Sequelize model file skeleton under backend/models/
  * - generates simple controller and route skeleton under backend/controllers and backend/routes
  * - NOTE: This generator writes skeletal files that must be integrated into app.
  */
-async function generate(projectRoot) {
+export async function generate(projectRoot) {
   const registryPath = path.join(projectRoot, "config", "serviceRegistry.json");
   const registry = JSON.parse(fs.readFileSync(registryPath, "utf8"));
   const modelsDir = path.join(projectRoot, "backend", "models");
@@ -24,7 +24,10 @@ async function generate(projectRoot) {
   if (!fs.existsSync(routesDir)) fs.mkdirSync(routesDir, { recursive: true });
 
   registry.forEach((svc) => {
-    const code = svc.kode_layanan.toLowerCase();
+    const code = (svc.kode_layanan || svc.id_layanan || svc.nama_layanan)
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, "_");
     const modelFile = path.join(modelsDir, `${code}.js`);
     const controllerFile = path.join(controllersDir, `${code}Controller.js`);
     const routeFile = path.join(routesDir, `${code}.js`);
@@ -66,9 +69,10 @@ export default function(models){
         routeFile,
         `import express from 'express';
 const router = express.Router();
-export default (app) => {
+export default async (app) => {
   const models = app.get('models');
-  const ctrl = (await import('../controllers/${code}Controller.js')).default(models);
+  const mod = await import('../controllers/${code}Controller.js');
+  const ctrl = mod.default(models);
   router.post('/', ctrl.create);
   router.get('/', ctrl.list);
   router.get('/:id', ctrl.get);
@@ -81,7 +85,8 @@ export default (app) => {
   return { generated: registry.map((r) => r.kode_layanan) };
 }
 
-if (require.main === module) {
+// Run as script
+if (process.argv[1] === __filename) {
   const projectRoot = path.resolve(__dirname, "..", "..");
   generate(projectRoot)
     .then((r) => console.log("generated", r))
@@ -90,5 +95,3 @@ if (require.main === module) {
       process.exit(1);
     });
 }
-
-module.exports = { generate };

@@ -4,6 +4,8 @@ import CaseWorkflowPage from "./pages/CaseWorkflowPage";
 import ReminderPage from "./pages/ReminderPage";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
+import { ToastProvider } from './contexts/ToastContext';
+import ToastContainer from './components/ToastContainer';
 const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -55,7 +57,8 @@ function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <Routes>
+    <ToastProvider>
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<LandingPage />} />
       <Route
@@ -237,6 +240,9 @@ function App() {
       />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+      </Routes>
+      <ToastContainer />
+    </ToastProvider>
   );
 }
 
