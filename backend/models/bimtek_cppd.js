@@ -1,7 +1,7 @@
 export default (sequelize, DataTypes) => {
   const bimtek_cppd = sequelize.define('bimtek_cppd', {
     id: { type: DataTypes.UUID, primaryKey: true },
-    layanan_id: { type: DataTypes.STRING },
+    layanan_id: { type: DataTypes.UUID },
     status: { type: DataTypes.STRING, defaultValue: 'draft' },
     payload: { type: DataTypes.JSONB }
   }, { tableName: 'bimtek_cppd' });

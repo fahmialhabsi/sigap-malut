@@ -38,6 +38,27 @@ export default function LoginPage() {
     const result = await login(email, password);
 
     if (result.success) {
+      // Debug: inspect result from store/login
+      // eslint-disable-next-line no-console
+      console.debug("LoginPage: login result=", result);
+      // Jika backend memberikan redirect, ikuti itu terlebih dahulu
+      if (result && result.redirect) {
+        // Only navigate if redirect is a string (avoid object -> /[object Object])
+        if (typeof result.redirect === "string") {
+          // eslint-disable-next-line no-console
+          console.debug("LoginPage: navigating to redirect=", result.redirect);
+          navigate(result.redirect);
+          setLoading(false);
+          return;
+        }
+        // Log unexpected redirect type and fall through to mapping
+        // eslint-disable-next-line no-console
+        console.warn(
+          "LoginPage: unexpected redirect type, falling back:",
+          result.redirect,
+        );
+      }
+
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem("user"));

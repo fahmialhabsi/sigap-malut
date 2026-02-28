@@ -6,7 +6,7 @@ const api = axios.create({
     (typeof process !== "undefined" &&
       process.env &&
       process.env.VITE_API_URL) ||
-    "http://localhost:5000/api",
+    "http://localhost:5050/api",
   headers: {
     "Content-Type": "application/json",
   },

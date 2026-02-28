@@ -1,31 +1,51 @@
 import bcrypt from "bcrypt";
 import { signAccess, signRefresh, verifyRefresh } from "../utils/jwt.js";
 
-// Controller implemented as ESM named exports. These handlers use models from `req.app.get('models')` to avoid coupling.
+function getModels(req) {
+  return (req.app && req.app.get && req.app.get("models")) || {};
+}
 
 export async function login(req, res, next) {
   try {
     const { username, password, email } = req.body;
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
+    const { User } = getModels(req);
     if (!User) return res.status(500).json({ error: "models not initialized" });
 
     const where = username ? { username } : { email };
-    const user = await User.findOne({ where });
+    // Prefer ORM lookup; assume DB schema now matches models
+    const user = await User.findOne({ where }).catch(() => null);
     if (!user) return res.status(401).json({ error: "invalid credentials" });
 
-    const ok = await bcrypt.compare(
-      password,
-      user.password || user.password_hash || "",
-    );
+    const stored = user.password || user.password_hash || "";
+    const ok = await bcrypt.compare(password, stored);
     if (!ok) return res.status(401).json({ error: "invalid credentials" });
 
-    const claims = { sub: user.id, role: user.role, bidang: user.bidang };
+    const normalizedRole = user.role || user.role_id || null;
+    const normalizedUnit = user.unit_kerja || user.unit_id || null;
+
+    const claims = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: normalizedRole,
+      unit_kerja: normalizedUnit,
+      nama_lengkap: user.nama_lengkap,
+    };
+
     const access = signAccess(claims);
-    const refresh = signRefresh({ sub: user.id });
+    const refresh = signRefresh({ id: user.id });
+
     return res.json({
       access,
       refresh,
-      user: { id: user.id, username: user.username, role: user.role },
+      redirect: "/dashboard",
+      user: {
+        id: user.id,
+        username: user.username,
+        role: normalizedRole,
+        unit_kerja: normalizedUnit,
+        nama_lengkap: user.nama_lengkap,
+      },
     });
   } catch (err) {
     next(err);
@@ -36,13 +56,19 @@ export async function refresh(req, res) {
   try {
     const { token } = req.body;
     const payload = verifyRefresh(token);
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
-    const user = await User.findByPk(payload.sub);
+    const { User } = getModels(req);
+    const userId = payload.sub || payload.id;
+    const user = await User.findByPk(userId).catch(() => null);
     if (!user) return res.status(401).json({ error: "invalid refresh token" });
+    const normalizedRole = user.role || user.role_id || null;
+    const normalizedUnit = user.unit_kerja || user.unit_id || null;
     const access = signAccess({
-      sub: user.id,
-      role: user.role,
-      bidang: user.bidang,
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: normalizedRole,
+      unit_kerja: normalizedUnit,
+      nama_lengkap: user.nama_lengkap,
     });
     return res.json({ access });
   } catch (err) {
@@ -50,17 +76,16 @@ export async function refresh(req, res) {
   }
 }
 
-export async function register(req, res) {
+export async function register(req, res, next) {
   try {
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
+    const { User } = getModels(req);
     if (!User) return res.status(500).json({ error: "models not initialized" });
     const { username, email, password, role } = req.body;
     if (!username || !email || !password)
       return res.status(400).json({ error: "missing fields" });
-    const exists = await User.findOne({
-      where: { [Symbol.for("or")]: [{ username }, { email }] },
-    }).catch(() => null);
-    // fallback simple check
+    const exists = await User.findOne({ where: { username } }).catch(
+      () => null,
+    );
     if (exists) return res.status(400).json({ error: "user exists" });
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({
@@ -69,23 +94,41 @@ export async function register(req, res) {
       password: hashed,
       role: role || "pelaksana",
     });
-    const access = signAccess({ sub: user.id, role: user.role });
-    const refresh = signRefresh({ sub: user.id });
-    res.status(201).json({
+    const normalizedRole = user.role || user.role_id || null;
+    const normalizedUnit = user.unit_kerja || user.unit_id || null;
+    const claims = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: normalizedRole,
+      unit_kerja: normalizedUnit,
+      nama_lengkap: user.nama_lengkap,
+    };
+    const access = signAccess(claims);
+    const refresh = signRefresh({ id: user.id });
+    return res.status(201).json({
       success: true,
+      access,
+      refresh,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: normalizedRole,
+      },
       data: {
         user: {
           id: user.id,
           username: user.username,
           email: user.email,
-          role: user.role,
+          role: normalizedRole,
         },
         token: access,
         refreshToken: refresh,
       },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 }
 
@@ -96,16 +139,15 @@ export async function getMe(req, res) {
 }
 
 export async function logout(req, res) {
-  // For stateless JWT, client should delete tokens; server-side blacklist not implemented here
   res.json({ success: true, message: "Logged out" });
 }
 
-export async function changePassword(req, res) {
+export async function changePassword(req, res, next) {
   try {
     const { currentPassword, newPassword } = req.body;
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
+    const { User } = getModels(req);
     if (!req.user || !User) return res.status(401).json({ success: false });
-    const user = await User.findByPk(req.user.id);
+    const user = await User.findByPk(req.user.id).catch(() => null);
     const ok = await bcrypt.compare(
       currentPassword,
       user.password || user.password_hash || "",
@@ -119,24 +161,24 @@ export async function changePassword(req, res) {
     await user.save();
     res.json({ success: true, message: "Password changed" });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
-export async function getAllUsers(req, res) {
+export async function getAllUsers(req, res, next) {
   try {
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
+    const { User } = getModels(req);
     if (!User) return res.status(500).json({ success: false });
     const users = await User.findAll({ attributes: { exclude: ["password"] } });
     res.json({ success: true, data: users });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
-export async function createUser(req, res) {
+export async function createUser(req, res, next) {
   try {
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
+    const { User } = getModels(req);
     if (!User) return res.status(500).json({ success: false });
     const payload = req.body;
     if (payload.password)
@@ -144,14 +186,14 @@ export async function createUser(req, res) {
     const user = await User.create(payload);
     res.status(201).json({ success: true, data: user });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
-export async function updateUser(req, res) {
+export async function updateUser(req, res, next) {
   try {
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
-    const user = await User.findByPk(req.params.id);
+    const { User } = getModels(req);
+    const user = await User.findByPk(req.params.id).catch(() => null);
     if (!user) return res.status(404).json({ success: false });
     Object.assign(user, req.body);
     if (req.body.password)
@@ -159,18 +201,20 @@ export async function updateUser(req, res) {
     await user.save();
     res.json({ success: true, data: user });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
-export async function deleteUser(req, res) {
+export async function deleteUser(req, res, next) {
   try {
-    const { User } = (req.app && req.app.get && req.app.get("models")) || {};
-    const user = await User.findByPk(req.params.id);
+    const { User } = getModels(req);
+    const user = await User.findByPk(req.params.id).catch(() => null);
     if (!user) return res.status(404).json({ success: false });
     await user.destroy();
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    next(err);
   }
 }
+
+export default null;

@@ -1,7 +1,7 @@
 export default (sequelize, DataTypes) => {
   const rekomendasi_teknis_keamanan_pangan = sequelize.define('rekomendasi_teknis_keamanan_pangan', {
     id: { type: DataTypes.UUID, primaryKey: true },
-    layanan_id: { type: DataTypes.STRING },
+    layanan_id: { type: DataTypes.UUID },
     status: { type: DataTypes.STRING, defaultValue: 'draft' },
     payload: { type: DataTypes.JSONB }
   }, { tableName: 'rekomendasi_teknis_keamanan_pangan' });

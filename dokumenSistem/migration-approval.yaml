@@ -1,0 +1,19 @@
+migration_id: migrate_roles_2026_02_28
+description: "Normalize role names from serviceRegistry/frontend into backend canonical roles"
+target_env: ["staging", "production"]
+required_approvers:
+  - github: "head-it"
+  - github: "sekretaris"
+  - github: "dba"
+backup_required: true
+backup_commands:
+  - "pg_dump -h $DB_HOST -U $DB_USER -Fc -d $DB_NAME -f backups/prod-$(date +%F-%H%M).dump"
+pre_checks:
+  - "health endpoint up"
+  - "smoke tests pass on staging"
+post_checks:
+  - "login as sample role users"
+  - "verify approval_log entries exist"
+approved_by: []
+approved_at: null
+notes: "Add approver github handles to 'approved_by' to enable auto-run"

@@ -42,6 +42,27 @@ export async function initModels(sequelize) {
             tableName: def.tableName,
           });
           const recreated = sequelize.define(name, attrs, opts);
+          // If the original associate mentions `models.Layanan`, it's likely
+          // the model expects `layanan_id` to reference the `Layanan` alias
+          // (which maps to `data_layanan_teknis` and uses UUID PK). Adjust
+          // the attribute type here to avoid FK type mismatch during sync.
+          try {
+            if (
+              typeof def.associate === "function" &&
+              def.associate.toString().includes("models.Layanan") &&
+              attrs.layanan_id &&
+              attrs.layanan_id.type &&
+              attrs.layanan_id.type !== DataTypes.UUID
+            ) {
+              attrs.layanan_id = Object.assign({}, attrs.layanan_id, {
+                type: DataTypes.UUID,
+              });
+              // re-define with corrected attrs
+              recreated = sequelize.define(name, attrs, opts);
+            }
+          } catch (e) {
+            // ignore — non-critical adjustment
+          }
           // preserve associate function if original exported one had it
           if (typeof def.associate === "function") {
             recreated.associate = def.associate;
@@ -139,7 +160,13 @@ export async function initModels(sequelize) {
     // noop
   }
 
-  Object.values(models).forEach((m) => {
+  // Ensure each distinct model object has its `associate` called only once.
+  // Models registry may contain multiple keys referencing the same model
+  // object (alias entries). Calling associate repeatedly on the same
+  // object can create duplicate associations and cause Sequelize errors
+  // such as duplicated alias names. Use a Set to deduplicate by object.
+  const uniqueModels = Array.from(new Set(Object.values(models)));
+  uniqueModels.forEach((m) => {
     if (typeof m.associate === "function") {
       try {
         m.associate(models);

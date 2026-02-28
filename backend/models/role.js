@@ -18,7 +18,7 @@ export default (sequelize, DataTypes) => {
       foreignKey: "role_id",
       as: "rolepermissions",
     });
-    Role.hasMany(models.User, { foreignKey: "role", as: "users" });
+    Role.hasMany(models.User, { foreignKey: "role_id", as: "users" });
   };
 
   return Role;

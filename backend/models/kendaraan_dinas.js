@@ -1,7 +1,7 @@
 export default (sequelize, DataTypes) => {
   const kendaraan_dinas = sequelize.define('kendaraan_dinas', {
     id: { type: DataTypes.UUID, primaryKey: true },
-    layanan_id: { type: DataTypes.STRING },
+    layanan_id: { type: DataTypes.UUID },
     status: { type: DataTypes.STRING, defaultValue: 'draft' },
     payload: { type: DataTypes.JSONB }
   }, { tableName: 'kendaraan_dinas' });

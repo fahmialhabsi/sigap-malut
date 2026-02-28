@@ -1,7 +1,7 @@
 export default (sequelize, DataTypes) => {
   const database_kompetensi_auditor = sequelize.define('database_kompetensi_auditor', {
     id: { type: DataTypes.UUID, primaryKey: true },
-    layanan_id: { type: DataTypes.STRING },
+    layanan_id: { type: DataTypes.UUID },
     status: { type: DataTypes.STRING, defaultValue: 'draft' },
     payload: { type: DataTypes.JSONB }
   }, { tableName: 'database_kompetensi_auditor' });

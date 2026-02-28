@@ -1,7 +1,7 @@
 export default (sequelize, DataTypes) => {
   const koordinasi_pengawasan_psat = sequelize.define('koordinasi_pengawasan_psat', {
     id: { type: DataTypes.UUID, primaryKey: true },
-    layanan_id: { type: DataTypes.STRING },
+    layanan_id: { type: DataTypes.UUID },
     status: { type: DataTypes.STRING, defaultValue: 'draft' },
     payload: { type: DataTypes.JSONB }
   }, { tableName: 'koordinasi_pengawasan_psat' });

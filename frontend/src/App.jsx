@@ -2,10 +2,10 @@ import ReportingWorkflowPage from "./pages/ReportingWorkflowPage";
 import CommentWorkflowPage from "./pages/CommentWorkflowPage";
 import CaseWorkflowPage from "./pages/CaseWorkflowPage";
 import ReminderPage from "./pages/ReminderPage";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
-import { ToastProvider } from './contexts/ToastContext';
-import ToastContainer from './components/ToastContainer';
+import { ToastProvider } from "./contexts/ToastContext";
+import ToastContainer from "./components/ToastContainer";
 const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -59,187 +59,186 @@ function App() {
   return (
     <ToastProvider>
       <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<LandingPage />} />
-      <Route
-        path="/user-management"
-        element={
-          <Suspense fallback={<div>Loading...</div>}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/user-management"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <PrivateRoute>
+                <UserManagementPage />
+              </PrivateRoute>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/superadmin"
+          element={
             <PrivateRoute>
-              <UserManagementPage />
+              <DashboardSuperAdmin />
             </PrivateRoute>
-          </Suspense>
-        }
-      />
-      <Route
-        path="/dashboard/superadmin"
-        element={
-          <PrivateRoute>
-            <DashboardSuperAdmin />
-          </PrivateRoute>
-        }
-      />
-      <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
-      <Route
-        path="/dashboard"
-        element={
-          isAuthenticated ? (
+          }
+        />
+        <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated ? (
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/dashboard/sekretariat"
+          element={
             <PrivateRoute>
-              <DashboardPage />
+              <DashboardSekretariat />
             </PrivateRoute>
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
-      <Route
-        path="/dashboard/sekretariat"
-        element={
-          <PrivateRoute>
-            <DashboardSekretariat />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/ketersediaan"
-        element={
-          <PrivateRoute>
-            <DashboardKetersediaan />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/distribusi"
-        element={
-          <PrivateRoute>
-            <DashboardDistribusi />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/konsumsi"
-        element={
-          <PrivateRoute>
-            <DashboardKonsumsi />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/uptd"
-        element={
-          <PrivateRoute>
-            <DashboardUPTD />
-          </PrivateRoute>
-        }
-      />
-      {/* Workflow and Reminder routes */}
-      <Route
-        path="/reporting-workflow"
-        element={
-          <PrivateRoute>
-            <ReportingWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/comment-workflow"
-        element={
-          <PrivateRoute>
-            <CommentWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/case-workflow"
-        element={
-          <PrivateRoute>
-            <CaseWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/reminder"
-        element={
-          <PrivateRoute>
-            <ReminderPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/create"
-        element={
-          <PrivateRoute>
-            <GenericCreatePage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/view/:id"
-        element={
-          <PrivateRoute>
-            <ViewDetailPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/edit/:id"
-        element={
-          <PrivateRoute>
-            <EditPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/:id"
-        element={
-          <PrivateRoute>
-            <ViewDetailPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/:id/edit"
-        element={
-          <PrivateRoute>
-            <EditPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/chatbot-upload"
-        element={
-          <PrivateRoute>
-            <ChatbotUploadPage />
-          </PrivateRoute>
-        }
-      />
-      {GeneratedRoutes({ PrivateRoute })}
-      <Route
-        path="/audit-trail"
-        element={
-          <PrivateRoute>
-            <AuditTrailPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/workflow-status"
-        element={
-          <PrivateRoute>
-            <WorkflowStatusPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/approval-workflow"
-        element={
-          <PrivateRoute>
-            <ApprovalWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+          }
+        />
+        <Route
+          path="/dashboard/ketersediaan"
+          element={
+            <PrivateRoute>
+              <DashboardKetersediaan />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/distribusi"
+          element={
+            <PrivateRoute>
+              <DashboardDistribusi />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/konsumsi"
+          element={
+            <PrivateRoute>
+              <DashboardKonsumsi />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/uptd"
+          element={
+            <PrivateRoute>
+              <DashboardUPTD />
+            </PrivateRoute>
+          }
+        />
+        {/* Workflow and Reminder routes */}
+        <Route
+          path="/reporting-workflow"
+          element={
+            <PrivateRoute>
+              <ReportingWorkflowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/comment-workflow"
+          element={
+            <PrivateRoute>
+              <CommentWorkflowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/case-workflow"
+          element={
+            <PrivateRoute>
+              <CaseWorkflowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reminder"
+          element={
+            <PrivateRoute>
+              <ReminderPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/create"
+          element={
+            <PrivateRoute>
+              <GenericCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/view/:id"
+          element={
+            <PrivateRoute>
+              <ViewDetailPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/edit/:id"
+          element={
+            <PrivateRoute>
+              <EditPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/:id"
+          element={
+            <PrivateRoute>
+              <ViewDetailPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/:id/edit"
+          element={
+            <PrivateRoute>
+              <EditPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chatbot-upload"
+          element={
+            <PrivateRoute>
+              <ChatbotUploadPage />
+            </PrivateRoute>
+          }
+        />
+        {GeneratedRoutes({ PrivateRoute })}
+        <Route
+          path="/audit-trail"
+          element={
+            <PrivateRoute>
+              <AuditTrailPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/workflow-status"
+          element={
+            <PrivateRoute>
+              <WorkflowStatusPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/approval-workflow"
+          element={
+            <PrivateRoute>
+              <ApprovalWorkflowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
       <ToastContainer />
     </ToastProvider>

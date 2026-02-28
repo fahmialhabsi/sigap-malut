@@ -9,11 +9,11 @@ export default (sequelize) => {
         defaultValue: DataTypes.UUIDV4,
       },
       modul: { type: DataTypes.STRING, allowNull: false },
-      entitas_id: { type: DataTypes.UUID, allowNull: false },
       aksi: { type: DataTypes.STRING, allowNull: false },
       data_lama: { type: DataTypes.JSONB, allowNull: true },
       data_baru: { type: DataTypes.JSONB, allowNull: true },
-      pegawai_id: { type: DataTypes.UUID, allowNull: false },
+      entitas_id: { type: DataTypes.INTEGER, allowNull: false },
+      pegawai_id: { type: DataTypes.INTEGER, allowNull: false },
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -25,9 +25,9 @@ export default (sequelize) => {
   );
 
   SA06.associate = (models) => {
-  SA06.belongsTo(models.Entitas, { foreignKey: "entitas_id", as: "entitas" });
-  SA06.belongsTo(models.Pegawai, { foreignKey: "pegawai_id", as: "pegawai" });
-};
+    SA06.belongsTo(models.Entitas, { foreignKey: "entitas_id", as: "entitas" });
+    SA06.belongsTo(models.Pegawai, { foreignKey: "pegawai_id", as: "pegawai" });
+  };
 
   return SA06;
 };

@@ -28,13 +28,13 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    role_id: {
+    role: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    unit_id: {
+    unit_kerja: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     nip: {
       type: DataTypes.STRING,

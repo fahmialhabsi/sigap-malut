@@ -1,39 +1,3 @@
-import create from 'zustand';
-import axios from 'axios';
-import { saveToken, clearToken, initAuth as initAuthUtil } from '../utils/auth';
-
-const useAuthStore = create((set, get) => ({
-  isAuthenticated: false,
-  isInitialized: false,
-  user: null,
-  initAuth: () => {
-    initAuthUtil();
-    const token = localStorage.getItem('sigap_token');
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    set({ isInitialized: true, isAuthenticated: !!token, user });
-  },
-  login: async (email, password) => {
-    try {
-      const res = await axios.post('/api/auth/login', { email, password });
-      if (res.data && res.data.token) {
-        saveToken(res.data.token);
-        localStorage.setItem('user', JSON.stringify(res.data.user || {}));
-        set({ isAuthenticated: true, user: res.data.user || {} });
-        return { success: true };
-      }
-      return { success: false, message: res.data?.message || 'Login failed' };
-    } catch (err) {
-      return { success: false, message: err?.response?.data?.message || err.message };
-    }
-  },
-  logout: async () => {
-    clearToken();
-    localStorage.removeItem('user');
-    set({ isAuthenticated: false, user: null });
-  },
-}));
-
-export default useAuthStore;
 import { create } from "zustand";
 import api from "../utils/api";
 import { logAuditTrail } from "../utils/auditTrail";
@@ -46,28 +10,31 @@ const useAuthStore = create((set) => ({
 
   login: async (email, password) => {
     try {
-      // some tests expect payload field `username`; include both to be compatible
-      const response = await api.post("/auth/login", {
-        email,
-        username: email,
-        password,
-      });
-      const { user, token } = response.data.data;
+      const identifier = (email || "").trim();
+      const payload = identifier.includes("@")
+        ? { email: identifier, password }
+        : { username: identifier, password };
+      const response = await api.post("/auth/login", payload);
+      // Backend returns { access, refresh, user }
+      // Debug: log backend response shape to help diagnose redirect issues
+      // eslint-disable-next-line no-console
+      console.debug("authStore.login response.data:", response.data);
+      const { access, refresh, user, redirect } = response.data || {};
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      if (access) localStorage.setItem("token", access);
+      if (refresh) localStorage.setItem("refresh", refresh);
+      if (user) localStorage.setItem("user", JSON.stringify(user));
 
       set({
-        user,
-        token,
-        isAuthenticated: true,
+        user: user || null,
+        token: access || null,
+        isAuthenticated: !!access,
         isInitialized: true,
       });
 
       logAuditTrail({ user, action: "login", detail: "User login" });
-      return { success: true };
+      return { success: true, redirect };
     } catch (error) {
-      // Reset state on failed login
       set({
         user: null,
         token: null,
@@ -109,12 +76,7 @@ const useAuthStore = create((set) => ({
     if (token && userStr) {
       try {
         const user = JSON.parse(userStr);
-        set({
-          user,
-          token,
-          isAuthenticated: true,
-          isInitialized: true,
-        });
+        set({ user, token, isAuthenticated: true, isInitialized: true });
       } catch (error) {
         console.error("Parse user error:", error);
         set({

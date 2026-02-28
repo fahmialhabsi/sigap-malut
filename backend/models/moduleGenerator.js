@@ -22,10 +22,20 @@ export default (sequelize) => {
     },
     { tableName: "module_generator", timestamps: false },
   );
-  
 
-ModuleGenerator.associate = (models) => {
-  ModuleGenerator.belongsTo(models.Modul, { foreignKey: "modul_id", as: "modul" });
-};
-return ModuleGenerator;
+  ModuleGenerator.associate = (models) => {
+    // Guard against missing target model to avoid crashing during startup
+    if (models && models.Modul) {
+      ModuleGenerator.belongsTo(models.Modul, {
+        foreignKey: "modul_id",
+        as: "modul",
+      });
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "ModuleGenerator.associate: target model 'Modul' not found in registry; skipping belongsTo association",
+      );
+    }
+  };
+  return ModuleGenerator;
 };

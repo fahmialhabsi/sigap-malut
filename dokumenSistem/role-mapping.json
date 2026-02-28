@@ -1,0 +1,45 @@
+{
+  "canonical_source": "backend/config/auth.js",
+  "generated_at": "2026-02-28T00:00:00Z",
+  "canonical_roles": [
+    "super_admin",
+    "kepala_dinas",
+    "sekretaris",
+    "kepala_bidang",
+    "kepala_uptd",
+    "kasubbag",
+    "fungsional",
+    "pelaksana",
+    "bendahara",
+    "guest"
+  ],
+  "mappings": [
+    {
+      "canonical": "sekretaris",
+      "aliases": ["sekretaris", "Sekretaris", "sekretaris_dinas"],
+      "sources": [
+        "frontend/LandingPage.jsx",
+        "master-data/FIELDS_SEKRETARIAT/*"
+      ],
+      "approved_by": []
+    },
+    {
+      "canonical": "kepala_bidang",
+      "aliases": [
+        "kepala_bidang",
+        "kepala_bidang_ketersediaan",
+        "kepala_bidang_distribusi",
+        "kepala_bidang_konsumsi"
+      ],
+      "sources": ["frontend/*", "serviceRegistry.json"],
+      "approved_by": []
+    },
+    {
+      "canonical": "pelaksana",
+      "aliases": ["pelaksana", "staf", "staff", "staff_ketersediaan"],
+      "sources": ["serviceRegistry.json", "master-data"],
+      "approved_by": []
+    }
+  ],
+  "notes": "Add approver GitHub handles (or emails) to approved_by before applying."
+}
