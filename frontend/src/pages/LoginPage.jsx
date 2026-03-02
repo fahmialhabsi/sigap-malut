@@ -4,30 +4,28 @@ import useAuthStore from "../stores/authStore";
 
 export default function LoginPage() {
   const location = useLocation();
-  // const params = new URLSearchParams(location.search);
-  // Hapus roleParam karena tidak digunakan
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const params = new URLSearchParams(location.search);
+  const roleParam = params.get("role");
 
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
 
   // Mapping role/unit_kerja ke dashboard
+  // Keys should match the `value` used in LandingPage role buttons
   const dashboardMapping = {
     super_admin: "/dashboard/superadmin",
-    kepala_dinas: "/dashboard/superadmin",
-    Sekretariat: "/dashboard/sekretariat",
-    "Bidang Ketersediaan": "/dashboard/ketersediaan",
-    "Bidang Distribusi": "/dashboard/distribusi",
-    "Bidang Konsumsi": "/dashboard/konsumsi",
-    UPTD: "/dashboard/uptd",
+    gubernur: "/dashboard/superadmin",
+    sekretaris: "/dashboard/sekretariat",
     kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
     kepala_bidang_distribusi: "/dashboard/distribusi",
     kepala_bidang_konsumsi: "/dashboard/konsumsi",
-    "Bidang Distribusi dan Cadangan Pangan": "/dashboard/distribusi",
-    // Tambahkan mapping lain jika diperlukan
+    kepala_uptd: "/dashboard/uptd",
+    publik: "/dashboard-publik",
+    // Add more mappings if needed
   };
 
   const handleSubmit = async (e) => {
@@ -41,17 +39,25 @@ export default function LoginPage() {
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem("user"));
-      } catch (e) {
+      } catch (err) {
         // ignore JSON parse error
       }
 
-      const roleIdToName = {
-        "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
-        // ... tambahkan lainnya
-      };
+      // Prioritize explicit role selected on LandingPage (via ?role=...)
+      if (roleParam) {
+        if (dashboardMapping[roleParam]) {
+          navigate(dashboardMapping[roleParam]);
+          setLoading(false);
+          return;
+        } else {
+          console.warn(
+            `LoginPage: unknown roleParam="${roleParam}". Falling back to user-derived dashboard.`,
+          );
+        }
+      }
 
+      // Fallback: derive from authenticated `user`
       if (user) {
-        // Prioritaskan role, lalu unit_kerja
         let dashboardPath = null;
         if (user.role && dashboardMapping[user.role]) {
           dashboardPath = dashboardMapping[user.role];
@@ -139,29 +145,25 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Demo Credentials */}
+        {/* Demo Credentials (match backend seed) */}
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
           <p className="text-xs text-gray-600 font-semibold mb-2">
             Demo Credentials:
           </p>
           <div className="text-xs text-gray-500 space-y-1">
             <p>
-              • Super Admin:
-              <code>
-                super_admin-sekretariat-dinas-pangan-maluku-utara@dinpangan.go.id
-                / Admin123
+              • Super Admin: <code>superadmin@dinpangan.go.id / Admin123</code>
+            </p>
+            <p>
+              • Sekretaris:{" "}
+              <code className="bg-gray-200 px-1 py-0.5 rounded">
+                sekretaris@dinpangan.go.id / Staff123
               </code>
             </p>
             <p>
-              • Kepala Dinas:{" "}
+              • Kepala Bidang Distribusi:{" "}
               <code className="bg-gray-200 px-1 py-0.5 rounded">
-                kepala.dinas / Kadis123
-              </code>
-            </p>
-            <p>
-              • Staff:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                staff.sekretariat / Staff123
+                kabiddistribusi@dinpangan.go.id / Distribusi123
               </code>
             </p>
           </div>

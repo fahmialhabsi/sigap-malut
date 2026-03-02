@@ -120,33 +120,67 @@ export async function seedMasterData() {
   console.log("🌱 Seeding master data...\n");
 
   try {
+    const dialect = sequelize.getDialect();
     // Seed Komoditas
     console.log("📦 Seeding komoditas...");
     for (const item of komoditas) {
-      await sequelize.query(
-        `INSERT OR IGNORE INTO master_komoditas (id, nama, kategori, satuan, is_strategis, created_at, updated_at) 
-         VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-        {
-          replacements: [
-            item.id,
-            item.nama,
-            item.kategori,
-            item.satuan,
-            item.is_strategis ? 1 : 0,
-          ],
-        },
-      );
+      if (dialect === "postgres") {
+        await sequelize.query(
+          `INSERT INTO master_komoditas (id, nama, kategori, satuan, is_strategis, created_at, updated_at)
+           VALUES (:id, :nama, :kategori, :satuan, :is_strategis, now(), now())
+           ON CONFLICT (id) DO NOTHING`,
+          {
+            replacements: {
+              id: item.id,
+              nama: item.nama,
+              kategori: item.kategori,
+              satuan: item.satuan,
+              is_strategis: item.is_strategis ? 1 : 0,
+            },
+          },
+        );
+      } else {
+        await sequelize.query(
+          `INSERT OR IGNORE INTO master_komoditas (id, nama, kategori, satuan, is_strategis, created_at, updated_at) 
+           VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+          {
+            replacements: [
+              item.id,
+              item.nama,
+              item.kategori,
+              item.satuan,
+              item.is_strategis ? 1 : 0,
+            ],
+          },
+        );
+      }
     }
     console.log(`  ✅ ${komoditas.length} komoditas seeded\n`);
 
     // Seed Kabupaten
     console.log("🏙️  Seeding kabupaten...");
     for (const kab of kabupaten) {
-      await sequelize.query(
-        `INSERT OR IGNORE INTO master_kabupaten (id, nama, kode, ibu_kota, created_at, updated_at) 
-         VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`,
-        { replacements: [kab.id, kab.nama, kab.kode, kab.ibu_kota] },
-      );
+      if (dialect === "postgres") {
+        await sequelize.query(
+          `INSERT INTO master_kabupaten (id, nama, kode, ibu_kota, created_at, updated_at)
+           VALUES (:id, :nama, :kode, :ibu_kota, now(), now())
+           ON CONFLICT (id) DO NOTHING`,
+          {
+            replacements: {
+              id: kab.id,
+              nama: kab.nama,
+              kode: kab.kode,
+              ibu_kota: kab.ibu_kota,
+            },
+          },
+        );
+      } else {
+        await sequelize.query(
+          `INSERT OR IGNORE INTO master_kabupaten (id, nama, kode, ibu_kota, created_at, updated_at) 
+           VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`,
+          { replacements: [kab.id, kab.nama, kab.kode, kab.ibu_kota] },
+        );
+      }
     }
     console.log(`  ✅ ${kabupaten.length} kabupaten seeded\n`);
 

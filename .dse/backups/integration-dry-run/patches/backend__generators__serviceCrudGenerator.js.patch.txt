@@ -1,9 +1,7 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+--- original
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require("fs");
+const path = require("path");
 
 /**
  * serviceCrudGenerator
@@ -64,36 +62,14 @@ module.exports = function(models){
     if (!fs.existsSync(routeFile)) {
       fs.writeFileSync(
         routeFile,
-        `import express from 'express';
-import { getController } from '../utils/dynamicImport.js';
-
-export default (app) => {
+        `const express = require('express');
+const router = express.Router();
+module.exports = (app) => {
   const models = app.get('models');
-  const router = express.Router();
-  // lazy-load controller (returns controller instance or object)
-  const ctrlPromise = getController('${code}', models);
-
-  router.post('/', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.create(req, res, next);
-    } catch (e) { next(e); }
-  });
-
-  router.get('/', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.list(req, res, next);
-    } catch (e) { next(e); }
-  });
-
-  router.get('/:id', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.get(req, res, next);
-    } catch (e) { next(e); }
-  });
-
+  const ctrl = require('../controllers/${code}Controller')(models);
+  router.post('/', ctrl.create);
+  router.get('/', ctrl.list);
+  router.get('/:id', ctrl.get);
   return router;
 };
 `,
@@ -103,17 +79,26 @@ export default (app) => {
   return { generated: registry.map((r) => r.kode_layanan) };
 }
 
-// ESM main guard — robust check for direct invocation
-const invokedPath = process.argv[1] ? path.resolve(process.argv[1]) : "";
-const selfPath = path.resolve(__filename);
-if (invokedPath === selfPath) {
-  const projectRoot = path.resolve(__dirname, "..", "..");
-  generate(projectRoot)
-    .then((r) => console.log("generated", r))
-    .catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
-}
+if (require.main === module) {
+  const projectRoot = pat
 
-export { generate };
++++ suggestion
+
+// replace: const fs = require("fs");
+import fs from 'fs';
+
+// replace: const path = require("path");
+import path from 'path';
+
+// replace: const ctrl = require('../controllers/${code}Controller')
+import ctrl from '../controllers/${code}Controller';
+
+// replace: module.exports = function(models){
+export default function(models){;
+
+// replace: module.exports = (app) => {
+export default (app) => {;
+
+// replace: module.exports = { generate };
+export { generate };;
+
