@@ -1,4 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
+--- original
+
+const { v4: uuidv4 } = require("uuid");
 
 /**
  * Workflow engine (single workflows object)
@@ -109,4 +111,13 @@ async function performTransition({
   return true;
 }
 
-export { performTransition, workflows };
+module.exports = { performTransition, work
+
++++ suggestion
+
+// replace: const { v4: uuidv4 } = require("uuid");
+import { v4: uuidv4 } from 'uuid';
+
+// replace: module.exports = { performTransition, workflows };
+export { performTransition, workflows };;
+

@@ -68,4 +68,4 @@ async function seedUsers() {
   console.log("✅ All user seeding complete!\n");
 }
 
-seedUsers();
+export { seedUsers };

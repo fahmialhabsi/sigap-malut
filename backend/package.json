@@ -13,6 +13,8 @@
     "generate:routes": "node scripts/generateRoutes.js",
     "generate:route-index": "node scripts/generateRouteIndex.js",
     "generate:all": "npm run generate:schema && npm run generate:models && npm run generate:controllers && npm run generate:routes && npm run generate:route-index",
+    "convert:tests:esm": "node scripts/convert-tests-to-esm.js",
+    "test": "mocha --file tests/setup.js \"tests/**/*.js\" --exit",
     "seed": "node database/seeders/seed.js",
     "migrate": "node database/migrations/migrate.js"
   },
