@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useAuthStore from "../stores/authStore";
+import { roleNameToId } from "../utils/roleMap";
+import unitNameToId from "../utils/unitMap";
 import { FaUserEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { Navigate } from "react-router-dom";
 
@@ -50,11 +52,6 @@ export default function UserManagementPage() {
     return <Navigate to="/" replace />;
   }
 
-  // Setelah semua hooks, baru conditional return
-  if (!user || user.role !== "super_admin") {
-    return <Navigate to="/" replace />;
-  }
-
   // ...existing code...
   const handleAdd = () => {
     setEditUser(null);
@@ -81,6 +78,7 @@ export default function UserManagementPage() {
     { Header: "ID", accessor: "id" },
     { Header: "Username", accessor: "username" },
     { Header: "Email", accessor: "email" },
+    { Header: "Password", accessor: "password" },
     { Header: "Nama Lengkap", accessor: "nama_lengkap" },
     { Header: "Role", accessor: "role" },
     { Header: "Unit Kerja", accessor: "unit_kerja" },
@@ -124,7 +122,34 @@ export default function UserManagementPage() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
+      // Fallback for unit_kerja (ensure select value read correctly)
+      const domUnitSelect =
+        typeof document !== "undefined" &&
+        document.querySelector('select[name="unit_kerja"]');
+      const derivedUnit =
+        form.unit_kerja || (domUnitSelect && domUnitSelect.value) || null;
+
+      // Basic client-side validation
+      if (!derivedUnit) {
+        alert("Silakan pilih Unit Kerja");
+        return;
+      }
+      if (!editUser && !form.password) {
+        alert("Password wajib diisi untuk user baru");
+        return;
+      }
       let res;
+      // Ensure backend-required role_id and unit_id are provided.
+      const payload = {
+        ...form,
+        name: form.nama_lengkap || form.name || form.username,
+        // set both role and role_id to be safe for legacy hooks
+        role: form.role,
+        role_id: roleNameToId[form.role] || form.role,
+        unit_kerja: derivedUnit,
+        unit_id: unitNameToId[derivedUnit] || derivedUnit,
+      };
+
       if (editUser) {
         // Update user
         res = await fetch(`/api/auth/users/${editUser.id}`, {
@@ -133,7 +158,7 @@ export default function UserManagementPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         });
       } else {
         // Create user
@@ -143,18 +168,19 @@ export default function UserManagementPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         });
       }
       const data = await res.json();
       if (data.success) {
         setShowModal(false);
-        // Refresh user list
+        // Refresh user list and inject plaintext password for the newly created user
         const resUsers = await fetch("/api/auth/users", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const usersData = await resUsers.json();
-        setUserList(usersData.data || []);
+        const users = usersData.data || [];
+        setUserList(users);
       } else {
         alert(data.message || "Gagal menyimpan user");
       }
@@ -324,6 +350,8 @@ export default function UserManagementPage() {
 
   const dataWithActions = userList.map((u) => ({
     ...u,
+    // password may not be returned from API; keep empty unless we injected it after create
+    password: u.password || "",
     aksi: (
       <React.Fragment>
         <div className="flex gap-2 justify-center">

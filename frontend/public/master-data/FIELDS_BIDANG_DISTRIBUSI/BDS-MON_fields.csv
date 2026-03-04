@@ -1,0 +1,56 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY082-LY086)
+jenis_monitoring,Jenis Monitoring,enum,NULL,true,false,NULL,none,"Arus Distribusi,Stok Pasar,Hambatan Distribusi,Fasilitasi Kelancaran,Koordinasi Wilayah",Jenis monitoring
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Bulan periode (YYYY-MM-01)
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+bulan,Bulan,int,2,true,false,NULL,none,NULL,Bulan (1-12)
+komoditas_id,Komoditas,int,11,false,false,NULL,none,NULL,FK ke tabel komoditas
+nama_komoditas,Nama Komoditas,varchar,255,false,false,NULL,none,NULL,Denormalized
+wilayah_asal,Wilayah Asal,varchar,255,false,false,NULL,none,NULL,Dari mana distribusi
+wilayah_tujuan,Wilayah Tujuan,varchar,255,false,false,NULL,none,NULL,Ke mana distribusi
+volume_distribusi,Volume Distribusi (Ton),decimal,"15,2",false,false,NULL,none,NULL,Volume yang didistribusikan
+satuan,Satuan,varchar,20,false,false,kg,none,NULL,Satuan
+moda_transportasi,Moda Transportasi,enum,NULL,false,false,NULL,none,"Darat,Laut,Udara",Transportasi yang digunakan
+tanggal_distribusi,Tanggal Distribusi,date,NULL,false,false,NULL,none,NULL,Kapan distribusi dilakukan
+frekuensi_distribusi,Frekuensi,int,11,false,false,NULL,none,NULL,Berapa kali distribusi
+pasar_id,Pasar,int,11,false,false,NULL,none,NULL,FK ke tabel pasar
+nama_pasar,Nama Pasar,varchar,255,false,false,NULL,none,NULL,Denormalized
+stok_pasar,Stok di Pasar (Ton),decimal,"15,2",false,false,NULL,none,NULL,Stok tersedia di pasar
+stok_normal,Stok Normal (Ton),decimal,"15,2",false,false,NULL,none,NULL,Stok dalam kondisi normal
+status_stok,Status Stok,enum,NULL,false,false,Aman,none,"Surplus,Aman,Menipis,Kritis",Status stok pasar
+jenis_hambatan,Jenis Hambatan,enum,NULL,false,false,NULL,none,"Infrastruktur,Cuaca,Administrasi,Keamanan,Biaya,Lainnya",Jenis hambatan distribusi
+lokasi_hambatan,Lokasi Hambatan,varchar,255,false,false,NULL,none,NULL,Dimana hambatan terjadi
+deskripsi_hambatan,Deskripsi Hambatan,text,NULL,false,false,NULL,none,NULL,Detail hambatan
+dampak_hambatan,Dampak Hambatan,text,NULL,false,false,NULL,none,NULL,Dampak yang ditimbulkan
+tingkat_hambatan,Tingkat Hambatan,enum,NULL,false,false,NULL,none,"Ringan,Sedang,Berat",Tingkat keparahan
+solusi_hambatan,Solusi Hambatan,text,NULL,false,false,NULL,none,NULL,Solusi yang ditempuh
+status_penanganan,Status Penanganan,enum,NULL,false,false,NULL,none,"Belum Ditangani,Dalam Proses,Selesai",Status penanganan hambatan
+jenis_fasilitasi,Jenis Fasilitasi,enum,NULL,false,false,NULL,none,"Perizinan,Koordinasi,Bantuan Logistik,Lainnya",Jenis fasilitasi kelancaran
+penerima_fasilitasi,Penerima Fasilitasi,varchar,255,false,false,NULL,none,NULL,Siapa yang difasilitasi
+tindakan_fasilitasi,Tindakan Fasilitasi,text,NULL,false,false,NULL,none,NULL,Tindakan yang dilakukan
+hasil_fasilitasi,Hasil Fasilitasi,text,NULL,false,false,NULL,none,NULL,Hasil fasilitasi
+instansi_koordinasi,Instansi Koordinasi,text,NULL,false,false,NULL,none,NULL,Instansi yang dikoordinasikan
+topik_koordinasi,Topik Koordinasi,text,NULL,false,false,NULL,none,NULL,Topik rapat koordinasi
+hasil_koordinasi,Hasil Koordinasi,text,NULL,false,false,NULL,none,NULL,Hasil rapat koordinasi
+tindak_lanjut_koordinasi,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Tindak lanjut koordinasi
+analisis,Analisis,text,NULL,false,false,NULL,none,NULL,Analisis kondisi distribusi
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi tindakan
+file_data,File Data,varchar,255,false,false,NULL,none,NULL,Upload data Excel
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan PDF
+file_foto,File Foto,json,NULL,false,false,NULL,none,NULL,Array foto dokumentasi
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Distribusi,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Sekretariat/Pimpinan,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data monitoring sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

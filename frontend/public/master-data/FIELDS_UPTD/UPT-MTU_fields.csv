@@ -1,0 +1,108 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY161-LY176)
+jenis_layanan_mutu,Jenis Layanan,enum,NULL,true,false,NULL,none,"Penjaminan Mutu,Verifikasi Kepatuhan,Pengendalian Mutu,Pengelolaan Temuan,Penyusunan SOP,Review SOP,Standar Layanan,Sosialisasi,Pelatihan Auditor,Sertifikasi Auditor,Evaluasi Auditor,Database Auditor,Supervisi Audit,Evaluasi Sertifikasi,Rekomendasi Mutu,Laporan Mutu",Jenis layanan manajemen mutu
+nomor_dokumen_mutu,Nomor Dokumen,varchar,100,false,false,NULL,none,NULL,Nomor dokumen mutu/SOP
+judul_dokumen,Judul Dokumen,varchar,255,false,false,NULL,none,NULL,Judul SOP/dokumen mutu
+tanggal_dokumen,Tanggal Dokumen,date,NULL,false,false,NULL,none,NULL,Tanggal ditetapkan
+versi,Versi,varchar,20,false,false,1.0,none,NULL,Versi dokumen
+status_dokumen,Status Dokumen,enum,NULL,false,false,NULL,none,"Draft,Review,Approved,Active,Obsolete",Status dokumen
+objek_verifikasi,Objek Verifikasi,varchar,255,false,false,NULL,none,NULL,Apa yang diverifikasi
+standar_kepatuhan,Standar Kepatuhan,varchar,255,false,false,NULL,none,NULL,Standar yang harus dipenuhi (SNI ISO dll)
+hasil_verifikasi,Hasil Verifikasi,enum,NULL,false,false,NULL,none,"Sesuai,Tidak Sesuai,Perlu Perbaikan",Hasil verifikasi
+catatan_verifikasi,Catatan Verifikasi,text,NULL,false,false,NULL,none,NULL,Catatan hasil verifikasi
+jenis_audit_mutu,Jenis Audit Mutu,enum,NULL,false,false,NULL,none,"Audit Internal,Audit Eksternal,Surveillance,Witnessing",Jenis audit mutu
+tanggal_audit_mutu,Tanggal Audit,date,NULL,false,false,NULL,none,NULL,Tanggal audit mutu
+auditor_mutu,Auditor,varchar,255,false,false,NULL,none,NULL,Nama auditor mutu
+hasil_audit_mutu,Hasil Audit,text,NULL,false,false,NULL,none,NULL,Hasil audit mutu
+temuan_mayor,Temuan Mayor,text,NULL,false,false,NULL,none,NULL,Temuan mayor (critical)
+temuan_minor,Temuan Minor,text,NULL,false,false,NULL,none,NULL,Temuan minor
+observasi,Observasi,text,NULL,false,false,NULL,none,NULL,Catatan observasi
+tindakan_korektif_mutu,Tindakan Korektif,text,NULL,false,false,NULL,none,NULL,Tindakan perbaikan
+penanggung_jawab_perbaikan,PJ Perbaikan,varchar,255,false,false,NULL,none,NULL,Penanggung jawab tindakan korektif
+batas_waktu_perbaikan_mutu,Batas Waktu,date,NULL,false,false,NULL,none,NULL,Deadline perbaikan
+status_perbaikan,Status Perbaikan,enum,NULL,false,false,NULL,none,"Open,In Progress,Closed,Verified",Status tindakan korektif
+kode_sop,Kode SOP,varchar,50,false,false,NULL,none,NULL,Kode SOP
+nama_sop,Nama SOP,varchar,255,false,false,NULL,none,NULL,Nama/judul SOP
+lingkup_sop,Lingkup SOP,text,NULL,false,false,NULL,none,NULL,Ruang lingkup SOP
+tujuan_sop,Tujuan SOP,text,NULL,false,false,NULL,none,NULL,Tujuan SOP
+definisi,Definisi,text,NULL,false,false,NULL,none,NULL,Definisi istilah
+prosedur,Prosedur,text,NULL,false,false,NULL,none,NULL,Langkah-langkah prosedur
+flowchart,Flowchart,varchar,255,false,false,NULL,none,NULL,File flowchart (PNG/PDF)
+formulir_terkait,Formulir Terkait,text,NULL,false,false,NULL,none,NULL,Formulir yang digunakan
+dokumen_terkait,Dokumen Terkait,text,NULL,false,false,NULL,none,NULL,Dokumen referensi
+tanggal_review,Tanggal Review,date,NULL,false,false,NULL,none,NULL,Tanggal review SOP
+reviewer,Reviewer,varchar,255,false,false,NULL,none,NULL,Nama reviewer
+hasil_review,Hasil Review,text,NULL,false,false,NULL,none,NULL,Hasil review SOP
+perubahan_yang_dilakukan,Perubahan,text,NULL,false,false,NULL,none,NULL,Perubahan yang dilakukan
+alasan_perubahan,Alasan Perubahan,text,NULL,false,false,NULL,none,NULL,Alasan revisi SOP
+jenis_standar_layanan,Jenis Standar Layanan,enum,NULL,false,false,NULL,none,"Persyaratan,Prosedur,Waktu,Biaya,Produk,Kompetensi,Sarana",Komponen standar layanan publik
+isi_standar,Isi Standar,text,NULL,false,false,NULL,none,NULL,Isi standar layanan
+metode_sosialisasi,Metode Sosialisasi,enum,NULL,false,false,NULL,none,"Workshop,Rapat,Presentasi,Leaflet,Online",Metode sosialisasi SOP
+tanggal_sosialisasi,Tanggal Sosialisasi,date,NULL,false,false,NULL,none,NULL,Tanggal sosialisasi
+peserta_sosialisasi,Peserta Sosialisasi,int,11,false,false,NULL,none,NULL,Jumlah peserta
+materi_sosialisasi,Materi Sosialisasi,varchar,255,false,false,NULL,none,NULL,File materi sosialisasi
+nama_pelatihan,Nama Pelatihan,varchar,255,false,false,NULL,none,NULL,Nama pelatihan auditor
+jenis_pelatihan,Jenis Pelatihan,enum,NULL,false,false,NULL,none,"Basic Auditor,Lead Auditor,Refreshment,Advance",Jenis pelatihan
+tanggal_pelatihan,Tanggal Pelatihan,date,NULL,false,false,NULL,none,NULL,Tanggal pelaksanaan
+durasi_pelatihan,Durasi (Hari),int,11,false,false,NULL,none,NULL,Lama pelatihan
+trainer,Trainer,varchar,255,false,false,NULL,none,NULL,Nama trainer/instruktur
+peserta_pelatihan,Peserta,text,NULL,false,false,NULL,none,NULL,Daftar peserta
+materi_pelatihan,Materi Pelatihan,text,NULL,false,false,NULL,none,NULL,Materi yang diajarkan
+hasil_evaluasi_pelatihan,Hasil Evaluasi,text,NULL,false,false,NULL,none,NULL,Hasil evaluasi pelatihan
+auditor_id,Auditor,int,11,false,false,NULL,none,NULL,FK ke database auditor
+nama_auditor,Nama Auditor,varchar,255,false,false,NULL,none,NULL,Nama lengkap auditor
+nip_auditor,NIP Auditor,varchar,18,false,false,NULL,none,NULL,NIP jika ASN
+sertifikat_auditor,Sertifikat Auditor,varchar,255,false,false,NULL,none,NULL,Nomor sertifikat auditor
+jenis_sertifikat_auditor,Jenis Sertifikat,enum,NULL,false,false,NULL,none,"Basic Auditor,Lead Auditor,Auditor GMP,Auditor HACCP,Lainnya",Jenis sertifikat
+tanggal_sertifikat,Tanggal Sertifikat,date,NULL,false,false,NULL,none,NULL,Tanggal sertifikat diterbitkan
+masa_berlaku_auditor,Masa Berlaku,date,NULL,false,false,NULL,none,NULL,Tanggal kadaluarsa sertifikat
+lembaga_penerbit,Lembaga Penerbit,varchar,255,false,false,NULL,none,NULL,Lembaga yang menerbitkan sertifikat
+kompetensi_auditor,Kompetensi,text,NULL,false,false,NULL,none,NULL,Daftar kompetensi auditor
+jumlah_audit_dilakukan,Jumlah Audit,int,11,false,false,0,none,NULL,Total audit yang dilakukan
+status_auditor,Status Auditor,enum,NULL,false,false,Aktif,none,"Aktif,Nonaktif,Expired",Status auditor
+jenis_evaluasi_auditor,Jenis Evaluasi,enum,NULL,false,false,NULL,none,"Evaluasi Kinerja,Evaluasi Kompetensi,Evaluasi Post Training",Jenis evaluasi auditor
+tanggal_evaluasi_auditor,Tanggal Evaluasi,date,NULL,false,false,NULL,none,NULL,Tanggal evaluasi
+skor_evaluasi,Skor Evaluasi,decimal,"5,2",false,false,NULL,none,NULL,Skor hasil evaluasi
+hasil_evaluasi_auditor,Hasil Evaluasi,enum,NULL,false,false,NULL,none,"Sangat Baik,Baik,Cukup,Kurang",Hasil evaluasi
+rekomendasi_evaluasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi hasil evaluasi
+tanggal_supervisi,Tanggal Supervisi,date,NULL,false,false,NULL,none,NULL,Tanggal supervisi audit lapangan
+lokasi_supervisi,Lokasi Supervisi,varchar,255,false,false,NULL,none,NULL,Lokasi supervisi
+supervisor,Supervisor,varchar,255,false,false,NULL,none,NULL,Nama supervisor
+auditor_disupervisi,Auditor Disupervisi,varchar,255,false,false,NULL,none,NULL,Auditor yang disupervisi
+temuan_supervisi,Temuan Supervisi,text,NULL,false,false,NULL,none,NULL,Temuan hasil supervisi
+rekomendasi_supervisi,Rekomendasi Supervisi,text,NULL,false,false,NULL,none,NULL,Rekomendasi perbaikan
+periode_evaluasi,Periode Evaluasi,date,NULL,false,false,NULL,none,NULL,Periode evaluasi sertifikasi
+total_sertifikasi_periode,Total Sertifikasi,int,11,false,false,NULL,none,NULL,Total sertifikasi dalam periode
+lulus_sertifikasi,Lulus,int,11,false,false,NULL,none,NULL,Jumlah yang lulus
+tidak_lulus,Tidak Lulus,int,11,false,false,NULL,none,NULL,Jumlah tidak lulus
+persentase_kelulusan_sertifikasi,Persentase Kelulusan (%),decimal,"5,2",false,false,NULL,none,NULL,Auto-calculate
+analisis_evaluasi,Analisis,text,NULL,false,false,NULL,none,NULL,Analisis hasil evaluasi
+jenis_rekomendasi,Jenis Rekomendasi,enum,NULL,false,false,NULL,none,"Rekomendasi Perbaikan Sistem,Rekomendasi Perbaikan Proses,Rekomendasi Pelatihan,Rekomendasi Investasi",Jenis rekomendasi
+isi_rekomendasi,Isi Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi perbaikan mutu
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,Kepala UPTD,none,NULL,Kepada siapa rekomendasi
+status_rekomendasi,Status Rekomendasi,enum,NULL,false,false,Open,none,"Open,In Progress,Closed",Status rekomendasi
+periode_laporan_mutu,Periode Laporan,date,NULL,false,false,NULL,none,NULL,Periode laporan mutu
+indikator_mutu,Indikator Mutu,text,NULL,false,false,NULL,none,NULL,Indikator mutu layanan
+capaian_mutu,Capaian Mutu,text,NULL,false,false,NULL,none,NULL,Capaian indikator mutu
+persentase_kepuasan_pelanggan,Kepuasan Pelanggan (%),decimal,"5,2",false,false,NULL,none,NULL,Hasil survei kepuasan
+temuan_mutu_periode,Temuan Periode,int,11,false,false,NULL,none,NULL,Total temuan dalam periode
+temuan_diselesaikan,Temuan Diselesaikan,int,11,false,false,NULL,none,NULL,Temuan yang sudah ditindaklanjuti
+ringkasan_laporan_mutu,Ringkasan,text,NULL,false,false,NULL,none,NULL,Ringkasan laporan mutu
+file_sop,File SOP,varchar,255,false,false,NULL,none,NULL,Upload SOP PDF
+file_flowchart,File Flowchart,varchar,255,false,false,NULL,none,NULL,Upload flowchart
+file_dokumen_mutu,File Dokumen Mutu,varchar,255,false,false,NULL,none,NULL,Upload dokumen mutu
+file_sertifikat_auditor,File Sertifikat Auditor,varchar,255,false,false,NULL,none,NULL,Upload sertifikat auditor
+file_laporan_mutu,File Laporan Mutu,varchar,255,false,false,NULL,none,NULL,Upload laporan mutu
+file_materi,File Materi,json,NULL,false,false,NULL,none,NULL,Array file materi pelatihan
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kasi Manajemen Mutu,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,Internal UPTD,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data mutu sensitif (kecuali sosialisasi & pelatihan)
+status,Status,enum,NULL,true,false,draft,none,"draft,review,approved,active",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

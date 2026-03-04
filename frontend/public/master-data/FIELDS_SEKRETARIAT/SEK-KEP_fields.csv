@@ -1,0 +1,38 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY008-LY015)
+asn_id,ASN,int,11,true,false,NULL,none,NULL,FK ke tabel asn
+nip,NIP,varchar,18,true,false,NULL,nip_18_digit,NULL,Nomor Induk Pegawai
+nama_asn,Nama ASN,varchar,255,true,false,NULL,none,NULL,Denormalized dari tabel asn
+jenis_layanan_kepegawaian,Jenis Layanan,enum,NULL,true,false,NULL,none,"Data Induk,Kenaikan Pangkat,Mutasi,Gaji Tunjangan,Cuti,Penilaian Kinerja,Disiplin,Pensiun",Layanan kepegawaian spesifik
+pangkat_lama,Pangkat Lama,varchar,50,false,false,NULL,none,NULL,Untuk kenaikan pangkat
+pangkat_baru,Pangkat Baru,varchar,50,false,false,NULL,none,NULL,Untuk kenaikan pangkat
+golongan_lama,Golongan Lama,varchar,10,false,false,NULL,none,NULL,Untuk kenaikan pangkat
+golongan_baru,Golongan Baru,varchar,10,false,false,NULL,none,NULL,Untuk kenaikan pangkat
+jabatan_lama,Jabatan Lama,varchar,255,false,false,NULL,none,NULL,Untuk mutasi
+jabatan_baru,Jabatan Baru,varchar,255,false,false,NULL,none,NULL,Untuk mutasi
+tmt_kenaikan,TMT Kenaikan,date,NULL,false,false,NULL,none,NULL,Terhitung Mulai Tanggal
+nomor_sk,Nomor SK,varchar,100,false,false,NULL,none,NULL,Nomor SK kepegawaian
+tanggal_sk,Tanggal SK,date,NULL,false,false,NULL,none,NULL,Tanggal SK ditetapkan
+jenis_cuti,Jenis Cuti,enum,NULL,false,false,NULL,none,"Tahunan,Sakit,Besar,Melahirkan,Alasan Penting,Luar Tanggungan Negara",Untuk layanan cuti
+tanggal_mulai_cuti,Mulai Cuti,date,NULL,false,false,NULL,none,NULL,Tanggal mulai cuti
+tanggal_selesai_cuti,Selesai Cuti,date,NULL,false,false,NULL,none,NULL,Tanggal selesai cuti
+lama_cuti,Lama Cuti,int,11,false,false,NULL,none,NULL,Jumlah hari
+nilai_skp,Nilai SKP,decimal,"5,2",false,false,NULL,none,NULL,Nilai penilaian kinerja
+predikat_kinerja,Predikat,enum,NULL,false,false,NULL,none,"Sangat Baik,Baik,Cukup,Kurang,Buruk",Predikat penilaian kinerja
+jenis_sanksi,Jenis Sanksi,enum,NULL,false,false,NULL,none,"Ringan,Sedang,Berat",Untuk disiplin & sanksi
+uraian_sanksi,Uraian Sanksi,text,NULL,false,false,NULL,none,NULL,Deskripsi sanksi
+tanggal_pensiun,Tanggal Pensiun,date,NULL,false,false,NULL,none,NULL,Untuk pensiun
+jenis_pensiun,Jenis Pensiun,enum,NULL,false,false,NULL,none,"BUP (Batas Usia Pensiun),Atas Permintaan Sendiri,Alasan Lain",Jenis pensiun
+gaji_pokok,Gaji Pokok,decimal,"15,2",false,false,NULL,none,NULL,Untuk gaji & tunjangan
+total_tunjangan,Total Tunjangan,decimal,"15,2",false,false,NULL,none,NULL,Untuk gaji & tunjangan
+file_sk,File SK,varchar,255,false,false,NULL,none,NULL,Upload SK PDF
+file_pendukung,File Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kasubbag Kepegawaian,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Semua data kepegawaian sensitif
+status,Status,enum,NULL,true,false,pending,none,"pending,proses,disetujui,ditolak,selesai",Status proses
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

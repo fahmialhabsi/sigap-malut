@@ -1,69 +1,162 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
 
 export default function LoginPage() {
   const location = useLocation();
-  // const params = new URLSearchParams(location.search);
-  // Hapus roleParam karena tidak digunakan
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const params = new URLSearchParams(location.search);
+  const roleParam = params.get("role");
 
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
 
   // Mapping role/unit_kerja ke dashboard
+  // Keys should match the `value` used in LandingPage role buttons
   const dashboardMapping = {
     super_admin: "/dashboard/superadmin",
-    kepala_dinas: "/dashboard/superadmin",
-    Sekretariat: "/dashboard/sekretariat",
-    "Bidang Ketersediaan": "/dashboard/ketersediaan",
-    "Bidang Distribusi": "/dashboard/distribusi",
-    "Bidang Konsumsi": "/dashboard/konsumsi",
-    UPTD: "/dashboard/uptd",
+    gubernur: "/dashboard/superadmin",
+    sekretaris: "/dashboard/sekretariat",
     kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
     kepala_bidang_distribusi: "/dashboard/distribusi",
     kepala_bidang_konsumsi: "/dashboard/konsumsi",
-    "Bidang Distribusi dan Cadangan Pangan": "/dashboard/distribusi",
-    // Tambahkan mapping lain jika diperlukan
+    kepala_uptd: "/dashboard/uptd",
+    publik: "/dashboard-publik",
+    // Add more mappings if needed
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("LoginPage: handleSubmit fired", { email, password });
     setError("");
     setLoading(true);
 
-    const result = await login(email, password);
+    console.log("LoginPage: login function type", typeof login, {
+      hasLogin: !!login,
+    });
+    let result;
+    try {
+      if (typeof login !== "function")
+        throw new Error("authStore.login is not a function");
+      result = await login(email, password);
+      console.log("LoginPage: login result", result);
+    } catch (err) {
+      console.error("LoginPage: login threw error", err);
+      setError(err?.message || "Login gagal (client)");
+      setLoading(false);
+      return;
+    }
 
-    if (result.success) {
-      let user = null;
-      try {
-        user = JSON.parse(localStorage.getItem("user"));
-      } catch (e) {
-        // ignore JSON parse error
+    if (!result || !result.success) {
+      setError(result?.message || "Email atau password salah");
+      setLoading(false);
+      return;
+    }
+
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem("user"));
+    } catch (err) {
+      console.warn("LoginPage: failed to parse user from localStorage", err);
+    }
+
+    // Prioritize explicit role selected on LandingPage (via ?role=...)
+    if (roleParam) {
+      const mapped = dashboardMapping[roleParam];
+      console.log("LoginPage: roleParam", { roleParam, mapped });
+      if (mapped != null) {
+        const coerced =
+          typeof mapped === "string"
+            ? mapped
+            : mapped && typeof mapped.pathname === "string"
+              ? mapped.pathname
+              : String(mapped);
+        try {
+          navigate(coerced);
+        } catch (err) {
+          console.error("Navigate error (roleParam):", err, {
+            mapped,
+            coerced,
+          });
+          window.location.href = coerced;
+        }
+        setLoading(false);
+        return;
+      } else {
+        console.warn(
+          `LoginPage: unknown roleParam="${roleParam}". Falling back to user-derived dashboard.`,
+        );
+      }
+    }
+
+    // Fallback: derive from authenticated `user`
+    if (user) {
+      const roleKey = roleIdToName[user.role_id] || user.role;
+      // tolerate different unit field names returned by backend
+      const unitVal = user.unit_kerja || user.unit_id || user.unit || "";
+      const uk = unitVal ? String(unitVal).toLowerCase() : "";
+
+      let dashboardPath =
+        roleKey && dashboardMapping[roleKey] ? dashboardMapping[roleKey] : null;
+
+      // If roleKey is generic like "kepala_bidang", use unit to pick specific bidang
+      if (
+        !dashboardPath &&
+        String(roleKey || "")
+          .toLowerCase()
+          .startsWith("kepala_bidang")
+      ) {
+        if (uk.includes("ketersediaan"))
+          dashboardPath = "/dashboard/ketersediaan";
+        else if (uk.includes("distribusi"))
+          dashboardPath = "/dashboard/distribusi";
+        else if (uk.includes("konsumsi")) dashboardPath = "/dashboard/konsumsi";
+        else if (uk.includes("sekretariat"))
+          dashboardPath = "/dashboard/sekretariat";
+        else if (uk.includes("uptd")) dashboardPath = "/dashboard/uptd";
       }
 
-      const roleIdToName = {
-        "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
-        // ... tambahkan lainnya
-      };
+      // As a final fallback, if mapping still missing, try to derive purely from unit
+      if (!dashboardPath && uk) {
+        if (uk.includes("ketersediaan"))
+          dashboardPath = "/dashboard/ketersediaan";
+        else if (uk.includes("distribusi"))
+          dashboardPath = "/dashboard/distribusi";
+        else if (uk.includes("konsumsi")) dashboardPath = "/dashboard/konsumsi";
+        else if (uk.includes("sekretariat"))
+          dashboardPath = "/dashboard/sekretariat";
+        else if (uk.includes("uptd")) dashboardPath = "/dashboard/uptd";
+      }
 
-      if (user) {
-        // Prioritaskan role, lalu unit_kerja
-        let dashboardPath = null;
-        if (user.role && dashboardMapping[user.role]) {
-          dashboardPath = dashboardMapping[user.role];
-        } else if (user.unit_kerja && dashboardMapping[user.unit_kerja]) {
-          dashboardPath = dashboardMapping[user.unit_kerja];
+      console.log("LoginPage: redirect decision", {
+        roleKey,
+        dashboardPath,
+        user,
+      });
+
+      let coercedPath = dashboardPath;
+      if (coercedPath != null && typeof coercedPath !== "string") {
+        if (coercedPath && typeof coercedPath.pathname === "string")
+          coercedPath = coercedPath.pathname;
+        else coercedPath = String(coercedPath);
+      }
+
+      try {
+        navigate(coercedPath || "/dashboard");
+      } catch (err) {
+        console.error("Navigate error (fallback):", err, { coercedPath, user });
+        try {
+          window.location.href = coercedPath || "/dashboard";
+        } catch (e) {
+          console.error("window.location fallback failed", e);
         }
-        navigate(dashboardPath || "/dashboard");
-      } else {
-        navigate("/dashboard");
       }
     } else {
-      setError(result.message);
+      navigate("/dashboard");
     }
 
     setLoading(false);
@@ -138,34 +231,6 @@ export default function LoginPage() {
             {loading ? "Memproses..." : "Login"}
           </button>
         </form>
-
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-600 font-semibold mb-2">
-            Demo Credentials:
-          </p>
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>
-              • Super Admin:
-              <code>
-                super_admin-sekretariat-dinas-pangan-maluku-utara@dinpangan.go.id
-                / Admin123
-              </code>
-            </p>
-            <p>
-              • Kepala Dinas:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                kepala.dinas / Kadis123
-              </code>
-            </p>
-            <p>
-              • Staff:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                staff.sekretariat / Staff123
-              </code>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

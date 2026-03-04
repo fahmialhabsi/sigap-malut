@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
+import path from "path";
+import { fileURLToPath } from "url";
 import { sequelize, testConnection } from "./config/database.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
@@ -19,6 +21,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ESM __dirname shim
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Middleware
 app.use(helmet());
 app.use(
@@ -32,6 +38,12 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve master-data static files from repository root
+app.use(
+  "/master-data",
+  express.static(path.join(__dirname, "..", "master-data")),
+);
 
 // Request logging (development only)
 if (process.env.NODE_ENV === "development") {

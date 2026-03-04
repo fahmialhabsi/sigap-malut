@@ -1,142 +1,215 @@
-import React, { useEffect } from "react";
-import useAuthStore from "../stores/authStore";
-import { roleIdToName } from "../utils/roleMap";
+    return (
+      <div className="min-h-screen font-inter" style={{ background: '#fff' }}>
+        <div className="flex min-h-screen">
+          {/* Sidebar */}
+          <aside
+            className="flex flex-col items-center py-6"
+            style={{ width: 72, backgroundColor: "#06A657" }}
+          >
+            {/* LOGO */}
+            <div
+              className="bg-white rounded-lg flex items-center justify-center mb-8"
+              style={{ width: 36, height: 36 }}
+            >
+              <span className="text-[#06A657] font-bold text-xs">LOGO</span>
+            </div>
+            {/* Sidebar menu modul, urutan dan warna sesuai SVG */}
+            <SidebarItem label="Dash" textColor="#06A657" />
+            <SidebarItem label="Stok" textColor="#06A657" />
+            <SidebarItem label="Gudang" textColor="#0B5FFF" />
+            <SidebarItem label="Produksi" textColor="#F59E0B" />
+            <SidebarItem label="Target" textColor="#EF4444" />
+            <SidebarItem label="Laporan" textColor="#0B5FFF" />
+            <SidebarItem label="Approve" textColor="#06A657" />
+            <SidebarItem label="Agenda" textColor="#0B5FFF" />
+          </aside>
 
-export default function DashboardKetersediaan() {
-  const user = useAuthStore((state) => state.user);
-  const roleName = user ? roleIdToName[user.role_id] : null;
+          {/* Main area */}
+          <div className="flex-1 flex flex-col">
+            {/* Header */}
+            <header
+              className="flex items-center px-6"
+              style={{ height: 60, backgroundColor: "#07723A", boxShadow: '0 1px 2px rgba(0,0,0,0.08)' }}
+            >
+              {/* Logo kiri (36x36) */}
+              <div className="flex items-center">
+                <div
+                  className="bg-white rounded-lg flex items-center justify-center"
+                  style={{ width: 36, height: 36 }}
+                >
+                  <span className="text-[#07723A] font-bold text-xs">LOGO</span>
+                </div>
+                <span className="ml-6 text-2xl text-white font-bold font-inter">Ketersediaan</span>
+              </div>
+              <div className="flex-1" />
+              {/* Notifikasi bulat kuning kanan */}
+              <div className="flex items-center space-x-4 mr-6">
+                <NotificationBell />
+                <ProfileAvatar />
+              </div>
+            </header>
 
-  useEffect(() => {
-    if (
-      !user ||
-      !(
-        roleName === "kepala_bidang_ketersediaan" ||
-        roleName === "super_admin" ||
-        user.unit_kerja === "Bidang Ketersediaan"
-      )
-    ) {
-      window.location.href = "/landing";
-    }
-  }, [user, roleName]);
-  return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-500 to-green-800 font-inter">
-      {/* Sidebar */}
-      <aside className="w-20 bg-green-700 flex flex-col items-center py-6 space-y-5">
-        {/* LOGO */}
-        <div className="bg-white rounded-lg w-12 h-12 flex items-center justify-center mb-8">
-          {/* Replace below with <img src={logoUrl} ... /> if available */}
-          <span className="text-green-800 font-bold text-xs">LOGO</span>
+            <main className="flex-1 px-8 py-6" style={{ background: '#fff' }}>
+              {/* HERO ROW (6 cards, 160x60) */}
+              <div className="grid grid-cols-6 gap-4 mb-6">
+                <KpiCard title="Stok Total" color="green" />
+                <KpiCard title="Stok Kritis" color="blue" />
+                <KpiCard title="Produksi Hr." color="yellow" />
+                <KpiCard title="Target Bulan" color="red" />
+                <KpiCard title="Backlog" color="blue" />
+                <KpiCard title="Approve" color="yellow" />
+              </div>
+
+              {/* PANEL ROW 1 */}
+              <div className="grid grid-cols-2 gap-6 mb-6">
+                <PanelBox title="Tabel Stok By Komoditas" color="green">
+                  <FakeTable label1="Komoditas" label2="Stok" />
+                </PanelBox>
+                <PanelBox title="Grafik Tren Stok" color="blue">
+                  <PlaceholderChart />
+                </PanelBox>
+              </div>
+
+              {/* PANEL ROW 2 */}
+              <div className="grid grid-cols-2 gap-6 mb-6">
+                <PanelBox title="Log Produksi/Mutasi" color="yellow">
+                  <FakeList />
+                </PanelBox>
+                <PanelBox title="Approval Stok" color="red">
+                  <FakeTable label1="Nama" label2="Status" />
+                </PanelBox>
+              </div>
+
+              {/* NOTIF KRITIS (full width) */}
+              <PanelBox title="Notifikasi Kritis" color="yellow" fullWidth>
+                <ul className="text-red-700 space-y-1">
+                  <li>
+                    Stok Beras di Gudang A <span className="font-semibold">di bawah minimum!</span>
+                  </li>
+                  <li>Pengajuan Mutasi belum approve 2 hari</li>
+                  <li>Perubahan target produksi bulan ini</li>
+                </ul>
+              </PanelBox>
+            </main>
+
+            {/* Footer */}
+            <footer
+              style={{ height: 30, backgroundColor: "#07723A" }}
+              className="flex items-center px-6"
+            >
+              <span className="text-white text-xs">
+                SIGAP Malut v1 | Bidang Ketersediaan
+              </span>
+            </footer>
+          </div>
         </div>
-        {/* Menu Modules */}
-        <SidebarItem label="Dash" />
-        <SidebarItem label="Stok" />
-        <SidebarItem label="Gudang" />
-        <SidebarItem label="Produksi" />
-        <SidebarItem label="Target" />
-        <SidebarItem label="Laporan" />
-        <SidebarItem label="Approve" />
-        <SidebarItem label="Agenda" />
-      </aside>
+      </div>
+    );
+            </div>
 
-      {/* Main Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="h-16 bg-green-800 flex items-center px-8 shadow">
-          <h1 className="text-2xl text-white font-bold tracking-wide flex-1">
-            SIGAP · Bidang Ketersediaan
-          </h1>
-          <div className="flex items-center space-x-4">
-            <NotificationBell />
-            <ProfileAvatar />
-          </div>
-        </header>
+            {/* PANEL ROW 2 */}
+            <div className="grid grid-cols-2 gap-6">
+              <PanelBox title="Log Produksi/Mutasi" color="yellow">
+                <FakeList />
+              </PanelBox>
+              <PanelBox title="Approval Stok" color="red">
+                <FakeTable label1="Nama" label2="Status" />
+              </PanelBox>
+            </div>
 
-        <main className="flex-1 px-8 py-4 space-y-6">
-          {/* HERO ROW */}
-          <div className="grid grid-cols-6 gap-4">
-            <KpiCard title="Stok Total" color="green" />
-            <KpiCard title="Stok Kritis" color="blue" />
-            <KpiCard title="Produksi Hari Ini" color="yellow" />
-            <KpiCard title="Target Bulan" color="red" />
-            <KpiCard title="Backlog Gudang" color="blue" />
-            <KpiCard title="Approval Pending" color="yellow" />
-          </div>
-
-          {/* PANEL ROW 1 */}
-          <div className="grid grid-cols-2 gap-6">
-            <PanelBox title="Tabel Stok By Komoditas">
-              <FakeTable label1="Komoditas" label2="Stok" />
+            {/* NOTIF KRITIS (full width) */}
+            <PanelBox title="Notifikasi Kritis" color="yellow" fullWidth>
+              <ul className="text-red-700 space-y-1">
+                <li>
+                  Stok Beras di Gudang A{" "}
+                  <span className="font-semibold">di bawah minimum!</span>
+                </li>
+                <li>Pengajuan Mutasi belum approve 2 hari</li>
+                <li>Perubahan target produksi bulan ini</li>
+              </ul>
             </PanelBox>
-            <PanelBox title="Grafik Tren Stok">
-              <PlaceholderChart />
-            </PanelBox>
-          </div>
+          </main>
 
-          {/* PANEL ROW 2 */}
-          <div className="grid grid-cols-2 gap-6">
-            <PanelBox title="Log Produksi/Mutasi">
-              <FakeList />
-            </PanelBox>
-            <PanelBox title="Approval Stok">
-              <FakeTable label1="Nama" label2="Status" />
-            </PanelBox>
-          </div>
-
-          {/* NOTIF KRITIS */}
-          <PanelBox title="Notifikasi Kritis">
-            <ul className="text-red-700 space-y-1">
-              <li>
-                Stok Beras di Gudang A{" "}
-                <span className="font-semibold">di bawah minimum!</span>
-              </li>
-              <li>Pengajuan Mutasi belum approve 2 hari</li>
-              <li>Perubahan target produksi bulan ini</li>
-            </ul>
-          </PanelBox>
-        </main>
-        <footer className="h-8 bg-green-800 flex items-center text-xs text-yellow-200 px-10">
-          SIGAP Malut v1 | Bidang Ketersediaan
-        </footer>
+          {/* Footer (height 30, same green as header) */}
+          <footer
+            style={{ height: 30, backgroundColor: "#07723A" }}
+            className="flex items-center px-6"
+          >
+            <span className="text-white text-xs">
+              SIGAP Malut v1 | Bidang Ketersediaan
+            </span>
+          </footer>
+        </div>
       </div>
     </div>
   );
 }
 
-// Reusable Components
+/* ---------- Reusable components ---------- */
 
-function SidebarItem({ label }) {
+function SidebarItem({ label, textColor = "#06A657" }) {
   return (
-    <button className="w-10 h-10 text-xs text-green-900 bg-green-100 rounded-lg shadow hover:bg-green-300 mb-1">
+    <button
+      className="mb-2 flex items-center justify-center rounded-lg"
+      style={{
+        width: 40,
+        height: 40,
+        backgroundColor: "#f4f4f4",
+        color: textColor,
+        fontSize: 11,
+      }}
+      aria-label={label}
+    >
       {label}
     </button>
   );
 }
 
 function KpiCard({ title, color }) {
-  const bg =
-    color === "green"
-      ? "bg-green-100 border-green-700"
-      : color === "blue"
-        ? "bg-blue-100 border-blue-700"
-        : color === "yellow"
-          ? "bg-yellow-100 border-yellow-500"
-          : color === "red"
-            ? "bg-red-100 border-red-500"
-            : "bg-gray-100 border-gray-300";
+  const mapping = {
+    green: { border: "#06A657", title: "#06A657" },
+    blue: { border: "#0B5FFF", title: "#0B5FFF" },
+    yellow: { border: "#FACC15", title: "#FACC15" },
+    red: { border: "#EF4444", title: "#EF4444" },
+  };
+  const c = mapping[color] || mapping.green;
+
   return (
     <div
-      className={`rounded-lg border-2 shadow flex flex-col items-center py-4 px-2 ${bg}`}
+      className="rounded-lg border-2 shadow flex flex-col items-center justify-center"
+      style={{ height: 60, borderColor: c.border, backgroundColor: "#fff" }}
     >
-      <div className="font-semibold mb-2">{title}</div>
+      <div
+        className="font-semibold mb-1"
+        style={{ color: c.title, fontSize: 12 }}
+      >
+        {title}
+      </div>
       <div className="text-2xl font-bold text-gray-800">123</div>
     </div>
   );
 }
 
-function PanelBox({ title, children }) {
+function PanelBox({ title, children, color = "green", fullWidth = false }) {
+  const mapping = {
+    green: { border: "#06A657", title: "#06A657" },
+    blue: { border: "#0B5FFF", title: "#0B5FFF" },
+    yellow: { border: "#FACC15", title: "#FACC15" },
+    red: { border: "#EF4444", title: "#EF4444" },
+  };
+  const c = mapping[color] || mapping.green;
+
   return (
-    <section className="rounded-xl bg-white/90 shadow p-4 flex flex-col mb-2 border border-green-200">
-      <h2 className="font-bold text-green-800 mb-2">{title}</h2>
+    <section
+      className="rounded-xl bg-white shadow p-4 mb-2"
+      style={{
+        border: `2px solid ${c.border}`,
+        minHeight: fullWidth ? 48 : 120,
+      }}
+    >
+      <h2 className="font-bold mb-3" style={{ color: c.title }}>
+        {title}
+      </h2>
       <div>{children}</div>
     </section>
   );
@@ -147,18 +220,18 @@ function FakeTable({ label1, label2 }) {
     <table className="w-full text-xs">
       <thead>
         <tr>
-          <th className="text-left">{label1}</th>
+          <th className="text-left pr-4">{label1}</th>
           <th className="text-left">{label2}</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Beras</td>
-          <td>2100 kg</td>
+          <td className="py-1">Beras</td>
+          <td className="py-1">2.100 kg</td>
         </tr>
         <tr>
-          <td>Jagung</td>
-          <td>700 kg</td>
+          <td className="py-1">Jagung</td>
+          <td className="py-1">700 kg</td>
         </tr>
       </tbody>
     </table>
@@ -175,18 +248,47 @@ function FakeList() {
   );
 }
 
-function NotificationBell() {
+function PlaceholderChart() {
   return (
-    <span className="inline-block w-7 h-7 bg-yellow-300 rounded-full flex items-center justify-center text-yellow-900">
+    <div
+      className="w-full h-32 rounded-md flex items-center justify-center text-sm text-gray-500"
+      style={{ backgroundColor: "#ffffff" }}
+    >
+      Grafik (placeholder)
+    </div>
+  );
+}
+
+function NotificationBell() {
+  // yellow circular indicator similar to the circle on the header in the SVG
+  return (
+    <div
+      className="flex items-center justify-center rounded-full"
+      style={{
+        width: 36,
+        height: 36,
+        backgroundColor: "#FACC15",
+        color: "#7a5a00",
+      }}
+      aria-hidden
+    >
       🔔
-    </span>
+    </div>
   );
 }
 
 function ProfileAvatar() {
   return (
-    <span className="inline-block w-8 h-8 rounded-full bg-green-300 flex items-center justify-center text-green-700">
+    <div
+      className="flex items-center justify-center rounded-full"
+      style={{
+        width: 36,
+        height: 36,
+        backgroundColor: "#D1FAE5",
+        color: "#065f46",
+      }}
+    >
       KB
-    </span>
+    </div>
   );
 }
