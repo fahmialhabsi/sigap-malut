@@ -13,24 +13,26 @@ import useAuthStore from "../stores/authStore";
 
 export default function DashboardSuperAdminLayout() {
   const user = useAuthStore((state) => state.user);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
   const roleName = user ? roleIdToName[user.role_id] : null;
 
   useEffect(() => {
-    if (
-      !user ||
-      !(
-        roleName === "super_admin" ||
-        user.unit_kerja === "Sekretariat Dinas" ||
-        user.unit_kerja === "Bidang Distribusi" ||
-        user.unit_kerja === "Bidang Konsumsi" ||
-        user.unit_kerja === "Publik" ||
-        user.unit_kerja === "UPTD" ||
-        user.unit_kerja === "Kepala Dinas"
-      )
-    ) {
+    // Wait until auth store is initialized before deciding to redirect
+    if (!isInitialized) return;
+
+    const allowed =
+      roleName === "super_admin" ||
+      user?.unit_kerja === "Sekretariat Dinas" ||
+      user?.unit_kerja === "Bidang Distribusi" ||
+      user?.unit_kerja === "Bidang Konsumsi" ||
+      user?.unit_kerja === "Publik" ||
+      user?.unit_kerja === "UPTD" ||
+      user?.unit_kerja === "Kepala Dinas";
+
+    if (!user || !allowed) {
       window.location.href = "/landing";
     }
-  }, [user, roleName]);
+  }, [user, roleName, isInitialized]);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-blue-600 to-green-800 font-inter">

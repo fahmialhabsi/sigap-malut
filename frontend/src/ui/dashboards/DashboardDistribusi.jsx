@@ -4,15 +4,13 @@ import useAuthStore from "../../stores/authStore";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import FieldMappingPreview from "../../components/FieldMappingPreview";
 import DashboardDistribusiLayout from "../../layouts/DashboardDistribusiLayout";
+import distribusiModules from "../../data/distribusiModules";
 
 export default function DashboardDistribusi() {
   const user = useAuthStore((state) => state.user);
 
-  const distribusiModules = [
-    { id: "D001", name: "Data pasar" },
-    { id: "D002", name: "Harga pangan" },
-    // Tambahkan modul lain sesuai kebutuhan
-  ];
+  // local fallback modules loaded from master-data
+  const _distribusiModules = distribusiModules;
 
   useEffect(() => {
     if (user && user.role === "kepala_bidang_distribusi") {
@@ -37,7 +35,7 @@ export default function DashboardDistribusi() {
   }
 
   return (
-    <DashboardDistribusiLayout>
+    <DashboardDistribusiLayout fallbackModules={_distribusiModules}>
       {/* Konten dashboard distribusi: KPI, tabel, dsb. Tanpa header dan subjudul */}
       {/* ...masukkan panel-panel dashboard di sini... */}
     </DashboardDistribusiLayout>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
 
 export default function LoginPage() {
   const location = useLocation();
@@ -30,46 +31,132 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("LoginPage: handleSubmit fired", { email, password });
     setError("");
     setLoading(true);
 
-    const result = await login(email, password);
+    console.log("LoginPage: login function type", typeof login, {
+      hasLogin: !!login,
+    });
+    let result;
+    try {
+      if (typeof login !== "function")
+        throw new Error("authStore.login is not a function");
+      result = await login(email, password);
+      console.log("LoginPage: login result", result);
+    } catch (err) {
+      console.error("LoginPage: login threw error", err);
+      setError(err?.message || "Login gagal (client)");
+      setLoading(false);
+      return;
+    }
 
-    if (result.success) {
-      let user = null;
-      try {
-        user = JSON.parse(localStorage.getItem("user"));
-      } catch (err) {
-        // ignore JSON parse error
-      }
+    if (!result || !result.success) {
+      setError(result?.message || "Email atau password salah");
+      setLoading(false);
+      return;
+    }
 
-      // Prioritize explicit role selected on LandingPage (via ?role=...)
-      if (roleParam) {
-        if (dashboardMapping[roleParam]) {
-          navigate(dashboardMapping[roleParam]);
-          setLoading(false);
-          return;
-        } else {
-          console.warn(
-            `LoginPage: unknown roleParam="${roleParam}". Falling back to user-derived dashboard.`,
-          );
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem("user"));
+    } catch (err) {
+      console.warn("LoginPage: failed to parse user from localStorage", err);
+    }
+
+    // Prioritize explicit role selected on LandingPage (via ?role=...)
+    if (roleParam) {
+      const mapped = dashboardMapping[roleParam];
+      console.log("LoginPage: roleParam", { roleParam, mapped });
+      if (mapped != null) {
+        const coerced =
+          typeof mapped === "string"
+            ? mapped
+            : mapped && typeof mapped.pathname === "string"
+              ? mapped.pathname
+              : String(mapped);
+        try {
+          navigate(coerced);
+        } catch (err) {
+          console.error("Navigate error (roleParam):", err, {
+            mapped,
+            coerced,
+          });
+          window.location.href = coerced;
         }
-      }
-
-      // Fallback: derive from authenticated `user`
-      if (user) {
-        let dashboardPath = null;
-        if (user.role && dashboardMapping[user.role]) {
-          dashboardPath = dashboardMapping[user.role];
-        } else if (user.unit_kerja && dashboardMapping[user.unit_kerja]) {
-          dashboardPath = dashboardMapping[user.unit_kerja];
-        }
-        navigate(dashboardPath || "/dashboard");
+        setLoading(false);
+        return;
       } else {
-        navigate("/dashboard");
+        console.warn(
+          `LoginPage: unknown roleParam="${roleParam}". Falling back to user-derived dashboard.`,
+        );
+      }
+    }
+
+    // Fallback: derive from authenticated `user`
+    if (user) {
+      const roleKey = roleIdToName[user.role_id] || user.role;
+      // tolerate different unit field names returned by backend
+      const unitVal = user.unit_kerja || user.unit_id || user.unit || "";
+      const uk = unitVal ? String(unitVal).toLowerCase() : "";
+
+      let dashboardPath =
+        roleKey && dashboardMapping[roleKey] ? dashboardMapping[roleKey] : null;
+
+      // If roleKey is generic like "kepala_bidang", use unit to pick specific bidang
+      if (
+        !dashboardPath &&
+        String(roleKey || "")
+          .toLowerCase()
+          .startsWith("kepala_bidang")
+      ) {
+        if (uk.includes("ketersediaan"))
+          dashboardPath = "/dashboard/ketersediaan";
+        else if (uk.includes("distribusi"))
+          dashboardPath = "/dashboard/distribusi";
+        else if (uk.includes("konsumsi")) dashboardPath = "/dashboard/konsumsi";
+        else if (uk.includes("sekretariat"))
+          dashboardPath = "/dashboard/sekretariat";
+        else if (uk.includes("uptd")) dashboardPath = "/dashboard/uptd";
+      }
+
+      // As a final fallback, if mapping still missing, try to derive purely from unit
+      if (!dashboardPath && uk) {
+        if (uk.includes("ketersediaan"))
+          dashboardPath = "/dashboard/ketersediaan";
+        else if (uk.includes("distribusi"))
+          dashboardPath = "/dashboard/distribusi";
+        else if (uk.includes("konsumsi")) dashboardPath = "/dashboard/konsumsi";
+        else if (uk.includes("sekretariat"))
+          dashboardPath = "/dashboard/sekretariat";
+        else if (uk.includes("uptd")) dashboardPath = "/dashboard/uptd";
+      }
+
+      console.log("LoginPage: redirect decision", {
+        roleKey,
+        dashboardPath,
+        user,
+      });
+
+      let coercedPath = dashboardPath;
+      if (coercedPath != null && typeof coercedPath !== "string") {
+        if (coercedPath && typeof coercedPath.pathname === "string")
+          coercedPath = coercedPath.pathname;
+        else coercedPath = String(coercedPath);
+      }
+
+      try {
+        navigate(coercedPath || "/dashboard");
+      } catch (err) {
+        console.error("Navigate error (fallback):", err, { coercedPath, user });
+        try {
+          window.location.href = coercedPath || "/dashboard";
+        } catch (e) {
+          console.error("window.location fallback failed", e);
+        }
       }
     } else {
-      setError(result.message);
+      navigate("/dashboard");
     }
 
     setLoading(false);
@@ -144,30 +231,6 @@ export default function LoginPage() {
             {loading ? "Memproses..." : "Login"}
           </button>
         </form>
-
-        {/* Demo Credentials (match backend seed) */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-600 font-semibold mb-2">
-            Demo Credentials:
-          </p>
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>
-              • Super Admin: <code>superadmin@dinpangan.go.id / Admin123</code>
-            </p>
-            <p>
-              • Sekretaris:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                sekretaris@dinpangan.go.id / Staff123
-              </code>
-            </p>
-            <p>
-              • Kepala Bidang Distribusi:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                kabiddistribusi@dinpangan.go.id / Distribusi123
-              </code>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

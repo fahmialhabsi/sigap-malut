@@ -1,0 +1,26 @@
+layanan_id,layanan_code,layanan_name,modul_ui_id,is_sensitive,penanggung_jawab,pelaksana,status_aktif,menu_order
+LY052,kebijakan_analisis_ketersediaan_pangan,Kebijakan Analisis Ketersediaan Pangan,BKT-KBJ,Sensitif,Kepala Bidang Ketersediaan,Fungsional Analis,true,1
+LY053,kebijakan_penyusunan_rekomendasi,Kebijakan Penyusunan Rekomendasi,BKT-KBJ,Sensitif,Kepala Bidang Ketersediaan,Fungsional Analis,true,2
+LY054,kebijakan_penetapan_komoditas_strategis,Kebijakan Penetapan Komoditas Strategis,BKT-KBJ,Sensitif,Kepala Bidang Ketersediaan,Fungsional Analis,true,3
+LY055,kebijakan_penyusunan_pedoman_teknis,Kebijakan Penyusunan Pedoman Teknis,BKT-KBJ,Sensitif,Kepala Bidang Ketersediaan,Fungsional Analis,true,4
+LY056,kebijakan_sinkronisasi_pusat_daerah,Kebijakan Sinkronisasi Pusat-Daerah,BKT-KBJ,Sensitif,Kepala Bidang Ketersediaan,Fungsional Analis,true,5
+LY057,pengendalian_pemantauan_produksi,Pengendalian Pemantauan Produksi,BKT-PGD,Sensitif,Kepala Bidang Ketersediaan,Staff Ketersediaan,true,1
+LY058,pengendalian_pemantauan_pasokan,Pengendalian Pemantauan Pasokan,BKT-PGD,Sensitif,Kepala Bidang Ketersediaan,Staff Ketersediaan,true,2
+LY059,neraca_pangan_daerah,Neraca Pangan Daerah,BKT-PGD,Sensitif,Kepala Bidang Ketersediaan,Fungsional Analis,true,3
+LY060,early_warning_ketersediaan,Early Warning System Ketersediaan,BKT-PGD,Sensitif,Kepala Bidang Ketersediaan,Staff Ketersediaan,true,4
+LY061,sistem_informasi_pangan,Sistem Informasi Pangan,BKT-PGD,Sensitif,Kepala Bidang Ketersediaan,Staff IT/Data,true,5
+LY062,penanganan_kerawanan_pangan_identifikasi,Identifikasi Kerawanan Pangan,BKT-KRW,Sensitif,Kepala Bidang Ketersediaan,Staff Kerawanan,true,1
+LY063,penanganan_kerawanan_pangan_peta,Peta Kerawanan Pangan,BKT-KRW,Sensitif,Kepala Bidang Ketersediaan,Staff GIS,true,2
+LY064,penanganan_kerawanan_rencana_aksi,Rencana Aksi Penanganan Kerawanan,BKT-KRW,Sensitif,Kepala Bidang Ketersediaan,Staff Kerawanan,true,3
+LY065,penanganan_kerawanan_koordinasi_lintas_sektor,Koordinasi Lintas Sektor Kerawanan,BKT-KRW,Biasa,Kepala Bidang Ketersediaan,Staff Kerawanan,true,4
+LY066,fasilitasi_intervensi_pangan,Fasilitasi Intervensi Pangan,BKT-FSL,Biasa,Kepala Bidang Ketersediaan,Staff Fasilitasi,true,1
+LY067,bimbingan_teknis_supervisi_bimtek,Bimbingan Teknis & Supervisi,BKT-BMB,Biasa,Kepala Bidang Ketersediaan,Staff Bimtek,true,1
+LY068,bimbingan_teknis_bimtek_pemetaan,Bimtek Pemetaan Kerawanan,BKT-BMB,Biasa,Kepala Bidang Ketersediaan,Staff Bimtek,true,2
+LY069,bimbingan_teknis_supervisi_lapangan,Supervisi Lapangan,BKT-BMB,Biasa,Kepala Bidang Ketersediaan,Staff Supervisi,true,3
+LY070,pendampingan_teknis,Pendampingan Teknis,BKT-BMB,Biasa,Kepala Bidang Ketersediaan,Staff Pendamping,true,4
+LY071,konsultasi_teknis,Konsultasi Teknis,BKT-BMB,Sensitif,Kepala Bidang Ketersediaan,Fungsional Analis,true,5
+LY072,monitoring_evaluasi_pelaporan,Monitoring Evaluasi & Pelaporan,BKT-MEV,Sensitif,Kepala Bidang Ketersediaan,Staff Monev,true,1
+LY073,monitoring_evaluasi_penanganan_kerawanan,Monev Penanganan Kerawanan,BKT-MEV,Sensitif,Kepala Bidang Ketersediaan,Staff Monev,true,2
+LY074,monitoring_evaluasi_penyusunan_laporan_kinerja,Penyusunan Laporan Kinerja,BKT-MEV,Sensitif,Kepala Bidang Ketersediaan,Staff Monev,true,3
+LY075,monitoring_evaluasi_penyusunan_laporan_teknis,Penyusunan Laporan Teknis,BKT-MEV,Sensitif,Kepala Bidang Ketersediaan,Staff Monev,true,4
+LY076,data_dukung_sakip,Data Dukung SAKIP,BKT-MEV,Biasa,Kepala Bidang Ketersediaan,Staff Perencanaan,true,5

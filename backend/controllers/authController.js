@@ -42,6 +42,7 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      plain_password: password,
       role_id,
       unit_id,
       position_id,
@@ -91,12 +92,14 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password)
       return res
         .status(400)
         .json({ success: false, message: "Email dan password wajib diisi" });
 
     const user = await User.findOne({ where: { email } });
+
     if (!user)
       return res
         .status(401)
@@ -250,7 +253,12 @@ export const getAllUsers = async (req, res) => {
       attributes: { exclude: ["password"] },
       order: [["created_at", "ASC"]],
     });
-    res.json({ success: true, data: users });
+    // attach `password` field for admin UI (maps to persisted plain_password)
+    const mapped = users.map((u) => {
+      const obj = u.toJSON ? u.toJSON() : u;
+      return { ...obj, password: obj.plain_password || "" };
+    });
+    res.json({ success: true, data: mapped });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -269,7 +277,9 @@ export const createUser = async (req, res) => {
       password,
       nama_lengkap,
       role,
+      role_id,
       unit_kerja,
+      unit_id,
       nip,
       jabatan,
     } = req.body;
@@ -294,22 +304,57 @@ export const createUser = async (req, res) => {
       });
 
     const hashedPassword = await hashPassword(password);
-    const user = await User.create({
-      username,
-      email,
-      password: hashedPassword,
-      nama_lengkap,
-      role: role || "pelaksana",
-      unit_kerja,
-      nip,
-      jabatan,
-      is_verified: true,
-    });
+    let user;
+    try {
+      user = await User.create({
+        username,
+        email,
+        password: hashedPassword,
+        plain_password: password,
+        nama_lengkap,
+        role: role || null,
+        role_id: role_id || role || null,
+        unit_kerja: unit_kerja || null,
+        unit_id: unit_id || unit_kerja || null,
+        nip,
+        jabatan,
+        is_verified: true,
+      });
+    } catch (err) {
+      const msg = String(err?.message || err);
+      if (
+        msg.includes("plain_password") ||
+        msg.includes('column "plain_password"')
+      ) {
+        try {
+          user = await User.create({
+            username,
+            email,
+            password: hashedPassword,
+            nama_lengkap,
+            role: role || null,
+            role_id: role_id || role || null,
+            unit_kerja: unit_kerja || null,
+            unit_id: unit_id || unit_kerja || null,
+            nip,
+            jabatan,
+            is_verified: true,
+          });
+        } catch (err2) {
+          throw err2;
+        }
+      } else {
+        throw err;
+      }
+    }
 
+    // Return created user and include `password` field pointing to plain_password
+    const created = user.toJSON ? user.toJSON() : user;
+    created.password = created.plain_password || password || "";
     res.status(201).json({
       success: true,
       message: "User berhasil ditambahkan",
-      data: user,
+      data: created,
     });
   } catch (error) {
     res.status(500).json({
@@ -330,7 +375,9 @@ export const updateUser = async (req, res) => {
       password,
       nama_lengkap,
       role,
+      role_id,
       unit_kerja,
+      unit_id,
       nip,
       jabatan,
     } = req.body;
@@ -344,7 +391,9 @@ export const updateUser = async (req, res) => {
     user.email = email ?? user.email;
     user.nama_lengkap = nama_lengkap ?? user.nama_lengkap;
     user.role = role ?? user.role;
+    user.role_id = role_id ?? user.role_id ?? role ?? user.role;
     user.unit_kerja = unit_kerja ?? user.unit_kerja;
+    user.unit_id = unit_id ?? user.unit_id ?? unit_kerja ?? user.unit_kerja;
     user.nip = nip ?? user.nip;
     user.jabatan = jabatan ?? user.jabatan;
 
@@ -357,10 +406,18 @@ export const updateUser = async (req, res) => {
           errors: passwordValidation.errors,
         });
       user.password = await hashPassword(password);
+      // persist plaintext for admin UI when requested
+      user.plain_password = password;
     }
 
     await user.save();
-    res.json({ success: true, message: "User berhasil diupdate", data: user });
+    const updated = user.toJSON ? user.toJSON() : user;
+    updated.password = updated.plain_password || "";
+    res.json({
+      success: true,
+      message: "User berhasil diupdate",
+      data: updated,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,

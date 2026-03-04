@@ -1,0 +1,35 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,LY049,none,NULL,FK ke layanan_menpanrb
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Bulan periode laporan
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+bulan,Bulan,int,2,true,false,NULL,none,NULL,Bulan (1-12)
+rencana_distribusi,Rencana Distribusi (Ton),decimal,"15,2",false,false,NULL,none,NULL,Rencana distribusi bulan ini
+realisasi_distribusi,Realisasi Distribusi (Ton),decimal,"15,2",false,false,NULL,none,NULL,Realisasi distribusi
+persentase_realisasi,Persentase Realisasi,decimal,"5,2",false,false,NULL,none,NULL,Auto-calculate
+inflasi_pangan_persen,Inflasi Pangan (%),decimal,"5,2",false,false,NULL,none,NULL,Inflasi bulan ini
+target_inflasi_tpid,Target TPID (%),decimal,"5,2",false,false,2.50,none,NULL,Target TPID
+status_inflasi,Status Inflasi,enum,NULL,false,false,NULL,none,"On Target,Warning,Alert",Status inflasi
+harga_stabil,Harga Stabil,int,11,false,false,NULL,none,NULL,Jumlah komoditas harga stabil
+harga_naik,Harga Naik,int,11,false,false,NULL,none,NULL,Jumlah komoditas harga naik
+harga_turun,Harga Turun,int,11,false,false,NULL,none,NULL,Jumlah komoditas harga turun
+operasi_pasar_dilakukan,Operasi Pasar,int,11,false,false,NULL,none,NULL,Jumlah operasi pasar dilakukan
+volume_operasi_pasar,Volume Operasi Pasar (Ton),decimal,"15,2",false,false,NULL,none,NULL,Total volume operasi pasar
+cppd_stok,Stok CPPD (Ton),decimal,"15,2",false,false,NULL,none,NULL,Stok cadangan pangan daerah
+cppd_pelepasan,Pelepasan CPPD (Ton),decimal,"15,2",false,false,NULL,none,NULL,CPPD yang dilepas
+cbp_bulog_stok,Stok CBP BULOG (Ton),decimal,"15,2",false,false,NULL,none,NULL,Cadangan Beras Pemerintah
+distribusi_antar_wilayah,Distribusi Antar Wilayah (Ton),decimal,"15,2",false,false,NULL,none,NULL,Volume distribusi antar daerah
+analisis,Analisis,text,NULL,false,false,NULL,none,NULL,Analisis kondisi distribusi
+kendala,Kendala,text,NULL,false,false,NULL,none,NULL,Kendala yang dihadapi
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi tindakan
+sumber_data,Sumber Data,varchar,255,false,false,Bidang Distribusi & Cadangan Pangan,none,NULL,Dari bidang mana
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan PDF
+file_data_pendukung,File Data Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Sekretaris,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,Bidang Distribusi,none,NULL,Yang menyusun
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi data
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

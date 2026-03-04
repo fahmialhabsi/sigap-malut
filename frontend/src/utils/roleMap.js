@@ -11,3 +11,10 @@ export const roleIdToName = {
   "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
   "80dcf548-d1c4-476d-922c-1e023a043e80": "viewer",
 };
+
+// inverse mapping: role name -> role id
+export const roleNameToId = Object.keys(roleIdToName).reduce((acc, id) => {
+  const name = roleIdToName[id];
+  if (name) acc[name] = id;
+  return acc;
+}, {});
