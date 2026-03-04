@@ -11,6 +11,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { roleIdToName } from "../utils/roleMap";
+import api from "../utils/api";
 
 Chart.register(
   CategoryScale,
@@ -22,11 +23,13 @@ Chart.register(
   Legend,
 );
 
-export default function DashboardDistribusiSuperModern() {
+export default function DashboardDistribusiSuperModern({
+  fallbackModules = [],
+}) {
   // State
   const sidebarOpen = window.innerWidth > 768;
   const [avatarOpen, setAvatarOpen] = useState(false);
-  const [modules, setModules] = useState([]);
+  const [modules, setModules] = useState(fallbackModules || []);
   const [menuAktif, setMenuAktif] = useState("");
   const [user, setUser] = useState(null);
   const [tableRows, setTableRows] = useState([]);
@@ -35,75 +38,123 @@ export default function DashboardDistribusiSuperModern() {
   const [notifikasi, setNotifikasi] = useState([]); // PATCH: Digunakan!
   const [authChecked, setAuthChecked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const lastAuthFetch = useRef(0);
+  const lastModulesFetch = useRef(0);
 
   // Ambil info user & role dari backend
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
+    const now = Date.now();
+    if (now - lastAuthFetch.current < 5000) return;
+    lastAuthFetch.current = now;
+
+    let mounted = true;
+    api
+      .get("/auth/me")
+      .then((res) => {
+        const data = res.data;
+        if (!mounted) return;
         setUser(data.data);
         setAuthChecked(true);
-        const roleName = data.data ? roleIdToName[data.data.role_id] : null;
-        if (
-          !data.data ||
-          !(
-            roleName === "kepala_bidang_distribusi" ||
-            roleName === "super_admin" ||
-            data.data.unit_kerja === "Bidang Distribusi"
-          )
-        ) {
+        const roleId = data.data ? (data.data.role_id ?? data.data.role) : null;
+        let roleName = null;
+        if (roleId !== null && roleId !== undefined) {
+          roleName =
+            roleIdToName[String(roleId)] || roleIdToName[roleId] || null;
+        }
+        const jabatan = data.data?.jabatan
+          ? String(data.data.jabatan).toLowerCase()
+          : "";
+        const isDistribusi =
+          roleName === "kepala_bidang_distribusi" ||
+          roleName === "super_admin" ||
+          // accept generic kepala_bidang roles (e.g. kepala_bidang)
+          (roleName &&
+            roleName.startsWith &&
+            roleName.startsWith("kepala_bidang")) ||
+          data.data?.unit_kerja === "Bidang Distribusi" ||
+          jabatan.includes("kepala bidang") ||
+          jabatan.includes("kepala");
+
+        if (!data.data || !isDistribusi) {
           window.location.href = "/landing";
         }
       })
       .catch(() => {
+        if (!mounted) return;
         setAuthChecked(true);
         window.location.href = "/landing";
       });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Ambil modul sidebar bidang distribusi
   useEffect(() => {
     if (!authChecked) return;
-    fetch("/api/modules")
-      .then((res) => res.json())
-      .then((data) => {
+    const now = Date.now();
+    if (now - lastModulesFetch.current < 5000) return;
+    lastModulesFetch.current = now;
+
+    let mounted = true;
+    api
+      .get("/modules")
+      .then((res) => {
+        if (!mounted) return;
+        const data = res.data;
         const distribusi = data.data?.filter(
           (row) => row.bidang === "Bidang Distribusi" && row.is_active,
         );
-        setModules(distribusi || []);
-        if (distribusi?.length) setMenuAktif(distribusi[0].nama_modul);
-      });
+        // prefer API modules when available, otherwise keep fallbackModules
+        if (distribusi && distribusi.length) {
+          setModules(distribusi);
+          setMenuAktif((m) => m || distribusi[0].nama_modul);
+        } else if (fallbackModules && fallbackModules.length) {
+          // fallback: use provided static modules
+          setModules(fallbackModules);
+          setMenuAktif((m) => m || fallbackModules[0].name);
+        }
+      })
+      .finally(() => {});
+
+    return () => {
+      mounted = false;
+    };
   }, [authChecked]);
 
   // Ambil data utama sesuai modul aktif
   useEffect(() => {
     if (!menuAktif) return;
-    const active = modules.find((m) => m.nama_modul === menuAktif);
+    const active = modules.find((m) => {
+      const name = m.nama_modul ?? m.name ?? m.id ?? m.modul_id ?? null;
+      return name === menuAktif;
+    });
     if (!active) return;
 
-    // Fetch tableRows
-    fetch(`/api/tables/${active.tabel_name}`)
-      .then((res) => res.json())
-      .then((data) => setTableRows(data.data || []))
-      .finally(() => setLoading(false));
+    // if module provides tabel_name, use existing table-driven UI
+    if (active.tabel_name) {
+      setLoading(true);
+      api
+        .get(`/tables/${active.tabel_name}`)
+        .then((res) => setTableRows(res.data.data || []))
+        .finally(() => setLoading(false));
 
-    // Fetch KPI
-    fetch(`/api/tables/${active.tabel_name}`)
-      .then((res) => res.json())
-      .then((data) =>
+      // KPI
+      api.get(`/tables/${active.tabel_name}`).then((res) => {
+        const data = res.data;
         setKpi([
           {
             title: "Total Data",
             value: data.count || (data.data ? data.data.length : 0),
             color: "blue",
           },
-        ]),
-      );
+        ]);
+      });
 
-    // Fetch Chart
-    fetch(`/api/tables/${active.tabel_name}`)
-      .then((res) => res.json())
-      .then((data) => {
+      // Chart
+      api.get(`/tables/${active.tabel_name}`).then((res) => {
+        const data = res.data;
         if (!data.data || !Array.isArray(data.data)) return;
         const perBulan = {};
         data.data.forEach((row) => {
@@ -127,11 +178,31 @@ export default function DashboardDistribusiSuperModern() {
         });
       });
 
-    // Notifikasi
-    fetch("/api/notification")
-      .then((res) => res.json())
-      .then((data) => setNotifikasi(data || []));
+      // Notifikasi
+      api.get("/notification").then((res) => setNotifikasi(res.data || []));
+      // ensure dynamic form cleared
+      setDynamicFormModule(null);
+    } else if (active.fields && Array.isArray(active.fields)) {
+      // fallback: the static module describes fields; render a dynamic form
+      setTableRows([]);
+      setKpi([
+        { title: "Fields", value: active.fields.length, color: "yellow" },
+      ]);
+      setChart({ labels: [], datasets: [] });
+      setNotifikasi([]);
+      setDynamicFormModule(active);
+    } else {
+      // unknown shape: clear displays
+      setTableRows([]);
+      setKpi([]);
+      setChart({ labels: [], datasets: [] });
+      setNotifikasi([]);
+      setDynamicFormModule(null);
+    }
   }, [menuAktif, modules]);
+
+  // Dynamic form state when a fallback module is active
+  const [dynamicFormModule, setDynamicFormModule] = useState(null);
 
   // Avatar logic
   const avatarRef = useRef();
@@ -176,15 +247,20 @@ export default function DashboardDistribusiSuperModern() {
           />
         </div>
         <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
-          {modules.map((modul) => (
-            <SidebarItem
-              key={modul.modul_id}
-              label={modul.nama_modul}
-              active={menuAktif === modul.nama_modul}
-              sidebarOpen={sidebarOpen}
-              onClick={() => setMenuAktif(modul.nama_modul)}
-            />
-          ))}
+          {modules.map((modul) => {
+            const label = modul.nama_modul || modul.name || modul.id || "-";
+            const key = modul.modul_id || modul.id || label;
+            const canonical = modul.nama_modul || modul.name || label;
+            return (
+              <SidebarItem
+                key={key}
+                label={label}
+                active={menuAktif === canonical}
+                sidebarOpen={sidebarOpen}
+                onClick={() => setMenuAktif(canonical)}
+              />
+            );
+          })}
         </nav>
         <div className="py-6 w-full text-xs text-blue-100/70 text-center tracking-wide">
           {sidebarOpen ? "SIGAP Malut" : "SIGAP"}
@@ -265,7 +341,11 @@ export default function DashboardDistribusiSuperModern() {
           </div>
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
             <PanelBox title={`Tabel ${menuAktif}`}>
-              <DataTable data={tableRows} />
+              {dynamicFormModule ? (
+                <DynamicForm module={dynamicFormModule} />
+              ) : (
+                <DataTable data={tableRows} />
+              )}
             </PanelBox>
             <PanelBox title="Grafik Tren Distribusi">
               <div className="h-56 flex items-center justify-center">
@@ -442,6 +522,112 @@ function DataTable({ data }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+function DynamicForm({ module }) {
+  const initial = {};
+  const fields = module.fields || [];
+  fields.forEach((f) => {
+    const key = f.field_name || f.name || f.id || f.key || "field";
+    initial[key] = "";
+  });
+  const [values, setValues] = useState(initial);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const init = {};
+    fields.forEach((f) => {
+      const key = f.field_name || f.name || f.id || f.key || "field";
+      init[key] = "";
+    });
+    setValues(init);
+    setSaved(false);
+  }, [module]);
+
+  const handleChange = (k, v) => setValues((s) => ({ ...s, [k]: v }));
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    try {
+      const existing = JSON.parse(
+        localStorage.getItem("distribusi_demo_submissions") || "[]",
+      );
+      existing.push({
+        module: module.name || module.nama_modul || module.id,
+        created: Date.now(),
+        values,
+      });
+      localStorage.setItem(
+        "distribusi_demo_submissions",
+        JSON.stringify(existing),
+      );
+      console.log("Saved demo submission:", { module, values });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (!fields || !fields.length)
+    return (
+      <div className="text-sm text-blue-100">
+        Tidak ada field untuk modul ini.
+      </div>
+    );
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {fields.map((f, idx) => {
+          const key = f.field_name || f.name || f.id || f.key || `field_${idx}`;
+          const label = f.label || f.title || key;
+          const type = (f.type || "string").toLowerCase();
+          if (type.includes("text") || type.includes("memo")) {
+            return (
+              <div key={key}>
+                <label className="text-xs text-blue-200 mb-1 block">
+                  {label}
+                </label>
+                <textarea
+                  className="w-full p-2 rounded bg-blue-900/40"
+                  value={values[key] || ""}
+                  onChange={(e) => handleChange(key, e.target.value)}
+                />
+              </div>
+            );
+          }
+          const inputType = type.includes("date")
+            ? "date"
+            : type.includes("int") || type.includes("num")
+              ? "number"
+              : "text";
+          return (
+            <div key={key}>
+              <label className="text-xs text-blue-200 mb-1 block">
+                {label}
+              </label>
+              <input
+                className="w-full p-2 rounded bg-blue-900/40"
+                value={values[key] || ""}
+                onChange={(e) => handleChange(key, e.target.value)}
+                type={inputType}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex items-center gap-2 mt-2">
+        <button
+          className="px-3 py-2 bg-yellow-400 text-slate-900 rounded font-semibold"
+          type="submit"
+        >
+          Simpan (Demo)
+        </button>
+        {saved && <span className="text-green-300 text-sm">Tersimpan</span>}
+      </div>
+    </form>
   );
 }
 

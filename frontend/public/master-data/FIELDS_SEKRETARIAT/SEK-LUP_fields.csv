@@ -1,0 +1,20 @@
+umkm_tersertifikasi,UMKM Tersertifikasi,int,11,false,false,NULL,none,NULL,Jumlah UMKM dapat sertifikat
+industri_pangan_terdaftar,Industri Pangan Terdaftar,int,11,false,false,NULL,none,NULL,Jumlah industri pangan
+temuan_pangan_tidak_layak,Temuan Pangan Tidak Layak,int,11,false,false,NULL,none,NULL,Pangan tidak layak konsumsi
+tindakan_pengawasan,Tindakan Pengawasan,text,NULL,false,false,NULL,none,NULL,Tindakan yang dilakukan
+kendala_laboratorium,Kendala Laboratorium,text,NULL,false,false,NULL,none,NULL,Kendala operasional lab
+kebutuhan_reagen,Kebutuhan Reagen,text,NULL,false,false,NULL,none,NULL,Kebutuhan bahan kimia
+kebutuhan_alat,Kebutuhan Alat,text,NULL,false,false,NULL,none,NULL,Kebutuhan peralatan lab
+analisis,Analisis,text,NULL,false,false,NULL,none,NULL,Analisis kinerja UPTD
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi perbaikan
+sumber_data,Sumber Data,varchar,255,false,false,UPTD Balai Pengawasan Mutu,none,NULL,Dari UPTD
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan PDF
+file_data_pendukung,File Data Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Sekretaris,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,UPTD,none,NULL,Yang menyusun
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data uji lab sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

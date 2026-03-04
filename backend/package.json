@@ -16,6 +16,7 @@
     "convert:tests:esm": "node scripts/convert-tests-to-esm.js",
     "test": "mocha --file tests/setup.js \"tests/**/*.js\" --exit",
     "seed": "node database/seeders/seed.js",
+    "undelete:users": "node scripts/undeleteUsers.js --all",
     "migrate": "node database/migrations/migrate.js"
   },
   "dependencies": {

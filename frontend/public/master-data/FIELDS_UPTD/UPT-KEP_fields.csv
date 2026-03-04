@@ -1,0 +1,4 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+unit_kerja,Unit Kerja,enum,NULL,true,false,UPTD,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",AUTO-SET ke UPTD (field khusus UPTD)
+akses_terbatas,Akses Terbatas,boolean,NULL,true,false,1,none,NULL,UPTD hanya bisa akses pegawai UPTD (field khusus UPTD)
+hak_akses_uptd,Hak Akses UPTD,enum,NULL,true,false,read_write,none,"read_only,read_write",UPTD bisa update data tertentu (cuti SKP) (field khusus UPTD)

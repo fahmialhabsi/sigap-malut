@@ -1,6 +1,7 @@
 import useAuthStore from "../../stores/authStore";
 import { Navigate, useNavigate } from "react-router-dom";
 import ProfessionalCharts from "../components/ProfessionalCharts";
+import { roleIdToName } from "../../utils/roleMap";
 
 export default function DashboardMain() {
   const bidangList = [
@@ -26,14 +27,18 @@ export default function DashboardMain() {
     },
     { label: "UPTD", path: "/dashboard/uptd", roles: ["kepala_uptd"] },
   ];
-  // Central RBAC utility
-  const hasRole = (role) => user && user.role === role;
-
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+
+  // Derive canonical role name and central RBAC utility
+  const roleName = user ? user.role || roleIdToName[user.role_id] : null;
+  const hasRole = (role) => roleName && roleName === role;
   if (!user) return <Navigate to="/login" replace />;
   if (hasRole("super_admin"))
     return <Navigate to="/dashboard/superadmin" replace />;
+  // Auto-redirect kepala bidang distribusi directly to their dashboard
+  if (hasRole("kepala_bidang_distribusi"))
+    return <Navigate to="/dashboard/distribusi" replace />;
   const allowedBidang = bidangList.filter((b) => hasRole(b.roles[0]));
   if (allowedBidang.length === 0) return <Navigate to="/" replace />;
   return (

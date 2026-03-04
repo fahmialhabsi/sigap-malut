@@ -1,5 +1,6 @@
 import DashboardMain from "../ui/dashboards/DashboardMain";
 import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
@@ -24,11 +25,7 @@ export default function DashboardPage() {
     "publik",
   ];
 
-  const roleIdToName = {
-    "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
-    // ... tambahkan semua role UUID lain sesuai schema
-  };
-  const roleName = roleIdToName[user.role_id];
+  const roleName = roleIdToName[user.role_id] || user.role || null;
 
   if (!allowedRoles.includes(roleName)) {
     return (

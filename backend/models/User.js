@@ -32,6 +32,11 @@ if (sequelize.models && sequelize.models.User) {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      // Persist plaintext password when explicitly requested by admin flows
+      plain_password: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       role_id: {
         type: DataTypes.STRING,
         allowNull: false,
