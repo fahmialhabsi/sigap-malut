@@ -1,7 +1,7 @@
 // =====================================================
 // AUTO-GENERATED ROUTE INDEX
 // Generated: 2026-02-17T19:37:29.473Z
-// Total Routes: 38
+// Total Routes: 39
 // =====================================================
 
 import BDSBMBRoutes from "./BDS-BMB.js";
@@ -54,6 +54,7 @@ import notificationRoutes from "./notification.js";
 import perintahRoutes from "./perintah.js";
 import pegawaiRoutes from "./pegawai.js";
 import komoditasRoutes from "./komoditas.js";
+import modulesRoutes from "./modules.js";
 
 export default function registerRoutes(app) {
   console.log("📡 Registering API routes...\n");
@@ -110,6 +111,7 @@ export default function registerRoutes(app) {
   // Master Data Lookup
   app.use("/api/pegawai", pegawaiRoutes);
   app.use("/api/komoditas", komoditasRoutes);
+  app.use("/modules", modulesRoutes);
 
-  console.log("✅ 38 API routes registered\n");
+  console.log("✅ 39 API routes registered\n");
 }

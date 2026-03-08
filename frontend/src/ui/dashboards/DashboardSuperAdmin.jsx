@@ -1,7 +1,19 @@
 import React from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
-
 import DashboardHeader from "../components/DashboardHeader";
+import useAuthStore from "../../stores/authStore";
+import { Navigate } from "react-router-dom";
+import { roleIdToName } from "../../utils/roleMap";
+
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
 
 // Modal component (didefinisikan di luar fungsi utama)
 function Modal({ open, title, content, onClose }) {
@@ -22,25 +34,22 @@ function Modal({ open, title, content, onClose }) {
   );
 }
 
-import useAuthStore from "../../stores/authStore";
-import { Navigate } from "react-router-dom";
-
 function DashboardSuperAdmin() {
   const user = useAuthStore((state) => state.user);
-  const hasRole = (role) => user && user.role === role;
-  if (!hasRole("super_admin")) return <Navigate to="/" replace />;
-  // Dummy Super Admin modules
+  const roleName = normalizeRoleName(user);
+
+  if (!user || roleName !== "super_admin") return <Navigate to="/" replace />;
+
   const superAdminModules = [
     { id: "SA01", name: "Monitoring 50 indikator" },
     { id: "SA02", name: "Tool modul tanpa coding" },
     { id: "SA03", name: "Tata Naskah Dinas" },
     { id: "SA04", name: "Database peraturan" },
     { id: "SA05", name: "Manajemen User", isUserManagement: true },
-    // Tambahkan modul lain sesuai kebutuhan
   ];
+
   return (
     <div className="max-w-[1400px] mx-auto px-2 sm:px-6 py-6">
-      {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 rounded-2xl shadow-lg px-6 py-6 flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-1 tracking-tight drop-shadow">
@@ -68,7 +77,6 @@ function DashboardSuperAdmin() {
         </div>
       </div>
 
-      {/* KPI Section */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 flex flex-col items-center shadow border-b-4 border-blue-400">
           <span className="text-3xl font-extrabold text-blue-700 dark:text-blue-300">
@@ -104,10 +112,10 @@ function DashboardSuperAdmin() {
         </div>
       </div>
 
-      {/* Modul Section */}
       <div className="font-bold text-lg mb-3 text-blue-900 dark:text-blue-200">
         Modul Super Admin
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {superAdminModules.map((modul, idx) =>
           modul.isUserManagement ? (

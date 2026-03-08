@@ -1,3 +1,5 @@
+// frontend/src/routes/generatedRoutes.jsx
+
 import { Route } from "react-router-dom";
 import SA01ListPage from "../pages/superadmin/SA01ListPage";
 import SA02ListPage from "../pages/superadmin/SA02ListPage";

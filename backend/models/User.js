@@ -32,15 +32,17 @@ if (sequelize.models && sequelize.models.User) {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      // Persist plaintext password when explicitly requested by admin flows
       plain_password: {
         type: DataTypes.STRING,
         allowNull: true,
       },
+
+      // IMPORTANT: role_id is UUID FK to roles.id
       role_id: {
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
         allowNull: false,
       },
+
       unit_id: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -100,20 +102,22 @@ if (sequelize.models && sequelize.models.User) {
     },
   );
 
-  // Map legacy input fields to current column names before validation
   _User.addHook("beforeValidate", (user) => {
     const data = user.dataValues || {};
-    if (!user.name && (user.nama_lengkap || data.nama_lengkap))
+
+    if (!user.name && (user.nama_lengkap || data.nama_lengkap)) {
       user.name = user.nama_lengkap || data.nama_lengkap;
-    // Ensure legacy column `nama_lengkap` is set when tests or callers provide `name`
-    if (!user.nama_lengkap && (user.name || data.name))
-      user.nama_lengkap = user.name || data.name;
-    // Ensure `unit_kerja` (legacy string) is populated when callers supply `unit_id` as string
-    if (!user.unit_kerja && (user.unit_id || data.unit_id))
-      user.unit_kerja = user.unit_id || data.unit_id;
-    if (!user.role_id && (user.role || data.role || user.role_id)) {
-      user.role_id = user.role || data.role || user.role_id;
     }
+    if (!user.nama_lengkap && (user.name || data.name)) {
+      user.nama_lengkap = user.name || data.name;
+    }
+    if (!user.unit_kerja && (user.unit_id || data.unit_id)) {
+      user.unit_kerja = user.unit_id || data.unit_id;
+    }
+
+    // IMPORTANT: do NOT auto-fill role_id from `role` string anymore.
+    // role_id must always be UUID.
+
     if (!user.unit_id && (user.unit_kerja || data.unit_kerja || user.unit_id)) {
       user.unit_id = user.unit_kerja || data.unit_kerja || user.unit_id;
     }
@@ -121,7 +125,6 @@ if (sequelize.models && sequelize.models.User) {
 
   User = _User;
 
-  // Instance helper for tests and legacy code: perform a soft delete (paranoid)
   if (!User.prototype.softDelete) {
     User.prototype.softDelete = async function () {
       await User.update(
@@ -136,7 +139,6 @@ if (sequelize.models && sequelize.models.User) {
 
 export default User;
 
-// Ensure instance helper exists even when model was already registered
 if (User && !User.prototype.softDelete) {
   User.prototype.softDelete = async function () {
     await User.update(

@@ -1,213 +1,242 @@
-    return (
-      <div className="min-h-screen font-inter" style={{ background: '#fff' }}>
-        <div className="flex min-h-screen">
-          {/* Sidebar */}
-          <aside
-            className="flex flex-col items-center py-6"
-            style={{ width: 72, backgroundColor: "#06A657" }}
-          >
-            {/* LOGO */}
-            <div
-              className="bg-white rounded-lg flex items-center justify-center mb-8"
-              style={{ width: 36, height: 36 }}
-            >
-              <span className="text-[#06A657] font-bold text-xs">LOGO</span>
-            </div>
-            {/* Sidebar menu modul, urutan dan warna sesuai SVG */}
-            <SidebarItem label="Dash" textColor="#06A657" />
-            <SidebarItem label="Stok" textColor="#06A657" />
-            <SidebarItem label="Gudang" textColor="#0B5FFF" />
-            <SidebarItem label="Produksi" textColor="#F59E0B" />
-            <SidebarItem label="Target" textColor="#EF4444" />
-            <SidebarItem label="Laporan" textColor="#0B5FFF" />
-            <SidebarItem label="Approve" textColor="#06A657" />
-            <SidebarItem label="Agenda" textColor="#0B5FFF" />
-          </aside>
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title as ChartTitle,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import api from "../utils/api";
+import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
 
-          {/* Main area */}
-          <div className="flex-1 flex flex-col">
-            {/* Header */}
-            <header
-              className="flex items-center px-6"
-              style={{ height: 60, backgroundColor: "#07723A", boxShadow: '0 1px 2px rgba(0,0,0,0.08)' }}
-            >
-              {/* Logo kiri (36x36) */}
-              <div className="flex items-center">
-                <div
-                  className="bg-white rounded-lg flex items-center justify-center"
-                  style={{ width: 36, height: 36 }}
-                >
-                  <span className="text-[#07723A] font-bold text-xs">LOGO</span>
-                </div>
-                <span className="ml-6 text-2xl text-white font-bold font-inter">Ketersediaan</span>
-              </div>
-              <div className="flex-1" />
-              {/* Notifikasi bulat kuning kanan */}
-              <div className="flex items-center space-x-4 mr-6">
-                <NotificationBell />
-                <ProfileAvatar />
-              </div>
-            </header>
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ChartTitle,
+  Tooltip,
+  Legend,
+);
 
-            <main className="flex-1 px-8 py-6" style={{ background: '#fff' }}>
-              {/* HERO ROW (6 cards, 160x60) */}
-              <div className="grid grid-cols-6 gap-4 mb-6">
-                <KpiCard title="Stok Total" color="green" />
-                <KpiCard title="Stok Kritis" color="blue" />
-                <KpiCard title="Produksi Hr." color="yellow" />
-                <KpiCard title="Target Bulan" color="red" />
-                <KpiCard title="Backlog" color="blue" />
-                <KpiCard title="Approve" color="yellow" />
-              </div>
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
 
-              {/* PANEL ROW 1 */}
-              <div className="grid grid-cols-2 gap-6 mb-6">
-                <PanelBox title="Tabel Stok By Komoditas" color="green">
-                  <FakeTable label1="Komoditas" label2="Stok" />
-                </PanelBox>
-                <PanelBox title="Grafik Tren Stok" color="blue">
-                  <PlaceholderChart />
-                </PanelBox>
-              </div>
+export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
+  const storeUser = useAuthStore((state) => state.user);
+  const storeRole = normalizeRoleName(storeUser);
 
-              {/* PANEL ROW 2 */}
-              <div className="grid grid-cols-2 gap-6 mb-6">
-                <PanelBox title="Log Produksi/Mutasi" color="yellow">
-                  <FakeList />
-                </PanelBox>
-                <PanelBox title="Approval Stok" color="red">
-                  <FakeTable label1="Nama" label2="Status" />
-                </PanelBox>
-              </div>
+  // Optional: extra guard (so layout still works even if someone lands directly)
+  useEffect(() => {
+    if (!storeUser) return;
+    const allowed =
+      storeRole === "kepala_bidang_ketersediaan" ||
+      storeRole === "super_admin" ||
+      storeRole === "kepala_dinas" ||
+      storeRole === "gubernur";
+    if (!allowed) window.location.href = "/";
+  }, [storeUser, storeRole]);
 
-              {/* NOTIF KRITIS (full width) */}
-              <PanelBox title="Notifikasi Kritis" color="yellow" fullWidth>
-                <ul className="text-red-700 space-y-1">
-                  <li>
-                    Stok Beras di Gudang A <span className="font-semibold">di bawah minimum!</span>
-                  </li>
-                  <li>Pengajuan Mutasi belum approve 2 hari</li>
-                  <li>Perubahan target produksi bulan ini</li>
-                </ul>
-              </PanelBox>
-            </main>
+  const sidebarOpen = window.innerWidth > 768;
+  const [modules, setModules] = useState(fallbackModules || []);
+  const [menuAktif, setMenuAktif] = useState("");
+  const [chart, setChart] = useState({ labels: [], datasets: [] });
+  const [notifikasi, setNotifikasi] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [kpi, setKpi] = useState([]);
+  const [tableRows, setTableRows] = useState([]);
+  const lastModulesFetch = useRef(0);
 
-            {/* Footer */}
-            <footer
-              style={{ height: 30, backgroundColor: "#07723A" }}
-              className="flex items-center px-6"
-            >
-              <span className="text-white text-xs">
-                SIGAP Malut v1 | Bidang Ketersediaan
-              </span>
-            </footer>
-          </div>
+  useEffect(() => {
+    const now = Date.now();
+    if (now - lastModulesFetch.current < 5000) return;
+    lastModulesFetch.current = now;
+
+    api.get("/modules/ketersediaan").then((res) => {
+      const data = res.data;
+      setModules(data);
+      setMenuAktif(data[0]?.nama_modul || "");
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!menuAktif) return;
+    const activeModule = modules.find((mod) => mod.nama_modul === menuAktif);
+    if (!activeModule) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/data/${activeModule.id}`);
+        setTableRows(res.data.rows);
+        setKpi([
+          {
+            title: "Total Data",
+            value: res.data.rows.length,
+            color: "blue",
+          },
+        ]);
+        setChart({
+          labels: res.data.chart.labels,
+          datasets: res.data.chart.datasets,
+        });
+        setNotifikasi(res.data.notifications);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [menuAktif, modules]);
+
+  const chartOptions = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: "#33415566" }, ticks: { color: "#f1f5f9" } },
+      y: { grid: { color: "#33415544" }, ticks: { color: "#f1f5f9" } },
+    },
+  };
+
+  return (
+    <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-green-900 via-green-800 to-slate-800 text-slate-100 select-none">
+      <aside
+        className={`h-full bg-green-950/95 z-30 flex flex-col items-center 
+        transition-all duration-300 ${
+          sidebarOpen ? "w-[275px] min-w-[275px]" : "w-[60px] min-w-[60px]"
+        } 
+        border-r border-green-900/60 shadow-xl`}
+      >
+        <div className="flex items-center justify-center w-full py-8">
+          <img
+            src="/Logo.png"
+            alt="logo"
+            className={`object-contain ${
+              sidebarOpen ? "w-24 h-24" : "w-10 h-10"
+            }`}
+          />
         </div>
-      </div>
-    );
-            </div>
+        <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
+          {modules.map((modul) => (
+            <SidebarItem
+              key={modul.id}
+              label={modul.nama_modul}
+              active={menuAktif === modul.nama_modul}
+              sidebarOpen={sidebarOpen}
+              onClick={() => setMenuAktif(modul.nama_modul)}
+            />
+          ))}
+        </nav>
+        <div className="py-6 w-full text-xs text-green-100/70 text-center tracking-wide">
+          {sidebarOpen ? "SIGAP Malut" : "SIGAP"}
+        </div>
+      </aside>
 
-            {/* PANEL ROW 2 */}
-            <div className="grid grid-cols-2 gap-6">
-              <PanelBox title="Log Produksi/Mutasi" color="yellow">
-                <FakeList />
-              </PanelBox>
-              <PanelBox title="Approval Stok" color="red">
-                <FakeTable label1="Nama" label2="Status" />
-              </PanelBox>
-            </div>
+      <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col bg-green-950/80 backdrop-blur">
+        <header className="flex-none w-full h-[75px] bg-green-900/80 flex items-center px-12 shadow-sm z-10 sticky top-0">
+          <div className="text-2xl text-white font-bold tracking-wide flex-1">
+            SIGAP <span className="font-light">·</span> Bidang Ketersediaan
+          </div>
+        </header>
 
-            {/* NOTIF KRITIS (full width) */}
-            <PanelBox title="Notifikasi Kritis" color="yellow" fullWidth>
-              <ul className="text-red-700 space-y-1">
-                <li>
-                  Stok Beras di Gudang A{" "}
-                  <span className="font-semibold">di bawah minimum!</span>
-                </li>
-                <li>Pengajuan Mutasi belum approve 2 hari</li>
-                <li>Perubahan target produksi bulan ini</li>
+        <main className="flex-1 min-h-0 min-w-0 flex flex-col gap-9 py-8 overflow-auto bg-transparent">
+          {loading && (
+            <div className="w-full text-center py-6">
+              <span className="text-green-200 font-bold text-lg">
+                Memuat Data...
+              </span>
+            </div>
+          )}
+
+          <div className="w-full max-w-7xl mx-auto flex flex-row flex-wrap gap-x-8 gap-y-4 items-stretch justify-between px-2">
+            {kpi.map((item, idx) => (
+              <KpiCard
+                key={idx}
+                title={item.title}
+                value={item.value}
+                color={item.color}
+              />
+            ))}
+          </div>
+
+          <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
+            <PanelBox title={`Tabel ${menuAktif}`}>
+              <DataTable data={tableRows} />
+            </PanelBox>
+            <PanelBox title="Grafik Tren Ketersediaan">
+              <div className="h-56 flex items-center justify-center">
+                <Line data={chart} options={chartOptions} />
+              </div>
+            </PanelBox>
+          </div>
+
+          <div className="w-full max-w-7xl mx-auto px-2">
+            <PanelBox title="Notifikasi Kritis">
+              <ul className="space-y-2 text-sm">
+                {notifikasi.map((notif, idx) => (
+                  <li key={idx} className="text-yellow-300">
+                    {notif.message}
+                  </li>
+                ))}
               </ul>
             </PanelBox>
-          </main>
-
-          {/* Footer (height 30, same green as header) */}
-          <footer
-            style={{ height: 30, backgroundColor: "#07723A" }}
-            className="flex items-center px-6"
-          >
-            <span className="text-white text-xs">
-              SIGAP Malut v1 | Bidang Ketersediaan
-            </span>
-          </footer>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );
 }
 
-/* ---------- Reusable components ---------- */
-
-function SidebarItem({ label, textColor = "#06A657" }) {
+function SidebarItem({ label, active, sidebarOpen, onClick }) {
   return (
-    <button
-      className="mb-2 flex items-center justify-center rounded-lg"
-      style={{
-        width: 40,
-        height: 40,
-        backgroundColor: "#f4f4f4",
-        color: textColor,
-        fontSize: 11,
-      }}
-      aria-label={label}
-    >
-      {label}
-    </button>
-  );
-}
-
-function KpiCard({ title, color }) {
-  const mapping = {
-    green: { border: "#06A657", title: "#06A657" },
-    blue: { border: "#0B5FFF", title: "#0B5FFF" },
-    yellow: { border: "#FACC15", title: "#FACC15" },
-    red: { border: "#EF4444", title: "#EF4444" },
-  };
-  const c = mapping[color] || mapping.green;
-
-  return (
-    <div
-      className="rounded-lg border-2 shadow flex flex-col items-center justify-center"
-      style={{ height: 60, borderColor: c.border, backgroundColor: "#fff" }}
-    >
-      <div
-        className="font-semibold mb-1"
-        style={{ color: c.title, fontSize: 12 }}
+    <div className="relative w-full flex items-center group transition">
+      {active && (
+        <div className="absolute left-2 h-[52px] w-2 bg-gradient-to-b from-yellow-400 to-yellow-200 rounded-r-lg scale-105 shadow-lg transition"></div>
+      )}
+      <button
+        className={`
+          h-[52px] w-full pl-10 pr-5 text-lg flex items-center rounded-2xl font-semibold
+          ${
+            active
+              ? "bg-green-800/90 text-yellow-300"
+              : "bg-green-700/85 text-green-100 hover:bg-green-800/85"
+          }
+          shadow group-hover:scale-105
+          transition-all
+          relative
+        `}
+        onClick={onClick}
       >
-        {title}
-      </div>
-      <div className="text-2xl font-bold text-gray-800">123</div>
+        <span className="flex-1 text-left">
+          {sidebarOpen ? label : label[0]}
+        </span>
+      </button>
     </div>
   );
 }
 
-function PanelBox({ title, children, color = "green", fullWidth = false }) {
-  const mapping = {
-    green: { border: "#06A657", title: "#06A657" },
-    blue: { border: "#0B5FFF", title: "#0B5FFF" },
-    yellow: { border: "#FACC15", title: "#FACC15" },
-    red: { border: "#EF4444", title: "#EF4444" },
-  };
-  const c = mapping[color] || mapping.green;
-
+function PanelBox({ title, children }) {
   return (
     <section
-      className="rounded-xl bg-white shadow p-4 mb-2"
+      className="rounded-2xl p-7 flex flex-col border border-green-900/60 shadow-md flex-1 bg-green-900/80 glassmorph-card"
       style={{
-        border: `2px solid ${c.border}`,
-        minHeight: fullWidth ? 48 : 120,
+        backdropFilter: "blur(17px)",
+        WebkitBackdropFilter: "blur(17px)",
       }}
     >
-      <h2 className="font-bold mb-3" style={{ color: c.title }}>
+      <h2 className="font-bold text-green-200 mb-4 text-xl flex items-center gap-2">
         {title}
       </h2>
       <div>{children}</div>
@@ -215,80 +244,57 @@ function PanelBox({ title, children, color = "green", fullWidth = false }) {
   );
 }
 
-function FakeTable({ label1, label2 }) {
-  return (
-    <table className="w-full text-xs">
-      <thead>
-        <tr>
-          <th className="text-left pr-4">{label1}</th>
-          <th className="text-left">{label2}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td className="py-1">Beras</td>
-          <td className="py-1">2.100 kg</td>
-        </tr>
-        <tr>
-          <td className="py-1">Jagung</td>
-          <td className="py-1">700 kg</td>
-        </tr>
-      </tbody>
-    </table>
-  );
-}
-
-function FakeList() {
-  return (
-    <ul className="pl-4 text-xs list-disc">
-      <li>Mutasi masuk Gudang A</li>
-      <li>Produksi Jagung 500kg</li>
-      <li>Input OP</li>
-    </ul>
-  );
-}
-
-function PlaceholderChart() {
-  return (
-    <div
-      className="w-full h-32 rounded-md flex items-center justify-center text-sm text-gray-500"
-      style={{ backgroundColor: "#ffffff" }}
-    >
-      Grafik (placeholder)
-    </div>
-  );
-}
-
-function NotificationBell() {
-  // yellow circular indicator similar to the circle on the header in the SVG
+function KpiCard({ title, value, color }) {
+  let bg, border, txt, shadow;
+  switch (color) {
+    case "green":
+      bg =
+        "bg-gradient-to-t from-green-900/80 to-green-700/60 backdrop-blur-md";
+      border = "border-green-700";
+      txt = "text-green-100";
+      shadow = "shadow-green-800/10";
+      break;
+    case "blue":
+      bg = "bg-gradient-to-t from-blue-900/80 to-blue-700/60 backdrop-blur-md";
+      border = "border-blue-700";
+      txt = "text-blue-100";
+      shadow = "shadow-blue-900/10";
+      break;
+    case "yellow":
+      bg =
+        "bg-gradient-to-t from-yellow-700/80 to-yellow-600/70 backdrop-blur-md";
+      border = "border-yellow-600";
+      txt = "text-yellow-50";
+      shadow = "shadow-yellow-800/10";
+      break;
+    case "red":
+      bg = "bg-gradient-to-t from-red-900/80 to-red-700/60 backdrop-blur-md";
+      border = "border-red-900";
+      txt = "text-red-100";
+      shadow = "shadow-red-800/10";
+      break;
+    default:
+      bg = "bg-slate-800/80";
+      border = "border-slate-700";
+      txt = "text-slate-100";
+      shadow = "shadow-slate-800/10";
+  }
   return (
     <div
-      className="flex items-center justify-center rounded-full"
+      className={`
+        rounded-2xl border-2 px-8 py-7 flex flex-col justify-between min-w-[210px] max-w-[250px]
+        ${bg} ${border} ${txt} ${shadow}
+        shadow-lg cursor-pointer
+        hover:scale-105 hover:shadow-2xl transition-all duration-200
+        glassmorph-card
+      `}
       style={{
-        width: 36,
-        height: 36,
-        backgroundColor: "#FACC15",
-        color: "#7a5a00",
-      }}
-      aria-hidden
-    >
-      🔔
-    </div>
-  );
-}
-
-function ProfileAvatar() {
-  return (
-    <div
-      className="flex items-center justify-center rounded-full"
-      style={{
-        width: 36,
-        height: 36,
-        backgroundColor: "#D1FAE5",
-        color: "#065f46",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
       }}
     >
-      KB
+      <div className="font-semibold mb-2 text-base">{title}</div>
+      <div className="text-4xl font-extrabold tracking-wider">{value}</div>
     </div>
   );
 }

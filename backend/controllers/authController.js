@@ -1,6 +1,7 @@
 // Clean ES module auth controller
 import { Op } from "sequelize";
 import User from "../models/User.js";
+import Role from "../models/Role.js";
 import {
   hashPassword,
   comparePassword,
@@ -9,10 +10,29 @@ import {
 import { generateToken, generateRefreshToken } from "../middleware/auth.js";
 import { logAudit } from "../services/auditLogService.js";
 
+async function generateUniqueUsernameFromEmail(email) {
+  const base = String(email || "")
+    .split("@")[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "")
+    .slice(0, 30);
+
+  let candidate = base || `user${Date.now()}`;
+  let i = 1;
+
+  while (true) {
+    const exists = await User.findOne({ where: { username: candidate } });
+    if (!exists) return candidate;
+    candidate = `${base || "user"}${i}`;
+    i += 1;
+  }
+}
+
 // Register (POST /api/auth/register)
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role_id, unit_id, position_id } = req.body;
+    const { username, name, email, password, role_id, unit_id, position_id } =
+      req.body;
 
     if (!name || !email || !password || !role_id || !unit_id) {
       return res.status(400).json({
@@ -30,15 +50,40 @@ export const register = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser)
+    const existingUserByEmail = await User.findOne({ where: { email } });
+    if (existingUserByEmail) {
       return res
         .status(400)
         .json({ success: false, message: "Email sudah digunakan" });
+    }
+
+    const resolvedUsername =
+      username || (await generateUniqueUsernameFromEmail(email));
+
+    // Optional: ensure username unique (in case client provides)
+    const existingUserByUsername = await User.findOne({
+      where: { username: resolvedUsername },
+    });
+    if (existingUserByUsername) {
+      return res.status(400).json({
+        success: false,
+        message: "Username sudah digunakan",
+      });
+    }
+
+    // Optional: validate role exists and active
+    const roleRow = await Role.findByPk(role_id);
+    if (!roleRow || roleRow.is_active === false) {
+      return res.status(400).json({
+        success: false,
+        message: "Role tidak valid atau tidak aktif",
+      });
+    }
 
     const hashedPassword = await hashPassword(password);
 
     const user = await User.create({
+      username: resolvedUsername,
       name,
       email,
       password: hashedPassword,
@@ -67,6 +112,7 @@ export const register = async (req, res) => {
       data: {
         user: {
           id: user.id,
+          username: user.username,
           name: user.name,
           email: user.email,
           role_id: user.role_id,
@@ -74,6 +120,7 @@ export const register = async (req, res) => {
           position_id: user.position_id,
           is_active: user.is_active,
         },
+        roleName: roleRow?.name || null,
         token,
         refreshToken,
       },
@@ -110,6 +157,15 @@ export const login = async (req, res) => {
         message: "Akun tidak aktif. Hubungi administrator.",
       });
 
+    // Optional: lockout enforcement if locked_until is set
+    if (user.locked_until && new Date(user.locked_until) > new Date()) {
+      return res.status(423).json({
+        success: false,
+        message: "Akun terkunci sementara. Coba lagi nanti.",
+        locked_until: user.locked_until,
+      });
+    }
+
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
       user.failed_login_attempts = (user.failed_login_attempts || 0) + 1;
@@ -130,6 +186,26 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
     const refreshToken = generateRefreshToken(user);
+
+    // Lookup role from Roles table (source of truth)
+    const roleRow = user.role_id ? await Role.findByPk(user.role_id) : null;
+    const roleName = roleRow?.name || null; // e.g. "GUBERNUR", "KEPALA_DINAS"
+
+    // Dashboard mapping (sesuai dokumenSistem: eksekutif -> /dashboard)
+    const roleToDashboard = {
+      SUPER_ADMIN: "/dashboard/superadmin",
+      SEKRETARIS: "/dashboard/sekretariat",
+
+      // Executive (dokumenSistem)
+      KEPALA_DINAS: "/dashboard",
+      GUBERNUR: "/dashboard",
+
+      // Public/Viewer
+      VIEWER: "/dashboard-publik",
+    };
+
+    const dashboardUrl =
+      (roleName && roleToDashboard[roleName]) || "/dashboard";
 
     if (user && user.id) {
       try {
@@ -155,13 +231,16 @@ export const login = async (req, res) => {
       data: {
         user: {
           id: user.id,
+          username: user.username,
           name: user.name,
           email: user.email,
           role_id: user.role_id,
           unit_id: user.unit_id,
         },
+        roleName,
         token,
         refreshToken,
+        dashboardUrl,
       },
     });
   } catch (error) {
@@ -276,25 +355,27 @@ export const createUser = async (req, res) => {
       email,
       password,
       nama_lengkap,
-      role,
-      role_id,
+      role, // string key (optional)
+      role_id, // uuid (optional)
       unit_kerja,
       unit_id,
       nip,
       jabatan,
     } = req.body;
+
     const passwordValidation = validatePassword(password);
-    if (!passwordValidation.isValid)
+    if (!passwordValidation.isValid) {
       return res.status(400).json({
         success: false,
         message: "Password tidak valid",
         errors: passwordValidation.errors,
       });
+    }
 
     const existingUser = await User.findOne({
       where: { [Op.or]: [{ username }, { email }] },
     });
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({
         success: false,
         message:
@@ -302,8 +383,27 @@ export const createUser = async (req, res) => {
             ? "Username sudah digunakan"
             : "Email sudah digunakan",
       });
+    }
+
+    // Resolve role_id safely:
+    // - Prefer role_id UUID if provided
+    // - Else map from role string -> roles table -> UUID
+    let resolvedRoleId = role_id || null;
+    if (!resolvedRoleId && role) {
+      const roleRow = await Role.findOne({
+        where: { name: String(role).toUpperCase() }, // expects stored as "SUPER_ADMIN", etc
+      });
+      if (!roleRow) {
+        return res.status(400).json({
+          success: false,
+          message: `Role '${role}' tidak ditemukan di tabel roles`,
+        });
+      }
+      resolvedRoleId = roleRow.id;
+    }
 
     const hashedPassword = await hashPassword(password);
+
     let user;
     try {
       user = await User.create({
@@ -312,8 +412,8 @@ export const createUser = async (req, res) => {
         password: hashedPassword,
         plain_password: password,
         nama_lengkap,
-        role: role || null,
-        role_id: role_id || role || null,
+        role: role || null, // keep string role if you want legacy support
+        role_id: resolvedRoleId, // ALWAYS UUID or null
         unit_kerja: unit_kerja || null,
         unit_id: unit_id || unit_kerja || null,
         nip,
@@ -326,31 +426,27 @@ export const createUser = async (req, res) => {
         msg.includes("plain_password") ||
         msg.includes('column "plain_password"')
       ) {
-        try {
-          user = await User.create({
-            username,
-            email,
-            password: hashedPassword,
-            nama_lengkap,
-            role: role || null,
-            role_id: role_id || role || null,
-            unit_kerja: unit_kerja || null,
-            unit_id: unit_id || unit_kerja || null,
-            nip,
-            jabatan,
-            is_verified: true,
-          });
-        } catch (err2) {
-          throw err2;
-        }
+        user = await User.create({
+          username,
+          email,
+          password: hashedPassword,
+          nama_lengkap,
+          role: role || null,
+          role_id: resolvedRoleId,
+          unit_kerja: unit_kerja || null,
+          unit_id: unit_id || unit_kerja || null,
+          nip,
+          jabatan,
+          is_verified: true,
+        });
       } else {
         throw err;
       }
     }
 
-    // Return created user and include `password` field pointing to plain_password
     const created = user.toJSON ? user.toJSON() : user;
     created.password = created.plain_password || password || "";
+
     res.status(201).json({
       success: true,
       message: "User berhasil ditambahkan",
@@ -374,45 +470,65 @@ export const updateUser = async (req, res) => {
       email,
       password,
       nama_lengkap,
-      role,
-      role_id,
+      role, // string key (optional)
+      role_id, // uuid (optional)
       unit_kerja,
       unit_id,
       nip,
       jabatan,
     } = req.body;
+
     const user = await User.findByPk(id);
-    if (!user)
+    if (!user) {
       return res
         .status(404)
         .json({ success: false, message: "User tidak ditemukan" });
+    }
 
     user.username = username ?? user.username;
     user.email = email ?? user.email;
     user.nama_lengkap = nama_lengkap ?? user.nama_lengkap;
     user.role = role ?? user.role;
-    user.role_id = role_id ?? user.role_id ?? role ?? user.role;
     user.unit_kerja = unit_kerja ?? user.unit_kerja;
     user.unit_id = unit_id ?? user.unit_id ?? unit_kerja ?? user.unit_kerja;
     user.nip = nip ?? user.nip;
     user.jabatan = jabatan ?? user.jabatan;
 
+    // Resolve role_id safely if role_id or role provided
+    if (role_id) {
+      user.role_id = role_id; // must be UUID from client
+    } else if (role) {
+      const roleRow = await Role.findOne({
+        where: { name: String(role).toUpperCase() },
+      });
+      if (!roleRow) {
+        return res.status(400).json({
+          success: false,
+          message: `Role '${role}' tidak ditemukan di tabel roles`,
+        });
+      }
+      user.role_id = roleRow.id;
+    }
+    // else: keep existing user.role_id as-is
+
     if (password) {
       const passwordValidation = validatePassword(password);
-      if (!passwordValidation.isValid)
+      if (!passwordValidation.isValid) {
         return res.status(400).json({
           success: false,
           message: "Password tidak valid",
           errors: passwordValidation.errors,
         });
+      }
       user.password = await hashPassword(password);
-      // persist plaintext for admin UI when requested
       user.plain_password = password;
     }
 
     await user.save();
+
     const updated = user.toJSON ? user.toJSON() : user;
     updated.password = updated.plain_password || "";
+
     res.json({
       success: true,
       message: "User berhasil diupdate",
