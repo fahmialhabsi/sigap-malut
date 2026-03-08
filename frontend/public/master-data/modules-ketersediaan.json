@@ -1,0 +1,18 @@
+[
+  {
+    "id": "K001",
+    "modul_id": "K001",
+    "name": "Master data komoditas",
+    "nama_modul": "Master data komoditas",
+    "bidang": "Bidang Ketersediaan",
+    "is_active": true
+  },
+  {
+    "id": "K002",
+    "modul_id": "K002",
+    "name": "Produksi pangan",
+    "nama_modul": "Produksi pangan",
+    "bidang": "Bidang Ketersediaan",
+    "is_active": true
+  }
+]

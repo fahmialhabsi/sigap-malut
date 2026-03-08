@@ -101,7 +101,7 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     };
   }, []);
 
-  // Replace the existing "Ambil modul sidebar bidang ketersediaan" useEffect with this
+  // Ambil modul sidebar bidang ketersediaan (tolerant + fallback statis)
   useEffect(() => {
     if (!authChecked) return;
     const now = Date.now();
@@ -109,36 +109,25 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     lastModulesFetch.current = now;
 
     let mounted = true;
-    api
-      .get("/modules")
-      .then((res) => {
-        if (!mounted) return;
 
-        console.log("DEBUG: /modules response:", res); // <-- full response
-
-        // tolerant parsing for various response shapes
-        const payload = res.data;
-        const arr = Array.isArray(payload)
-          ? payload
-          : Array.isArray(payload?.data)
-            ? payload.data
-            : Array.isArray(payload?.result)
-              ? payload.result
-              : [];
-
-        console.log("DEBUG: parsed modules array (arr):", arr);
-
-        // do a tolerant bidang lookup (trim + ignore case)
+    // helper: set modules safely
+    const applyModules = (arr) => {
+      if (!mounted) return;
+      if (arr && arr.length) {
+        // filter by bidang ketersediaan if possible (tolerant)
         const ketersediaan = arr.filter((row) => {
           const bidang = String(
-            row.bidang || row.bidang_name || row.bidangLabel || "",
+            row.bidang ||
+              row.bidang_name ||
+              row.bidangLabel ||
+              row.department ||
+              "",
           )
             .trim()
             .toLowerCase();
+          // accept "bidang ketersediaan" atau hanya "ketersediaan"
           return bidang === "bidang ketersediaan" || bidang === "ketersediaan";
         });
-
-        console.log("DEBUG: filtered ketersediaan modules:", ketersediaan);
 
         if (ketersediaan && ketersediaan.length) {
           setModules(ketersediaan);
@@ -149,32 +138,95 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
               ketersediaan[0].name ||
               ketersediaan[0].id,
           );
-        } else if (arr && arr.length) {
-          // fallback: use all modules if no bidang matches
-          console.warn(
-            "WARNING: no 'Bidang Ketersediaan' found — using all modules as fallback",
-          );
-          setModules(arr);
-          setMenuAktif(
-            (m) => m || arr[0].nama_modul || arr[0].name || arr[0].id,
-          );
-        } else if (fallbackModules && fallbackModules.length) {
-          setModules(fallbackModules);
-          setMenuAktif((m) => m || fallbackModules[0].name);
-        } else {
-          // still empty - show message in console
-          console.warn(
-            "No modules returned by API and no fallbackModules provided",
-          );
-          setModules([]);
+          return;
         }
+
+        // fallback: if no bidang match but arr has items, use arr
+        setModules(arr);
+        setMenuAktif((m) => m || arr[0].nama_modul || arr[0].name || arr[0].id);
+        return;
+      }
+
+      // nothing to set
+      setModules([]);
+    };
+
+    // first try API /modules
+    api
+      .get("/modules")
+      .then((res) => {
+        if (!mounted) return;
+
+        console.log("DEBUG: /modules response:", res);
+
+        // parse tolerant payload shapes
+        const payload = res.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : Array.isArray(payload?.result)
+              ? payload.result
+              : [];
+
+        // If API explicitly forbids non-super-admins (success:false message) -> fallback to static
+        if (
+          payload &&
+          payload.success === false &&
+          String(payload.message || "")
+            .toLowerCase()
+            .includes("super admin")
+        ) {
+          console.warn(
+            "Modules list restricted to super_admin — loading fallback static modules",
+          );
+          // fallback to static file in public/master-data
+          return fetch("/master-data/modules-ketersediaan.json")
+            .then((r) => r.json())
+            .then((json) => applyModules(json))
+            .catch((e) => {
+              console.error("Failed to load fallback static modules:", e);
+              applyModules([]);
+            });
+        }
+
+        // if API returned modules, apply them
+        if (arr && arr.length) {
+          applyModules(arr);
+          return;
+        }
+
+        // if response contained object that maybe has data.modules etc, attempt deeper extraction
+        const possibleArr = Array.isArray(payload?.data?.modules)
+          ? payload.data.modules
+          : [];
+        if (possibleArr && possibleArr.length) {
+          applyModules(possibleArr);
+          return;
+        }
+
+        // fallback to static public file if API didn't return usable modules
+        console.warn(
+          "API /modules returned empty or unexpected shape — trying static fallback",
+        );
+        return fetch("/master-data/modules-ketersediaan.json")
+          .then((r) => r.json())
+          .then((json) => applyModules(json))
+          .catch((e) => {
+            console.error("Failed to load fallback static modules:", e);
+            applyModules([]);
+          });
       })
       .catch((err) => {
-        console.error("Fetch modules error:", err);
-        if (mounted && fallbackModules && fallbackModules.length) {
-          setModules(fallbackModules);
-          setMenuAktif((m) => m || fallbackModules[0].name);
-        }
+        console.error("Fetch /modules error:", err);
+        // on network error or 403/401, fallback to static
+        fetch("/master-data/modules-ketersediaan.json")
+          .then((r) => r.json())
+          .then((json) => applyModules(json))
+          .catch((e) => {
+            console.error("Failed to load fallback static modules:", e);
+            applyModules([]);
+          });
       });
 
     return () => {
