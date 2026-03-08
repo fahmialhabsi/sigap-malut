@@ -37,33 +37,16 @@ import DashboardPublikLayout from "./layouts/DashboardPublikLayout";
 /**
  * PrivateRoute wrapper ensures user is authenticated before rendering dashboard layout.
  * If not authenticated, navigates to /login.
+ *
+ * This version uses `isInitialized` from authStore to avoid premature redirects
+ * while `initAuth()` is still populating the store from localStorage / backend.
  */
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
-  // DEBUG: tampilkan status auth setiap kali PrivateRoute dievaluasi
-  try {
-    // eslint-disable-next-line no-console
-    console.log("PrivateRoute:", {
-      isAuthenticated,
-      token:
-        typeof window !== "undefined" ? localStorage.getItem("token") : null,
-      user:
-        typeof window !== "undefined"
-          ? JSON.parse(localStorage.getItem("user"))
-          : null,
-    });
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log("PrivateRoute debug error", e);
-  }
-
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  // Jika store belum menganggap user authenticated tapi token ada di localStorage,
-  // kemungkinan initAuth sedang berjalan. Tampilkan loading agar tidak redirect prematur.
-  if (!isAuthenticated && token) {
+  // Jika proses inisialisasi auth belum selesai, tampilkan loading agar tidak redirect prematur.
+  if (!isInitialized) {
     return <div>Loading...</div>;
   }
 
