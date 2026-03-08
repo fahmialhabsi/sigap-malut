@@ -1,3 +1,4 @@
+console.log("Loaded: DashboardKetersediaan wrapper");
 // frontend/src/ui/dashboards/DashboardKetersediaan.jsx
 import React from "react";
 import DashboardKetersediaanLayout from "../../layouts/DashboardKetersediaanLayout";
