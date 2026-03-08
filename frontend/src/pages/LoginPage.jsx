@@ -2,10 +2,63 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 
+// Map normalized role names to dashboard paths
+const roleToDashboard = {
+  super_admin: "/dashboard/superadmin",
+  kepala_dinas: "/dashboard/superadmin",
+  gubernur: "/dashboard/superadmin",
+  sekretaris: "/dashboard/sekretariat",
+  kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
+  kepala_bidang_distribusi: "/dashboard/distribusi",
+  kepala_bidang_konsumsi: "/dashboard/konsumsi",
+  kepala_uptd: "/dashboard/uptd",
+  publik: "/dashboard-publik",
+};
+
+// Map unit_kerja name to dashboard path as secondary fallback
+const unitToDashboard = {
+  "Bidang Distribusi": "/dashboard/distribusi",
+  "Bidang Distribusi dan Cadangan Pangan": "/dashboard/distribusi",
+  "Bidang Ketersediaan": "/dashboard/ketersediaan",
+  "Bidang Ketersediaan dan Kerawanan Pangan": "/dashboard/ketersediaan",
+  "Bidang Konsumsi": "/dashboard/konsumsi",
+  "Bidang Konsumsi dan Keamanan Pangan": "/dashboard/konsumsi",
+  Sekretariat: "/dashboard/sekretariat",
+  "Sekretariat Dinas": "/dashboard/sekretariat",
+  "Sekretariat Dinas Pangan": "/dashboard/sekretariat",
+  UPTD: "/dashboard/uptd",
+  "UPTD Balai Pengawasan Mutu Pangan dan Obat Hewan": "/dashboard/uptd",
+};
+
+/**
+ * Derive the correct dashboard path for a normalized user object.
+ * Falls back to the role query param hint, then to /dashboard.
+ */
+function getDashboardPath(user, roleHint) {
+  if (!user) return "/dashboard";
+
+  // 1. Specific role mapping
+  if (user.role && roleToDashboard[user.role]) {
+    return roleToDashboard[user.role];
+  }
+
+  // 2. unit_kerja name mapping
+  if (user.unit_kerja && unitToDashboard[user.unit_kerja]) {
+    return unitToDashboard[user.unit_kerja];
+  }
+
+  // 3. Use role query param hint from landing page as last resort
+  if (roleHint && roleToDashboard[roleHint]) {
+    return roleToDashboard[roleHint];
+  }
+
+  return "/dashboard";
+}
+
 export default function LoginPage() {
   const location = useLocation();
-  // const params = new URLSearchParams(location.search);
-  // Hapus roleParam karena tidak digunakan
+  const params = new URLSearchParams(location.search);
+  const roleHint = params.get("role") || "";
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,22 +66,6 @@ export default function LoginPage() {
 
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
-
-  // Mapping role/unit_kerja ke dashboard
-  const dashboardMapping = {
-    super_admin: "/dashboard/superadmin",
-    kepala_dinas: "/dashboard/superadmin",
-    Sekretariat: "/dashboard/sekretariat",
-    "Bidang Ketersediaan": "/dashboard/ketersediaan",
-    "Bidang Distribusi": "/dashboard/distribusi",
-    "Bidang Konsumsi": "/dashboard/konsumsi",
-    UPTD: "/dashboard/uptd",
-    kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
-    kepala_bidang_distribusi: "/dashboard/distribusi",
-    kepala_bidang_konsumsi: "/dashboard/konsumsi",
-    "Bidang Distribusi dan Cadangan Pangan": "/dashboard/distribusi",
-    // Tambahkan mapping lain jika diperlukan
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,27 +78,11 @@ export default function LoginPage() {
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem("user"));
-      } catch (e) {
+      } catch (_e) {
         // ignore JSON parse error
       }
 
-      const roleIdToName = {
-        "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
-        // ... tambahkan lainnya
-      };
-
-      if (user) {
-        // Prioritaskan role, lalu unit_kerja
-        let dashboardPath = null;
-        if (user.role && dashboardMapping[user.role]) {
-          dashboardPath = dashboardMapping[user.role];
-        } else if (user.unit_kerja && dashboardMapping[user.unit_kerja]) {
-          dashboardPath = dashboardMapping[user.unit_kerja];
-        }
-        navigate(dashboardPath || "/dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+      navigate(getDashboardPath(user, roleHint));
     } else {
       setError(result.message);
     }

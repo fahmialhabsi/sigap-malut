@@ -1,6 +1,74 @@
 import { create } from "zustand";
 import api from "../utils/api";
 import { logAuditTrail } from "../utils/auditTrail";
+import { roleIdToName } from "../utils/roleMap";
+
+// Map unit_kerja names to specific role names for bidang-level accounts
+const unitToRole = {
+  "Bidang Distribusi": "kepala_bidang_distribusi",
+  "Bidang Distribusi dan Cadangan Pangan": "kepala_bidang_distribusi",
+  "Bidang Ketersediaan": "kepala_bidang_ketersediaan",
+  "Bidang Ketersediaan dan Kerawanan Pangan": "kepala_bidang_ketersediaan",
+  "Bidang Konsumsi": "kepala_bidang_konsumsi",
+  "Bidang Konsumsi dan Keamanan Pangan": "kepala_bidang_konsumsi",
+  Sekretariat: "sekretaris",
+  "Sekretariat Dinas": "sekretaris",
+  "Sekretariat Dinas Pangan": "sekretaris",
+  UPTD: "kepala_uptd",
+  "UPTD Balai Pengawasan Mutu Pangan dan Obat Hewan": "kepala_uptd",
+};
+
+// Generic role names that should be further refined using unit_kerja
+const genericRoles = new Set([
+  "kepala_bidang",
+  "kepala_seksi",
+  "pelaksana",
+  "jabatan_fungsional",
+  "auditor",
+  "viewer",
+]);
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Normalize a raw user payload from the backend so that role/roleName
+ * is always a specific, RBAC-ready value and unit_kerja holds a human-
+ * readable name rather than a UUID.
+ */
+export function normalizeUser(raw) {
+  if (!raw) return raw;
+
+  const normalized = { ...raw };
+
+  // 1. Derive role name: prefer role_id mapping, then existing role string
+  let roleName = raw.role || "";
+  if (raw.role_id && roleIdToName[raw.role_id]) {
+    roleName = roleIdToName[raw.role_id];
+  }
+
+  // 2. Normalize unit_kerja – if it looks like a UUID use alternate name fields
+  let unitKerja = raw.unit_kerja || "";
+  if (UUID_REGEX.test(unitKerja)) {
+    unitKerja =
+      raw.unitName ||
+      raw.unit_name ||
+      raw.nama_unit ||
+      raw.bidang ||
+      unitKerja;
+  }
+
+  // 3. If role is still generic, infer specific role from unit name
+  if (genericRoles.has(roleName) && unitToRole[unitKerja]) {
+    roleName = unitToRole[unitKerja];
+  }
+
+  normalized.role = roleName;
+  normalized.roleName = roleName;
+  normalized.unit_kerja = unitKerja;
+
+  return normalized;
+}
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -16,7 +84,8 @@ const useAuthStore = create((set) => ({
         username: email,
         password,
       });
-      const { user, token } = response.data.data;
+      const { user: rawUser, token } = response.data.data;
+      const user = normalizeUser(rawUser);
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
@@ -72,7 +141,7 @@ const useAuthStore = create((set) => ({
 
     if (token && userStr) {
       try {
-        const user = JSON.parse(userStr);
+        const user = normalizeUser(JSON.parse(userStr));
         set({
           user,
           token,
