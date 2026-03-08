@@ -100,7 +100,7 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     };
   }, []);
 
-  // Ambil modul sidebar bidang ketersediaan
+  // Replace the existing "Ambil modul sidebar bidang ketersediaan" useEffect with this
   useEffect(() => {
     if (!authChecked) return;
     const now = Date.now();
@@ -112,21 +112,69 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
       .get("/modules")
       .then((res) => {
         if (!mounted) return;
-        const data = res.data;
-        const ketersediaan = data.data?.filter(
-          (row) => row.bidang === "Bidang Ketersediaan" && row.is_active,
-        );
+
+        console.log("DEBUG: /modules response:", res); // <-- full response
+
+        // tolerant parsing for various response shapes
+        const payload = res.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : Array.isArray(payload?.result)
+              ? payload.result
+              : [];
+
+        console.log("DEBUG: parsed modules array (arr):", arr);
+
+        // do a tolerant bidang lookup (trim + ignore case)
+        const ketersediaan = arr.filter((row) => {
+          const bidang = String(
+            row.bidang || row.bidang_name || row.bidangLabel || "",
+          )
+            .trim()
+            .toLowerCase();
+          return bidang === "bidang ketersediaan" || bidang === "ketersediaan";
+        });
+
+        console.log("DEBUG: filtered ketersediaan modules:", ketersediaan);
+
         if (ketersediaan && ketersediaan.length) {
           setModules(ketersediaan);
           setMenuAktif(
-            (m) => m || ketersediaan[0].nama_modul || ketersediaan[0].name,
+            (m) =>
+              m ||
+              ketersediaan[0].nama_modul ||
+              ketersediaan[0].name ||
+              ketersediaan[0].id,
+          );
+        } else if (arr && arr.length) {
+          // fallback: use all modules if no bidang matches
+          console.warn(
+            "WARNING: no 'Bidang Ketersediaan' found — using all modules as fallback",
+          );
+          setModules(arr);
+          setMenuAktif(
+            (m) => m || arr[0].nama_modul || arr[0].name || arr[0].id,
           );
         } else if (fallbackModules && fallbackModules.length) {
           setModules(fallbackModules);
           setMenuAktif((m) => m || fallbackModules[0].name);
+        } else {
+          // still empty - show message in console
+          console.warn(
+            "No modules returned by API and no fallbackModules provided",
+          );
+          setModules([]);
         }
       })
-      .finally(() => {});
+      .catch((err) => {
+        console.error("Fetch modules error:", err);
+        if (mounted && fallbackModules && fallbackModules.length) {
+          setModules(fallbackModules);
+          setMenuAktif((m) => m || fallbackModules[0].name);
+        }
+      });
 
     return () => {
       mounted = false;
