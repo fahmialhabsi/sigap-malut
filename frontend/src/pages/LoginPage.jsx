@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+import { getDashboardPath } from "../utils/getDashboardPath";
 
 export default function LoginPage() {
   const location = useLocation();
@@ -13,22 +14,6 @@ export default function LoginPage() {
 
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
-
-  // Mapping role/unit_kerja ke dashboard
-  const dashboardMapping = {
-    super_admin: "/dashboard/superadmin",
-    kepala_dinas: "/dashboard/superadmin",
-    Sekretariat: "/dashboard/sekretariat",
-    "Bidang Ketersediaan": "/dashboard/ketersediaan",
-    "Bidang Distribusi": "/dashboard/distribusi",
-    "Bidang Konsumsi": "/dashboard/konsumsi",
-    UPTD: "/dashboard/uptd",
-    kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
-    kepala_bidang_distribusi: "/dashboard/distribusi",
-    kepala_bidang_konsumsi: "/dashboard/konsumsi",
-    "Bidang Distribusi dan Cadangan Pangan": "/dashboard/distribusi",
-    // Tambahkan mapping lain jika diperlukan
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,23 +30,7 @@ export default function LoginPage() {
         // ignore JSON parse error
       }
 
-      const roleIdToName = {
-        "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
-        // ... tambahkan lainnya
-      };
-
-      if (user) {
-        // Prioritaskan role, lalu unit_kerja
-        let dashboardPath = null;
-        if (user.role && dashboardMapping[user.role]) {
-          dashboardPath = dashboardMapping[user.role];
-        } else if (user.unit_kerja && dashboardMapping[user.unit_kerja]) {
-          dashboardPath = dashboardMapping[user.unit_kerja];
-        }
-        navigate(dashboardPath || "/dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+      navigate(getDashboardPath(user));
     } else {
       setError(result.message);
     }
