@@ -1,3 +1,5 @@
+// frontend/src/ui/dashboards/DashboardMain.jsx
+
 import useAuthStore from "../../stores/authStore";
 import { Navigate, useNavigate } from "react-router-dom";
 import ProfessionalCharts from "../components/ProfessionalCharts";

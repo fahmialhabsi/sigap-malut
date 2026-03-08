@@ -1,100 +1,115 @@
+// frontend/src/stores/authStore.js
+
 import { create } from "zustand";
 import api from "../utils/api";
 import { logAuditTrail } from "../utils/auditTrail";
-import { roleIdToName } from "../utils/roleMap";
+import { roleIdToName } from "../utils/roleMap"; // <- sudah ada
+import unitNameToId from "../utils/unitMap"; // <- import untuk mapping unit
 
-const authStore = create((set) => ({
+// Build inverse mapping unitId -> unitName (lowercased keys for tolerant lookup)
+const unitIdToName = Object.entries(unitNameToId || {}).reduce(
+  (acc, [name, id]) => {
+    if (id) acc[String(id).toLowerCase()] = name;
+    return acc;
+  },
+  {},
+);
+
+// Helper: normalisasi objek user agar frontend konsisten menggunakan field yang sama
+function normalizeUser(raw) {
+  if (!raw) return null;
+  const user = { ...raw };
+
+  // role: jika backend mengirim role (string) gunakan itu;
+  // jika hanya ada role_id (UUID) mapping ke nama role via roleIdToName
+  if (!user.role) {
+    const fromRoleId = user.role_id && roleIdToName?.[String(user.role_id)];
+    user.role = fromRoleId || user.role || null;
+  }
+
+  // roleName: variasi lain kalau ada
+  if (!user.roleName) {
+    user.roleName = user.roleName || user.role || null;
+  }
+
+  // unit_kerja: konsistenkan dari unit_id / unit / unitName / unit_kerja
+  let unitVal =
+    user.unit_kerja ||
+    user.unit ||
+    user.unit_id ||
+    user.unitName ||
+    user.unit_name ||
+    null;
+
+  // Jika unitVal adalah UUID (atau adalah salah satu id dalam mapping), convert ke display name
+  if (unitVal) {
+    const lower = String(unitVal).toLowerCase();
+    if (unitIdToName[lower]) {
+      // gunakan display name seperti "Bidang Distribusi"
+      unitVal = unitIdToName[lower];
+    }
+  }
+
+  user.unit_kerja = unitVal;
+
+  // jabatan: konsistenkan dari beberapa kemungkinan field
+  user.jabatan = user.jabatan || user.position || user.role_title || null;
+
+  return user;
+}
+
+const useAuthStore = create((set) => ({
   user: null,
   token: null,
-  refreshToken: null,
   isAuthenticated: false,
   isInitialized: false,
 
-  login: async (emailOrUsername, password) => {
+  login: async (email, password) => {
     try {
-      const payload =
-        emailOrUsername && String(emailOrUsername).includes("@")
-          ? { email: emailOrUsername, password }
-          : { username: emailOrUsername, password };
+      // some tests expect payload field `username`; include both to be compatible
+      const response = await api.post("/auth/login", {
+        email,
+        username: email,
+        password,
+      });
 
-      const response = await api.post("/auth/login", payload);
-      console.log("authStore.login: response", response?.data);
+      // backend response shape: response.data.data.{ user, token } atau data.data
+      const { user: rawUser, token } =
+        response.data.data || response.data || {};
 
-      const {
-        user: rawUser,
-        token,
-        refreshToken,
-        dashboardUrl,
-        roleName,
-      } = response.data.data;
+      const user = normalizeUser(rawUser);
 
-      const unitVal =
-        rawUser?.unit_kerja || rawUser?.unit_id || rawUser?.unit || "";
-      const unit = unitVal ? String(unitVal).toLowerCase() : "";
-
-      const inferRoleFromUnit = () => {
-        if (!unit) return null;
-        if (unit.includes("ketersediaan")) return "kepala_bidang_ketersediaan";
-        if (unit.includes("distribusi")) return "kepala_bidang_distribusi";
-        if (unit.includes("konsumsi")) return "kepala_bidang_konsumsi";
-        if (unit.includes("sekretariat")) return "sekretaris";
-        if (unit.includes("uptd")) return "kepala_uptd";
-        return null;
-      };
-
-      const user = {
-        ...rawUser,
-        roleName: roleName || null, // "GUBERNUR", etc (from backend)
-        dashboardUrl: dashboardUrl || null,
-        role:
-          rawUser?.role ||
-          roleIdToName?.[rawUser?.role_id] ||
-          inferRoleFromUnit() ||
-          null,
-      };
-
-      // Persist auth
-      if (token) localStorage.setItem("token", token);
-      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
       set({
         user,
-        token: token || null,
-        refreshToken: refreshToken || null,
-        isAuthenticated: !!token,
+        token,
+        isAuthenticated: true,
         isInitialized: true,
       });
 
       logAuditTrail({ user, action: "login", detail: "User login" });
-
-      // IMPORTANT: return backend `data` object (so caller can read data.dashboardUrl)
-      return { success: true, data: response.data.data };
+      return { success: true, data: response.data.data || response.data };
     } catch (error) {
-      console.error("authStore.login: error", error?.response?.data || error);
-
+      // Reset state on failed login
       set({
         user: null,
         token: null,
-        refreshToken: null,
         isAuthenticated: false,
         isInitialized: true,
       });
-
       localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
-
       logAuditTrail({
         user: null,
         action: "login_failed",
         detail: "Login gagal",
       });
-
+      console.error("Login error:", error);
       return {
         success: false,
         message: error.response?.data?.message || "Login gagal",
-        error: error.response?.data || null,
       };
     }
   },
@@ -102,15 +117,11 @@ const authStore = create((set) => ({
   logout: async () => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     logAuditTrail({ user, action: "logout", detail: "User logout" });
-
     localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
-
     set({
       user: null,
       token: null,
-      refreshToken: null,
       isAuthenticated: false,
       isInitialized: true,
     });
@@ -118,17 +129,16 @@ const authStore = create((set) => ({
 
   initAuth: () => {
     const token = localStorage.getItem("token");
-    const refreshToken = localStorage.getItem("refreshToken");
     const userStr = localStorage.getItem("user");
 
     if (token && userStr) {
       try {
-        const user = JSON.parse(userStr);
+        const raw = JSON.parse(userStr);
+        const user = normalizeUser(raw);
         set({
           user,
-          token: token || null,
-          refreshToken: refreshToken || null,
-          isAuthenticated: !!token,
+          token,
+          isAuthenticated: true,
           isInitialized: true,
         });
       } catch (error) {
@@ -136,7 +146,6 @@ const authStore = create((set) => ({
         set({
           user: null,
           token: null,
-          refreshToken: null,
           isAuthenticated: false,
           isInitialized: true,
         });
@@ -145,7 +154,6 @@ const authStore = create((set) => ({
       set({
         user: null,
         token: null,
-        refreshToken: null,
         isAuthenticated: false,
         isInitialized: true,
       });
@@ -153,5 +161,4 @@ const authStore = create((set) => ({
   },
 }));
 
-export const useAuthStore = authStore;
 export default useAuthStore;

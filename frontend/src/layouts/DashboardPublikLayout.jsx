@@ -6,12 +6,8 @@ export default function DashboardPublikLayout({ children }) {
       <header className="sticky top-0 z-10 border-b border-muted bg-ink/80 backdrop-blur text-surface">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-4">
           <div>
-            <h2 className="text-2xl font-display text-primary">
-              Dashboard Publik
-            </h2>
-            <p className="text-sm text-muted">
-              Ringkasan Data Publik dan Monitoring
-            </p>
+            <h2 className="text-2xl font-display text-primary">Dashboard Publik</h2>
+            <p className="text-sm text-muted">Ringkasan Data Publik dan Monitoring</p>
           </div>
         </div>
       </header>

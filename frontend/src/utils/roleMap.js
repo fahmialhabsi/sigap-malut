@@ -2,7 +2,7 @@
 export const roleIdToName = {
   "03e73e11-aa19-42f1-ad36-57b9ea005c60": "auditor",
   "aae6d80e-c865-434f-b6ef-850e16f29ca5": "jabatan_fungsional",
-  "468f7103-2c95-4b1d-b288-cbb082bb0963": "kepala_bidang_distribusi",
+  "468f7103-2c95-4b1d-b288-cbb082bb0963": "kepala_bidang",
   "3b92b758-1521-481e-b22c-a7db0af47ed5": "kepala_dinas",
 
   // NEW (role sungguhan):
