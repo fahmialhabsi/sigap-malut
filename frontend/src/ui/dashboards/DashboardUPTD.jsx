@@ -2,8 +2,22 @@ import React from "react";
 import useAuthStore from "../../stores/authStore";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import { Navigate } from "react-router-dom";
+import FieldMappingPreview from "../../components/FieldMappingPreview";
+import { roleIdToName } from "../../utils/roleMap";
+
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
+
 export default function DashboardUPTD() {
   const user = useAuthStore((state) => state.user);
+  const roleName = normalizeRoleName(user);
 
   React.useEffect(() => {
     if (user) {
@@ -16,13 +30,22 @@ export default function DashboardUPTD() {
     }
   }, [user]);
 
-  const hasRole = (role) => user && user.role === role;
-  if (!hasRole("kepala_uptd")) return <Navigate to="/" replace />;
-  // Modul UPTD (dummy, bisa diambil dari config jika ada)
+  const unitKerja = user?.unit_kerja
+    ? String(user.unit_kerja).toLowerCase()
+    : "";
+  const isAllowed =
+    !!user &&
+    (roleName === "kepala_uptd" ||
+      roleName === "super_admin" ||
+      roleName === "kepala_dinas" ||
+      roleName === "gubernur" ||
+      unitKerja.includes("uptd"));
+
+  if (!isAllowed) return <Navigate to="/" replace />;
+
   const uptdModules = [
     { id: "U001", name: "Sertifikasi Prima" },
     { id: "U002", name: "Audit pangan" },
-    // Tambahkan modul lain sesuai kebutuhan
   ];
 
   return (
@@ -32,7 +55,7 @@ export default function DashboardUPTD() {
         <div className="text-muted mb-4">
           Ringkasan KPI dan modul UPTD Balai Pengawasan Mutu dan Keamanan Pangan
         </div>
-        {/* KPI UPTD (dummy) */}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-purple-50 rounded-lg p-4 flex flex-col items-center">
             <span className="text-2xl font-bold">59</span>
@@ -53,7 +76,7 @@ export default function DashboardUPTD() {
             <span className="text-xs text-purple-700">Data Valid</span>
           </div>
         </div>
-        {/* Modul UPTD (auto-sync field mapping) */}
+
         <div className="font-bold mb-2">Modul UPTD</div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {uptdModules.map((modul) => (

@@ -1,5 +1,9 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const mappingPath = path.join(
   __dirname,
@@ -7,9 +11,11 @@ const mappingPath = path.join(
   "config",
   "roleModuleMapping.json",
 );
-let roleMap = {};
+
+let roleMap = { roles: {} };
 try {
-  roleMap = require(mappingPath);
+  const raw = fs.readFileSync(mappingPath, "utf8");
+  roleMap = JSON.parse(raw);
 } catch (e) {
   roleMap = { roles: {} };
 }
@@ -18,8 +24,8 @@ function hasPermission(role, permission) {
   if (!role) return false;
   const r = roleMap.roles[role];
   if (!r) return false;
-  if (r.permissions.includes("*")) return true;
-  return r.permissions.includes(permission);
+  if (r.permissions && r.permissions.includes("*")) return true;
+  return Array.isArray(r.permissions) && r.permissions.includes(permission);
 }
 
 function authorize(permission) {
@@ -35,4 +41,4 @@ function authorize(permission) {
   };
 }
 
-module.exports = { authorize, hasPermission };
+export { authorize, hasPermission };

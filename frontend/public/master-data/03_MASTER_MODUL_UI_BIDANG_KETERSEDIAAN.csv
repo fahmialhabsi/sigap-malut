@@ -1,0 +1,7 @@
+modul_id,nama_modul,kategori,bidang,icon,has_approval,has_file_upload,is_public,menu_order,is_active,total_layanan
+BKT-KBJ,Kebijakan & Analisis Ketersediaan,Bidang Ketersediaan,Bidang Ketersediaan & Kerawanan Pangan,document-chart-bar,true,true,false,1,true,5
+BKT-PGD,Pengendalian & Monitoring Produksi,Bidang Ketersediaan,Bidang Ketersediaan & Kerawanan Pangan,chart-bar,false,true,true,2,true,5
+BKT-KRW,Kerawanan Pangan,Bidang Ketersediaan,Bidang Ketersediaan & Kerawanan Pangan,exclamation-triangle,true,true,true,3,true,4
+BKT-FSL,Fasilitasi & Intervensi,Bidang Ketersediaan,Bidang Ketersediaan & Kerawanan Pangan,hand-raised,false,true,false,4,true,1
+BKT-BMB,Bimbingan & Pendampingan,Bidang Ketersediaan,Bidang Ketersediaan & Kerawanan Pangan,academic-cap,false,true,false,5,true,5
+BKT-MEV,Monitoring Evaluasi & Pelaporan,Bidang Ketersediaan,Bidang Ketersediaan & Kerawanan Pangan,clipboard-document-check,false,true,false,6,true,6

@@ -28,3 +28,9 @@ body {
 code {
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
+
+body,
+html,
+#root {
+  background: #fff !important;
+}

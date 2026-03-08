@@ -1,6 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
+
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
 
 // Kategori utama dan role mapping
 const categories = [
@@ -27,7 +38,7 @@ const categories = [
   { key: "UPTD", label: "UPTD", roles: ["super_admin", "kepala_uptd"] },
 ];
 
-// Modul per kategori (contoh, tambahkan sesuai kebutuhan)
+// Modul per kategori (contoh)
 const modulesByCategory = {
   Sekretariat: [
     { id: "SEK-ADM", name: "Administrasi Umum & Persuratan" },
@@ -46,22 +57,18 @@ const modulesByCategory = {
   "Bidang Ketersediaan": [
     { id: "K001", name: "Master data komoditas", publik: true },
     { id: "K002", name: "Produksi pangan", publik: true },
-    // ...tambahkan modul lain...
   ],
   "Bidang Distribusi": [
     { id: "D001", name: "Data pasar", publik: true },
     { id: "D002", name: "Harga pangan", publik: true },
-    // ...tambahkan modul lain...
   ],
   "Bidang Konsumsi": [
     { id: "C001", name: "Konsumsi pangan", publik: true },
     { id: "C002", name: "Skor PPH", publik: true },
-    // ...tambahkan modul lain...
   ],
   UPTD: [
     { id: "U001", name: "Sertifikasi Prima", approval: true },
     { id: "U002", name: "Audit pangan", approval: true },
-    // ...tambahkan modul lain...
   ],
 };
 
@@ -71,9 +78,10 @@ export default function DashboardLayout({ children }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dark] = useState(() => localStorage.getItem("darkMode") === "true");
   const dropdownRef = useRef(null);
-  const user = useAuthStore((state) => state.user);
 
-  // Handle click modul
+  const user = useAuthStore((state) => state.user);
+  const roleName = normalizeRoleName(user);
+
   const handleModuleClick = (modulId) => {
     navigate(`/module/${modulId.toLowerCase()}`);
   };
@@ -83,19 +91,17 @@ export default function DashboardLayout({ children }) {
     children &&
     children.type &&
     (children.type.name === "DashboardDistribusiLayout" ||
-      children.type.displayName === "DashboardDistribusiLayout");
+      children.type.displayName === "DashboardDistribusiLayout" ||
+      children.type.name === "DashboardDistribusiSuperModern" ||
+      children.type.displayName === "DashboardDistribusiSuperModern");
 
   if (isDistribusiLayout) {
-    // Untuk distribusi, render children saja tanpa header/nav/main
     return <>{children}</>;
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
-      {/* Header hanya jika bukan distribusi */}
-      {/* Hapus header dan ringkasan dashboard jika bukan distribusi */}
-      {/* Navbar horizontal modul Sekretariat */}
-      {user && user.role === "sekretaris" ? (
+      {user && roleName === "sekretaris" ? (
         <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
           <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
             {modulesByCategory["Sekretariat"].map((modul) => (
@@ -113,7 +119,7 @@ export default function DashboardLayout({ children }) {
         <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
           <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
             {categories
-              .filter((cat) => user && cat.roles.includes(user.role))
+              .filter((cat) => roleName && cat.roles.includes(roleName))
               .map((cat) => (
                 <button
                   key={cat.key}
@@ -126,7 +132,7 @@ export default function DashboardLayout({ children }) {
           </div>
         </nav>
       )}
-      {/* Konten utama dashboard */}
+
       <main className="flex-1 px-8 py-8 mx-auto max-w-6xl">{children}</main>
     </div>
   );

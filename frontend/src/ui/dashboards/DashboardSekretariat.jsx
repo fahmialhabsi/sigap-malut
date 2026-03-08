@@ -3,6 +3,17 @@ import useAuthStore from "../../stores/authStore";
 import FieldMappingPreview from "../../components/FieldMappingPreview";
 import { Navigate } from "react-router-dom";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
+import { roleIdToName } from "../../utils/roleMap";
+
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
 
 // Data dummy (bisa diganti API)
 const kpiData = [
@@ -15,6 +26,7 @@ const kpiData = [
   { label: "Alert Data", value: 3, info: "Perlu validasi" },
   { label: "Audit Log", value: 250, info: "Aksi tercatat" },
 ];
+
 const alertData = [
   {
     type: "warning",
@@ -28,6 +40,7 @@ const alertData = [
   },
   { type: "info", message: "1 dokumen menunggu approval", time: "Baru saja" },
 ];
+
 const tableData = [
   {
     bidang: "Kepegawaian",
@@ -76,6 +89,7 @@ function ExecutiveSummaryPanel({ kpiData }) {
     </div>
   );
 }
+
 function ComplianceAlertPanel({ alertData }) {
   return (
     <div className="bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-2">
@@ -84,7 +98,13 @@ function ComplianceAlertPanel({ alertData }) {
         {alertData.map((alert, idx) => (
           <li
             key={idx}
-            className={`p-2 rounded ${alert.type === "danger" ? "bg-red-100 text-red-700" : alert.type === "warning" ? "bg-yellow-100 text-yellow-800" : "bg-blue-50 text-blue-700"}`}
+            className={`p-2 rounded ${
+              alert.type === "danger"
+                ? "bg-red-100 text-red-700"
+                : alert.type === "warning"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-blue-50 text-blue-700"
+            }`}
           >
             <div className="flex justify-between items-center">
               <span>{alert.message}</span>
@@ -96,6 +116,7 @@ function ComplianceAlertPanel({ alertData }) {
     </div>
   );
 }
+
 function DataFlowChart() {
   return (
     <div className="bg-slate-800 rounded-xl shadow p-6">
@@ -146,6 +167,7 @@ function DataFlowChart() {
     </div>
   );
 }
+
 function LintasBidangTable({ tableData }) {
   return (
     <div className="bg-slate-800 rounded-xl shadow p-6">
@@ -165,7 +187,13 @@ function LintasBidangTable({ tableData }) {
               <tr key={idx} className="border-b last:border-none">
                 <td className="px-4 py-2">{row.bidang}</td>
                 <td
-                  className={`px-4 py-2 font-semibold ${row.status === "Valid" ? "text-green-600" : row.status === "Revisi" ? "text-yellow-700" : "text-red-600"}`}
+                  className={`px-4 py-2 font-semibold ${
+                    row.status === "Valid"
+                      ? "text-green-600"
+                      : row.status === "Revisi"
+                        ? "text-yellow-700"
+                        : "text-red-600"
+                  }`}
                 >
                   {row.status}
                 </td>
@@ -179,6 +207,7 @@ function LintasBidangTable({ tableData }) {
     </div>
   );
 }
+
 function QuickActionBar() {
   return (
     <div className="flex flex-wrap gap-4 justify-end">
@@ -197,6 +226,7 @@ function QuickActionBar() {
     </div>
   );
 }
+
 function AIFeedbackPanel() {
   return (
     <div className="bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-2">
@@ -219,6 +249,7 @@ function AIFeedbackPanel() {
     </div>
   );
 }
+
 function OpenDataPortal() {
   return (
     <div className="bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-2">
@@ -243,6 +274,8 @@ function OpenDataPortal() {
 
 export default function DashboardSekretariat() {
   const user = useAuthStore((state) => state.user);
+  const roleName = normalizeRoleName(user);
+
   React.useEffect(() => {
     if (user) {
       workflowStatusUpdateAPI({
@@ -253,28 +286,39 @@ export default function DashboardSekretariat() {
       });
     }
   }, [user]);
-  const hasRole = (role) => user && user.role === role;
-  if (!hasRole("sekretaris")) return <Navigate to="/" replace />;
+
+  const unitKerja = user?.unit_kerja
+    ? String(user.unit_kerja).toLowerCase()
+    : "";
+  const isAllowed =
+    !!user &&
+    (roleName === "sekretaris" ||
+      roleName === "super_admin" ||
+      roleName === "kepala_dinas" ||
+      roleName === "gubernur" ||
+      unitKerja.includes("sekretariat"));
+
+  if (!isAllowed) return <Navigate to="/" replace />;
+
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
-      {/* Executive Summary & Compliance/Alert Panel */}
       <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 px-8 py-6">
         <ExecutiveSummaryPanel kpiData={kpiData} />
         <ComplianceAlertPanel alertData={alertData} />
       </section>
-      {/* Flowchart Alur Data */}
+
       <section className="w-full px-8 py-4">
         <DataFlowChart />
       </section>
-      {/* Data Table Lintas Bidang */}
+
       <section className="w-full px-8 py-4">
         <LintasBidangTable tableData={tableData} />
       </section>
-      {/* Quick Action Bar */}
+
       <section className="w-full px-8 py-4">
         <QuickActionBar />
       </section>
-      {/* AI/Feedback Panel & Open Data */}
+
       <section className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 px-8 py-4">
         <AIFeedbackPanel />
         <OpenDataPortal />

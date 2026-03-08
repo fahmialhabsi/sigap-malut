@@ -1,7 +1,11 @@
+// backend/server.js
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
+import path from "path";
+import { fileURLToPath } from "url";
 import { sequelize, testConnection } from "./config/database.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
@@ -10,6 +14,7 @@ import bdsHrgRoutes from "./routes/BDS-HRG.js";
 import bktPgdRoutes from "./routes/BKT-PGD.js";
 import tablesRoutes from "./routes/tables.js";
 import modulesRoutes from "./routes/modules.js";
+import bksEvlRoutes from "./routes/BKS-EVL.js";
 
 import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
 import workflowStatusRouter from "./routes/workflow-status.js";
@@ -18,6 +23,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// ESM __dirname shim
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(helmet());
@@ -32,6 +41,12 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve master-data static files from repository root
+app.use(
+  "/master-data",
+  express.static(path.join(__dirname, "..", "master-data")),
+);
 
 // Request logging (development only)
 if (process.env.NODE_ENV === "development") {
@@ -82,6 +97,7 @@ app.use("/api/sek-adm", sekAdmRoutes);
 app.use("/api/bds-hrg", bdsHrgRoutes);
 app.use("/api/bkt-pgd", bktPgdRoutes);
 app.use("/api/modules", modulesRoutes);
+app.use("/api/bks-evl", bksEvlRoutes);
 
 // Register all auto-generated routes
 registerRoutes(app);
