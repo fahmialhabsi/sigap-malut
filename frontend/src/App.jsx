@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // frontend/src/App.jsx
 
 import React, { useEffect, Suspense, lazy } from "react";
@@ -283,24 +282,3 @@ function App() {
 }
 
 export default App;
-=======
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-// Import other components and routes
-import DashboardPublik from './path/to/DashboardPublik'; // Adjust the import path as necessary
-import DashboardPublikLayout from './path/to/DashboardPublikLayout'; // Adjust the import path as necessary
-
-const App = () => {
-    return (
-        <Router>
-            <Routes>
-                <Route path="/dashboard-publik" element={<DashboardPublikLayout><DashboardPublik /></DashboardPublikLayout>} />
-                {/* Existing routes go here */}
-            </Routes>
-        </Router>
-    );
-};
-
-export default App;
->>>>>>> 5493b062331d33d35b0565794b8cfc9fbe4b81dd
