@@ -1,12 +1,7 @@
 // frontend/src/App.jsx
 
 import React, { useEffect, Suspense, lazy } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import ReportingWorkflowPage from "./pages/ReportingWorkflowPage";
 import CommentWorkflowPage from "./pages/CommentWorkflowPage";
@@ -63,7 +58,7 @@ function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <Router>
+    <>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<LandingPage />} />
@@ -277,7 +272,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
-    </Router>
+    </>
   );
 }
 
