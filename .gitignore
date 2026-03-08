@@ -30,3 +30,8 @@ coverage/
 # Temporary
 .tmp/
 .cache/
+
+# Microsoft Office temporary/lock files
+~$*.doc*
+~$*.xls*
+~$*.ppt*

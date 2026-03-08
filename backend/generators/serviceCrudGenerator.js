@@ -1,5 +1,9 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * serviceCrudGenerator
@@ -60,14 +64,36 @@ module.exports = function(models){
     if (!fs.existsSync(routeFile)) {
       fs.writeFileSync(
         routeFile,
-        `const express = require('express');
-const router = express.Router();
-module.exports = (app) => {
+        `import express from 'express';
+import { getController } from '../utils/dynamicImport.js';
+
+export default (app) => {
   const models = app.get('models');
-  const ctrl = require('../controllers/${code}Controller')(models);
-  router.post('/', ctrl.create);
-  router.get('/', ctrl.list);
-  router.get('/:id', ctrl.get);
+  const router = express.Router();
+  // lazy-load controller (returns controller instance or object)
+  const ctrlPromise = getController('${code}', models);
+
+  router.post('/', async (req, res, next) => {
+    try {
+      const ctrl = await ctrlPromise;
+      return ctrl.create(req, res, next);
+    } catch (e) { next(e); }
+  });
+
+  router.get('/', async (req, res, next) => {
+    try {
+      const ctrl = await ctrlPromise;
+      return ctrl.list(req, res, next);
+    } catch (e) { next(e); }
+  });
+
+  router.get('/:id', async (req, res, next) => {
+    try {
+      const ctrl = await ctrlPromise;
+      return ctrl.get(req, res, next);
+    } catch (e) { next(e); }
+  });
+
   return router;
 };
 `,
@@ -77,7 +103,10 @@ module.exports = (app) => {
   return { generated: registry.map((r) => r.kode_layanan) };
 }
 
-if (require.main === module) {
+// ESM main guard — robust check for direct invocation
+const invokedPath = process.argv[1] ? path.resolve(process.argv[1]) : "";
+const selfPath = path.resolve(__filename);
+if (invokedPath === selfPath) {
   const projectRoot = path.resolve(__dirname, "..", "..");
   generate(projectRoot)
     .then((r) => console.log("generated", r))
@@ -87,4 +116,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { generate };
+export { generate };

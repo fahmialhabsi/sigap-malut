@@ -1,192 +1,300 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title as ChartTitle,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import api from "../utils/api";
 import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
 
-export default function DashboardKetersediaan() {
-  const user = useAuthStore((state) => state.user);
-  const roleName = user ? roleIdToName[user.role_id] : null;
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ChartTitle,
+  Tooltip,
+  Legend,
+);
+
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
+
+export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
+  const storeUser = useAuthStore((state) => state.user);
+  const storeRole = normalizeRoleName(storeUser);
+
+  // Optional: extra guard (so layout still works even if someone lands directly)
+  useEffect(() => {
+    if (!storeUser) return;
+    const allowed =
+      storeRole === "kepala_bidang_ketersediaan" ||
+      storeRole === "super_admin" ||
+      storeRole === "kepala_dinas" ||
+      storeRole === "gubernur";
+    if (!allowed) window.location.href = "/";
+  }, [storeUser, storeRole]);
+
+  const sidebarOpen = window.innerWidth > 768;
+  const [modules, setModules] = useState(fallbackModules || []);
+  const [menuAktif, setMenuAktif] = useState("");
+  const [chart, setChart] = useState({ labels: [], datasets: [] });
+  const [notifikasi, setNotifikasi] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [kpi, setKpi] = useState([]);
+  const [tableRows, setTableRows] = useState([]);
+  const lastModulesFetch = useRef(0);
 
   useEffect(() => {
-    if (
-      !user ||
-      !(
-        roleName === "kepala_bidang_ketersediaan" ||
-        roleName === "super_admin" ||
-        user.unit_kerja === "Bidang Ketersediaan"
-      )
-    ) {
-      window.location.href = "/landing";
-    }
-  }, [user, roleName]);
+    const now = Date.now();
+    if (now - lastModulesFetch.current < 5000) return;
+    lastModulesFetch.current = now;
+
+    api.get("/modules/ketersediaan").then((res) => {
+      const data = res.data;
+      setModules(data);
+      setMenuAktif(data[0]?.nama_modul || "");
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!menuAktif) return;
+    const activeModule = modules.find((mod) => mod.nama_modul === menuAktif);
+    if (!activeModule) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/data/${activeModule.id}`);
+        setTableRows(res.data.rows);
+        setKpi([
+          {
+            title: "Total Data",
+            value: res.data.rows.length,
+            color: "blue",
+          },
+        ]);
+        setChart({
+          labels: res.data.chart.labels,
+          datasets: res.data.chart.datasets,
+        });
+        setNotifikasi(res.data.notifications);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [menuAktif, modules]);
+
+  const chartOptions = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: "#33415566" }, ticks: { color: "#f1f5f9" } },
+      y: { grid: { color: "#33415544" }, ticks: { color: "#f1f5f9" } },
+    },
+  };
+
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-500 to-green-800 font-inter">
-      {/* Sidebar */}
-      <aside className="w-20 bg-green-700 flex flex-col items-center py-6 space-y-5">
-        {/* LOGO */}
-        <div className="bg-white rounded-lg w-12 h-12 flex items-center justify-center mb-8">
-          {/* Replace below with <img src={logoUrl} ... /> if available */}
-          <span className="text-green-800 font-bold text-xs">LOGO</span>
+    <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-green-900 via-green-800 to-slate-800 text-slate-100 select-none">
+      <aside
+        className={`h-full bg-green-950/95 z-30 flex flex-col items-center 
+        transition-all duration-300 ${
+          sidebarOpen ? "w-[275px] min-w-[275px]" : "w-[60px] min-w-[60px]"
+        } 
+        border-r border-green-900/60 shadow-xl`}
+      >
+        <div className="flex items-center justify-center w-full py-8">
+          <img
+            src="/Logo.png"
+            alt="logo"
+            className={`object-contain ${
+              sidebarOpen ? "w-24 h-24" : "w-10 h-10"
+            }`}
+          />
         </div>
-        {/* Menu Modules */}
-        <SidebarItem label="Dash" />
-        <SidebarItem label="Stok" />
-        <SidebarItem label="Gudang" />
-        <SidebarItem label="Produksi" />
-        <SidebarItem label="Target" />
-        <SidebarItem label="Laporan" />
-        <SidebarItem label="Approve" />
-        <SidebarItem label="Agenda" />
+        <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
+          {modules.map((modul) => (
+            <SidebarItem
+              key={modul.id}
+              label={modul.nama_modul}
+              active={menuAktif === modul.nama_modul}
+              sidebarOpen={sidebarOpen}
+              onClick={() => setMenuAktif(modul.nama_modul)}
+            />
+          ))}
+        </nav>
+        <div className="py-6 w-full text-xs text-green-100/70 text-center tracking-wide">
+          {sidebarOpen ? "SIGAP Malut" : "SIGAP"}
+        </div>
       </aside>
 
-      {/* Main Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="h-16 bg-green-800 flex items-center px-8 shadow">
-          <h1 className="text-2xl text-white font-bold tracking-wide flex-1">
-            SIGAP · Bidang Ketersediaan
-          </h1>
-          <div className="flex items-center space-x-4">
-            <NotificationBell />
-            <ProfileAvatar />
+      <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col bg-green-950/80 backdrop-blur">
+        <header className="flex-none w-full h-[75px] bg-green-900/80 flex items-center px-12 shadow-sm z-10 sticky top-0">
+          <div className="text-2xl text-white font-bold tracking-wide flex-1">
+            SIGAP <span className="font-light">·</span> Bidang Ketersediaan
           </div>
         </header>
 
-        <main className="flex-1 px-8 py-4 space-y-6">
-          {/* HERO ROW */}
-          <div className="grid grid-cols-6 gap-4">
-            <KpiCard title="Stok Total" color="green" />
-            <KpiCard title="Stok Kritis" color="blue" />
-            <KpiCard title="Produksi Hari Ini" color="yellow" />
-            <KpiCard title="Target Bulan" color="red" />
-            <KpiCard title="Backlog Gudang" color="blue" />
-            <KpiCard title="Approval Pending" color="yellow" />
+        <main className="flex-1 min-h-0 min-w-0 flex flex-col gap-9 py-8 overflow-auto bg-transparent">
+          {loading && (
+            <div className="w-full text-center py-6">
+              <span className="text-green-200 font-bold text-lg">
+                Memuat Data...
+              </span>
+            </div>
+          )}
+
+          <div className="w-full max-w-7xl mx-auto flex flex-row flex-wrap gap-x-8 gap-y-4 items-stretch justify-between px-2">
+            {kpi.map((item, idx) => (
+              <KpiCard
+                key={idx}
+                title={item.title}
+                value={item.value}
+                color={item.color}
+              />
+            ))}
           </div>
 
-          {/* PANEL ROW 1 */}
-          <div className="grid grid-cols-2 gap-6">
-            <PanelBox title="Tabel Stok By Komoditas">
-              <FakeTable label1="Komoditas" label2="Stok" />
+          <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
+            <PanelBox title={`Tabel ${menuAktif}`}>
+              <DataTable data={tableRows} />
             </PanelBox>
-            <PanelBox title="Grafik Tren Stok">
-              <PlaceholderChart />
-            </PanelBox>
-          </div>
-
-          {/* PANEL ROW 2 */}
-          <div className="grid grid-cols-2 gap-6">
-            <PanelBox title="Log Produksi/Mutasi">
-              <FakeList />
-            </PanelBox>
-            <PanelBox title="Approval Stok">
-              <FakeTable label1="Nama" label2="Status" />
+            <PanelBox title="Grafik Tren Ketersediaan">
+              <div className="h-56 flex items-center justify-center">
+                <Line data={chart} options={chartOptions} />
+              </div>
             </PanelBox>
           </div>
 
-          {/* NOTIF KRITIS */}
-          <PanelBox title="Notifikasi Kritis">
-            <ul className="text-red-700 space-y-1">
-              <li>
-                Stok Beras di Gudang A{" "}
-                <span className="font-semibold">di bawah minimum!</span>
-              </li>
-              <li>Pengajuan Mutasi belum approve 2 hari</li>
-              <li>Perubahan target produksi bulan ini</li>
-            </ul>
-          </PanelBox>
+          <div className="w-full max-w-7xl mx-auto px-2">
+            <PanelBox title="Notifikasi Kritis">
+              <ul className="space-y-2 text-sm">
+                {notifikasi.map((notif, idx) => (
+                  <li key={idx} className="text-yellow-300">
+                    {notif.message}
+                  </li>
+                ))}
+              </ul>
+            </PanelBox>
+          </div>
         </main>
-        <footer className="h-8 bg-green-800 flex items-center text-xs text-yellow-200 px-10">
-          SIGAP Malut v1 | Bidang Ketersediaan
-        </footer>
       </div>
     </div>
   );
 }
 
-// Reusable Components
-
-function SidebarItem({ label }) {
+function SidebarItem({ label, active, sidebarOpen, onClick }) {
   return (
-    <button className="w-10 h-10 text-xs text-green-900 bg-green-100 rounded-lg shadow hover:bg-green-300 mb-1">
-      {label}
-    </button>
-  );
-}
-
-function KpiCard({ title, color }) {
-  const bg =
-    color === "green"
-      ? "bg-green-100 border-green-700"
-      : color === "blue"
-        ? "bg-blue-100 border-blue-700"
-        : color === "yellow"
-          ? "bg-yellow-100 border-yellow-500"
-          : color === "red"
-            ? "bg-red-100 border-red-500"
-            : "bg-gray-100 border-gray-300";
-  return (
-    <div
-      className={`rounded-lg border-2 shadow flex flex-col items-center py-4 px-2 ${bg}`}
-    >
-      <div className="font-semibold mb-2">{title}</div>
-      <div className="text-2xl font-bold text-gray-800">123</div>
+    <div className="relative w-full flex items-center group transition">
+      {active && (
+        <div className="absolute left-2 h-[52px] w-2 bg-gradient-to-b from-yellow-400 to-yellow-200 rounded-r-lg scale-105 shadow-lg transition"></div>
+      )}
+      <button
+        className={`
+          h-[52px] w-full pl-10 pr-5 text-lg flex items-center rounded-2xl font-semibold
+          ${
+            active
+              ? "bg-green-800/90 text-yellow-300"
+              : "bg-green-700/85 text-green-100 hover:bg-green-800/85"
+          }
+          shadow group-hover:scale-105
+          transition-all
+          relative
+        `}
+        onClick={onClick}
+      >
+        <span className="flex-1 text-left">
+          {sidebarOpen ? label : label[0]}
+        </span>
+      </button>
     </div>
   );
 }
 
 function PanelBox({ title, children }) {
   return (
-    <section className="rounded-xl bg-white/90 shadow p-4 flex flex-col mb-2 border border-green-200">
-      <h2 className="font-bold text-green-800 mb-2">{title}</h2>
+    <section
+      className="rounded-2xl p-7 flex flex-col border border-green-900/60 shadow-md flex-1 bg-green-900/80 glassmorph-card"
+      style={{
+        backdropFilter: "blur(17px)",
+        WebkitBackdropFilter: "blur(17px)",
+      }}
+    >
+      <h2 className="font-bold text-green-200 mb-4 text-xl flex items-center gap-2">
+        {title}
+      </h2>
       <div>{children}</div>
     </section>
   );
 }
 
-function FakeTable({ label1, label2 }) {
+function KpiCard({ title, value, color }) {
+  let bg, border, txt, shadow;
+  switch (color) {
+    case "green":
+      bg =
+        "bg-gradient-to-t from-green-900/80 to-green-700/60 backdrop-blur-md";
+      border = "border-green-700";
+      txt = "text-green-100";
+      shadow = "shadow-green-800/10";
+      break;
+    case "blue":
+      bg = "bg-gradient-to-t from-blue-900/80 to-blue-700/60 backdrop-blur-md";
+      border = "border-blue-700";
+      txt = "text-blue-100";
+      shadow = "shadow-blue-900/10";
+      break;
+    case "yellow":
+      bg =
+        "bg-gradient-to-t from-yellow-700/80 to-yellow-600/70 backdrop-blur-md";
+      border = "border-yellow-600";
+      txt = "text-yellow-50";
+      shadow = "shadow-yellow-800/10";
+      break;
+    case "red":
+      bg = "bg-gradient-to-t from-red-900/80 to-red-700/60 backdrop-blur-md";
+      border = "border-red-900";
+      txt = "text-red-100";
+      shadow = "shadow-red-800/10";
+      break;
+    default:
+      bg = "bg-slate-800/80";
+      border = "border-slate-700";
+      txt = "text-slate-100";
+      shadow = "shadow-slate-800/10";
+  }
   return (
-    <table className="w-full text-xs">
-      <thead>
-        <tr>
-          <th className="text-left">{label1}</th>
-          <th className="text-left">{label2}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Beras</td>
-          <td>2100 kg</td>
-        </tr>
-        <tr>
-          <td>Jagung</td>
-          <td>700 kg</td>
-        </tr>
-      </tbody>
-    </table>
-  );
-}
-
-function FakeList() {
-  return (
-    <ul className="pl-4 text-xs list-disc">
-      <li>Mutasi masuk Gudang A</li>
-      <li>Produksi Jagung 500kg</li>
-      <li>Input OP</li>
-    </ul>
-  );
-}
-
-function NotificationBell() {
-  return (
-    <span className="inline-block w-7 h-7 bg-yellow-300 rounded-full flex items-center justify-center text-yellow-900">
-      🔔
-    </span>
-  );
-}
-
-function ProfileAvatar() {
-  return (
-    <span className="inline-block w-8 h-8 rounded-full bg-green-300 flex items-center justify-center text-green-700">
-      KB
-    </span>
+    <div
+      className={`
+        rounded-2xl border-2 px-8 py-7 flex flex-col justify-between min-w-[210px] max-w-[250px]
+        ${bg} ${border} ${txt} ${shadow}
+        shadow-lg cursor-pointer
+        hover:scale-105 hover:shadow-2xl transition-all duration-200
+        glassmorph-card
+      `}
+      style={{
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+      }}
+    >
+      <div className="font-semibold mb-2 text-base">{title}</div>
+      <div className="text-4xl font-extrabold tracking-wider">{value}</div>
+    </div>
   );
 }

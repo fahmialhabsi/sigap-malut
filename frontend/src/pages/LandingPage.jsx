@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 const roles = [
   { label: "Super Admin", value: "super_admin" },
-  { label: "Kepala Dinas Dan Gubernur", value: "gubernur" },
+  { label: "Kepala Dinas", value: "kepala_dinas" },
+  { label: "Gubernur", value: "gubernur" },
   { label: "Sekretariat Dinas Pangan", value: "sekretaris" },
   {
     label: "Bidang Ketersediaan dan Kerawanan Pangan",
@@ -27,15 +28,16 @@ export default function LandingPage() {
 
   const handleContinue = () => {
     if (!selectedRole) return;
-    if (selectedRole === "super_admin") {
-      navigate("/login?role=super_admin");
-    } else if (selectedRole === "gubernur") {
-      navigate("/login?role=gubernur");
-    } else if (selectedRole === "publik") {
+
+    // Sesuai dokumenSistem:
+    // - Publik: langsung (tanpa login)
+    // - Internal (termasuk Kepala Dinas & Gubernur): wajib login
+    if (selectedRole === "publik") {
       navigate("/dashboard-publik");
-    } else {
-      navigate(`/login?role=${selectedRole}`);
+      return;
     }
+
+    navigate(`/login?role=${selectedRole}`);
   };
 
   return (
@@ -47,17 +49,23 @@ export default function LandingPage() {
         <p className="text-center text-muted mb-4">
           Silakan pilih tipe pengguna untuk melanjutkan:
         </p>
+
         <div className="flex flex-col gap-3">
           {roles.map((role) => (
             <button
               key={role.value}
               onClick={() => setSelectedRole(role.value)}
-              className={`rounded px-4 py-3 font-semibold border transition text-base ${selectedRole === role.value ? "bg-blue-600 text-white border-blue-600" : "bg-white text-blue-600 border-neutral-300 hover:border-blue-600"}`}
+              className={`rounded px-4 py-3 font-semibold border transition text-base ${
+                selectedRole === role.value
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-blue-600 border-neutral-300 hover:border-blue-600"
+              }`}
             >
               {role.label}
             </button>
           ))}
         </div>
+
         <button
           type="button"
           className="mt-4 bg-blue-600 text-white rounded px-6 py-3 font-semibold shadow hover:bg-blue-700 transition disabled:opacity-50"

@@ -1,13 +1,20 @@
 // utils/fieldMapping.js
 // Auto-sync field mapping dari master-data/*.csv ke modul UI
 
+const BACKEND_BASE_URL =
+  import.meta?.env?.VITE_BACKEND_URL || "http://localhost:5000";
+
 export async function fetchFieldMapping(modulId) {
-  // Asumsi: file CSV field mapping disimpan di /master-data/FIELDS/ atau subfolder
-  // dan penamaan file: FIELDS_<MODULID>.csv atau FIELDS_<BIDANG>/<MODULID>.csv
-  // Untuk demo, hanya fetch satu file statis. Untuk produksi, bisa pakai API/backend.
+  // File convention: FIELDS_<MODULID>.csv
+  const fileName = `FIELDS_${modulId}.csv`;
+
   try {
-    const res = await fetch(`/master-data/FIELDS/FIELDS_${modulId}.csv`);
+    // 1) Source of truth: backend serves repo root /master-data as static files
+    const url = `${BACKEND_BASE_URL}/master-data/FIELDS/${fileName}`;
+    const res = await fetch(url);
+
     if (!res.ok) return null;
+
     const text = await res.text();
     return parseCsvFields(text);
   } catch (e) {
@@ -21,10 +28,9 @@ function parseCsvFields(csv) {
   return lines.map((line) => {
     const values = line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/); // handle koma dalam kutip
     const obj = {};
-    keys.forEach(
-      (k, i) =>
-        (obj[k.trim()] = (values[i] || "").replace(/^"|"$/g, "").trim()),
-    );
+    keys.forEach((k, i) => {
+      obj[k.trim()] = (values[i] || "").replace(/^"|"$/g, "").trim();
+    });
     return obj;
   });
 }

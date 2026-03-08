@@ -102,7 +102,8 @@ class WorkflowService {
   // Create workflow instance
   async createWorkflow(data) {
     // Save to approval_workflow table
-    const ApprovalWorkflow = require("../models/approvalWorkflow.js");
+    const _mod1 = await import("../models/approvalWorkflow.js");
+    const ApprovalWorkflow = _mod1.default ?? _mod1.ApprovalWorkflow ?? _mod1;
     const workflow = await ApprovalWorkflow.create({
       modul_id: data.modul_id,
       record_id: data.record_id,
@@ -121,7 +122,8 @@ class WorkflowService {
   // Log approval action
   async logApproval(workflowId, data) {
     // Save to approval_log table
-    const ApprovalLog = require("../models/approvalLog.js");
+    const _mod2 = await import("../models/approvalLog.js");
+    const ApprovalLog = _mod2.default ?? _mod2.ApprovalLog ?? _mod2;
     const log = await ApprovalLog.create({
       workflow_id: workflowId,
       approver_id: data.user_id,
@@ -137,7 +139,8 @@ class WorkflowService {
   // Detect and log bypass
   async detectBypass(data) {
     // Save to bypass_detection table
-    const BypassDetection = require("../models/bypassDetection.js");
+    const _mod3 = await import("../models/bypassDetection.js");
+    const BypassDetection = _mod3.default ?? _mod3.BypassDetection ?? _mod3;
     const bypass = await BypassDetection.create({
       workflow_id: data.workflow_id,
       user_id: data.user_id,
@@ -155,8 +158,10 @@ class WorkflowService {
   async sendBypassAlert(bypass) {
     console.log("📧 Sending bypass alert to Sekretaris and Kepala Dinas");
     // Implementasi notifikasi email/WhatsApp
-    const emailService = require("../utils/emailService");
-    const whatsappService = require("../utils/whatsappService");
+    const _mod4 = await import("../utils/emailService.js");
+    const emailService = _mod4.default ?? _mod4.emailService ?? _mod4;
+    const _mod5 = await import("../utils/whatsappService.js");
+    const whatsappService = _mod5.default ?? _mod5.whatsappService ?? _mod5;
     const recipients = [bypass.sekretarisEmail, bypass.kepalaDinasEmail];
     const subject = `ALERT: BYPASS KOORDINASI oleh ${bypass.namaStaf}`;
     const message = `BYPASS terdeteksi pada workflow: ${bypass.workflowId}\n\nDetail:\n${JSON.stringify(bypass, null, 2)}`;

@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "SIGAP Malut - Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "accessToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"superadmin@dinpangan.go.id\",\n  \"password\": \"Admin123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "const res = pm.response.json();",
+              "if(res && res.data && (res.data.token || res.data.accessToken)) {",
+              "  pm.environment.set('accessToken', res.data.token || res.data.accessToken);",
+              "  console.log('Saved token to environment');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Me (protected)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "me"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Has user data', function() { const j = pm.response.json(); pm.expect(j).to.have.property('data'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

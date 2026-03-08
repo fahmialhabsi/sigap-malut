@@ -1,0 +1,131 @@
+--- original
+
+// Fungsi approve untuk approval multi-level
+export function approve(doc, level) {
+  doc.approvals[level] = true;
+  return doc;
+}
+
+// Fungsi transition untuk workflow state
+export function transition(from, to) {
+  if (from === "draft" && to === "submitted") return "submitted";
+  throw new Error("invalid transition");
+}
+class WorkflowService {
+  // Get workflow path for a module
+  getWorkflowPath(unitKerja, modulId) {
+    const workflows = {
+      Sekretariat: {
+        default: ["pelaksana", "kasubbag", "sekretaris", "kepala_dinas"],
+        levels: 4,
+      },
+      UPTD: {
+        default: [
+          "pelaksana",
+          "kasi_uptd",
+          "kepala_uptd",
+          "sekretaris",
+          "kepala_dinas",
+        ],
+        levels: 5,
+      },
+      "Bidang Ketersediaan": {
+        default: [
+          "pelaksana",
+          "fungsional",
+          "kepala_bidang",
+          "sekretaris",
+          "kepala_dinas",
+        ],
+        levels: 5,
+      },
+      "Bidang Distribusi": {
+        default: [
+          "pelaksana",
+          "fungsional",
+          "kepala_bidang",
+          "sekretaris",
+          "kepala_dinas",
+        ],
+        levels: 5,
+      },
+      "Bidang Konsumsi": {
+        default: [
+          "pelaksana",
+          "fungsional",
+          "kepala_bidang",
+          "sekretaris",
+          "kepala_dinas",
+        ],
+        levels: 5,
+      },
+    };
+
+    return workflows[unitKerja] || workflows["Sekretariat"];
+  }
+
+  // Get next approver
+  getNextApprover(currentRole, unitKerja) {
+    const workflow = this.getWorkflowPath(unitKerja);
+    const currentIndex = workflow.default.indexOf(currentRole);
+
+    if (currentIndex === -1 || currentIndex === workflow.default.length - 1) {
+      return null;
+    }
+
+    return workflow.default[currentIndex + 1];
+  }
+
+  // Check if can approve
+  canApprove(userRole, documentStatus, unitKerja) {
+    const workflow = this.getWorkflowPath(unitKerja);
+    const requiredRole = this.getRequiredRoleForStatus(documentStatus);
+
+    return (
+      workflow.default.includes(userRole) &&
+      workflow.default.indexOf(userRole) >=
+        workflow.default.indexOf(requiredRole)
+    );
+  }
+
+  // Get required role for status
+  getRequiredRoleForStatus(status) {
+    const statusRoleMap = {
+      draft: "pelaksana",
+      pending: "kasubbag", // or kasi_uptd or fungsional
+      review: "kepala_bidang", // or kepala_uptd or sekretaris
+      approved: "sekretaris",
+      final: "kepala_dinas",
+    };
+
+    return statusRoleMap[status] || "pelaksana";
+  }
+
+  // Create workflow instance
+  async createWorkflow(data) {
+    // Save to approval_workflow table
+    const ApprovalWorkflow = require("../models/approvalWorkflow.js");
+    const workflow = await ApprovalWorkflow.create({
+      modul_id: data.modul_id,
+      record_id: data.record_id,
+      unit_kerja: data.unit_kerja,
+      current_level: 1,
+
+
++++ suggestion
+
+// replace: const ApprovalWorkflow = require("../models/approvalWorkflow.js");
+import ApprovalWorkflow from '../models/approvalWorkflow.js';
+
+// replace: const ApprovalLog = require("../models/approvalLog.js");
+import ApprovalLog from '../models/approvalLog.js';
+
+// replace: const BypassDetection = require("../models/bypassDetection.js");
+import BypassDetection from '../models/bypassDetection.js';
+
+// replace: const emailService = require("../utils/emailService");
+import emailService from '../utils/emailService';
+
+// replace: const whatsappService = require("../utils/whatsappService");
+import whatsappService from '../utils/whatsappService';
+
