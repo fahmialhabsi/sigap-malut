@@ -1,7 +1,10 @@
+// frontend/src/pages/LoginPage.jsx
+
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
+import { getDashboardPath } from "../utils/getDashboardPath";
 
 function normalizeRoleName(user) {
   return (
@@ -99,6 +102,20 @@ export default function LoginPage() {
           return;
         }
       }
+
+      // === tambahan: inference via getDashboardPath util ===
+      try {
+        const inferredPath = getDashboardPath(user);
+        if (inferredPath && inferredPath !== "/dashboard") {
+          navigate(inferredPath, { replace: true });
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        // ignore error here but you can uncomment to debug
+        // console.error("getDashboardPath error:", err);
+      }
+      // ======================================================
 
       // 3) Fallback based on actual user role/unit
       if (roleName === "super_admin")
