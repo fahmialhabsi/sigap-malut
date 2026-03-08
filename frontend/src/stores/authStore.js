@@ -73,11 +73,21 @@ const useAuthStore = create((set) => ({
         password,
       });
 
-      // backend response shape: response.data.data.{ user, token } atau data.data
-      const { user: rawUser, token } =
-        response.data.data || response.data || {};
+      // backend response shape: response.data.data.{ user, token, roleName } atau data.data
+      const payload = response.data.data || response.data || {};
+      const rawUser = payload.user || payload;
+      const token = payload.token || null;
+      const roleNameFromResp = payload.roleName || payload.role_name || null;
 
-      const user = normalizeUser(rawUser);
+      let user = normalizeUser(rawUser);
+
+      // Jika backend mengirim roleName terpisah, pastikan kita menyimpannya ke user
+      if (roleNameFromResp && user) {
+        // normalisasi casing ke nilai yang konsisten (frontend memakai role / roleName)
+        user.roleName = user.roleName || roleNameFromResp;
+        // juga set user.role jika belum ada dan roleName bisa dipakai langsung
+        user.role = user.role || roleNameFromResp;
+      }
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
@@ -90,7 +100,7 @@ const useAuthStore = create((set) => ({
       });
 
       logAuditTrail({ user, action: "login", detail: "User login" });
-      return { success: true, data: response.data.data || response.data };
+      return { success: true, data: payload };
     } catch (error) {
       // Reset state on failed login
       set({
