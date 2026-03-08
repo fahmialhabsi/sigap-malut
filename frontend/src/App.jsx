@@ -58,6 +58,15 @@ function PrivateRoute({ children }) {
     console.log("PrivateRoute debug error", e);
   }
 
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  // Jika store belum menganggap user authenticated tapi token ada di localStorage,
+  // kemungkinan initAuth sedang berjalan. Tampilkan loading agar tidak redirect prematur.
+  if (!isAuthenticated && token) {
+    return <div>Loading...</div>;
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
