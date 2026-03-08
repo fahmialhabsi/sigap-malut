@@ -41,6 +41,23 @@ import DashboardPublikLayout from "./layouts/DashboardPublikLayout";
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  // DEBUG: tampilkan status auth setiap kali PrivateRoute dievaluasi
+  try {
+    // eslint-disable-next-line no-console
+    console.log("PrivateRoute:", {
+      isAuthenticated,
+      token:
+        typeof window !== "undefined" ? localStorage.getItem("token") : null,
+      user:
+        typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("user"))
+          : null,
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log("PrivateRoute debug error", e);
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
