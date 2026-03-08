@@ -1,3 +1,4 @@
+console.log("Loaded: DashboardKetersediaanLayout");
 import React, { useState, useEffect, useRef } from "react";
 import {
   Chart,
