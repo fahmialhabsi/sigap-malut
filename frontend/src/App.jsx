@@ -1,8 +1,10 @@
+// frontend/src/App.jsx
+
 import ReportingWorkflowPage from "./pages/ReportingWorkflowPage";
 import CommentWorkflowPage from "./pages/CommentWorkflowPage";
 import CaseWorkflowPage from "./pages/CaseWorkflowPage";
 import ReminderPage from "./pages/ReminderPage";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
 const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 import LoginPage from "./pages/LoginPage";
@@ -24,6 +26,11 @@ import DashboardSuperAdmin from "./ui/dashboards/DashboardSuperAdmin";
 import AuditTrailPage from "./pages/AuditTrailPage";
 import WorkflowStatusPage from "./pages/WorkflowStatusPage";
 import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
+import BksModulePage from "./pages/bidangKonsumsi/BksModulePage";
+
+// PUBLIC dashboard imports (100% public)
+import DashboardPublik from "./ui/dashboards/DashboardPublik";
+import DashboardPublikLayout from "./layouts/DashboardPublikLayout";
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -58,6 +65,17 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<LandingPage />} />
+
+      {/* 100% PUBLIC: Masyarakat / Peneliti / Lainnya */}
+      <Route
+        path="/dashboard-publik"
+        element={
+          <DashboardPublikLayout>
+            <DashboardPublik />
+          </DashboardPublikLayout>
+        }
+      />
+
       <Route
         path="/user-management"
         element={
@@ -68,6 +86,7 @@ function App() {
           </Suspense>
         }
       />
+
       <Route
         path="/dashboard/superadmin"
         element={
@@ -76,7 +95,9 @@ function App() {
           </PrivateRoute>
         }
       />
+
       <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
+
       <Route
         path="/dashboard"
         element={
@@ -89,6 +110,7 @@ function App() {
           )
         }
       />
+
       <Route
         path="/dashboard/sekretariat"
         element={
@@ -121,6 +143,16 @@ function App() {
           </PrivateRoute>
         }
       />
+
+      <Route
+        path="/konsumsi/:modulUiId"
+        element={
+          <PrivateRoute>
+            <BksModulePage />
+          </PrivateRoute>
+        }
+      />
+
       <Route
         path="/dashboard/uptd"
         element={
@@ -129,6 +161,7 @@ function App() {
           </PrivateRoute>
         }
       />
+
       {/* Workflow and Reminder routes */}
       <Route
         path="/reporting-workflow"
@@ -162,6 +195,7 @@ function App() {
           </PrivateRoute>
         }
       />
+
       <Route
         path="/module/:moduleId/create"
         element={
@@ -202,6 +236,7 @@ function App() {
           </PrivateRoute>
         }
       />
+
       <Route
         path="/chatbot-upload"
         element={
@@ -210,7 +245,9 @@ function App() {
           </PrivateRoute>
         }
       />
+
       {GeneratedRoutes({ PrivateRoute })}
+
       <Route
         path="/audit-trail"
         element={
@@ -235,6 +272,7 @@ function App() {
           </PrivateRoute>
         }
       />
+
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

@@ -23,6 +23,16 @@ Chart.register(
   Legend,
 );
 
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
+
 export default function DashboardDistribusiSuperModern({
   fallbackModules = [],
 }) {
@@ -33,9 +43,9 @@ export default function DashboardDistribusiSuperModern({
   const [menuAktif, setMenuAktif] = useState("");
   const [user, setUser] = useState(null);
   const [tableRows, setTableRows] = useState([]);
-  const [kpi, setKpi] = useState([]); // PATCH: Digunakan!
-  const [chart, setChart] = useState({ labels: [], datasets: [] }); // PATCH: Digunakan!
-  const [notifikasi, setNotifikasi] = useState([]); // PATCH: Digunakan!
+  const [kpi, setKpi] = useState([]);
+  const [chart, setChart] = useState({ labels: [], datasets: [] });
+  const [notifikasi, setNotifikasi] = useState([]);
   const [authChecked, setAuthChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const lastAuthFetch = useRef(0);
@@ -48,41 +58,43 @@ export default function DashboardDistribusiSuperModern({
     lastAuthFetch.current = now;
 
     let mounted = true;
+
     api
       .get("/auth/me")
       .then((res) => {
-        const data = res.data;
         if (!mounted) return;
-        setUser(data.data);
-        setAuthChecked(true);
-        const roleId = data.data ? (data.data.role_id ?? data.data.role) : null;
-        let roleName = null;
-        if (roleId !== null && roleId !== undefined) {
-          roleName =
-            roleIdToName[String(roleId)] || roleIdToName[roleId] || null;
-        }
-        const jabatan = data.data?.jabatan
-          ? String(data.data.jabatan).toLowerCase()
-          : "";
-        const isDistribusi =
-          roleName === "kepala_bidang_distribusi" ||
-          roleName === "super_admin" ||
-          // accept generic kepala_bidang roles (e.g. kepala_bidang)
-          (roleName &&
-            roleName.startsWith &&
-            roleName.startsWith("kepala_bidang")) ||
-          data.data?.unit_kerja === "Bidang Distribusi" ||
-          jabatan.includes("kepala bidang") ||
-          jabatan.includes("kepala");
 
-        if (!data.data || !isDistribusi) {
-          window.location.href = "/landing";
+        const data = res.data?.data;
+        setUser(data);
+        setAuthChecked(true);
+
+        const normalized = normalizeRoleName(data);
+        const jabatan = data?.jabatan ? String(data.jabatan).toLowerCase() : "";
+        const unitKerja = data?.unit_kerja
+          ? String(data.unit_kerja).toLowerCase()
+          : "";
+
+        // Distribusi allowed:
+        // - kepala_bidang_distribusi
+        // - super_admin
+        // - (opsional) kepala_dinas/gubernur jika dokumenSistem mengizinkan monitoring lintas bidang
+        const isDistribusi =
+          normalized === "kepala_bidang_distribusi" ||
+          normalized === "super_admin" ||
+          normalized === "kepala_dinas" ||
+          normalized === "gubernur" ||
+          unitKerja === "bidang distribusi" ||
+          jabatan.includes("kepala bidang") ||
+          jabatan.includes("kepala distribusi");
+
+        if (!data || !isDistribusi) {
+          window.location.href = "/";
         }
       })
       .catch(() => {
         if (!mounted) return;
         setAuthChecked(true);
-        window.location.href = "/landing";
+        window.location.href = "/";
       });
 
     return () => {
@@ -106,12 +118,10 @@ export default function DashboardDistribusiSuperModern({
         const distribusi = data.data?.filter(
           (row) => row.bidang === "Bidang Distribusi" && row.is_active,
         );
-        // prefer API modules when available, otherwise keep fallbackModules
         if (distribusi && distribusi.length) {
           setModules(distribusi);
           setMenuAktif((m) => m || distribusi[0].nama_modul);
         } else if (fallbackModules && fallbackModules.length) {
-          // fallback: use provided static modules
           setModules(fallbackModules);
           setMenuAktif((m) => m || fallbackModules[0].name);
         }
@@ -123,86 +133,9 @@ export default function DashboardDistribusiSuperModern({
     };
   }, [authChecked]);
 
-  // Ambil data utama sesuai modul aktif
-  useEffect(() => {
-    if (!menuAktif) return;
-    const active = modules.find((m) => {
-      const name = m.nama_modul ?? m.name ?? m.id ?? m.modul_id ?? null;
-      return name === menuAktif;
-    });
-    if (!active) return;
-
-    // if module provides tabel_name, use existing table-driven UI
-    if (active.tabel_name) {
-      setLoading(true);
-      api
-        .get(`/tables/${active.tabel_name}`)
-        .then((res) => setTableRows(res.data.data || []))
-        .finally(() => setLoading(false));
-
-      // KPI
-      api.get(`/tables/${active.tabel_name}`).then((res) => {
-        const data = res.data;
-        setKpi([
-          {
-            title: "Total Data",
-            value: data.count || (data.data ? data.data.length : 0),
-            color: "blue",
-          },
-        ]);
-      });
-
-      // Chart
-      api.get(`/tables/${active.tabel_name}`).then((res) => {
-        const data = res.data;
-        if (!data.data || !Array.isArray(data.data)) return;
-        const perBulan = {};
-        data.data.forEach((row) => {
-          const bln = row.bulan || "Jan";
-          perBulan[bln] = (perBulan[bln] || 0) + (row.jumlah || 1);
-        });
-        setChart({
-          labels: Object.keys(perBulan),
-          datasets: [
-            {
-              label: "Trend",
-              data: Object.values(perBulan),
-              borderColor: "#38bdf8",
-              backgroundColor: "#38bdf844",
-              tension: 0.4,
-              fill: true,
-              pointBackgroundColor: "#60a5fa",
-              pointRadius: 5,
-            },
-          ],
-        });
-      });
-
-      // Notifikasi
-      api.get("/notification").then((res) => setNotifikasi(res.data || []));
-      // ensure dynamic form cleared
-      setDynamicFormModule(null);
-    } else if (active.fields && Array.isArray(active.fields)) {
-      // fallback: the static module describes fields; render a dynamic form
-      setTableRows([]);
-      setKpi([
-        { title: "Fields", value: active.fields.length, color: "yellow" },
-      ]);
-      setChart({ labels: [], datasets: [] });
-      setNotifikasi([]);
-      setDynamicFormModule(active);
-    } else {
-      // unknown shape: clear displays
-      setTableRows([]);
-      setKpi([]);
-      setChart({ labels: [], datasets: [] });
-      setNotifikasi([]);
-      setDynamicFormModule(null);
-    }
-  }, [menuAktif, modules]);
-
   // Dynamic form state when a fallback module is active
   const [dynamicFormModule, setDynamicFormModule] = useState(null);
+  const [values, setValues] = useState({});
 
   // Avatar logic
   const avatarRef = useRef();
@@ -236,14 +169,18 @@ export default function DashboardDistribusiSuperModern({
     <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-blue-900 via-blue-800 to-slate-800 text-slate-100 select-none">
       <aside
         className={`h-full bg-blue-950/95 z-30 flex flex-col items-center 
-        transition-all duration-300 ${sidebarOpen ? "w-[275px] min-w-[275px]" : "w-[60px] min-w-[60px]"}
+        transition-all duration-300 ${
+          sidebarOpen ? "w-[275px] min-w-[275px]" : "w-[60px] min-w-[60px]"
+        }
         border-r border-blue-900/60 shadow-xl`}
       >
         <div className="flex items-center justify-center w-full py-8">
           <img
             src="/Logo.png"
             alt="logo"
-            className={`object-contain ${sidebarOpen ? "w-24 h-24" : "w-10 h-10"}`}
+            className={`object-contain ${
+              sidebarOpen ? "w-24 h-24" : "w-10 h-10"
+            }`}
           />
         </div>
         <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
@@ -266,6 +203,7 @@ export default function DashboardDistribusiSuperModern({
           {sidebarOpen ? "SIGAP Malut" : "SIGAP"}
         </div>
       </aside>
+
       <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col bg-blue-950/80 backdrop-blur">
         <header className="flex-none w-full h-[75px] bg-blue-900/80 flex items-center px-12 shadow-sm z-10 sticky top-0">
           <div className="text-2xl text-white font-bold tracking-wide flex-1">
@@ -282,6 +220,9 @@ export default function DashboardDistribusiSuperModern({
               second: "2-digit",
             })}
           </div>
+          <div className="mr-5 hidden md:block text-xs text-blue-100/70">
+            {user?.email || ""}
+          </div>
           <div className="relative mr-5">
             <NotificationBell />
             {notifikasi.length > 0 && (
@@ -293,17 +234,16 @@ export default function DashboardDistribusiSuperModern({
           <div className="relative" ref={avatarRef}>
             <button onClick={() => setAvatarOpen(!avatarOpen)}>
               <ProfileAvatar
-                sidebarOpen={true}
-                userName={user?.nama_lengkap || "User"}
+                userName={user?.nama_lengkap || user?.name || "User"}
               />
             </button>
             {avatarOpen && (
               <div className="absolute right-0 mt-2 w-44 bg-slate-900/95 rounded-xl shadow-lg border border-blue-950 p-3 flex flex-col text-sm animate-fade-in-up">
                 <div className="font-bold mb-2">
-                  {user?.nama_lengkap || "Pengguna"}
+                  {user?.nama_lengkap || user?.name || "Pengguna"}
                 </div>
                 <div className="mb-2 text-blue-200 text-xs">
-                  {user?.unit_kerja || ""}
+                  {user?.unit_kerja || user?.unit_id || ""}
                 </div>
                 <button className="py-1 w-full rounded text-left hover:bg-blue-800/60 px-2">
                   Profil Saya
@@ -311,17 +251,23 @@ export default function DashboardDistribusiSuperModern({
                 <button className="py-1 w-full rounded text-left hover:bg-blue-800/60 px-2">
                   Pengaturan
                 </button>
-                <button className="py-1 w-full rounded text-left hover:bg-blue-800/60 px-2 text-red-400">
+                <button
+                  className="py-1 w-full rounded text-left hover:bg-blue-800/60 px-2 text-red-400"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("refreshToken");
+                    localStorage.removeItem("user");
+                    window.location.href = "/";
+                  }}
+                >
                   Keluar
                 </button>
               </div>
             )}
           </div>
         </header>
-        <main
-          className={`flex-1 min-h-0 min-w-0 flex flex-col gap-9 py-8 overflow-auto bg-transparent`}
-        >
-          {/* Loading Spinner */}
+
+        <main className="flex-1 min-h-0 min-w-0 flex flex-col gap-9 py-8 overflow-auto bg-transparent">
           {loading && (
             <div className="w-full text-center py-6">
               <span className="text-blue-200 font-bold text-lg">
@@ -329,6 +275,7 @@ export default function DashboardDistribusiSuperModern({
               </span>
             </div>
           )}
+
           <div className="w-full max-w-7xl mx-auto flex flex-row flex-wrap gap-x-8 gap-y-4 items-stretch justify-between px-2">
             {kpi.map((item, idx) => (
               <KpiCard
@@ -339,6 +286,7 @@ export default function DashboardDistribusiSuperModern({
               />
             ))}
           </div>
+
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
             <PanelBox title={`Tabel ${menuAktif}`}>
               {dynamicFormModule ? (
@@ -353,6 +301,7 @@ export default function DashboardDistribusiSuperModern({
               </div>
             </PanelBox>
           </div>
+
           <div className="w-full max-w-7xl mx-auto px-2">
             <PanelBox
               title="Notifikasi Kritis"
@@ -365,7 +314,7 @@ export default function DashboardDistribusiSuperModern({
                 ).map((n, idx) => (
                   <li
                     key={idx}
-                    className={`flex items-center gap-2 text-yellow-300`}
+                    className="flex items-center gap-2 text-yellow-300"
                   >
                     <span className="text-lg">{n.icon ?? "⚠️"}</span>
                     {n.message || n.text || ""}
@@ -526,12 +475,13 @@ function DataTable({ data }) {
 }
 
 function DynamicForm({ module }) {
-  const initial = {};
   const fields = module.fields || [];
+  const initial = {};
   fields.forEach((f) => {
     const key = f.field_name || f.name || f.id || f.key || "field";
     initial[key] = "";
   });
+
   const [values, setValues] = useState(initial);
   const [saved, setSaved] = useState(false);
 
@@ -543,7 +493,8 @@ function DynamicForm({ module }) {
     });
     setValues(init);
     setSaved(false);
-  }, [module]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [module?.id]);
 
   const handleChange = (k, v) => setValues((s) => ({ ...s, [k]: v }));
 
@@ -562,7 +513,6 @@ function DynamicForm({ module }) {
         "distribusi_demo_submissions",
         JSON.stringify(existing),
       );
-      console.log("Saved demo submission:", { module, values });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
@@ -584,6 +534,7 @@ function DynamicForm({ module }) {
           const key = f.field_name || f.name || f.id || f.key || `field_${idx}`;
           const label = f.label || f.title || key;
           const type = (f.type || "string").toLowerCase();
+
           if (type.includes("text") || type.includes("memo")) {
             return (
               <div key={key}>
@@ -598,11 +549,13 @@ function DynamicForm({ module }) {
               </div>
             );
           }
+
           const inputType = type.includes("date")
             ? "date"
             : type.includes("int") || type.includes("num")
               ? "number"
               : "text";
+
           return (
             <div key={key}>
               <label className="text-xs text-blue-200 mb-1 block">
@@ -645,7 +598,7 @@ function NotificationBell() {
 function ProfileAvatar({ userName = "User" }) {
   return (
     <span className="flex w-10 h-10 rounded-full bg-blue-700 border-2 border-blue-400 items-center justify-center text-white text-lg font-bold shadow-xl hover:ring-2 hover:ring-blue-500 transition">
-      {userName
+      {String(userName)
         .split(" ")
         .map((n) => n[0])
         .join("")

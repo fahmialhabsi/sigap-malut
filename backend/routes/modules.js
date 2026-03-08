@@ -110,4 +110,30 @@ router.get("/:moduleId", async (req, res) => {
   }
 });
 
+router.get("/ketersediaan", async (req, res) => {
+  try {
+    const modules = await loadModules();
+    console.log("Loaded modules:", modules); // Log semua modul yang dimuat
+
+    const ketersediaanModules = modules.filter(
+      (row) => row.bidang === "Bidang Ketersediaan" && row.is_active,
+    );
+
+    console.log("Filtered Ketersediaan modules:", ketersediaanModules); // Log modul yang difilter
+
+    res.json({
+      success: true,
+      data: ketersediaanModules,
+      count: ketersediaanModules.length,
+    });
+  } catch (error) {
+    console.error("Error filtering Ketersediaan modules:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal membaca modul Ketersediaan",
+      error: error.message,
+    });
+  }
+});
+
 export default router;

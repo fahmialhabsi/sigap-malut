@@ -1,11 +1,19 @@
-// src/ui/dashboards/DashboardKetersediaan.jsx
-
 import React from "react";
 import { Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import FieldMappingPreview from "../../components/FieldMappingPreview";
 import { roleIdToName } from "../../utils/roleMap";
+
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
 
 export default function DashboardKetersediaan() {
   const user = useAuthStore((state) => state.user);
@@ -38,30 +46,24 @@ export default function DashboardKetersediaan() {
   const ketersediaanModules = [
     { id: "K001", name: "Master data komoditas" },
     { id: "K002", name: "Produksi pangan" },
-    // Tambahkan modul lain sesuai kebutuhan
   ];
 
-  // Normalize role key: prefer explicit `user.role`, then map from `role_id`,
-  // then fall back to the raw role_id string. This makes guard tolerant
-  // when `roleMap` doesn't contain every GUID.
-  const rawRole = user ? user.role || user.role_id : null;
-  const roleKey = rawRole
-    ? (roleIdToName[String(rawRole)] || String(rawRole)).toLowerCase()
-    : null;
-
+  const roleName = normalizeRoleName(user);
   const jabatan = user?.jabatan ? String(user.jabatan).toLowerCase() : "";
   const unitKerja = user?.unit_kerja
     ? String(user.unit_kerja).toLowerCase()
     : "";
 
+  // Allowed:
+  // - Kabid Ketersediaan / Super Admin
+  // - Eksekutif (Kepala Dinas/Gubernur) boleh monitoring lintas bidang (opsional sesuai dokumenSistem)
   const isKetersediaan =
-    roleKey === "super_admin" ||
-    (roleKey &&
-      (roleKey.includes("ketersediaan") ||
-        roleKey.startsWith("kepala_bidang"))) ||
+    roleName === "super_admin" ||
+    roleName === "kepala_bidang_ketersediaan" ||
+    roleName === "kepala_dinas" ||
+    roleName === "gubernur" ||
     unitKerja.includes("ketersediaan") ||
-    jabatan.includes("kepala bidang") ||
-    jabatan.includes("kepala");
+    jabatan.includes("kepala bidang");
 
   React.useEffect(() => {
     if (user && isKetersediaan) {
@@ -74,7 +76,7 @@ export default function DashboardKetersediaan() {
     }
   }, [user, isKetersediaan]);
 
-  if (!isKetersediaan) return <Navigate to="/" replace />;
+  if (!user || !isKetersediaan) return <Navigate to="/" replace />;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -90,10 +92,11 @@ export default function DashboardKetersediaan() {
             </button>
           </div>
         </div>
+
         <div className="text-muted mb-4 dark:text-gray-300">
           Ringkasan KPI dan modul Bidang Ketersediaan
         </div>
-        {/* KPI Ketersediaan (dummy) */}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-green-50 dark:bg-gray-800 rounded-lg p-4 flex flex-col items-center">
             <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -128,7 +131,7 @@ export default function DashboardKetersediaan() {
             </span>
           </div>
         </div>
-        {/* Modul Ketersediaan (auto-sync field mapping) */}
+
         <div className="font-bold mb-2">Modul Bidang Ketersediaan</div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {ketersediaanModules.map((modul) => (

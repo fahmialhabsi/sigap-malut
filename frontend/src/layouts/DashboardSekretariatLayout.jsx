@@ -10,34 +10,43 @@ import FooterBarSekretariat from "../components/dashboard-sekretariat/FooterBarS
 import { roleIdToName } from "../utils/roleMap";
 import useAuthStore from "../stores/authStore";
 
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
+
 export default function DashboardSekretariatLayout() {
   const user = useAuthStore((state) => state.user);
-  const roleName = user ? roleIdToName[user.role_id] : null;
+  const roleName = normalizeRoleName(user);
 
   useEffect(() => {
-    if (
-      !user ||
-      !(
-        roleName === "sekretaris" ||
-        roleName === "super_admin" ||
-        user.unit_kerja === "Sekretariat Dinas"
-      )
-    ) {
-      window.location.href = "/landing";
+    const allowed =
+      roleName === "sekretaris" ||
+      roleName === "super_admin" ||
+      roleName === "kepala_dinas" ||
+      roleName === "gubernur" ||
+      (user?.unit_kerja &&
+        String(user.unit_kerja).toLowerCase().includes("sekretariat"));
+
+    if (!user || !allowed) {
+      window.location.href = "/";
     }
   }, [user, roleName]);
 
   return (
     <div className="relative min-h-screen bg-[#10182A] font-inter">
-      {/* Sidebar */}
       <div className="fixed top-0 left-0 h-full w-[72px] bg-[#06A657] z-30">
         <SidebarMenuSekretariat />
       </div>
-      {/* Header */}
       <div className="fixed top-0 left-[72px] right-0 h-[60px] bg-[#07723A] z-20">
         <HeaderBarSekretariat />
       </div>
-      {/* Main Content */}
+
       <main className="pt-[60px] pl-[72px] pb-12 min-h-screen flex flex-col items-center">
         <div className="w-full max-w-[1128px] flex flex-col gap-8">
           <HeroRowSekretariat />
@@ -53,7 +62,7 @@ export default function DashboardSekretariatLayout() {
           </div>
         </div>
       </main>
-      {/* Footer */}
+
       <FooterBarSekretariat />
     </div>
   );

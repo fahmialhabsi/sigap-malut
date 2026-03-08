@@ -1,3 +1,5 @@
+// backend/server.js
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -12,6 +14,7 @@ import bdsHrgRoutes from "./routes/BDS-HRG.js";
 import bktPgdRoutes from "./routes/BKT-PGD.js";
 import tablesRoutes from "./routes/tables.js";
 import modulesRoutes from "./routes/modules.js";
+import bksEvlRoutes from "./routes/BKS-EVL.js";
 
 import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
 import workflowStatusRouter from "./routes/workflow-status.js";
@@ -94,6 +97,7 @@ app.use("/api/sek-adm", sekAdmRoutes);
 app.use("/api/bds-hrg", bdsHrgRoutes);
 app.use("/api/bkt-pgd", bktPgdRoutes);
 app.use("/api/modules", modulesRoutes);
+app.use("/api/bks-evl", bksEvlRoutes);
 
 // Register all auto-generated routes
 registerRoutes(app);

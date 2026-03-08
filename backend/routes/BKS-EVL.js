@@ -1,8 +1,4 @@
-// =====================================================
-// ROUTES: BksEvl
-// Base Path: /api/bks-evl
-// Generated: 2026-02-17T19:24:49.294Z
-// =====================================================
+// backend/routes/BKS-EVL.js
 
 import express from "express";
 import {
@@ -11,13 +7,16 @@ import {
   createBksEvl,
   updateBksEvl,
   deleteBksEvl,
+  getBksEvlSummary,
 } from "../controllers/BKS-EVL.js";
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// All routes are protected
 router.use(protect);
+
+// WAJIB sebelum "/:id"
+router.get("/summary", getBksEvlSummary);
 
 router.route("/").get(getAllBksEvl).post(createBksEvl);
 
