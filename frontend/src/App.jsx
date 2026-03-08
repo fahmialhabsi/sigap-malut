@@ -1,12 +1,19 @@
 // frontend/src/App.jsx
 
+import React, { useEffect, Suspense, lazy } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
 import ReportingWorkflowPage from "./pages/ReportingWorkflowPage";
 import CommentWorkflowPage from "./pages/CommentWorkflowPage";
 import CaseWorkflowPage from "./pages/CaseWorkflowPage";
 import ReminderPage from "./pages/ReminderPage";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, Suspense, lazy } from "react";
 const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
+
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import GenericCreatePage from "./pages/GenericCreatePage";
@@ -28,22 +35,16 @@ import WorkflowStatusPage from "./pages/WorkflowStatusPage";
 import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
 import BksModulePage from "./pages/bidangKonsumsi/BksModulePage";
 
-// PUBLIC dashboard imports (100% public)
+// PUBLIC dashboard imports
 import DashboardPublik from "./ui/dashboards/DashboardPublik";
 import DashboardPublikLayout from "./layouts/DashboardPublikLayout";
 
+/**
+ * PrivateRoute wrapper ensures user is authenticated before rendering dashboard layout.
+ * If not authenticated, navigates to /login.
+ */
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isInitialized = useAuthStore((state) => state.isInitialized);
-
-  // Tunggu inisialisasi selesai
-  if (!isInitialized) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
-  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -62,219 +63,221 @@ function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<LandingPage />} />
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
 
-      {/* 100% PUBLIC: Masyarakat / Peneliti / Lainnya */}
-      <Route
-        path="/dashboard-publik"
-        element={
-          <DashboardPublikLayout>
-            <DashboardPublik />
-          </DashboardPublikLayout>
-        }
-      />
+        {/* 100% PUBLIC: Masyarakat / Peneliti / Lainnya */}
+        <Route
+          path="/dashboard-publik"
+          element={
+            <DashboardPublikLayout>
+              <DashboardPublik />
+            </DashboardPublikLayout>
+          }
+        />
 
-      <Route
-        path="/user-management"
-        element={
-          <Suspense fallback={<div>Loading...</div>}>
+        <Route
+          path="/user-management"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <PrivateRoute>
+                <UserManagementPage />
+              </PrivateRoute>
+            </Suspense>
+          }
+        />
+
+        <Route
+          path="/dashboard/superadmin"
+          element={
             <PrivateRoute>
-              <UserManagementPage />
+              <DashboardSuperAdmin />
             </PrivateRoute>
-          </Suspense>
-        }
-      />
+          }
+        />
 
-      <Route
-        path="/dashboard/superadmin"
-        element={
-          <PrivateRoute>
-            <DashboardSuperAdmin />
-          </PrivateRoute>
-        }
-      />
+        <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
 
-      <Route path="/modul/:modul_id" element={<GenericCreatePage />} />
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated ? (
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
 
-      <Route
-        path="/dashboard"
-        element={
-          isAuthenticated ? (
+        <Route
+          path="/dashboard/sekretariat"
+          element={
             <PrivateRoute>
-              <DashboardPage />
+              <DashboardSekretariat />
             </PrivateRoute>
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+          }
+        />
+        <Route
+          path="/dashboard/ketersediaan"
+          element={
+            <PrivateRoute>
+              <DashboardKetersediaan />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/distribusi"
+          element={
+            <PrivateRoute>
+              <DashboardDistribusi />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/konsumsi"
+          element={
+            <PrivateRoute>
+              <DashboardKonsumsi />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/dashboard/sekretariat"
-        element={
-          <PrivateRoute>
-            <DashboardSekretariat />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/ketersediaan"
-        element={
-          <PrivateRoute>
-            <DashboardKetersediaan />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/distribusi"
-        element={
-          <PrivateRoute>
-            <DashboardDistribusi />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/konsumsi"
-        element={
-          <PrivateRoute>
-            <DashboardKonsumsi />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/konsumsi/:modulUiId"
+          element={
+            <PrivateRoute>
+              <BksModulePage />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/konsumsi/:modulUiId"
-        element={
-          <PrivateRoute>
-            <BksModulePage />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/dashboard/uptd"
+          element={
+            <PrivateRoute>
+              <DashboardUPTD />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/dashboard/uptd"
-        element={
-          <PrivateRoute>
-            <DashboardUPTD />
-          </PrivateRoute>
-        }
-      />
+        {/* Workflow and Reminder routes */}
+        <Route
+          path="/reporting-workflow"
+          element={
+            <PrivateRoute>
+              <ReportingWorkflowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/comment-workflow"
+          element={
+            <PrivateRoute>
+              <CommentWorkflowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/case-workflow"
+          element={
+            <PrivateRoute>
+              <CaseWorkflowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reminder"
+          element={
+            <PrivateRoute>
+              <ReminderPage />
+            </PrivateRoute>
+          }
+        />
 
-      {/* Workflow and Reminder routes */}
-      <Route
-        path="/reporting-workflow"
-        element={
-          <PrivateRoute>
-            <ReportingWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/comment-workflow"
-        element={
-          <PrivateRoute>
-            <CommentWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/case-workflow"
-        element={
-          <PrivateRoute>
-            <CaseWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/reminder"
-        element={
-          <PrivateRoute>
-            <ReminderPage />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/module/:moduleId/create"
+          element={
+            <PrivateRoute>
+              <GenericCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/view/:id"
+          element={
+            <PrivateRoute>
+              <ViewDetailPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/edit/:id"
+          element={
+            <PrivateRoute>
+              <EditPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/:id"
+          element={
+            <PrivateRoute>
+              <ViewDetailPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId/:id/edit"
+          element={
+            <PrivateRoute>
+              <EditPage />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/module/:moduleId/create"
-        element={
-          <PrivateRoute>
-            <GenericCreatePage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/view/:id"
-        element={
-          <PrivateRoute>
-            <ViewDetailPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/edit/:id"
-        element={
-          <PrivateRoute>
-            <EditPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/:id"
-        element={
-          <PrivateRoute>
-            <ViewDetailPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/module/:moduleId/:id/edit"
-        element={
-          <PrivateRoute>
-            <EditPage />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/chatbot-upload"
+          element={
+            <PrivateRoute>
+              <ChatbotUploadPage />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/chatbot-upload"
-        element={
-          <PrivateRoute>
-            <ChatbotUploadPage />
-          </PrivateRoute>
-        }
-      />
+        {GeneratedRoutes({ PrivateRoute })}
 
-      {GeneratedRoutes({ PrivateRoute })}
+        <Route
+          path="/audit-trail"
+          element={
+            <PrivateRoute>
+              <AuditTrailPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/workflow-status"
+          element={
+            <PrivateRoute>
+              <WorkflowStatusPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/approval-workflow"
+          element={
+            <PrivateRoute>
+              <ApprovalWorkflowPage />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/audit-trail"
-        element={
-          <PrivateRoute>
-            <AuditTrailPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/workflow-status"
-        element={
-          <PrivateRoute>
-            <WorkflowStatusPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/approval-workflow"
-        element={
-          <PrivateRoute>
-            <ApprovalWorkflowPage />
-          </PrivateRoute>
-        }
-      />
-
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
