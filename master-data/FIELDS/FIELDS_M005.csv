@@ -1,15 +1,14 @@
 field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
 id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
-kpi_code,Kode KPI,varchar,10,true,true,NULL,uppercase,NULL,Contoh: C.1 atau C.25
-kpi_name,Nama KPI,varchar,255,true,false,NULL,none,NULL,Nama indikator keberhasilan
-kategori,Kategori,enum,NULL,true,false,NULL,none,"efisiensi_operasional,akuntabilitas,kepuasan_stakeholder,dampak_strategis,kepegawaian,keuangan,data_pelaporan,inflasi,sppg",Kategori KPI
-target_value,Target,decimal,"10,2",true,false,NULL,none,NULL,Target yang ingin dicapai
-target_unit,Satuan Target,enum,NULL,true,false,persen,none,"persen,hari,jumlah,rupiah",Satuan dari target
-current_value,Nilai Saat Ini,decimal,"10,2",false,false,0,none,NULL,Nilai pencapaian saat ini
-status,Status,enum,NULL,true,false,pending,none,"on_target,warning,critical,achieved",Status pencapaian
-periode,Periode,date,NULL,true,false,NULL,none,NULL,Bulan periode pengukuran
-penanggung_jawab,Penanggung Jawab,varchar,255,false,false,NULL,none,NULL,Unit yang bertanggung jawab
-cara_pengukuran,Cara Pengukuran,text,NULL,false,false,NULL,none,NULL,Metode pengukuran KPI
-is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,KPI masih digunakan
+asn_id,ASN ID,int,11,true,false,NULL,none,NULL,FK ke tabel asn
+nip,NIP,varchar,18,true,false,NULL,nip_18_digit,NULL,
+nama_asn,Nama ASN,varchar,255,false,false,NULL,none,NULL,
+jenis_cuti,Jenis Cuti,enum,NULL,true,false,NULL,none,"Tahunan,Sakit,Besar,Melahirkan,Alasan Penting,Luar Tanggungan Negara",Jenis cuti
+tanggal_mulai,Tanggal Mulai,date,NULL,true,false,NULL,none,NULL,
+tanggal_selesai,Tanggal Selesai,date,NULL,true,false,NULL,none,NULL,
+lama_hari,Lama Cuti,int,11,false,false,NULL,none,NULL,Jumlah hari
+alasan,Alasan,text,NULL,false,false,NULL,none,NULL,
+status,Status,enum,NULL,true,false,pending,none,"pending,approved,rejected,cancelled",Status
+pengganti,NIP Pengganti,varchar,18,false,false,NULL,nip_18_digit,NULL,NIP pengganti sementara (opsional)
 created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
 updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
