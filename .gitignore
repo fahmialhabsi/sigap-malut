@@ -34,4 +34,4 @@ coverage/
 # Microsoft Office temporary/lock files
 ~$*.doc*
 ~$*.xls*
-~$*.ppt*
+~$*.ppt*backup_fields_*/
