@@ -86,16 +86,26 @@ export default function DashboardLayout({ children }) {
     navigate(`/module/${modulId.toLowerCase()}`);
   };
 
-  // Cek apakah children adalah layout bidang (khusus distribusi)
-  const isDistribusiLayout =
-    children &&
-    children.type &&
-    (children.type.name === "DashboardDistribusiLayout" ||
-      children.type.displayName === "DashboardDistribusiLayout" ||
-      children.type.name === "DashboardDistribusiSuperModern" ||
-      children.type.displayName === "DashboardDistribusiSuperModern");
+  // Dashboard bidang modern membawa layout full-screen sendiri (dengan sidebar internal).
+  const childComponentName =
+    children?.type?.displayName || children?.type?.name || "";
+  const standaloneDashboardNames = [
+    "DashboardDistribusi",
+    "DashboardDistribusiLayout",
+    "DashboardDistribusiSuperModern",
+    "DashboardSekretariat",
+    "DashboardSekretariatLayout",
+    "DashboardKetersediaan",
+    "DashboardKetersediaanLayout",
+    "DashboardKonsumsi",
+    "DashboardKonsumsiLayout",
+    "DashboardUPTD",
+    "DashboardUPTDLayout",
+  ];
+  const isStandaloneDashboard =
+    standaloneDashboardNames.includes(childComponentName);
 
-  if (isDistribusiLayout) {
+  if (isStandaloneDashboard) {
     return <>{children}</>;
   }
 

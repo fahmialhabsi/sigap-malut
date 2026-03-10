@@ -1,5 +1,5 @@
 console.log("Loaded: DashboardKetersediaanLayout");
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Chart,
   CategoryScale,
@@ -34,9 +34,18 @@ function normalizeRoleName(user) {
   );
 }
 
+const KEBIJAKAN_STORAGE_KEY = "ketersediaan_kebijakan_analisis_records";
+
 export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
   // State
-  const sidebarOpen = window.innerWidth > 768;
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 768;
+  });
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.innerWidth >= 768;
+  });
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [modules, setModules] = useState(fallbackModules || []);
   const [menuAktif, setMenuAktif] = useState("");
@@ -47,15 +56,35 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
   const [notifikasi, setNotifikasi] = useState([]);
   const [authChecked, setAuthChecked] = useState(false);
   const [loading, setLoading] = useState(false);
-  const lastAuthFetch = useRef(0);
-  const lastModulesFetch = useRef(0);
+  const [kebijakanForm, setKebijakanForm] = useState(() => ({
+    tanggal: new Date().toISOString().slice(0, 10),
+    komoditas: "",
+    wilayah: "",
+    stokTon: "",
+    kebutuhanTon: "",
+    rekomendasi: "",
+    status: "Draft",
+  }));
+  const [kebijakanRows, setKebijakanRows] = useState([]);
+  const [kebijakanSaved, setKebijakanSaved] = useState(false);
+
+  // Keep sidebar behavior consistent between desktop and mobile.
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(true);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Ambil info user & role dari backend
   useEffect(() => {
-    const now = Date.now();
-    if (now - lastAuthFetch.current < 5000) return;
-    lastAuthFetch.current = now;
-
     let mounted = true;
 
     api
@@ -104,17 +133,12 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
   // Ambil modul sidebar bidang ketersediaan (tolerant + fallback statis)
   useEffect(() => {
     if (!authChecked) return;
-    const now = Date.now();
-    if (now - lastModulesFetch.current < 5000) return;
-    lastModulesFetch.current = now;
-
     let mounted = true;
 
     // helper: set modules safely
     const applyModules = (arr) => {
       if (!mounted) return;
       if (arr && arr.length) {
-        // filter by bidang ketersediaan if possible (tolerant)
         const ketersediaan = arr.filter((row) => {
           const bidang = String(
             row.bidang ||
@@ -125,42 +149,63 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
           )
             .trim()
             .toLowerCase();
-          // accept "bidang ketersediaan" atau hanya "ketersediaan"
-          return bidang === "bidang ketersediaan" || bidang === "ketersediaan";
+          const moduleId = String(row.modul_id || row.id || "")
+            .trim()
+            .toUpperCase();
+          const isActive =
+            row?.is_active === undefined ||
+            row?.is_active === null ||
+            row?.is_active === true ||
+            String(row?.is_active).toLowerCase() === "true" ||
+            String(row?.is_active) === "1";
+          return (
+            isActive &&
+            (bidang.includes("ketersediaan") || moduleId.startsWith("BKT-"))
+          );
         });
 
         if (ketersediaan && ketersediaan.length) {
-          setModules(ketersediaan);
+          const sorted = [...ketersediaan].sort((a, b) => {
+            const orderA = Number(a?.menu_order ?? a?.menuOrder ?? 9999);
+            const orderB = Number(b?.menu_order ?? b?.menuOrder ?? 9999);
+            return orderA - orderB;
+          });
+
+          setModules(sorted);
           setMenuAktif(
-            (m) =>
-              m ||
-              ketersediaan[0].nama_modul ||
-              ketersediaan[0].name ||
-              ketersediaan[0].id,
+            (m) => m || sorted[0].nama_modul || sorted[0].name || sorted[0].id,
           );
           return;
         }
 
-        // fallback: if no bidang match but arr has items, use arr
+        // fallback: use arr if no bidang match
         setModules(arr);
         setMenuAktif((m) => m || arr[0].nama_modul || arr[0].name || arr[0].id);
         return;
       }
 
-      // nothing to set
+      if (Array.isArray(fallbackModules) && fallbackModules.length) {
+        setModules(fallbackModules);
+        setMenuAktif(
+          (m) =>
+            m ||
+            fallbackModules[0].nama_modul ||
+            fallbackModules[0].name ||
+            fallbackModules[0].id,
+        );
+        return;
+      }
+
       setModules([]);
     };
 
-    // first try API /modules
     api
       .get("/modules")
       .then((res) => {
         if (!mounted) return;
 
-        console.log("DEBUG: /modules response:", res);
-
-        // parse tolerant payload shapes
         const payload = res.data;
+        // normalize array candidates
         const arr = Array.isArray(payload)
           ? payload
           : Array.isArray(payload?.data)
@@ -169,7 +214,7 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
               ? payload.result
               : [];
 
-        // If API explicitly forbids non-super-admins (success:false message) -> fallback to static
+        // if API explicitly forbids: fallback to static
         if (
           payload &&
           payload.success === false &&
@@ -177,26 +222,18 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
             .toLowerCase()
             .includes("super admin")
         ) {
-          console.warn(
-            "Modules list restricted to super_admin — loading fallback static modules",
-          );
-          // fallback to static file in public/master-data
           return fetch("/master-data/modules-ketersediaan.json")
             .then((r) => r.json())
             .then((json) => applyModules(json))
-            .catch((e) => {
-              console.error("Failed to load fallback static modules:", e);
-              applyModules([]);
-            });
+            .catch(() => applyModules(fallbackModules));
         }
 
-        // if API returned modules, apply them
         if (arr && arr.length) {
           applyModules(arr);
           return;
         }
 
-        // if response contained object that maybe has data.modules etc, attempt deeper extraction
+        // deeper attempt
         const possibleArr = Array.isArray(payload?.data?.modules)
           ? payload.data.modules
           : [];
@@ -205,28 +242,18 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
           return;
         }
 
-        // fallback to static public file if API didn't return usable modules
-        console.warn(
-          "API /modules returned empty or unexpected shape — trying static fallback",
-        );
+        // fallback static
         return fetch("/master-data/modules-ketersediaan.json")
           .then((r) => r.json())
           .then((json) => applyModules(json))
-          .catch((e) => {
-            console.error("Failed to load fallback static modules:", e);
-            applyModules([]);
-          });
+          .catch(() => applyModules(fallbackModules));
       })
-      .catch((err) => {
-        console.error("Fetch /modules error:", err);
-        // on network error or 403/401, fallback to static
+      .catch(() => {
+        // network / error -> fallback static
         fetch("/master-data/modules-ketersediaan.json")
           .then((r) => r.json())
           .then((json) => applyModules(json))
-          .catch((e) => {
-            console.error("Failed to load fallback static modules:", e);
-            applyModules([]);
-          });
+          .catch(() => applyModules(fallbackModules));
       });
 
     return () => {
@@ -234,18 +261,59 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     };
   }, [authChecked]);
 
+  const activeModule = useMemo(
+    () =>
+      modules.find(
+        (mod) => mod.nama_modul === menuAktif || mod.name === menuAktif,
+      ) || null,
+    [menuAktif, modules],
+  );
+
+  const isKebijakanAnalisisMenu = useMemo(() => {
+    const moduleId = String(activeModule?.modul_id || activeModule?.id || "")
+      .trim()
+      .toUpperCase();
+    const moduleName = String(
+      activeModule?.nama_modul || activeModule?.name || menuAktif || "",
+    )
+      .trim()
+      .toLowerCase();
+
+    return (
+      moduleId === "BKT-KBJ" ||
+      (moduleName.includes("kebijakan") && moduleName.includes("ketersediaan"))
+    );
+  }, [activeModule, menuAktif]);
+
+  useEffect(() => {
+    try {
+      const savedRows = JSON.parse(
+        localStorage.getItem(KEBIJAKAN_STORAGE_KEY) || "[]",
+      );
+      setKebijakanRows(Array.isArray(savedRows) ? savedRows : []);
+    } catch {
+      setKebijakanRows([]);
+    }
+  }, []);
+
   // Data fetch for active module (table, chart, kpi, notifications)
   useEffect(() => {
-    if (!menuAktif) return;
-    const activeModule = modules.find(
-      (mod) => mod.nama_modul === menuAktif || mod.name === menuAktif,
-    );
     if (!activeModule) return;
+
+    if (isKebijakanAnalisisMenu) {
+      setTableRows([]);
+      setChart({ labels: [], datasets: [] });
+      setNotifikasi([]);
+      setLoading(false);
+      return;
+    }
+
+    const activeModuleId = activeModule.modul_id || activeModule.id;
 
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await api.get(`/data/${activeModule.id}`);
+        const res = await api.get(`/data/${activeModuleId}`);
         setTableRows(res.data.rows || []);
         setKpi([
           {
@@ -271,10 +339,7 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     };
 
     fetchData();
-  }, [menuAktif, modules]);
-
-  // Dynamic form state when a fallback module is active
-  const [dynamicFormModule, setDynamicFormModule] = useState(null);
+  }, [activeModule, isKebijakanAnalisisMenu]);
 
   // Avatar logic
   const avatarRef = useRef();
@@ -304,12 +369,104 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     },
   };
 
+  const kpiShown = isKebijakanAnalisisMenu
+    ? [
+        {
+          title: "Total Dokumen Kebijakan",
+          value: kebijakanRows.length,
+          color: "green",
+        },
+        {
+          title: "Status Final",
+          value: kebijakanRows.filter((row) => row.status === "Final").length,
+          color: "blue",
+        },
+        {
+          title: "Perlu Review",
+          value: kebijakanRows.filter((row) => row.status !== "Final").length,
+          color: "yellow",
+        },
+      ]
+    : kpi;
+
+  const handleKebijakanFormChange = (field, value) => {
+    setKebijakanForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleKebijakanSubmit = (e) => {
+    e.preventDefault();
+
+    if (
+      !kebijakanForm.tanggal ||
+      !kebijakanForm.komoditas ||
+      !kebijakanForm.wilayah
+    ) {
+      window.alert("Tanggal, Komoditas, dan Wilayah wajib diisi.");
+      return;
+    }
+
+    const stokTon = Number(kebijakanForm.stokTon || 0);
+    const kebutuhanTon = Number(kebijakanForm.kebutuhanTon || 0);
+
+    const newRow = {
+      id: `${Date.now()}`,
+      tanggal: kebijakanForm.tanggal,
+      komoditas: kebijakanForm.komoditas,
+      wilayah: kebijakanForm.wilayah,
+      stokTon,
+      kebutuhanTon,
+      selisihTon: stokTon - kebutuhanTon,
+      status: kebijakanForm.status,
+      rekomendasi: kebijakanForm.rekomendasi,
+      dibuatPada: Date.now(),
+    };
+
+    setKebijakanRows((prev) => {
+      const nextRows = [newRow, ...prev];
+      localStorage.setItem(KEBIJAKAN_STORAGE_KEY, JSON.stringify(nextRows));
+      return nextRows;
+    });
+
+    setKebijakanForm({
+      tanggal: new Date().toISOString().slice(0, 10),
+      komoditas: "",
+      wilayah: "",
+      stokTon: "",
+      kebutuhanTon: "",
+      rekomendasi: "",
+      status: "Draft",
+    });
+
+    setKebijakanSaved(true);
+    setTimeout(() => setKebijakanSaved(false), 1800);
+  };
+
+  const handleDeleteKebijakanRow = (rowId) => {
+    setKebijakanRows((prev) => {
+      const nextRows = prev.filter((row) => row.id !== rowId);
+      localStorage.setItem(KEBIJAKAN_STORAGE_KEY, JSON.stringify(nextRows));
+      return nextRows;
+    });
+  };
+
   return (
     <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-green-900 via-green-800 to-slate-800 text-slate-100 select-none">
+      {isMobile && sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Tutup sidebar"
+          className="fixed inset-0 z-20 bg-slate-950/45"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <aside
-        className={`h-full bg-green-950/95 z-30 flex flex-col items-center 
+        className={`h-full bg-green-950/95 z-30 flex flex-col items-center flex-shrink-0
         transition-all duration-300 ${
-          sidebarOpen ? "w-[275px] min-w-[275px]" : "w-[60px] min-w-[60px]"
+          isMobile
+            ? `${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed left-0 top-0 w-[275px] min-w-[275px]`
+            : sidebarOpen
+              ? "w-[275px] min-w-[275px]"
+              : "w-[72px] min-w-[72px]"
         } 
         border-r border-green-900/60 shadow-xl`}
       >
@@ -321,23 +478,29 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
           />
         </div>
         <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
-          {modules.map((modul) => {
-            const label = modul.nama_modul || modul.name || modul.id || "-";
-            const key = modul.modul_id || modul.id || label;
-            const canonical = modul.nama_modul || modul.name || label;
-            return (
-              <SidebarItem
-                key={key}
-                label={label}
-                active={menuAktif === canonical}
-                sidebarOpen={sidebarOpen}
-                onClick={() => {
-                  setDynamicFormModule(null);
-                  setMenuAktif(canonical);
-                }}
-              />
-            );
-          })}
+          {Array.isArray(modules) && modules.length ? (
+            modules.map((modul) => {
+              const label = modul.nama_modul || modul.name || modul.id || "-";
+              const key = modul.modul_id || modul.id || label;
+              const canonical = modul.nama_modul || modul.name || label;
+              return (
+                <SidebarItem
+                  key={key}
+                  label={label}
+                  active={menuAktif === canonical}
+                  sidebarOpen={sidebarOpen}
+                  onClick={() => {
+                    setMenuAktif(canonical);
+                    if (isMobile) setSidebarOpen(false);
+                  }}
+                />
+              );
+            })
+          ) : (
+            <div className="px-2 py-4 text-center text-sm text-green-100/70">
+              {sidebarOpen ? "Menu belum tersedia" : "-"}
+            </div>
+          )}
         </nav>
         <div className="py-6 w-full text-xs text-green-100/70 text-center tracking-wide">
           {sidebarOpen ? "SIGAP Malut" : "SIGAP"}
@@ -345,8 +508,18 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
       </aside>
 
       <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col bg-green-950/80 backdrop-blur">
-        <header className="flex-none w-full h-[75px] bg-green-900/80 flex items-center px-12 shadow-sm z-10 sticky top-0">
-          <div className="text-2xl text-white font-bold tracking-wide flex-1">
+        <header className="flex-none w-full h-[75px] bg-green-900/80 flex items-center px-4 md:px-12 shadow-sm z-10 sticky top-0">
+          <button
+            type="button"
+            className="mr-3 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-green-700/70 bg-green-950/60 text-green-100 hover:bg-green-800/70"
+            onClick={() => setSidebarOpen((open) => !open)}
+            aria-label={sidebarOpen ? "Tutup sidebar" : "Buka sidebar"}
+          >
+            <span className="text-base font-bold">
+              {sidebarOpen ? "<" : "="}
+            </span>
+          </button>
+          <div className="text-lg md:text-2xl text-white font-bold tracking-wide flex-1">
             SIGAP <span className="font-light">·</span> Bidang Ketersediaan
           </div>
           <div className="mr-8 hidden md:block font-mono text-sm blur-none select-text opacity-75">
@@ -417,7 +590,7 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
           )}
 
           <div className="w-full max-w-7xl mx-auto flex flex-row flex-wrap gap-x-8 gap-y-4 items-stretch justify-between px-2">
-            {kpi.map((item, idx) => (
+            {kpiShown.map((item, idx) => (
               <KpiCard
                 key={idx}
                 title={item.title}
@@ -427,20 +600,172 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
             ))}
           </div>
 
-          <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
-            <PanelBox title={`Tabel ${menuAktif}`}>
-              {dynamicFormModule ? (
-                <DynamicForm module={dynamicFormModule} />
-              ) : (
+          {isKebijakanAnalisisMenu ? (
+            <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
+              <PanelBox title="Form Kebijakan & Analisis Ketersediaan">
+                <form onSubmit={handleKebijakanSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormInput
+                      label="Tanggal"
+                      type="date"
+                      value={kebijakanForm.tanggal}
+                      onChange={(e) =>
+                        handleKebijakanFormChange("tanggal", e.target.value)
+                      }
+                    />
+                    <FormInput
+                      label="Komoditas"
+                      value={kebijakanForm.komoditas}
+                      placeholder="Contoh: Beras"
+                      onChange={(e) =>
+                        handleKebijakanFormChange("komoditas", e.target.value)
+                      }
+                    />
+                    <FormInput
+                      label="Wilayah"
+                      value={kebijakanForm.wilayah}
+                      placeholder="Contoh: Halmahera Barat"
+                      onChange={(e) =>
+                        handleKebijakanFormChange("wilayah", e.target.value)
+                      }
+                    />
+                    <div>
+                      <label className="text-xs text-green-200 mb-1 block">
+                        Status Dokumen
+                      </label>
+                      <select
+                        className="w-full rounded-lg border border-green-700/60 bg-green-950/50 px-3 py-2 text-green-50"
+                        value={kebijakanForm.status}
+                        onChange={(e) =>
+                          handleKebijakanFormChange("status", e.target.value)
+                        }
+                      >
+                        <option value="Draft">Draft</option>
+                        <option value="Review">Review</option>
+                        <option value="Final">Final</option>
+                      </select>
+                    </div>
+                    <FormInput
+                      label="Stok (Ton)"
+                      type="number"
+                      value={kebijakanForm.stokTon}
+                      placeholder="0"
+                      onChange={(e) =>
+                        handleKebijakanFormChange("stokTon", e.target.value)
+                      }
+                    />
+                    <FormInput
+                      label="Kebutuhan (Ton)"
+                      type="number"
+                      value={kebijakanForm.kebutuhanTon}
+                      placeholder="0"
+                      onChange={(e) =>
+                        handleKebijakanFormChange(
+                          "kebutuhanTon",
+                          e.target.value,
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-green-200 mb-1 block">
+                      Rekomendasi Kebijakan
+                    </label>
+                    <textarea
+                      className="w-full rounded-lg border border-green-700/60 bg-green-950/50 px-3 py-2 text-green-50 min-h-24"
+                      placeholder="Tuliskan rekomendasi kebijakan berdasarkan analisis ketersediaan..."
+                      value={kebijakanForm.rekomendasi}
+                      onChange={(e) =>
+                        handleKebijakanFormChange("rekomendasi", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-lg bg-yellow-400 text-slate-900 font-semibold hover:bg-yellow-300"
+                    >
+                      Simpan Data Kebijakan
+                    </button>
+                    {kebijakanSaved && (
+                      <span className="text-sm text-green-200">
+                        Data berhasil disimpan.
+                      </span>
+                    )}
+                  </div>
+                </form>
+              </PanelBox>
+
+              <PanelBox title="List Kebijakan & Analisis">
+                {kebijakanRows.length ? (
+                  <div className="overflow-auto max-h-[360px]">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-green-300">
+                          <th className="text-left py-2 pr-3">Tanggal</th>
+                          <th className="text-left py-2 pr-3">Komoditas</th>
+                          <th className="text-left py-2 pr-3">Wilayah</th>
+                          <th className="text-left py-2 pr-3">Selisih</th>
+                          <th className="text-left py-2 pr-3">Status</th>
+                          <th className="text-left py-2 pr-0">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {kebijakanRows.map((row) => (
+                          <tr
+                            key={row.id}
+                            className="border-t border-green-900/60 text-green-100"
+                          >
+                            <td className="py-2 pr-3">{row.tanggal}</td>
+                            <td className="py-2 pr-3">{row.komoditas}</td>
+                            <td className="py-2 pr-3">{row.wilayah}</td>
+                            <td
+                              className={`py-2 pr-3 font-semibold ${
+                                Number(row.selisihTon) >= 0
+                                  ? "text-green-300"
+                                  : "text-red-300"
+                              }`}
+                            >
+                              {Number(row.selisihTon).toLocaleString("id-ID")}{" "}
+                              ton
+                            </td>
+                            <td className="py-2 pr-3">{row.status}</td>
+                            <td className="py-2 pr-0">
+                              <button
+                                type="button"
+                                className="px-2 py-1 rounded bg-red-900/70 text-red-100 hover:bg-red-800/80"
+                                onClick={() => handleDeleteKebijakanRow(row.id)}
+                              >
+                                Hapus
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-green-100 text-sm">
+                    Belum ada data kebijakan. Isi form di panel kiri untuk
+                    menambahkan data.
+                  </div>
+                )}
+              </PanelBox>
+            </div>
+          ) : (
+            <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
+              <PanelBox title={`Tabel ${menuAktif}`}>
                 <DataTable data={tableRows} />
-              )}
-            </PanelBox>
-            <PanelBox title="Grafik Tren Ketersediaan">
-              <div className="h-56 flex items-center justify-center">
-                <Line data={chart} options={chartOptions} />
-              </div>
-            </PanelBox>
-          </div>
+              </PanelBox>
+              <PanelBox title="Grafik Tren Ketersediaan">
+                <div className="h-56 flex items-center justify-center">
+                  <Line data={chart} options={chartOptions} />
+                </div>
+              </PanelBox>
+            </div>
+          )}
 
           <div className="w-full max-w-7xl mx-auto px-2">
             <PanelBox title="Notifikasi Kritis">
@@ -575,6 +900,21 @@ function PanelBox({ title, children, customClass }) {
       </h2>
       <div>{children}</div>
     </section>
+  );
+}
+
+function FormInput({ label, type = "text", value, placeholder, onChange }) {
+  return (
+    <div>
+      <label className="text-xs text-green-200 mb-1 block">{label}</label>
+      <input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={onChange}
+        className="w-full rounded-lg border border-green-700/60 bg-green-950/50 px-3 py-2 text-green-50"
+      />
+    </div>
   );
 }
 

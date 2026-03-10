@@ -4,6 +4,8 @@ import FieldMappingPreview from "../../components/FieldMappingPreview";
 import { Navigate } from "react-router-dom";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import { roleIdToName } from "../../utils/roleMap";
+import DashboardSekretariatLayout from "../../layouts/DashboardSekretariatLayout";
+import sekretariatModules from "../../data/sekretariatModules";
 
 function normalizeRoleName(user) {
   return (
@@ -68,85 +70,137 @@ const tableData = [
   },
 ];
 
-function ExecutiveSummaryPanel({ kpiData }) {
+function HeroCard({ title, value, info, accent = "emerald" }) {
+  const accentMap = {
+    emerald: {
+      bg: "bg-gradient-to-t from-black/95 to-slate-900/85",
+      border: "border-slate-700",
+      title: "text-slate-200",
+      value: "text-slate-100",
+    },
+    blue: {
+      bg: "bg-gradient-to-t from-slate-950/90 to-blue-950/70",
+      border: "border-blue-700",
+      title: "text-blue-200",
+      value: "text-blue-100",
+    },
+    amber: {
+      bg: "bg-gradient-to-t from-slate-950/90 to-amber-950/70",
+      border: "border-amber-700",
+      title: "text-amber-200",
+      value: "text-amber-100",
+    },
+    red: {
+      bg: "bg-gradient-to-t from-slate-950/90 to-red-950/70",
+      border: "border-red-700",
+      title: "text-red-200",
+      value: "text-red-100",
+    },
+  };
+
+  const theme = accentMap[accent] || accentMap.emerald;
+
   return (
-    <div className="col-span-2 bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-4">
-      <h3 className="font-bold text-lg mb-2 text-slate-100">
-        Executive Summary
-      </h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {kpiData.map((kpi) => (
-          <div
-            key={kpi.label}
-            className="bg-slate-900 rounded-lg p-4 flex flex-col items-center border border-slate-700"
-          >
-            <span className="text-2xl font-bold text-white">{kpi.value}</span>
-            <span className="text-xs text-slate-300 mt-1">{kpi.label}</span>
-            <span className="text-xs text-slate-400 mt-1">{kpi.info}</span>
-          </div>
-        ))}
+    <div
+      className={`rounded-2xl border-2 px-4 py-3 min-h-[86px] flex flex-col justify-between shadow-lg ${theme.bg} ${theme.border}`}
+      style={{
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+      }}
+    >
+      <div className={`text-2xl font-extrabold tracking-wide ${theme.value}`}>
+        {value}
+      </div>
+      <div>
+        <div className={`text-xs font-semibold ${theme.title}`}>{title}</div>
+        <div className="text-[11px] text-slate-200/80 mt-1">{info}</div>
       </div>
     </div>
   );
 }
 
+function PanelBox({ title, accent = "emerald", children, className = "" }) {
+  const accentMap = {
+    emerald: "text-slate-200",
+    blue: "text-blue-200",
+    amber: "text-amber-200",
+    red: "text-red-200",
+  };
+  const titleColor = accentMap[accent] || accentMap.emerald;
+
+  return (
+    <section
+      className={`rounded-2xl p-7 flex flex-col border border-slate-800/85 shadow-md flex-1 bg-slate-950/88 ${className}`}
+      style={{
+        backdropFilter: "blur(17px)",
+        WebkitBackdropFilter: "blur(17px)",
+      }}
+    >
+      <h2
+        className={`font-bold mb-4 text-xl flex items-center gap-2 ${titleColor}`}
+      >
+        {title}
+      </h2>
+      <div>{children}</div>
+    </section>
+  );
+}
+
 function ComplianceAlertPanel({ alertData }) {
   return (
-    <div className="bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-2">
-      <h3 className="font-bold text-lg mb-2">Compliance & Alert</h3>
+    <PanelBox title="Compliance & Alert" accent="amber">
       <ul className="space-y-2">
         {alertData.map((alert, idx) => (
           <li
             key={idx}
             className={`p-2 rounded ${
               alert.type === "danger"
-                ? "bg-red-100 text-red-700"
+                ? "bg-red-950/60 text-red-100"
                 : alert.type === "warning"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-blue-50 text-blue-700"
+                  ? "bg-amber-950/60 text-amber-100"
+                  : "bg-blue-950/60 text-blue-100"
             }`}
           >
             <div className="flex justify-between items-center">
               <span>{alert.message}</span>
-              <span className="text-xs text-muted">{alert.time}</span>
+              <span className="text-xs text-slate-200/75">{alert.time}</span>
             </div>
           </li>
         ))}
       </ul>
-    </div>
+    </PanelBox>
   );
 }
 
 function DataFlowChart() {
   return (
-    <div className="bg-slate-800 rounded-xl shadow p-6">
-      <h3 className="font-bold text-lg mb-4">Alur Data & Koordinasi</h3>
+    <PanelBox title="Alur Data & Koordinasi" accent="blue">
       <div className="flex flex-col items-center">
         <div className="flex flex-row items-center gap-4">
           {[
             {
               label: "Pelaksana",
-              color: "bg-blue-200 text-blue-800",
+              color: "bg-slate-700 text-slate-100",
               desc: "Input Data",
             },
             {
               label: "Fungsional",
-              color: "bg-blue-200 text-blue-800",
+              color: "bg-slate-700 text-slate-100",
               desc: "Validasi Teknis",
             },
             {
               label: "Bidang/UPTD",
-              color: "bg-blue-200 text-blue-800",
+              color: "bg-slate-700 text-slate-100",
               desc: "Review",
             },
             {
               label: "Sekretariat",
-              color: "bg-blue-500 text-white",
+              color: "bg-slate-700 text-white",
               desc: "Integrasi & Distribusi",
             },
             {
               label: "Kepala Dinas",
-              color: "bg-green-500 text-white",
+              color: "bg-slate-700 text-white",
               desc: "Keputusan",
             },
           ].map((node, idx, arr) => (
@@ -164,18 +218,17 @@ function DataFlowChart() {
           ))}
         </div>
       </div>
-    </div>
+    </PanelBox>
   );
 }
 
 function LintasBidangTable({ tableData }) {
   return (
-    <div className="bg-slate-800 rounded-xl shadow p-6">
-      <h3 className="font-bold text-lg mb-4">Data Lintas Bidang</h3>
+    <PanelBox title="Data Lintas Bidang" accent="emerald">
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-blue-50 text-blue-700">
+            <tr className="bg-slate-900/90 text-slate-100">
               <th className="px-4 py-2 text-left">Bidang</th>
               <th className="px-4 py-2 text-left">Status</th>
               <th className="px-4 py-2 text-left">Update Terakhir</th>
@@ -184,15 +237,18 @@ function LintasBidangTable({ tableData }) {
           </thead>
           <tbody>
             {tableData.map((row, idx) => (
-              <tr key={idx} className="border-b last:border-none">
+              <tr
+                key={idx}
+                className="border-b border-slate-800/70 last:border-none"
+              >
                 <td className="px-4 py-2">{row.bidang}</td>
                 <td
                   className={`px-4 py-2 font-semibold ${
                     row.status === "Valid"
-                      ? "text-green-600"
+                      ? "text-emerald-300"
                       : row.status === "Revisi"
-                        ? "text-yellow-700"
-                        : "text-red-600"
+                        ? "text-amber-300"
+                        : "text-red-300"
                   }`}
                 >
                   {row.status}
@@ -204,23 +260,23 @@ function LintasBidangTable({ tableData }) {
           </tbody>
         </table>
       </div>
-    </div>
+    </PanelBox>
   );
 }
 
 function QuickActionBar() {
   return (
     <div className="flex flex-wrap gap-4 justify-end">
-      <button className="bg-blue-700 text-white px-4 py-2 rounded font-semibold shadow hover:bg-blue-800">
+      <button className="bg-blue-900 text-blue-100 px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-800 border border-blue-700/70">
         Upload Dokumen
       </button>
-      <button className="bg-green-600 text-white px-4 py-2 rounded font-semibold shadow hover:bg-green-700">
+      <button className="bg-emerald-900 text-emerald-100 px-4 py-2 rounded-lg font-semibold shadow hover:bg-emerald-800 border border-emerald-700/70">
         Generate Laporan
       </button>
-      <button className="bg-yellow-500 text-white px-4 py-2 rounded font-semibold shadow hover:bg-yellow-600">
+      <button className="bg-amber-900 text-amber-100 px-4 py-2 rounded-lg font-semibold shadow hover:bg-amber-800 border border-amber-700/70">
         Broadcast
       </button>
-      <button className="bg-gray-100 text-blue-700 px-4 py-2 rounded font-semibold shadow hover:bg-blue-50 border border-blue-200">
+      <button className="bg-slate-900 text-slate-100 px-4 py-2 rounded-lg font-semibold shadow hover:bg-slate-800 border border-slate-600/80">
         Export Data
       </button>
     </div>
@@ -229,46 +285,46 @@ function QuickActionBar() {
 
 function AIFeedbackPanel() {
   return (
-    <div className="bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-2">
-      <h3 className="font-bold text-lg mb-2">AI & Feedback</h3>
-      <div className="mb-2 text-sm text-muted">
+    <PanelBox title="AI & Feedback" accent="blue">
+      <div className="mb-2 text-sm text-slate-200/90">
         Rekomendasi AI: Tidak ada bottleneck terdeteksi. Semua alur berjalan
         normal.
       </div>
       <div className="mb-2">
-        <label className="block text-xs mb-1">Laporan Masalah/Feedback:</label>
+        <label className="block text-xs mb-1 text-slate-300/90">
+          Laporan Masalah/Feedback:
+        </label>
         <textarea
-          className="w-full border rounded p-2 text-sm"
+          className="w-full border border-slate-700 bg-black/70 rounded p-2 text-sm text-slate-50"
           rows={2}
           placeholder="Tulis feedback atau masalah di sini..."
         />
-        <button className="mt-2 bg-blue-700 text-white px-3 py-1 rounded font-semibold hover:bg-blue-800">
+        <button className="mt-2 bg-blue-700 text-white px-3 py-1 rounded-lg font-semibold hover:bg-blue-800">
           Kirim
         </button>
       </div>
-    </div>
+    </PanelBox>
   );
 }
 
 function OpenDataPortal() {
   return (
-    <div className="bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-2">
-      <h3 className="font-bold text-lg mb-2">Open Data Portal</h3>
-      <div className="mb-2 text-sm text-muted">
+    <PanelBox title="Open Data Portal" accent="amber">
+      <div className="mb-2 text-sm text-slate-200/90">
         Ringkasan data publik tersedia untuk diunduh:
       </div>
       <div className="flex gap-2">
-        <button className="bg-gray-100 text-blue-700 px-4 py-2 rounded font-semibold shadow hover:bg-blue-50 border border-blue-200">
+        <button className="bg-slate-900 text-slate-100 px-4 py-2 rounded-lg font-semibold shadow hover:bg-slate-800 border border-slate-600/80">
           Download Excel
         </button>
-        <button className="bg-gray-100 text-blue-700 px-4 py-2 rounded font-semibold shadow hover:bg-blue-50 border border-blue-200">
+        <button className="bg-slate-900 text-slate-100 px-4 py-2 rounded-lg font-semibold shadow hover:bg-slate-800 border border-slate-600/80">
           Download PDF
         </button>
-        <button className="bg-gray-100 text-blue-700 px-4 py-2 rounded font-semibold shadow hover:bg-blue-50 border border-blue-200">
+        <button className="bg-slate-900 text-slate-100 px-4 py-2 rounded-lg font-semibold shadow hover:bg-slate-800 border border-slate-600/80">
           Download CSV
         </button>
       </div>
-    </div>
+    </PanelBox>
   );
 }
 
@@ -300,29 +356,112 @@ export default function DashboardSekretariat() {
 
   if (!isAllowed) return <Navigate to="/" replace />;
 
+  const moduleCards = [...sekretariatModules]
+    .filter(
+      (row) =>
+        row?.is_active === undefined ||
+        row?.is_active === null ||
+        row?.is_active === true ||
+        String(row?.is_active).toLowerCase() === "true" ||
+        String(row?.is_active) === "1",
+    )
+    .sort((a, b) => {
+      const orderA = Number(a?.menu_order ?? a?.menuOrder ?? 9999);
+      const orderB = Number(b?.menu_order ?? b?.menuOrder ?? 9999);
+      return orderA - orderB;
+    });
+
   return (
-    <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
-      <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 px-8 py-6">
-        <ExecutiveSummaryPanel kpiData={kpiData} />
-        <ComplianceAlertPanel alertData={alertData} />
-      </section>
+    <DashboardSekretariatLayout fallbackModules={moduleCards}>
+      <div className="w-full px-6 md:px-12 py-8 space-y-8">
+        <div
+          className="bg-gradient-to-r from-black/95 to-slate-900/92 border-2 border-slate-800/85 rounded-2xl p-8 shadow-2xl"
+          style={{
+            backdropFilter: "blur(15px)",
+            WebkitBackdropFilter: "blur(15px)",
+          }}
+        >
+          <h1 className="text-3xl font-bold text-white mb-3 flex items-center gap-3">
+            <span className="text-4xl"></span>
+            Dashboard Sekretariat
+          </h1>
+          <p className="text-slate-200/85 text-base leading-relaxed">
+            Ringkasan koordinasi lintas bidang, kepatuhan alur, dan administrasi
+            operasional Sekretariat.
+          </p>
+        </div>
 
-      <section className="w-full px-8 py-4">
-        <DataFlowChart />
-      </section>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <HeroCard
+            title={kpiData[0].label}
+            value={kpiData[0].value}
+            info={kpiData[0].info}
+            accent="blue"
+          />
+          <HeroCard
+            title={kpiData[1].label}
+            value={kpiData[1].value}
+            info={kpiData[1].info}
+            accent="emerald"
+          />
+          <HeroCard
+            title={kpiData[2].label}
+            value={kpiData[2].value}
+            info={kpiData[2].info}
+            accent="amber"
+          />
+          <HeroCard
+            title={kpiData[3].label}
+            value={kpiData[3].value}
+            info={kpiData[3].info}
+            accent="red"
+          />
+        </div>
 
-      <section className="w-full px-8 py-4">
-        <LintasBidangTable tableData={tableData} />
-      </section>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-9">
+          <div className="xl:col-span-2 flex flex-col gap-9">
+            <DataFlowChart />
+            <LintasBidangTable tableData={tableData} />
+          </div>
+          <div className="xl:col-span-1">
+            <ComplianceAlertPanel alertData={alertData} />
+          </div>
+        </div>
 
-      <section className="w-full px-8 py-4">
-        <QuickActionBar />
-      </section>
+        <PanelBox title="Aksi Cepat" accent="emerald">
+          <QuickActionBar />
+        </PanelBox>
 
-      <section className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 px-8 py-4">
-        <AIFeedbackPanel />
-        <OpenDataPortal />
-      </section>
-    </div>
+        <PanelBox title="Modul Sekretariat" accent="blue">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {moduleCards.map((modul) => (
+              <div
+                key={modul.id}
+                className="bg-gradient-to-br from-slate-900/92 to-black/85 border-2 border-slate-700/70 rounded-xl p-5 flex flex-col gap-3 shadow-lg hover:scale-105 transition"
+                style={{
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                }}
+              >
+                <div className="font-bold text-lg text-slate-100">
+                  {modul.name}
+                </div>
+                <div className="text-xs text-slate-300/80 font-mono">
+                  ID: {modul.id}
+                </div>
+                <div className="mt-2">
+                  <FieldMappingPreview modulId={modul.id} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </PanelBox>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-9">
+          <AIFeedbackPanel />
+          <OpenDataPortal />
+        </div>
+      </div>
+    </DashboardSekretariatLayout>
   );
 }
