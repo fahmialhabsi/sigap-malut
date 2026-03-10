@@ -36,11 +36,21 @@ module.exports = {
       allowNull: true,
     });
 
-    // Add UNIQUE index on nip (only if nip has values/you prepared migration for empty existing rows)
-    await queryInterface.addIndex(TABLE_NAME, ["nip"], {
-      unique: true,
-      name: `${TABLE_NAME}_nip_unique`,
-    });
+    // safer: create partial unique index on nip for Postgres (ignore NULLs)
+    if (
+      queryInterface.sequelize.getDialect &&
+      queryInterface.sequelize.getDialect() === "postgres"
+    ) {
+      await queryInterface.sequelize.query(
+        `CREATE UNIQUE INDEX IF NOT EXISTS ${TABLE_NAME}_nip_unique ON ${TABLE_NAME} (nip) WHERE nip IS NOT NULL;`,
+      );
+    } else {
+      // fallback for sqlite/mysql: create normal unique index (may fail if duplicates exist)
+      await queryInterface.addIndex(TABLE_NAME, ["nip"], {
+        unique: true,
+        name: `${TABLE_NAME}_nip_unique`,
+      });
+    }
 
     // Add FK constraint to users.id (created_by)
     await queryInterface.addConstraint(TABLE_NAME, {
@@ -65,9 +75,21 @@ module.exports = {
       );
     } catch (e) {}
 
-    // remove index
+    // remove index safely
     try {
-      await queryInterface.removeIndex(TABLE_NAME, `${TABLE_NAME}_nip_unique`);
+      if (
+        queryInterface.sequelize.getDialect &&
+        queryInterface.sequelize.getDialect() === "postgres"
+      ) {
+        await queryInterface.sequelize.query(
+          `DROP INDEX IF EXISTS ${TABLE_NAME}_nip_unique;`,
+        );
+      } else {
+        await queryInterface.removeIndex(
+          TABLE_NAME,
+          `${TABLE_NAME}_nip_unique`,
+        );
+      }
     } catch (e) {}
 
     await queryInterface.removeColumn(TABLE_NAME, "created_by");
