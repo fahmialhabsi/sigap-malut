@@ -6,6 +6,8 @@ tempat_lahir,Tempat Lahir,varchar,100,false,false,NULL,none,NULL
 tanggal_lahir,Tanggal Lahir,date,NULL,false,false,NULL,none,NULL
 jenis_kelamin,Jenis Kelamin,enum,NULL,false,false,NULL,none,"Laki-Laki,Perempuan",Jenis kelamin
 agama,Agama,enum,NULL,false,false,NULL,none,"Islam,Kristen,Katolik,Hindu,Budha,Kepercayaan",Agama
+email,Email,varchar,255,false,false,NULL,email,NULL,Alamat email ASN
+phone,Telepon,varchar,32,false,false,NULL,phone,NULL,Nomor telepon/HP
 pendidikan_terakhir,Pendidikan Terakhir,varchar,255,false,false,NULL,none,NULL
 unit_kerja,Unit Kerja,varchar,255,false,false,NULL,none,NULL
 jabatan,Jabatan,varchar,255,false,false,NULL,none,NULL
@@ -14,6 +16,8 @@ golongan,Golongan,varchar,10,false,false,NULL,none,NULL
 tanggal_pengangkatan,Tanggal Pengangkatan,date,NULL,false,false,NULL,none,NULL
 tanggal_pensiun,Tanggal Pensiun,date,NULL,false,false,NULL,none,NULL
 status_kepegawaian,Status Kepegawaian,enum,NULL,false,false,aktif,none,"aktif,nonaktif,pensiun",Status
+alamat_ktp,Alamat KTP,text,NULL,false,false,NULL,none,NULL,Alamat resmi
 file_dokumen,File Dokumen,json,NULL,false,false,NULL,none,NULL,Paths to supporting docs
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi data
 created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
 updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
