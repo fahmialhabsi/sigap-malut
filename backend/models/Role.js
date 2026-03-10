@@ -14,6 +14,12 @@ const Role = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    code: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      unique: true,
+      comment: "Role code identifier (e.g., kepala_dinas, sekretaris)",
+    },
     level: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -22,6 +28,12 @@ const Role = sequelize.define(
     description: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    default_permissions: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: [],
+      comment: "Default permissions array for this role",
     },
     is_active: {
       type: DataTypes.BOOLEAN,

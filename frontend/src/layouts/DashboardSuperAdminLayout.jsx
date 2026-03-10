@@ -33,7 +33,7 @@ export default function DashboardSuperAdminLayout() {
   }, [user, roleName, isInitialized]);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-600 to-green-800 font-inter">
+    <div className="relative min-h-screen bg-black font-inter">
       <SidebarMenu />
       <HeaderBar />
       <main className="pl-20 pt-16 pb-8 pr-0 min-h-[calc(100vh-2rem)]">
