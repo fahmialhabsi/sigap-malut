@@ -16,6 +16,8 @@
     "mocha": "^11.7.5"
   },
   "scripts": {
-    "integration:dry-run": "node scripts/integration-generator/dry-run.js"
+    "integration:dry-run": "node scripts/integration-generator/dry-run.js",
+    "generate:master-files": "node scripts/generate_master_files.js",
+    "generate:fields-m1-9": "node scripts/generate_fields_M001_M009.js"
   }
 }
