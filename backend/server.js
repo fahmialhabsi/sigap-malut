@@ -15,15 +15,17 @@ import bktPgdRoutes from "./routes/BKT-PGD.js";
 import tablesRoutes from "./routes/tables.js";
 import modulesRoutes from "./routes/modules.js";
 import bksEvlRoutes from "./routes/BKS-EVL.js";
-
-import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
 import workflowStatusRouter from "./routes/workflow-status.js";
 import tasksRouter from "./routes/tasks.js";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number.parseInt(process.env.PORT || "5000", 10) || 5000;
+const MAX_PORT_RETRIES = 10;
+const isDevelopment = process.env.NODE_ENV === "development";
+const enableStartupLogs =
+  process.env.STARTUP_LOGGING !== "false" && process.env.NODE_ENV !== "test";
 
 // ESM __dirname shim
 const __filename = fileURLToPath(import.meta.url);
@@ -50,7 +52,7 @@ app.use(
 );
 
 // Request logging (development only)
-if (process.env.NODE_ENV === "development") {
+if (isDevelopment) {
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`);
     next();
@@ -105,9 +107,8 @@ registerRoutes(app);
 
 // Dynamic table routes (must be after specific routes)
 app.use("/api/workflow-status", workflowStatusRouter);
-app.use("/api", tablesRoutes);
-app.use("/api", workflowRoutes);
 app.use("/api/tasks", tasksRouter);
+app.use("/api", tablesRoutes);
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
@@ -127,23 +128,72 @@ app.use((err, req, res, next) => {
   });
 });
 
+function listen(port) {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port);
+
+    const handleListening = () => {
+      server.off("error", handleError);
+      resolve(server);
+    };
+
+    const handleError = (error) => {
+      server.off("listening", handleListening);
+      reject(error);
+    };
+
+    server.once("listening", handleListening);
+    server.once("error", handleError);
+  });
+}
+
+async function listenWithFallback(startPort) {
+  let currentPort = startPort;
+  const maxAttempts = isDevelopment ? MAX_PORT_RETRIES : 1;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    try {
+      const server = await listen(currentPort);
+
+      if (attempt > 0) {
+        console.warn(
+          `Port ${startPort} is in use. Backend running on port ${currentPort}.`,
+        );
+      }
+
+      return { server, port: currentPort };
+    } catch (error) {
+      if (error.code !== "EADDRINUSE" || attempt === maxAttempts - 1) {
+        throw error;
+      }
+
+      currentPort += 1;
+    }
+  }
+
+  throw new Error(
+    `Unable to bind backend server after ${maxAttempts} attempts starting from port ${startPort}.`,
+  );
+}
+
 // Start server
 async function startServer() {
   try {
     await testConnection();
 
+    if (enableStartupLogs) {
+      console.log(`Database connected (${sequelize.getDialect()}).`);
+    }
+
     // Sync database models (only create tables if not exist)
     await sequelize.sync();
 
-    app.listen(PORT, () => {
-      console.log(`\n${"=".repeat(60)}`);
-      console.log(`SIGAP Malut Backend Server`);
-      console.log(`${"=".repeat(60)}`);
-      console.log(`Server running on: http://localhost:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`Database: ${sequelize.getDialect()}`);
-      console.log(`${"=".repeat(60)}\n`);
-    });
+    const { port } = await listenWithFallback(PORT);
+
+    if (enableStartupLogs) {
+      const envName = process.env.NODE_ENV || "development";
+      console.log(`Server running on http://localhost:${port} (${envName}).`);
+    }
   } catch (error) {
     console.error("❌ Failed to start server:", error);
     process.exit(1);

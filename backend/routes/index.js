@@ -57,8 +57,6 @@ import komoditasRoutes from "./komoditas.js";
 import modulesRoutes from "./modules.js";
 
 export default function registerRoutes(app) {
-  console.log("📡 Registering API routes...\n");
-
   app.use("/api/chatbot", chatbotRoutes);
   app.use("/api/bds-bmb", BDSBMBRoutes);
   app.use("/api/bds-cpd", BDSCPDRoutes);

@@ -1,20 +1,47 @@
-module.exports = (sequelize, DataTypes) => {
-  const Approval = sequelize.define(
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
+
+const Approval =
+  sequelize.models.Approval ||
+  sequelize.define(
     "Approval",
     {
-      task_id: DataTypes.INTEGER,
-      approver_role: DataTypes.STRING,
-      approver_user_id: DataTypes.INTEGER,
-      decision: DataTypes.STRING,
-      note: DataTypes.TEXT,
-      decided_at: DataTypes.DATE,
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      task_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      approver_role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      approver_user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      decision: {
+        type: DataTypes.ENUM("pending", "approved", "rejected"),
+        allowNull: false,
+        defaultValue: "pending",
+      },
+      note: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      decided_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
-    { tableName: "Approvals", underscored: true, timestamps: false },
+    {
+      tableName: "Approvals",
+      timestamps: false,
+      underscored: true,
+    },
   );
 
-  Approval.associate = function (models) {
-    Approval.belongsTo(models.Task, { foreignKey: "task_id" });
-  };
-
-  return Approval;
-};
+export default Approval;

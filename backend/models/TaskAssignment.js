@@ -1,26 +1,48 @@
-module.exports = (sequelize, DataTypes) => {
-  const TaskAssignment = sequelize.define(
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
+
+const TaskAssignment =
+  sequelize.models.TaskAssignment ||
+  sequelize.define(
     "TaskAssignment",
     {
-      task_id: DataTypes.INTEGER,
-      assignee_role: DataTypes.STRING,
-      assignee_user_id: DataTypes.INTEGER,
-      assigned_by: DataTypes.INTEGER,
-      assigned_at: DataTypes.DATE,
-      status: DataTypes.STRING,
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      task_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      assignee_role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      assignee_user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      assigned_by: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      assigned_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "assigned",
+      },
     },
-    { tableName: "TaskAssignments", underscored: true, timestamps: false },
+    {
+      tableName: "TaskAssignments",
+      timestamps: false,
+      underscored: true,
+    },
   );
 
-  TaskAssignment.associate = function (models) {
-    TaskAssignment.belongsTo(models.Task, { foreignKey: "task_id" });
-    if (models.User) {
-      TaskAssignment.belongsTo(models.User, {
-        foreignKey: "assignee_user_id",
-        as: "assignee",
-      });
-    }
-  };
-
-  return TaskAssignment;
-};
+export default TaskAssignment;

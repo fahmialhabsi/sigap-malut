@@ -1,14 +1,45 @@
-const express = require("express");
-const {
-  Task,
-  TaskAssignment,
-  TaskLog,
-  Approval,
-  sequelize,
-} = require("../models");
-const auditLogger = require("../utils/auditLogger");
+import express from "express";
+import Task from "../models/Task.js";
+import TaskAssignment from "../models/TaskAssignment.js";
+import TaskLog from "../models/TaskLog.js";
+import Approval from "../models/Approval.js";
+import User from "../models/User.js";
+import { sequelize } from "../config/database.js";
+import { logAudit } from "../services/auditLogService.js";
 
 const router = express.Router();
+
+function ensureTaskAssociations() {
+  if (!Task.associations.TaskAssignments) {
+    Task.hasMany(TaskAssignment, { foreignKey: "task_id" });
+  }
+
+  if (!Task.associations.TaskLogs) {
+    Task.hasMany(TaskLog, { foreignKey: "task_id" });
+  }
+
+  if (!Task.associations.Approvals) {
+    Task.hasMany(Approval, { foreignKey: "task_id" });
+  }
+
+  if (!Task.associations.creator) {
+    Task.belongsTo(User, { foreignKey: "created_by", as: "creator" });
+  }
+
+  if (!TaskAssignment.associations.Task) {
+    TaskAssignment.belongsTo(Task, { foreignKey: "task_id" });
+  }
+
+  if (!TaskLog.associations.Task) {
+    TaskLog.belongsTo(Task, { foreignKey: "task_id" });
+  }
+
+  if (!Approval.associations.Task) {
+    Approval.belongsTo(Task, { foreignKey: "task_id" });
+  }
+}
+
+ensureTaskAssociations();
 
 // helper to get current user from request (assumes auth middleware sets req.user)
 function currentUserId(req) {
@@ -19,7 +50,7 @@ function currentUserId(req) {
 router.post("/", async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const payload = req.body;
+    const payload = { ...req.body };
     payload.created_by = currentUserId(req);
     const task = await Task.create(payload, { transaction: t });
 
@@ -35,7 +66,7 @@ router.post("/", async (req, res) => {
     );
 
     // write audit log
-    await auditLogger(sequelize, {
+    await logAudit({
       modul: "tasks",
       entitas_id: String(task.id),
       aksi: "CREATE",
@@ -56,7 +87,7 @@ router.post("/", async (req, res) => {
 // List tasks with filters
 router.get("/", async (req, res) => {
   try {
-    const { status, role, assigned_to } = req.query;
+    const { status, assigned_to } = req.query;
     const where = {};
     if (status) where.status = status;
     if (assigned_to) where.created_by = assigned_to;
@@ -114,7 +145,7 @@ router.post("/:id/assign", async (req, res) => {
       { transaction: t },
     );
 
-    await auditLogger(sequelize, {
+    await logAudit({
       modul: "tasks",
       entitas_id: String(id),
       aksi: "ASSIGN",
@@ -165,7 +196,7 @@ router.post("/:id/transition", async (req, res) => {
       { transaction: t },
     );
 
-    await auditLogger(sequelize, {
+    await logAudit({
       modul: "tasks",
       entitas_id: String(id),
       aksi: action.toUpperCase(),
@@ -182,4 +213,4 @@ router.post("/:id/transition", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

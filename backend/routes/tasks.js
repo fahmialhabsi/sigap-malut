@@ -1,8 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const taskController = require("../controllers/taskController");
+import express from "express";
+import taskController from "../controllers/taskController.js";
+import { protect } from "../middleware/auth.js";
 
-// Using controller router directly (taskController is an express.Router)
+const router = express.Router();
+
+// Protect task workflow endpoints to ensure actor/context are available.
+router.use(protect);
 router.use("/", taskController);
 
-module.exports = router;
+export default router;
