@@ -11,8 +11,12 @@ import {
   deleteUser,
 } from "../controllers/authController.js";
 import { protect } from "../middleware/auth.js";
+import limiter from "../middleware/rateLimiter.js";
 
 const router = express.Router();
+
+// Apply rate limiting to all auth endpoints.
+router.use(limiter);
 
 // Public routes
 router.post("/register", register);
