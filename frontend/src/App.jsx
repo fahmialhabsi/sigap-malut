@@ -167,6 +167,14 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/uptd/:modulId"
+          element={
+            <PrivateRoute>
+              <DashboardUPTD />
+            </PrivateRoute>
+          }
+        />
 
         {/* Workflow and Reminder routes */}
         <Route

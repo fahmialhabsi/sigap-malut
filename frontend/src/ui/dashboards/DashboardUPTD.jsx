@@ -1,7 +1,7 @@
 import React from "react";
 import useAuthStore from "../../stores/authStore";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
-import { Navigate } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import FieldMappingPreview from "../../components/FieldMappingPreview";
 import { roleIdToName } from "../../utils/roleMap";
 import DashboardUPTDLayout from "../../layouts/DashboardUPTDLayout";
@@ -56,6 +56,7 @@ function PanelBox({ title, children, customClass = "" }) {
 }
 
 export default function DashboardUPTD() {
+  const { modulId } = useParams();
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
 
@@ -69,6 +70,18 @@ export default function DashboardUPTD() {
       });
     }
   }, [user]);
+
+  React.useEffect(() => {
+    if (!modulId || typeof document === "undefined") return;
+
+    const targetId = `uptd-${String(modulId).toLowerCase()}`;
+    const targetElement = document.getElementById(targetId);
+    if (!targetElement) return;
+
+    requestAnimationFrame(() => {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [modulId]);
 
   const unitKerja = user?.unit_kerja
     ? String(user.unit_kerja).toLowerCase()
