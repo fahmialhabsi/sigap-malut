@@ -7,6 +7,7 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const enableSqlLogging = process.env.SQL_LOGGING === "true";
 
 const sequelize = new Sequelize({
   dialect: process.env.DB_DIALECT || "sqlite",
@@ -23,7 +24,7 @@ const sequelize = new Sequelize({
     password: process.env.DB_PASSWORD,
   }),
 
-  logging: process.env.NODE_ENV === "development" ? console.log : false,
+  logging: enableSqlLogging ? console.log : false,
 
   define: {
     timestamps: true,
@@ -43,7 +44,6 @@ const sequelize = new Sequelize({
 async function testConnection() {
   try {
     await sequelize.authenticate();
-    console.log("✅ Database connection established successfully.");
   } catch (error) {
     console.error("❌ Unable to connect to database:", error.message);
     process.exit(1);
