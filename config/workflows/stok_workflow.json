@@ -1,0 +1,62 @@
+{
+  "name": "stok_workflow",
+  "description": "Workflow for stock/komoditas related tasks – verifikasi teknis + distribusi.",
+  "based_on": "default_workflow",
+  "states": [
+    "draft",
+    "assigned",
+    "inspection",
+    "qc_verified",
+    "distribution_ready",
+    "distributed",
+    "closed",
+    "rejected"
+  ],
+  "transitions": [
+    {
+      "name": "assign",
+      "from": ["draft"],
+      "to": "assigned",
+      "allowed_roles": ["sekretaris", "kepala_bidang"]
+    },
+    {
+      "name": "start_inspection",
+      "from": ["assigned"],
+      "to": "inspection",
+      "allowed_roles": ["staf_pelaksana", "pejabat_fungsional", "seksi_manajemen_teknis"]
+    },
+    {
+      "name": "qc_verify",
+      "from": ["inspection"],
+      "to": "qc_verified",
+      "allowed_roles": ["pejabat_fungsional", "seksi_manajemen_mutu", "seksi_manajemen_teknis"]
+    },
+    {
+      "name": "prepare_distribution",
+      "from": ["qc_verified"],
+      "to": "distribution_ready",
+      "allowed_roles": ["kepala_bidang", "kepala_uptd"]
+    },
+    {
+      "name": "mark_distributed",
+      "from": ["distribution_ready"],
+      "to": "distributed",
+      "allowed_roles": ["staf_pelaksana", "kepala_bidang"]
+    },
+    {
+      "name": "close",
+      "from": ["distributed"],
+      "to": "closed",
+      "allowed_roles": ["sekretaris", "kepala_dinas"]
+    },
+    {
+      "name": "reject",
+      "from": ["inspection", "qc_verified"],
+      "to": "rejected",
+      "allowed_roles": ["pejabat_fungsional", "seksi_manajemen_mutu", "seksi_manajemen_teknis"]
+    }
+  ],
+  "notes": {
+    "enforcement": "Every transition MUST write an audit snapshot to audit_log (modul='tasks'). Evidence files stored in task_files with integrity hash."
+  }
+}
