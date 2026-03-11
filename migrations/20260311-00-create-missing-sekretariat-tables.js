@@ -1,10 +1,36 @@
 export const up = async (queryInterface, Sequelize) => {
-  // helper: check if table exists (works for sqlite)
+  const dialect =
+    typeof queryInterface.sequelize.getDialect === "function"
+      ? queryInterface.sequelize.getDialect()
+      : null;
+
+  // helper: check if table exists (cross-dialect: sqlite, postgres, fallback)
   async function tableExists(tableName) {
-    const res = await queryInterface.sequelize.query(
-      `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
-    );
-    return Array.isArray(res) && res[0] && res[0].length > 0;
+    if (dialect === "sqlite" || dialect === "mssql") {
+      const res = await queryInterface.sequelize.query(
+        `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
+      );
+      return Array.isArray(res) && res[0] && res[0].length > 0;
+    } else if (dialect === "postgres") {
+      const res = await queryInterface.sequelize.query(
+        `SELECT to_regclass('${tableName}')`,
+      );
+      return (
+        Array.isArray(res) &&
+        res[0] &&
+        res[0][0] &&
+        res[0][0].to_regclass !== null
+      );
+    } else {
+      try {
+        await queryInterface.sequelize.query(
+          `SELECT 1 FROM ${tableName} LIMIT 1;`,
+        );
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
   }
 
   // Create minimal tables only if missing. Minimal columns so subsequent migrations that add columns can run.

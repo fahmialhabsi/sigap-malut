@@ -79,7 +79,7 @@ const useAuthStore = create((set) => ({
       // backend response shape: response.data.data.{ user, token, roleName } atau data.data
       const payload = response.data.data || response.data || {};
       const rawUser = payload.user || payload;
-      const token = payload.token || payload?.access_token || null;
+      const token = payload?.token || payload?.access_token || null;
       const roleNameFromResp = payload.roleName || payload.role_name || null;
 
       let user = normalizeUser(rawUser);

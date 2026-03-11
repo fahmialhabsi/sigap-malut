@@ -239,19 +239,6 @@ export default function DashboardSekretariatLayout({
     };
   }, [authChecked]);
 
-  // Also add a small Approval Queue widget (example) near top of layout where appropriate:
-  // Example (pseudo JSX) - put in render area:
-  {
-    user && user.role === "sekretaris" && (
-      <div className="approval-queue-widget">
-        <h3>Approval queue</h3>
-        <button onClick={() => (window.location.href = "/sekretariat/tasks")}>
-          Open Tasks
-        </button>
-      </div>
-    );
-  }
-
   useEffect(() => {
     const handleClick = (e) => {
       if (avatarRef.current && !avatarRef.current.contains(e.target)) {
