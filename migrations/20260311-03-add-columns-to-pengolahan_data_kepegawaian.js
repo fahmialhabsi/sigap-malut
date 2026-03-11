@@ -1,72 +1,71 @@
-"use strict";
+export const up = async (queryInterface, Sequelize) => {
+  const dialect =
+    typeof queryInterface.sequelize.getDialect === "function"
+      ? queryInterface.sequelize.getDialect()
+      : null;
 
-const TABLE_NAME = "pengelolaan_data_kepegawaian";
-const ENUM_IS_SENSITIVE = `enum_${TABLE_NAME}_is_sensitive`;
-
-module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    // email
-    await queryInterface.addColumn(TABLE_NAME, "email", {
-      type: Sequelize.STRING(255),
-      allowNull: true,
-    });
-
-    // phone
-    await queryInterface.addColumn(TABLE_NAME, "phone", {
-      type: Sequelize.STRING(32),
-      allowNull: true,
-    });
-
-    // alamat_ktp
-    await queryInterface.addColumn(TABLE_NAME, "alamat_ktp", {
-      type: Sequelize.TEXT,
-      allowNull: true,
-    });
-
-    // is_sensitive
-    await queryInterface.addColumn(TABLE_NAME, "is_sensitive", {
-      type: Sequelize.ENUM("Biasa", "Sensitif"),
-      allowNull: false,
-      defaultValue: "Biasa",
-    });
-
-    // created_by FK
-    await queryInterface.addColumn(TABLE_NAME, "created_by", {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-    });
-
-    await queryInterface.addConstraint(TABLE_NAME, {
-      fields: ["created_by"],
-      type: "foreign key",
-      name: `${TABLE_NAME}_created_by_fkey`,
-      references: { table: "users", field: "id" },
-      onUpdate: "CASCADE",
-      onDelete: "SET NULL",
-    });
-  },
-
-  down: async (queryInterface, Sequelize) => {
-    try {
-      await queryInterface.removeConstraint(
-        TABLE_NAME,
-        `${TABLE_NAME}_created_by_fkey`,
+  // helper: check table exists for sqlite/postgres
+  async function tableExists(tableName) {
+    if (dialect === "sqlite") {
+      const res = await queryInterface.sequelize.query(
+        `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
       );
-    } catch (e) {}
-
-    await queryInterface.removeColumn(TABLE_NAME, "created_by");
-    await queryInterface.removeColumn(TABLE_NAME, "is_sensitive");
-    await queryInterface.removeColumn(TABLE_NAME, "alamat_ktp");
-    await queryInterface.removeColumn(TABLE_NAME, "phone");
-    await queryInterface.removeColumn(TABLE_NAME, "email");
-
-    if (
-      queryInterface.sequelize.getDialect &&
-      queryInterface.sequelize.getDialect() === "postgres"
-    ) {
-      await queryInterface.sequelize.query(
-        `DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_type WHERE typname = '${ENUM_IS_SENSITIVE}') THEN DROP TYPE "${ENUM_IS_SENSITIVE}"; END IF; END$$;`,
+      return Array.isArray(res) && res[0] && res[0].length > 0;
+    }
+    if (dialect === "postgres") {
+      const res = await queryInterface.sequelize.query(
+        `SELECT to_regclass('${tableName}') as reg`,
+      );
+      return (
+        Array.isArray(res) && res[0] && res[0][0] && res[0][0].reg !== null
       );
     }
-  },
+    // fallback
+    try {
+      await queryInterface.sequelize.query(
+        `SELECT 1 FROM ${tableName} LIMIT 1;`,
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  if (await tableExists("pengelolaan_data_kepegawaian")) {
+    return;
+  }
+
+  const columns = {
+    id:
+      dialect === "postgres"
+        ? {
+            type: Sequelize.UUID,
+            primaryKey: true,
+            defaultValue: Sequelize.literal("gen_random_uuid()"),
+          }
+        : {
+            type: Sequelize.UUID,
+            primaryKey: true,
+            defaultValue: Sequelize.UUIDV4,
+          },
+    // minimal base columns; add more if needed later via existing add-columns migration
+    created_at: {
+      type: Sequelize.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+    },
+    updated_at: {
+      type: Sequelize.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+    },
+  };
+
+  await queryInterface.createTable("pengelolaan_data_kepegawaian", columns);
+};
+
+export const down = async (queryInterface) => {
+  await queryInterface
+    .dropTable("pengelolaan_data_kepegawaian")
+    .catch(() => {});
 };
