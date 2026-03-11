@@ -304,6 +304,15 @@ export default function DashboardSekretariatLayout({
         </div>
 
         <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
+          {/* Quick link: Task inbox */}
+          <SidebarItem
+            to="/sekretariat/tugas"
+            label="📋 Tugas"
+            sidebarOpen={sidebarOpen}
+            onNavigate={() => {
+              if (isMobile) setSidebarOpen(false);
+            }}
+          />
           {sekretariatMenu.length ? (
             sekretariatMenu.map((m) => (
               <SidebarItem
