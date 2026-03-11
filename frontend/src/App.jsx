@@ -11,7 +11,20 @@ const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import ModulePage from "./pages/ModulePage";
 import GenericCreatePage from "./pages/GenericCreatePage";
+import SEKADMCreatePage from "./pages/SEKADMCreatePage";
+import SEKASTCreatePage from "./pages/SEKASTCreatePage";
+import SEKHUMCreatePage from "./pages/SEKHUMCreatePage";
+import SEKKBJCreatePage from "./pages/SEKKBJCreatePage";
+import SEKKEPCreatePage from "./pages/SEKKEPCreatePage";
+import SEKKEUCreatePage from "./pages/SEKKEUCreatePage";
+import SEKLDSCreatePage from "./pages/SEKLDSCreatePage";
+import SEKLKSCreatePage from "./pages/SEKLKSCreatePage";
+import SEKLKTCreatePage from "./pages/SEKLKTCreatePage";
+import SEKLUPCreatePage from "./pages/SEKLUPCreatePage";
+import SEKRENCreatePage from "./pages/SEKRENCreatePage";
+import SEKRMHCreatePage from "./pages/SEKRMHCreatePage";
 import ViewDetailPage from "./pages/ViewDetailPage";
 import EditPage from "./pages/EditPage";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -211,6 +224,102 @@ function App() {
         />
 
         <Route
+          path="/module/sek-adm/create"
+          element={
+            <PrivateRoute>
+              <SEKADMCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-kep/create"
+          element={
+            <PrivateRoute>
+              <SEKKEPCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-keu/create"
+          element={
+            <PrivateRoute>
+              <SEKKEUCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-ast/create"
+          element={
+            <PrivateRoute>
+              <SEKASTCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-rmh/create"
+          element={
+            <PrivateRoute>
+              <SEKRMHCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-hum/create"
+          element={
+            <PrivateRoute>
+              <SEKHUMCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-ren/create"
+          element={
+            <PrivateRoute>
+              <SEKRENCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-kbj/create"
+          element={
+            <PrivateRoute>
+              <SEKKBJCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-lkt/create"
+          element={
+            <PrivateRoute>
+              <SEKLKTCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-lds/create"
+          element={
+            <PrivateRoute>
+              <SEKLDSCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-lks/create"
+          element={
+            <PrivateRoute>
+              <SEKLKSCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/sek-lup/create"
+          element={
+            <PrivateRoute>
+              <SEKLUPCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/module/:moduleId/create"
           element={
             <PrivateRoute>
@@ -247,6 +356,14 @@ function App() {
           element={
             <PrivateRoute>
               <EditPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId"
+          element={
+            <PrivateRoute>
+              <ModulePage />
             </PrivateRoute>
           }
         />

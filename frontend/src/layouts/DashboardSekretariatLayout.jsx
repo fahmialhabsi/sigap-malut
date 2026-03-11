@@ -26,6 +26,16 @@ function isActiveModule(row) {
   );
 }
 
+function normalizeModuleId(row) {
+  return String(row?.modul_id || row?.id || "")
+    .trim()
+    .toUpperCase();
+}
+
+function isSekretariatModule(row) {
+  return normalizeModuleId(row).startsWith("SEK-");
+}
+
 function SidebarItem({ to, label, sidebarOpen, onNavigate }) {
   return (
     <NavLink
@@ -142,39 +152,44 @@ export default function DashboardSekretariatLayout({
   useEffect(() => {
     if (!authChecked) return;
     let mounted = true;
+    const roleName = normalizeRoleName(user);
 
     const applyModules = (arr) => {
       if (!mounted) return;
 
       const rows = Array.isArray(arr) ? arr : [];
-      if (!rows.length) {
-        setModules(Array.isArray(fallbackModules) ? fallbackModules : []);
-        return;
-      }
+      const sekretariatRows = rows.filter((row) => isSekretariatModule(row));
+      const fallbackRows = Array.isArray(fallbackModules)
+        ? fallbackModules
+        : [];
 
-      const sekretariatRows = rows.filter((row) => {
-        const moduleId = String(row?.modul_id || row?.id || "")
-          .trim()
-          .toUpperCase();
-        const bidang = String(
-          row?.bidang ||
-            row?.bidang_name ||
-            row?.kategori ||
-            row?.department ||
-            "",
-        )
-          .trim()
-          .toLowerCase();
+      // Keep fallback as baseline, then overlay API data by module ID.
+      const mergedModules = new Map();
 
-        const byBidang = bidang.includes("sekretariat");
-        const byId =
-          moduleId.startsWith("SA") ||
-          /^M0(0[1-9]|[1-2][0-9]|3[0-1])$/.test(moduleId);
+      fallbackRows
+        .filter((row) => isSekretariatModule(row))
+        .forEach((row) => {
+          mergedModules.set(normalizeModuleId(row), row);
+        });
 
-        return isActiveModule(row) && (byBidang || byId);
+      sekretariatRows.forEach((row) => {
+        const key = normalizeModuleId(row);
+        if (!key) return;
+
+        const base = mergedModules.get(key) || {};
+        mergedModules.set(key, {
+          ...base,
+          ...row,
+          id: row?.id || row?.modul_id || base?.id || base?.modul_id || key,
+          modul_id:
+            row?.modul_id || row?.id || base?.modul_id || base?.id || key,
+        });
       });
 
-      const selected = sekretariatRows.length ? sekretariatRows : rows;
+      const selected = [...mergedModules.values()].filter(
+        (row) => isActiveModule(row) && isSekretariatModule(row),
+      );
+
       const sorted = [...selected].sort((a, b) => {
         const orderA = Number(a?.menu_order ?? a?.menuOrder ?? 9999);
         const orderB = Number(b?.menu_order ?? b?.menuOrder ?? 9999);
@@ -182,6 +197,22 @@ export default function DashboardSekretariatLayout({
       });
       setModules(sorted);
     };
+
+    const loadStaticModules = () => {
+      fetch("/master-data/modules-sekretariat.json")
+        .then((r) => r.json())
+        .then((json) => applyModules(json))
+        .catch(() => applyModules(fallbackModules));
+    };
+
+    // /api/modules is protected for super_admin in backend.
+    // Use static master-data for other roles to avoid 403 noise.
+    if (roleName !== "super_admin") {
+      loadStaticModules();
+      return () => {
+        mounted = false;
+      };
+    }
 
     api
       .get("/modules")
@@ -202,55 +233,16 @@ export default function DashboardSekretariatLayout({
           return;
         }
 
-        fetch("/master-data/modules-sekretariat.json")
-          .then((r) => r.json())
-          .then((json) => applyModules(json))
-          .catch(() => applyModules(fallbackModules));
+        loadStaticModules();
       })
       .catch(() => {
-        fetch("/master-data/modules-sekretariat.json")
-          .then((r) => r.json())
-          .then((json) => applyModules(json))
-          .catch(() => applyModules(fallbackModules));
+        loadStaticModules();
       });
 
     return () => {
       mounted = false;
     };
-  }, [authChecked, fallbackModules]);
-
-  useEffect(() => {
-    if (!authChecked) return;
-    let mounted = true;
-    fetch("/api/modules")
-      .then((r) => r.json())
-      .then((res) => {
-        if (!mounted) return;
-        if (res && Array.isArray(res.data)) {
-          // map to same shape expected by layout
-          setModules(res.data);
-        }
-      })
-      .catch((err) => {
-        console.warn("Could not fetch modules:", err);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [authChecked]);
-
-  // Also add a small Approval Queue widget (example) near top of layout where appropriate:
-  // Example (pseudo JSX) - put in render area:
-  {
-    user && user.role === "sekretaris" && (
-      <div className="approval-queue-widget">
-        <h3>Approval queue</h3>
-        <button onClick={() => (window.location.href = "/sekretariat/tasks")}>
-          Open Tasks
-        </button>
-      </div>
-    );
-  }
+  }, [authChecked, fallbackModules, user]);
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -266,6 +258,7 @@ export default function DashboardSekretariatLayout({
   const sekretariatMenu = useMemo(() => {
     const modulRows = (Array.isArray(modules) ? modules : [])
       .filter(isActiveModule)
+      .filter(isSekretariatModule)
       .sort((a, b) => {
         const orderA = Number(a?.menu_order ?? a?.menuOrder ?? 9999);
         const orderB = Number(b?.menu_order ?? b?.menuOrder ?? 9999);
@@ -273,12 +266,14 @@ export default function DashboardSekretariatLayout({
       })
       .map((row) => {
         const id = row.modul_id || row.id;
+        if (!id) return null;
         return {
           id,
           name: row.nama_modul || row.name || id,
           path: `/module/${String(id).toLowerCase()}`,
         };
-      });
+      })
+      .filter(Boolean);
 
     return [
       {
@@ -290,22 +285,10 @@ export default function DashboardSekretariatLayout({
     ];
   }, [modules]);
 
-  const menuLabelMap = {
-    DASHBOARD: "Dashboard Sekretariat",
-    M001: "Data ASN",
-    M002: "Tracking KGB",
-    M003: "Tracking Pangkat",
-    M004: "Tracking Penghargaan",
-    M005: "Data Cuti",
-    M006: "Perjalanan Dinas",
-    M007: "Diklat & Pelatihan",
-    M008: "SKP",
-    M009: "Database Kepegawaian",
-  };
-
   const getMenuLabel = (moduleItem) => {
     const key = String(moduleItem?.id || "").toUpperCase();
-    return menuLabelMap[key] || moduleItem?.name || "Modul";
+    if (key === "DASHBOARD") return "Dashboard Sekretariat";
+    return moduleItem?.name || "Modul Sekretariat";
   };
 
   return (
@@ -320,7 +303,7 @@ export default function DashboardSekretariatLayout({
       )}
 
       <aside
-        className={`h-full bg-black/95 z-30 flex flex-col items-center flex-shrink-0 transition-all duration-300 ${
+        className={`h-full min-h-0 bg-black/95 z-30 flex flex-col items-center flex-shrink-0 transition-all duration-300 ${
           isMobile
             ? `${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed left-0 top-0 w-[275px] min-w-[275px]`
             : sidebarOpen
@@ -336,7 +319,7 @@ export default function DashboardSekretariatLayout({
           />
         </div>
 
-        <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
+        <nav className="w-full min-h-0 flex flex-col gap-4 flex-1 justify-start overflow-y-auto overflow-x-hidden px-3 py-2">
           {sekretariatMenu.length ? (
             sekretariatMenu.map((m) => (
               <SidebarItem
@@ -428,6 +411,30 @@ export default function DashboardSekretariatLayout({
         </header>
 
         <main className="flex-1 min-h-0 min-w-0 flex flex-col overflow-auto bg-transparent">
+          {/* Approval Queue (visible to Sekretaris) */}
+          {normalizeRoleName(user) === "sekretaris" && (
+            <div className="mx-6 my-4 p-4 rounded-md bg-white/5 border border-slate-700">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Approval Queue</h3>
+                  <p className="text-sm text-slate-300">
+                    Tugas yang menunggu persetujuan Anda
+                  </p>
+                </div>
+                <div>
+                  <button
+                    onClick={() =>
+                      (window.location.href = "/sekretariat/tasks")
+                    }
+                    className="py-2 px-3 rounded bg-yellow-400 text-slate-900 font-semibold hover:bg-yellow-300"
+                  >
+                    Buka Tasks
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {children}
         </main>
 
@@ -482,5 +489,9 @@ style.textContent = `
 }
 `;
 if (typeof document !== "undefined") {
-  document.head.appendChild(style);
+  // avoid appending duplicate style tag if already present
+  if (!document.head.querySelector("style[data-sigap-dashboard]")) {
+    style.setAttribute("data-sigap-dashboard", "true");
+    document.head.appendChild(style);
+  }
 }

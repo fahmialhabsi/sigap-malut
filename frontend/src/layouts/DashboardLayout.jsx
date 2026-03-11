@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
 
@@ -74,6 +74,7 @@ const modulesByCategory = {
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeCategory, setActiveCategory] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dark] = useState(() => localStorage.getItem("darkMode") === "true");
@@ -104,6 +105,9 @@ export default function DashboardLayout({ children }) {
   ];
   const isStandaloneDashboard =
     standaloneDashboardNames.includes(childComponentName);
+  const hideTopNavigation = String(location?.pathname || "").startsWith(
+    "/module/",
+  );
 
   if (isStandaloneDashboard) {
     return <>{children}</>;
@@ -111,37 +115,38 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
-      {user && roleName === "sekretaris" ? (
-        <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
-          <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
-            {modulesByCategory["Sekretariat"].map((modul) => (
-              <button
-                key={modul.id}
-                className="px-4 py-2 rounded font-semibold flex items-center gap-2 transition bg-ink text-accent hover:bg-accentDark"
-                onClick={() => handleModuleClick(modul.id)}
-              >
-                <span>{modul.name}</span>
-              </button>
-            ))}
-          </div>
-        </nav>
-      ) : (
-        <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
-          <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
-            {categories
-              .filter((cat) => roleName && cat.roles.includes(roleName))
-              .map((cat) => (
+      {!hideTopNavigation &&
+        (user && roleName === "sekretaris" ? (
+          <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
+            <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
+              {modulesByCategory["Sekretariat"].map((modul) => (
                 <button
-                  key={cat.key}
+                  key={modul.id}
                   className="px-4 py-2 rounded font-semibold flex items-center gap-2 transition bg-ink text-accent hover:bg-accentDark"
-                  onClick={() => setActiveCategory(cat.key)}
+                  onClick={() => handleModuleClick(modul.id)}
                 >
-                  <span>{cat.label}</span>
+                  <span>{modul.name}</span>
                 </button>
               ))}
-          </div>
-        </nav>
-      )}
+            </div>
+          </nav>
+        ) : (
+          <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
+            <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
+              {categories
+                .filter((cat) => roleName && cat.roles.includes(roleName))
+                .map((cat) => (
+                  <button
+                    key={cat.key}
+                    className="px-4 py-2 rounded font-semibold flex items-center gap-2 transition bg-ink text-accent hover:bg-accentDark"
+                    onClick={() => setActiveCategory(cat.key)}
+                  >
+                    <span>{cat.label}</span>
+                  </button>
+                ))}
+            </div>
+          </nav>
+        ))}
 
       <main className="flex-1 px-8 py-8 mx-auto max-w-6xl">{children}</main>
     </div>
