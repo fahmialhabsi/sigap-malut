@@ -29,6 +29,7 @@ import AuditTrailPage from "./pages/AuditTrailPage";
 import WorkflowStatusPage from "./pages/WorkflowStatusPage";
 import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
 import BksModulePage from "./pages/bidangKonsumsi/BksModulePage";
+import SekretariatTasksPage from "./pages/SekretariatTasksPage";
 
 // PUBLIC dashboard imports
 import DashboardPublik from "./ui/dashboards/DashboardPublik";
@@ -114,6 +115,15 @@ function App() {
             ) : (
               <Navigate to="/login" replace />
             )
+          }
+        />
+
+        <Route
+          path="/sekretariat/tasks/*"
+          element={
+            <PrivateRoute>
+              <SekretariatTasksPage />
+            </PrivateRoute>
           }
         />
 

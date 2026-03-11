@@ -49,17 +49,37 @@ router.use(protect);
 
 router.get("/", async (req, res) => {
   try {
-    if (req.user?.role !== "super_admin") {
+    const userRole = req.user?.role;
+    const SEKRETARIAT_ROLES = [
+      "sekretaris",
+      "kasubag_umum",
+      "jabatan_fungsional",
+      "pelaksana",
+      "bendahara",
+      "super_admin",
+      "kepala_dinas",
+    ];
+
+    const isSekretariat = SEKRETARIAT_ROLES.includes(userRole);
+    if (!isSekretariat) {
       return res.status(403).json({
         success: false,
-        message: "Hanya super admin yang bisa mengakses daftar modul",
+        message: "Akses tidak diizinkan untuk role ini",
       });
     }
 
     const modules = await loadModules();
-    const activeModules = modules
-      .filter((row) => row.is_active)
-      .sort((a, b) => {
+
+    // Super admin sees all; sekretariat roles see only sekretariat modules
+    const filtered =
+      userRole === "super_admin"
+        ? modules.filter((row) => row.is_active)
+        : modules.filter((row) => {
+            const bidang = String(row.bidang || "").toLowerCase();
+            return row.is_active && bidang.includes("sekretariat");
+          });
+
+    const activeModules = filtered.sort((a, b) => {
         const bidangCompare = (a.bidang || "").localeCompare(b.bidang || "");
         if (bidangCompare !== 0) return bidangCompare;
         return (a.modul_id || "").localeCompare(b.modul_id || "");
