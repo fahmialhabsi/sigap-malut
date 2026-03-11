@@ -1,0 +1,54 @@
+{
+  "sekretaris": [
+    "create_task",
+    "assign_task",
+    "final_approve",
+    "view_all",
+    "escalate",
+    "view_audit",
+    "review_unit_approvals"
+  ],
+  "kasubag_umum_kepegawaian": [
+    "view_unit_tasks",
+    "assign_to_pelaksana",
+    "verify",
+    "create_task_unit"
+  ],
+  "pejabat_fungsional": [
+    "verify_technical",
+    "analyse",
+    "request_changes",
+    "view_assigned"
+  ],
+  "bendahara": [
+    "create_draft",
+    "upload_finance_evidence",
+    "submit_finance",
+    "view_finance_queue"
+  ],
+  "staf_pelaksana": [
+    "create_draft",
+    "update_task_progress",
+    "upload_evidence",
+    "submit_done",
+    "view_assigned"
+  ],
+  "kepala_bidang": ["approve_unit", "view_unit_summary", "escalate"],
+  "kepala_uptd": ["approve_unit", "view_uptd_summary", "escalate"],
+  "subbag_tata_usaha": [
+    "verify_admin",
+    "assign_to_uptd_staff",
+    "view_unit_tasks"
+  ],
+  "seksi_manajemen_mutu": [
+    "verify_technical",
+    "view_lab_results",
+    "assign_corrections"
+  ],
+  "seksi_manajemen_teknis": [
+    "verify_technical",
+    "view_inspection_reports",
+    "assign_tindak_lanjut"
+  ],
+  "kepala_dinas": ["view_all", "final_decision", "close_task"]
+}

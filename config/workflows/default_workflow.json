@@ -1,0 +1,130 @@
+{
+  "name": "default_workflow",
+  "description": "Standard task workflow enforcing Sekretariat → Unit verification → JF analysis → Unit approval → Sekretaris review → (optional) Kepala Dinas",
+  "states": [
+    "draft",
+    "submitted",
+    "assigned",
+    "in_progress",
+    "submitted_for_verification",
+    "verified",
+    "analyzed",
+    "approved_by_unit",
+    "reviewed_by_secretary",
+    "approved_by_secretary",
+    "forwarded_to_kepala_dinas",
+    "closed",
+    "rejected",
+    "escalated"
+  ],
+  "transitions": [
+    {
+      "name": "submit_draft",
+      "from": ["draft"],
+      "to": "submitted",
+      "allowed_roles": [
+        "staf_pelaksana",
+        "bendahara",
+        "pejabat_fungsional",
+        "kasubag_umum_kepegawaian"
+      ]
+    },
+    {
+      "name": "assign_task",
+      "from": ["submitted"],
+      "to": "assigned",
+      "allowed_roles": [
+        "sekretaris",
+        "kasubag_umum_kepegawaian",
+        "subbag_tata_usaha",
+        "kepala_bidang",
+        "kepala_uptd"
+      ]
+    },
+    {
+      "name": "start_work",
+      "from": ["assigned"],
+      "to": "in_progress",
+      "allowed_roles": ["staf_pelaksana", "bendahara"]
+    },
+    {
+      "name": "submit_for_verification",
+      "from": ["in_progress"],
+      "to": "submitted_for_verification",
+      "allowed_roles": ["staf_pelaksana", "bendahara"]
+    },
+    {
+      "name": "verify_unit",
+      "from": ["submitted_for_verification"],
+      "to": "verified",
+      "allowed_roles": [
+        "kasubag_umum_kepegawaian",
+        "pejabat_fungsional",
+        "subbag_tata_usaha",
+        "seksi_manajemen_mutu",
+        "seksi_manajemen_teknis"
+      ]
+    },
+    {
+      "name": "analyze_by_jf",
+      "from": ["verified"],
+      "to": "analyzed",
+      "allowed_roles": ["pejabat_fungsional"]
+    },
+    {
+      "name": "approve_unit",
+      "from": ["analyzed", "verified"],
+      "to": "approved_by_unit",
+      "allowed_roles": ["kepala_bidang", "kepala_uptd", "sekretaris"]
+    },
+    {
+      "name": "review_by_secretary",
+      "from": ["approved_by_unit"],
+      "to": "reviewed_by_secretary",
+      "allowed_roles": ["sekretaris"]
+    },
+    {
+      "name": "approve_by_secretary",
+      "from": ["reviewed_by_secretary"],
+      "to": "approved_by_secretary",
+      "allowed_roles": ["sekretaris"]
+    },
+    {
+      "name": "forward_to_kepala_dinas",
+      "from": ["approved_by_secretary"],
+      "to": "forwarded_to_kepala_dinas",
+      "allowed_roles": ["sekretaris"]
+    },
+    {
+      "name": "close_by_kepala_dinas",
+      "from": [
+        "forwarded_to_kepala_dinas",
+        "approved_by_unit",
+        "approved_by_secretary"
+      ],
+      "to": "closed",
+      "allowed_roles": ["kepala_dinas"]
+    },
+    {
+      "name": "reject",
+      "from": ["submitted_for_verification", "verified", "analyzed"],
+      "to": "rejected",
+      "allowed_roles": [
+        "pejabat_fungsional",
+        "kasubag_umum_kepegawaian",
+        "subbag_tata_usaha",
+        "seksi_manajemen_mutu",
+        "seksi_manajemen_teknis"
+      ]
+    },
+    {
+      "name": "escalate",
+      "from": ["any"],
+      "to": "escalated",
+      "allowed_roles": ["sekretaris", "kepala_bidang", "kepala_uptd"]
+    }
+  ],
+  "notes": {
+    "enforcement": "Every transition MUST write an audit snapshot to audit_log (modul='tasks'). Evidence files stored in task_files with integrity hash. Workflow enforces SOTK: staff inti cannot bypass Sekretaris when task originates in Secretariat; unit tasks follow unit approval chain."
+  }
+}
