@@ -18,6 +18,7 @@ import bksEvlRoutes from "./routes/BKS-EVL.js";
 
 import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
 import workflowStatusRouter from "./routes/workflow-status.js";
+import taskRoutes from "./routes/tasks.js";
 
 dotenv.config();
 
@@ -97,6 +98,7 @@ app.use("/api/sek-adm", sekAdmRoutes);
 app.use("/api/bds-hrg", bdsHrgRoutes);
 app.use("/api/bkt-pgd", bktPgdRoutes);
 app.use("/api/modules", modulesRoutes);
+app.use("/api/tasks", taskRoutes);
 app.use("/api/bks-evl", bksEvlRoutes);
 
 // Register all auto-generated routes

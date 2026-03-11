@@ -1,7 +1,7 @@
 // frontend/src/layouts/DashboardSekretariatLayout.jsx
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import sekretariatModules from "../data/sekretariatModules";
 import { roleIdToName } from "../utils/roleMap";
@@ -65,6 +65,7 @@ export default function DashboardSekretariatLayout({
   children,
   fallbackModules = sekretariatModules,
 }) {
+  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.innerWidth < 768;
@@ -81,6 +82,8 @@ export default function DashboardSekretariatLayout({
   const [modules, setModules] = useState(
     Array.isArray(fallbackModules) ? fallbackModules : [],
   );
+  const [approvalQueue, setApprovalQueue] = useState([]);
+  const [approvalOpen, setApprovalOpen] = useState(false);
   const avatarRef = useRef();
 
   useEffect(() => {
@@ -219,6 +222,23 @@ export default function DashboardSekretariatLayout({
     };
   }, [authChecked, fallbackModules]);
 
+  // Fetch approval queue (submitted tasks awaiting sekretaris review)
+  useEffect(() => {
+    if (!authChecked) return;
+    let mounted = true;
+    api
+      .get("/tasks", { params: { status: "submitted" } })
+      .then((res) => {
+        if (!mounted) return;
+        const arr = Array.isArray(res.data?.data) ? res.data.data : [];
+        setApprovalQueue(arr);
+      })
+      .catch(() => {
+        // Silently fail - tasks endpoint may not exist yet
+      });
+    return () => { mounted = false; };
+  }, [authChecked]);
+
   useEffect(() => {
     const handleClick = (e) => {
       if (avatarRef.current && !avatarRef.current.contains(e.target)) {
@@ -253,12 +273,18 @@ export default function DashboardSekretariatLayout({
         name: "Dashboard",
         path: "/dashboard/sekretariat",
       },
+      {
+        id: "tasks",
+        name: "Task Workflow",
+        path: "/sekretariat/tasks",
+      },
       ...modulRows,
     ];
   }, [modules]);
 
   const menuLabelMap = {
     DASHBOARD: "Dashboard Sekretariat",
+    TASKS: "Task Workflow",
     M001: "Data ASN",
     M002: "Tracking KGB",
     M003: "Tracking Pangkat",
@@ -364,6 +390,58 @@ export default function DashboardSekretariatLayout({
               <span className="absolute -top-1 -right-1 rounded-full w-4 h-4 bg-red-500 flex items-center justify-center text-xs text-white animate-bounce">
                 !
               </span>
+            )}
+          </div>
+          {/* Approval Queue Widget */}
+          <div className="relative mr-3">
+            <button
+              onClick={() => setApprovalOpen((o) => !o)}
+              className="relative flex items-center gap-1.5 px-3 py-1.5 bg-orange-900/80 hover:bg-orange-800 border border-orange-700/60 rounded-lg text-orange-100 text-xs font-semibold transition"
+              title="Antrian Persetujuan"
+            >
+              📥 Antrian
+              {approvalQueue.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 bg-orange-500 text-white rounded-full text-[10px] font-bold">
+                  {approvalQueue.length}
+                </span>
+              )}
+            </button>
+            {approvalOpen && (
+              <div className="absolute right-0 mt-2 w-72 bg-black/97 rounded-xl shadow-2xl border border-slate-700 p-3 z-50 animate-fade-in-up">
+                <div className="font-bold text-sm text-orange-300 mb-2">
+                  Antrian Persetujuan ({approvalQueue.length})
+                </div>
+                {approvalQueue.length === 0 ? (
+                  <div className="text-xs text-slate-400 py-2">Tidak ada tugas menunggu persetujuan</div>
+                ) : (
+                  <ul className="space-y-2 max-h-60 overflow-y-auto">
+                    {approvalQueue.map((t) => (
+                      <li
+                        key={t.id}
+                        className="flex items-start gap-2 p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 cursor-pointer"
+                        onClick={() => {
+                          setApprovalOpen(false);
+                          navigate(`/sekretariat/tasks/${t.id}`);
+                        }}
+                      >
+                        <span className="text-orange-400 mt-0.5 flex-shrink-0">📋</span>
+                        <div>
+                          <div className="text-xs font-semibold text-white">{t.title}</div>
+                          {t.modul_id && (
+                            <div className="text-[10px] text-slate-400 font-mono">{t.modul_id}</div>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <button
+                  onClick={() => { setApprovalOpen(false); navigate("/sekretariat/tasks"); }}
+                  className="mt-3 w-full text-center text-xs text-blue-400 hover:text-blue-300 font-semibold"
+                >
+                  Lihat Semua Tugas →
+                </button>
+              </div>
             )}
           </div>
           <div className="relative" ref={avatarRef}>
