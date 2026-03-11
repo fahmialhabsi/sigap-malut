@@ -112,6 +112,4 @@ export default function registerRoutes(app) {
   app.use("/api/pegawai", pegawaiRoutes);
   app.use("/api/komoditas", komoditasRoutes);
   app.use("/modules", modulesRoutes);
-
-  console.log("✅ 39 API routes registered\n");
 }
