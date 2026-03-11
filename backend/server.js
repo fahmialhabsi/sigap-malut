@@ -18,6 +18,7 @@ import bksEvlRoutes from "./routes/BKS-EVL.js";
 
 import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
 import workflowStatusRouter from "./routes/workflow-status.js";
+import taskRoutes from "./routes/tasks.js";
 
 dotenv.config();
 
@@ -104,6 +105,7 @@ registerRoutes(app);
 
 // Dynamic table routes (must be after specific routes)
 app.use("/api/workflow-status", workflowStatusRouter);
+app.use("/api", taskRoutes);
 app.use("/api", tablesRoutes);
 app.use("/api", workflowRoutes);
 // 404 handler
