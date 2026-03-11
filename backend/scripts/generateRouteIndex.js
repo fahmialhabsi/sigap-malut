@@ -33,7 +33,6 @@ function generateRouteIndex() {
 
   code += `\n`;
   code += `export default function registerRoutes(app) {\n`;
-  code += `  console.log('📡 Registering API routes...\\n');\n\n`;
 
   // Register routes
   routeFiles.forEach((file) => {
@@ -44,7 +43,6 @@ function generateRouteIndex() {
   });
 
   code += `\n`;
-  code += `  console.log('✅ ${routeFiles.length} API routes registered\\n');\n`;
   code += `}\n`;
 
   fs.writeFileSync(OUTPUT_FILE, code);

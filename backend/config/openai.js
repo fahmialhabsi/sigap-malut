@@ -15,9 +15,6 @@ let openaiClient = null;
 
 export const getOpenAIClient = () => {
   if (!openaiConfig.enabled) {
-    console.warn(
-      "OpenAI is disabled. Set OPENAI_ENABLED=true in .env to enable.",
-    );
     return null;
   }
 

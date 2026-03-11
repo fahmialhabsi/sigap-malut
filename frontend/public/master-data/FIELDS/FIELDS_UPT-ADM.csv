@@ -1,0 +1,19 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+nomor_surat,Nomor Surat/Dokumen,varchar,100,true,true,NULL,none,NULL,Nomor surat atau dokumen administrasi
+jenis_dokumen,Jenis Dokumen,enum,NULL,true,false,NULL,none,"surat_masuk,surat_keluar,nota_dinas,surat_tugas,sk_keputusan,laporan,berita_acara,undangan,lainnya",Jenis dokumen administrasi
+perihal,Perihal,varchar,500,true,false,NULL,none,NULL,Perihal atau pokok surat/dokumen
+pengirim,Pengirim,varchar,255,false,false,NULL,none,NULL,Nama pengirim surat/dokumen
+penerima,Penerima,varchar,255,false,false,NULL,none,NULL,Nama penerima surat/dokumen
+tanggal_surat,Tanggal Surat,date,NULL,false,false,NULL,none,NULL,Tanggal tercetak pada surat
+tanggal_terima,Tanggal Terima,date,NULL,false,false,NULL,none,NULL,Tanggal surat diterima
+status,Status,enum,NULL,true,false,proses,none,"proses,disposisi,selesai,arsip",Status penanganan dokumen
+disposisi,Disposisi,text,NULL,false,false,NULL,none,NULL,Disposisi pimpinan
+nomor_agenda,Nomor Agenda,varchar,50,false,false,NULL,none,NULL,Nomor agenda pencatatan
+file_dokumen,File Dokumen,varchar,500,false,false,NULL,none,NULL,Path file dokumen terlampir
+catatan,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan
+is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,Flag data aktif
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi sensitivitas data
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID pembuat
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

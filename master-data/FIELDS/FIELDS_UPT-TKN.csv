@@ -1,0 +1,20 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+nomor_sampel,Nomor Sampel,varchar,50,true,true,NULL,none,NULL,Nomor unik identifikasi sampel
+nama_sampel,Nama Sampel,varchar,255,true,false,NULL,none,NULL,Nama/deskripsi sampel yang diuji
+jenis_komoditas,Jenis Komoditas,enum,NULL,true,false,NULL,none,"pangan_segar,pangan_olahan,pangan_impor,bahan_tambahan_pangan,air_minum",Jenis komoditas pangan
+asal_sampel,Asal Sampel,varchar,255,true,false,NULL,none,NULL,Asal usul atau sumber sampel
+tujuan_pengujian,Tujuan Pengujian,enum,NULL,true,false,NULL,none,"keamanan_pangan,mutu_fisik,mutu_kimia,mutu_mikrobiologi,audit_sertifikasi,pengawasan_rutin",Tujuan dilakukannya pengujian
+metode_uji,Metode Uji,varchar,255,false,false,NULL,none,NULL,Metode/standar pengujian yang digunakan
+parameter_uji,Parameter Uji,text,NULL,true,false,NULL,none,NULL,Parameter yang diujikan (bisa lebih dari satu)
+hasil_uji,Hasil Uji,text,NULL,false,false,NULL,none,NULL,Hasil pengujian laboratorium
+status_uji,Status Uji,enum,NULL,true,false,proses,none,"proses,selesai,ditolak,menunggu_konfirmasi",Status proses pengujian
+tanggal_terima,Tanggal Terima Sampel,date,NULL,true,false,NULL,none,NULL,Tanggal sampel diterima laboratorium
+tanggal_selesai,Tanggal Selesai,date,NULL,false,false,NULL,none,NULL,Tanggal hasil pengujian selesai
+petugas_uji,Petugas Penguji,varchar,255,false,false,NULL,none,NULL,Nama petugas/analis yang melakukan pengujian
+catatan,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan
+is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,Flag data aktif
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Klasifikasi sensitivitas data
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID pembuat
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
