@@ -25,7 +25,7 @@ const TaskApproval = sequelize.define(
       type: DataTypes.STRING(20),
       allowNull: true,
       validate: {
-        isIn: [[null, "approved", "rejected", "revision"]],
+        isIn: [["approved", "rejected", "revision", "closed"]],
       },
     },
     note: {

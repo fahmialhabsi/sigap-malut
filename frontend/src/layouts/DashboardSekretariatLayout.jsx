@@ -301,6 +301,11 @@ export default function DashboardSekretariatLayout({
     return menuLabelMap[key] || moduleItem?.name || "Modul";
   };
 
+  const handleApprovalViewAll = () => {
+    setApprovalOpen(false);
+    navigate("/sekretariat/tasks");
+  };
+
   return (
     <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-black via-slate-950 to-slate-900 text-slate-100 select-none">
       {isMobile && sidebarOpen && (
@@ -436,7 +441,7 @@ export default function DashboardSekretariatLayout({
                   </ul>
                 )}
                 <button
-                  onClick={() => { setApprovalOpen(false); navigate("/sekretariat/tasks"); }}
+                  onClick={handleApprovalViewAll}
                   className="mt-3 w-full text-center text-xs text-blue-400 hover:text-blue-300 font-semibold"
                 >
                   Lihat Semua Tugas →

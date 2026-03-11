@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 
@@ -133,7 +133,7 @@ export default function TaskDetail({ taskId: propTaskId, userRole, onBack }) {
   const [transitionNote, setTransitionNote] = useState("");
   const [transitioning, setTransitioning] = useState(false);
 
-  async function loadTask() {
+  const loadTask = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -144,11 +144,11 @@ export default function TaskDetail({ taskId: propTaskId, userRole, onBack }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [taskId]);
 
   useEffect(() => {
     if (taskId) loadTask();
-  }, [taskId]);
+  }, [taskId, loadTask]);
 
   async function handleTransition(toStatus) {
     setTransitioning(true);

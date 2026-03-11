@@ -14,7 +14,35 @@ import {
 
 const router = express.Router();
 
-// All task routes require authentication
+// Simple in-memory rate limiter: max 60 requests per minute per IP
+const requestCounts = new Map();
+const WINDOW_MS = 60_000;
+const MAX_REQUESTS = 60;
+
+function rateLimit(req, res, next) {
+  const key = req.ip || "unknown";
+  const now = Date.now();
+  const entry = requestCounts.get(key) || { count: 0, start: now };
+
+  if (now - entry.start > WINDOW_MS) {
+    entry.count = 1;
+    entry.start = now;
+  } else {
+    entry.count += 1;
+  }
+  requestCounts.set(key, entry);
+
+  if (entry.count > MAX_REQUESTS) {
+    return res.status(429).json({
+      success: false,
+      message: "Terlalu banyak permintaan. Coba lagi nanti.",
+    });
+  }
+  return next();
+}
+
+// All task routes require authentication + rate limiting
+router.use(rateLimit);
 router.use(protect);
 
 // POST   /api/tasks          - create task
