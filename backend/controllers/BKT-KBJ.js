@@ -4,7 +4,7 @@
 // Generated: 2026-02-17T19:24:48.401Z
 // =====================================================
 
-import BktKbj from "../models/BKT-KBJ.js";
+import bktKbjService from "../services/modules/bktKbjService.js";
 import { logAudit } from "../services/auditLogService.js";
 
 // @desc    Get all BktKbj records
@@ -18,7 +18,7 @@ export const getAllBktKbj = async (req, res) => {
 
     const where = { ...filters };
 
-    const { count, rows } = await BktKbj.findAndCountAll({
+    const { count, rows } = await bktKbjService.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -49,7 +49,7 @@ export const getAllBktKbj = async (req, res) => {
 // @access  Private
 export const getBktKbjById = async (req, res) => {
   try {
-    const record = await BktKbj.findByPk(req.params.id);
+    const record = await bktKbjService.findByPk(req.params.id);
 
     if (!record) {
       return res.status(404).json({
@@ -76,7 +76,7 @@ export const getBktKbjById = async (req, res) => {
 // @access  Private
 export const createBktKbj = async (req, res) => {
   try {
-    const record = await BktKbj.create({
+    const record = await bktKbjService.create({
       ...req.body,
       created_by: req.user?.id,
     });
@@ -107,7 +107,7 @@ export const createBktKbj = async (req, res) => {
 // @access  Private
 export const updateBktKbj = async (req, res) => {
   try {
-    const record = await BktKbj.findByPk(req.params.id);
+    const record = await bktKbjService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,
@@ -146,7 +146,7 @@ export const updateBktKbj = async (req, res) => {
 // @access  Private
 export const deleteBktKbj = async (req, res) => {
   try {
-    const record = await BktKbj.findByPk(req.params.id);
+    const record = await bktKbjService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,

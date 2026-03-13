@@ -1,6 +1,7 @@
 // utils/workflowHooks.js
 // Sederhana: workflow hooks untuk tracking status alur dan audit trail
 import { logAuditTrail } from "./auditTrail";
+import { workflowStatusUpdateAPI } from "../services/workflowStatusService";
 
 export function workflowStatusUpdate({ user, modulId, status, detail }) {
   // Simpan status alur ke localStorage (bisa diintegrasi backend)
@@ -9,6 +10,10 @@ export function workflowStatusUpdate({ user, modulId, status, detail }) {
   const logs = JSON.parse(localStorage.getItem("workflowStatus") || "[]");
   logs.push(entry);
   localStorage.setItem("workflowStatus", JSON.stringify(logs));
+
+  // Fire and forget sync to backend workflow log.
+  workflowStatusUpdateAPI({ user, modulId, status, detail }).catch(() => {});
+
   // Audit trail juga
   logAuditTrail({
     user,

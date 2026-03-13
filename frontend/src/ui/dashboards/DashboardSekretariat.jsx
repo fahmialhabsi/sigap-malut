@@ -3,6 +3,10 @@ import useAuthStore from "../../stores/authStore";
 import FieldMappingPreview from "../../components/FieldMappingPreview";
 import { Navigate } from "react-router-dom";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
+import {
+  emptyDashboardSummary,
+  fetchDashboardSummary,
+} from "../../services/dashboardService";
 import { roleIdToName } from "../../utils/roleMap";
 import DashboardSekretariatLayout from "../../layouts/DashboardSekretariatLayout";
 import sekretariatModules from "../../data/sekretariatModules";
@@ -17,58 +21,96 @@ function normalizeRoleName(user) {
   );
 }
 
-// Data dummy (bisa diganti API)
-const kpiData = [
-  {
-    label: "Compliance Koordinasi",
-    value: "98%",
-    info: "Koordinasi lintas bidang",
-  },
-  { label: "Dokumen Masuk", value: 120, info: "Bulan ini" },
-  { label: "Alert Data", value: 3, info: "Perlu validasi" },
-  { label: "Audit Log", value: 250, info: "Aksi tercatat" },
-];
+function formatDateTime(value) {
+  if (!value) return "-";
 
-const alertData = [
-  {
-    type: "warning",
-    message: "3 data keuangan belum valid",
-    time: "2 jam lalu",
-  },
-  {
-    type: "danger",
-    message: "Bypass alur ditemukan di Bidang Konsumsi",
-    time: "1 hari lalu",
-  },
-  { type: "info", message: "1 dokumen menunggu approval", time: "Baru saja" },
-];
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "-";
 
-const tableData = [
-  {
-    bidang: "Kepegawaian",
-    status: "Valid",
-    lastUpdate: "2026-02-22",
-    penanggungJawab: "Kasubag Umum",
-  },
-  {
-    bidang: "Keuangan",
-    status: "Perlu Validasi",
-    lastUpdate: "2026-02-21",
-    penanggungJawab: "Bendahara",
-  },
-  {
-    bidang: "Aset",
-    status: "Valid",
-    lastUpdate: "2026-02-20",
-    penanggungJawab: "Kasubag Aset",
-  },
-  {
-    bidang: "Distribusi",
-    status: "Revisi",
-    lastUpdate: "2026-02-19",
-    penanggungJawab: "Kabid Distribusi",
-  },
-];
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(parsed);
+}
+
+function inferBidang(moduleId) {
+  const value = String(moduleId || "").toUpperCase();
+  if (value.startsWith("SEK-")) return "Sekretariat";
+  if (value.startsWith("BKT-")) return "Bidang Ketersediaan";
+  if (value.startsWith("BDS-")) return "Bidang Distribusi";
+  if (value.startsWith("BKS-")) return "Bidang Konsumsi";
+  if (value.startsWith("UPT-")) return "UPTD";
+  return value || "Umum";
+}
+
+function buildAlerts(summary, isLoading, errorMessage) {
+  if (errorMessage) {
+    return [
+      {
+        type: "danger",
+        message: errorMessage,
+        time: "baru saja",
+      },
+    ];
+  }
+
+  if (isLoading) {
+    return [
+      {
+        type: "info",
+        message: "Memuat statistik dashboard dari backend",
+        time: "sekarang",
+      },
+    ];
+  }
+
+  const transitions = summary.workflow_statistics.recent_transitions || [];
+  const alerts = transitions.slice(0, 2).map((item) => ({
+    type: item.to_state === "ditolak" ? "danger" : "warning",
+    message: `${item.module_id} berpindah ke status ${item.to_state}`,
+    time: formatDateTime(item.created_at),
+  }));
+
+  if (summary.approval_statistics.approvals_today > 0) {
+    alerts.push({
+      type: "info",
+      message: `${summary.approval_statistics.approvals_today} approval tercatat hari ini`,
+      time: "hari ini",
+    });
+  }
+
+  if (alerts.length === 0) {
+    alerts.push({
+      type: "info",
+      message: "Belum ada alert kritis. Alur operasional berjalan normal.",
+      time: "sinkron terakhir",
+    });
+  }
+
+  return alerts;
+}
+
+function buildTableData(summary) {
+  const activity = summary.module_activity || [];
+
+  if (activity.length === 0) {
+    return [
+      {
+        bidang: "Sekretariat",
+        status: "Monitoring",
+        lastUpdate: "-",
+        penanggungJawab: "Menunggu event backend",
+      },
+    ];
+  }
+
+  return activity.slice(0, 6).map((item) => ({
+    bidang: inferBidang(item.module_id),
+    status: item.total_events >= 5 ? "Valid" : "Revisi",
+    lastUpdate: formatDateTime(item.last_event_at),
+    penanggungJawab: item.module_id,
+  }));
+}
 
 function HeroCard({ title, value, info, accent = "emerald" }) {
   const accentMap = {
@@ -331,6 +373,11 @@ function OpenDataPortal() {
 export default function DashboardSekretariat() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
+  const [dashboardSummary, setDashboardSummary] = React.useState(
+    emptyDashboardSummary,
+  );
+  const [summaryLoading, setSummaryLoading] = React.useState(true);
+  const [summaryError, setSummaryError] = React.useState("");
 
   React.useEffect(() => {
     if (user) {
@@ -342,6 +389,34 @@ export default function DashboardSekretariat() {
       });
     }
   }, [user]);
+
+  React.useEffect(() => {
+    let mounted = true;
+
+    setSummaryLoading(true);
+    fetchDashboardSummary()
+      .then((summary) => {
+        if (!mounted) return;
+        setDashboardSummary(summary);
+        setSummaryError("");
+      })
+      .catch((error) => {
+        if (!mounted) return;
+        setSummaryError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Gagal memuat statistik sekretariat",
+        );
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setSummaryLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const unitKerja = user?.unit_kerja
     ? String(user.unit_kerja).toLowerCase()
@@ -371,6 +446,34 @@ export default function DashboardSekretariat() {
       return orderA - orderB;
     });
 
+  const serviceStats = dashboardSummary.service_statistics;
+  const approvalStats = dashboardSummary.approval_statistics;
+  const moduleActivity = dashboardSummary.module_activity;
+  const kpiData = [
+    {
+      label: "Modul Terdaftar",
+      value: serviceStats.total_registered_modules,
+      info: "Modul aktif yang terbaca dari registry master-data",
+    },
+    {
+      label: "Tugas Aktif",
+      value: serviceStats.active_tasks,
+      info: `${serviceStats.total_tasks} total tugas tercatat`,
+    },
+    {
+      label: "Workflow Aktif",
+      value: serviceStats.open_workflows,
+      info: `${serviceStats.total_workflows} workflow terdaftar`,
+    },
+    {
+      label: "Approval Hari Ini",
+      value: approvalStats.approvals_today,
+      info: `${approvalStats.total_approvals} total approval tercatat`,
+    },
+  ];
+  const alertData = buildAlerts(dashboardSummary, summaryLoading, summaryError);
+  const tableData = buildTableData(dashboardSummary);
+
   return (
     <DashboardSekretariatLayout fallbackModules={moduleCards}>
       <div className="w-full px-6 md:px-12 py-8 space-y-8">
@@ -389,6 +492,12 @@ export default function DashboardSekretariat() {
             Ringkasan koordinasi lintas bidang, kepatuhan alur, dan administrasi
             operasional Sekretariat.
           </p>
+          <div className="mt-3 text-sm text-slate-300/85">
+            {summaryLoading
+              ? "Memuat statistik backend..."
+              : summaryError ||
+                `Sinkron terakhir ${formatDateTime(dashboardSummary.generated_at)}`}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -430,6 +539,35 @@ export default function DashboardSekretariat() {
 
         <PanelBox title="Aksi Cepat" accent="emerald">
           <QuickActionBar />
+        </PanelBox>
+
+        <PanelBox title="Aktivitas Modul Terkini" accent="amber">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {moduleActivity.length === 0 ? (
+              <div className="text-sm text-slate-300/85">
+                {summaryLoading
+                  ? "Menarik aktivitas modul dari backend..."
+                  : "Belum ada aktivitas modul untuk ditampilkan."}
+              </div>
+            ) : (
+              moduleActivity.slice(0, 6).map((item) => (
+                <div
+                  key={`${item.module_id}-${item.last_event_at}`}
+                  className="rounded-xl border border-slate-800/80 bg-black/35 px-4 py-3"
+                >
+                  <div className="font-semibold text-slate-100">
+                    {item.module_id}
+                  </div>
+                  <div className="mt-1 text-sm text-amber-200">
+                    {item.total_events} event audit
+                  </div>
+                  <div className="mt-1 text-xs text-slate-300/80">
+                    {formatDateTime(item.last_event_at)}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </PanelBox>
 
         <PanelBox title="Modul Sekretariat" accent="blue">

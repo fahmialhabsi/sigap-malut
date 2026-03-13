@@ -13,14 +13,22 @@ import {
   deleteSekKeu,
 } from "../controllers/SEK-KEU.js";
 import { protect } from "../middleware/auth.js";
+import { requirePermission } from "../middleware/rbacMiddleware.js";
 
 const router = express.Router();
 
 // All routes are protected
 router.use(protect);
 
-router.route("/").get(getAllSekKeu).post(createSekKeu);
+router
+  .route("/")
+  .get(requirePermission("read", { moduleKey: "sek-keu" }), getAllSekKeu)
+  .post(requirePermission("create", { moduleKey: "sek-keu" }), createSekKeu);
 
-router.route("/:id").get(getSekKeuById).put(updateSekKeu).delete(deleteSekKeu);
+router
+  .route("/:id")
+  .get(requirePermission("read", { moduleKey: "sek-keu" }), getSekKeuById)
+  .put(requirePermission("update", { moduleKey: "sek-keu" }), updateSekKeu)
+  .delete(requirePermission("delete", { moduleKey: "sek-keu" }), deleteSekKeu);
 
 export default router;

@@ -1,18 +1,11 @@
-export async function generateModule(modulData, token) {
-  const resp = await fetch("/api/modules/generate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(modulData),
-  });
-  return await resp.json();
+import api from "./apiClient";
+
+export async function generateModule(modulData) {
+  const response = await api.post("/module-generator/generate", modulData);
+  return response.data;
 }
 
-export async function fetchDynamicModules(token) {
-  const resp = await fetch("/api/modules/list", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return await resp.json();
+export async function fetchDynamicModules() {
+  const response = await api.get("/module-generator/list");
+  return response.data;
 }

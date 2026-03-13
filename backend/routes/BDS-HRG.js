@@ -13,14 +13,22 @@ import {
   deleteBdsHrg,
 } from "../controllers/BDS-HRG.js";
 import { protect } from "../middleware/auth.js";
+import { requirePermission } from "../middleware/rbacMiddleware.js";
 
 const router = express.Router();
 
 // All routes are protected
 router.use(protect);
 
-router.route("/").get(getAllBdsHrg).post(createBdsHrg);
+router
+  .route("/")
+  .get(requirePermission("read", { moduleKey: "bds-hrg" }), getAllBdsHrg)
+  .post(requirePermission("create", { moduleKey: "bds-hrg" }), createBdsHrg);
 
-router.route("/:id").get(getBdsHrgById).put(updateBdsHrg).delete(deleteBdsHrg);
+router
+  .route("/:id")
+  .get(requirePermission("read", { moduleKey: "bds-hrg" }), getBdsHrgById)
+  .put(requirePermission("update", { moduleKey: "bds-hrg" }), updateBdsHrg)
+  .delete(requirePermission("delete", { moduleKey: "bds-hrg" }), deleteBdsHrg);
 
 export default router;

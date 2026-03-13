@@ -4,21 +4,21 @@ import {
   listDynamicModules,
 } from "../controllers/moduleGeneratorController.js";
 import { protect } from "../middleware/auth.js";
-import authorizeByRole from "../middleware/authorizeByRole.js";
+import { requireRole } from "../middleware/rbacMiddleware.js";
 
 const router = express.Router();
 
 router.post(
   "/generate",
   protect,
-  authorizeByRole("super_admin"),
+  requireRole("super_admin"),
   moduleGenerate,
 );
 
 router.get(
   "/list",
   protect,
-  authorizeByRole("super_admin"),
+  requireRole("super_admin"),
   listDynamicModules,
 );
 

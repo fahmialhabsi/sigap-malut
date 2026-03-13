@@ -1,5 +1,9 @@
 import { expect } from "chai";
-import { validateInput, generateJWT, checkRBAC } from "../middleware/auth.js";
+import {
+  checkRBAC,
+  generateJWT,
+  validateInput,
+} from "../utils/authTestHelpers.js";
 
 describe("Error Handling & Security", () => {
   it("should reject invalid input and protect endpoint dengan JWT/RBAC", async () => {

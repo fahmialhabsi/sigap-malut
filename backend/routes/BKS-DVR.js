@@ -13,14 +13,22 @@ import {
   deleteBksDvr,
 } from "../controllers/BKS-DVR.js";
 import { protect } from "../middleware/auth.js";
+import { requirePermission } from "../middleware/rbacMiddleware.js";
 
 const router = express.Router();
 
 // All routes are protected
 router.use(protect);
 
-router.route("/").get(getAllBksDvr).post(createBksDvr);
+router
+  .route("/")
+  .get(requirePermission("read", { moduleKey: "bks-dvr" }), getAllBksDvr)
+  .post(requirePermission("create", { moduleKey: "bks-dvr" }), createBksDvr);
 
-router.route("/:id").get(getBksDvrById).put(updateBksDvr).delete(deleteBksDvr);
+router
+  .route("/:id")
+  .get(requirePermission("read", { moduleKey: "bks-dvr" }), getBksDvrById)
+  .put(requirePermission("update", { moduleKey: "bks-dvr" }), updateBksDvr)
+  .delete(requirePermission("delete", { moduleKey: "bks-dvr" }), deleteBksDvr);
 
 export default router;

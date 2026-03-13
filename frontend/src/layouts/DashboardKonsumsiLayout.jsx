@@ -153,10 +153,11 @@ export default function DashboardKonsumsiLayout({
       })
       .map((row) => {
         const id = row.modul_id || row.id;
+        const routeId = String(id || "").toLowerCase();
         return {
           id,
           name: row.nama_modul || row.name || id,
-          path: `/konsumsi/${id}`,
+          path: routeId ? `/module/${routeId}/create` : "/dashboard/konsumsi",
         };
       });
 

@@ -57,6 +57,9 @@ export default function BKTPGDCreatePage() {
         { id: 3, nama: "Kepulauan Sula" },
         { id: 4, nama: "Halmahera Selatan" },
         { id: 5, nama: "Halmahera Utara" },
+        { id: 6, nama: "Halmahera Timur" },
+        { id: 7, nama: "Pulau Morotai" },
+        { id: 8, nama: "Pulau Taliabu" },
         { id: 9, nama: "Kota Ternate" },
         { id: 10, nama: "Kota Tidore Kepulauan" },
       ]);
@@ -258,7 +261,7 @@ export default function BKTPGDCreatePage() {
               name="komoditas_id"
               value={formData.komoditas_id}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="">Pilih Komoditas</option>
@@ -279,7 +282,7 @@ export default function BKTPGDCreatePage() {
               name="jenis_pengendalian"
               value={formData.jenis_pengendalian}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="Pemantauan Produksi">Pemantauan Produksi</option>
@@ -300,7 +303,7 @@ export default function BKTPGDCreatePage() {
               name="periode"
               value={formData.periode}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -314,7 +317,7 @@ export default function BKTPGDCreatePage() {
               name="kabupaten"
               value={formData.kabupaten}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="">Pilih Kabupaten/Kota</option>
@@ -337,7 +340,8 @@ export default function BKTPGDCreatePage() {
               name="luas_tanam"
               value={formData.luas_tanam}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             />
           </div>
@@ -353,7 +357,8 @@ export default function BKTPGDCreatePage() {
               name="luas_panen"
               value={formData.luas_panen}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             />
           </div>
@@ -369,7 +374,8 @@ export default function BKTPGDCreatePage() {
               name="produksi"
               value={formData.produksi}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             />
           </div>
@@ -385,7 +391,8 @@ export default function BKTPGDCreatePage() {
               name="produktivitas"
               value={formData.produktivitas}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
             />
           </div>
 
@@ -399,7 +406,7 @@ export default function BKTPGDCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

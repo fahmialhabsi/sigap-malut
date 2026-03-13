@@ -8,15 +8,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { sequelize, testConnection } from "./config/database.js";
 import registerRoutes from "./routes/index.js";
-import authRoutes from "./routes/auth.js";
-import sekAdmRoutes from "./routes/SEK-ADM.js";
-import bdsHrgRoutes from "./routes/BDS-HRG.js";
-import bktPgdRoutes from "./routes/BKT-PGD.js";
-import tablesRoutes from "./routes/tables.js";
-import modulesRoutes from "./routes/modules.js";
-import bksEvlRoutes from "./routes/BKS-EVL.js";
-import workflowStatusRouter from "./routes/workflow-status.js";
-import tasksRouter from "./routes/tasks.js";
 
 dotenv.config();
 
@@ -73,17 +64,26 @@ app.get("/health", (req, res) => {
 app.get("/api/test-db", async (req, res) => {
   try {
     await sequelize.authenticate();
+    const dialect = sequelize.getDialect();
+    let tableCount = 0;
 
-    // Get table count
-    const [tables] = await sequelize.query(
-      "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';",
-    );
+    if (dialect === "sqlite") {
+      const [tables] = await sequelize.query(
+        "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';",
+      );
+      tableCount = Number(tables?.[0]?.count || 0);
+    } else if (dialect === "postgres") {
+      const [tables] = await sequelize.query(
+        "SELECT COUNT(*)::int AS count FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';",
+      );
+      tableCount = Number(tables?.[0]?.count || 0);
+    }
 
     res.json({
       success: true,
       message: "Database connection successful",
-      dialect: sequelize.getDialect(),
-      tables: tables[0].count,
+      dialect,
+      tables: tableCount,
     });
   } catch (error) {
     res.status(500).json({
@@ -94,21 +94,9 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-// Auth routes (harus sebelum registerRoutes)
-app.use("/api/auth", authRoutes);
-app.use("/api/sek-adm", sekAdmRoutes);
-app.use("/api/bds-hrg", bdsHrgRoutes);
-app.use("/api/bkt-pgd", bktPgdRoutes);
-app.use("/api/modules", modulesRoutes);
-app.use("/api/bks-evl", bksEvlRoutes);
-
-// Register all auto-generated routes
+// Single route entry point
 registerRoutes(app);
 
-// Dynamic table routes (must be after specific routes)
-app.use("/api/workflow-status", workflowStatusRouter);
-app.use("/api/tasks", tasksRouter);
-app.use("/api", tablesRoutes);
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({

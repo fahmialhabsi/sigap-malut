@@ -112,15 +112,28 @@ export default function SEKRENCreatePage() {
               name="jenis_layanan_perencanaan"
               value={formData.jenis_layanan_perencanaan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Renstra">Renstra</option>
-              <option value="Renja">Renja</option>
-              <option value="Fasilitasi Program">Fasilitasi Program</option>
-              <option value="Sinkronisasi">Sinkronisasi</option>
-              <option value="LKJIP/LAKIP">LKJIP/LAKIP</option>
-              <option value="Laporan Kinerja">Laporan Kinerja</option>
+              <option style={{ color: "#111827" }} value="Renstra">
+                Renstra
+              </option>
+              <option style={{ color: "#111827" }} value="Renja">
+                Renja
+              </option>
+              <option style={{ color: "#111827" }} value="Fasilitasi Program">
+                Fasilitasi Program
+              </option>
+              <option style={{ color: "#111827" }} value="Sinkronisasi">
+                Sinkronisasi
+              </option>
+              <option style={{ color: "#111827" }} value="LKJIP/LAKIP">
+                LKJIP/LAKIP
+              </option>
+              <option style={{ color: "#111827" }} value="Laporan Kinerja">
+                Laporan Kinerja
+              </option>
             </select>
           </div>
 
@@ -133,7 +146,7 @@ export default function SEKRENCreatePage() {
               name="tahun_perencanaan"
               value={formData.tahun_perencanaan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -148,7 +161,7 @@ export default function SEKRENCreatePage() {
               value={formData.periode_renstra}
               onChange={handleChange}
               placeholder="Contoh: 2024-2029"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -161,7 +174,7 @@ export default function SEKRENCreatePage() {
               name="nama_program"
               value={formData.nama_program}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -174,7 +187,7 @@ export default function SEKRENCreatePage() {
               name="nama_kegiatan"
               value={formData.nama_kegiatan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -187,7 +200,7 @@ export default function SEKRENCreatePage() {
               name="indikator_kinerja"
               value={formData.indikator_kinerja}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -200,7 +213,7 @@ export default function SEKRENCreatePage() {
               name="target_kinerja"
               value={formData.target_kinerja}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -213,7 +226,7 @@ export default function SEKRENCreatePage() {
               name="pagu_anggaran"
               value={formData.pagu_anggaran}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -225,12 +238,21 @@ export default function SEKRENCreatePage() {
               name="status_sinkronisasi"
               value={formData.status_sinkronisasi}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
             >
-              <option value="Belum">Belum</option>
-              <option value="Proses">Proses</option>
-              <option value="Sesuai">Sesuai</option>
-              <option value="Tidak Sesuai">Tidak Sesuai</option>
+              <option style={{ color: "#111827" }} value="Belum">
+                Belum
+              </option>
+              <option style={{ color: "#111827" }} value="Proses">
+                Proses
+              </option>
+              <option style={{ color: "#111827" }} value="Sesuai">
+                Sesuai
+              </option>
+              <option style={{ color: "#111827" }} value="Tidak Sesuai">
+                Tidak Sesuai
+              </option>
             </select>
           </div>
 
@@ -243,7 +265,7 @@ export default function SEKRENCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -257,7 +279,7 @@ export default function SEKRENCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -270,11 +292,16 @@ export default function SEKRENCreatePage() {
               name="is_sensitive"
               value={formData.is_sensitive}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Biasa">Biasa</option>
-              <option value="Sensitif">Sensitif</option>
+              <option style={{ color: "#111827" }} value="Biasa">
+                Biasa
+              </option>
+              <option style={{ color: "#111827" }} value="Sensitif">
+                Sensitif
+              </option>
             </select>
           </div>
 
@@ -286,13 +313,22 @@ export default function SEKRENCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="draft">Draft</option>
-              <option value="finalisasi">Finalisasi</option>
-              <option value="disetujui">Disetujui</option>
-              <option value="final">Final</option>
+              <option style={{ color: "#111827" }} value="draft">
+                Draft
+              </option>
+              <option style={{ color: "#111827" }} value="finalisasi">
+                Finalisasi
+              </option>
+              <option style={{ color: "#111827" }} value="disetujui">
+                Disetujui
+              </option>
+              <option style={{ color: "#111827" }} value="final">
+                Final
+              </option>
             </select>
           </div>
 
@@ -305,7 +341,7 @@ export default function SEKRENCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

@@ -4,7 +4,7 @@
 // Generated: 2026-02-17T19:24:48.388Z
 // =====================================================
 
-import BdsHrg from "../models/BDS-HRG.js";
+import bdsHrgService from "../services/modules/bdsHrgService.js";
 import { logAudit } from "../services/auditLogService.js";
 
 // @desc    Get all BdsHrg records
@@ -18,7 +18,7 @@ export const getAllBdsHrg = async (req, res) => {
 
     const where = { ...filters };
 
-    const { count, rows } = await BdsHrg.findAndCountAll({
+    const { count, rows } = await bdsHrgService.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -49,7 +49,7 @@ export const getAllBdsHrg = async (req, res) => {
 // @access  Private
 export const getBdsHrgById = async (req, res) => {
   try {
-    const record = await BdsHrg.findByPk(req.params.id);
+    const record = await bdsHrgService.findByPk(req.params.id);
 
     if (!record) {
       return res.status(404).json({
@@ -76,7 +76,7 @@ export const getBdsHrgById = async (req, res) => {
 // @access  Private
 export const createBdsHrg = async (req, res) => {
   try {
-    const record = await BdsHrg.create({
+    const record = await bdsHrgService.create({
       ...req.body,
       created_by: req.user?.id,
     });
@@ -107,7 +107,7 @@ export const createBdsHrg = async (req, res) => {
 // @access  Private
 export const updateBdsHrg = async (req, res) => {
   try {
-    const record = await BdsHrg.findByPk(req.params.id);
+    const record = await bdsHrgService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,
@@ -146,7 +146,7 @@ export const updateBdsHrg = async (req, res) => {
 // @access  Private
 export const deleteBdsHrg = async (req, res) => {
   try {
-    const record = await BdsHrg.findByPk(req.params.id);
+    const record = await bdsHrgService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,

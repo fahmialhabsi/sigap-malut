@@ -112,13 +112,19 @@ export default function SEKKBJCreatePage() {
               name="jenis_layanan_kebijakan"
               value={formData.jenis_layanan_kebijakan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Bahan Kebijakan Teknis">
+              <option
+                style={{ color: "#111827" }}
+                value="Bahan Kebijakan Teknis"
+              >
                 Bahan Kebijakan Teknis
               </option>
-              <option value="Rekapitulasi Laporan">Rekapitulasi Laporan</option>
+              <option style={{ color: "#111827" }} value="Rekapitulasi Laporan">
+                Rekapitulasi Laporan
+              </option>
             </select>
           </div>
 
@@ -131,7 +137,7 @@ export default function SEKKBJCreatePage() {
               name="tahun"
               value={formData.tahun}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -145,7 +151,7 @@ export default function SEKKBJCreatePage() {
               name="judul"
               value={formData.judul}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -160,7 +166,7 @@ export default function SEKKBJCreatePage() {
               value={formData.periode}
               onChange={handleChange}
               placeholder="Bulanan/Triwulan/Semester/Tahunan"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -175,7 +181,7 @@ export default function SEKKBJCreatePage() {
               value={formData.ditujukan_kepada}
               onChange={handleChange}
               placeholder="Kepala Dinas/Gubernur"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -188,7 +194,7 @@ export default function SEKKBJCreatePage() {
               value={formData.latar_belakang}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -201,7 +207,7 @@ export default function SEKKBJCreatePage() {
               value={formData.permasalahan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -214,7 +220,7 @@ export default function SEKKBJCreatePage() {
               value={formData.analisis}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -227,7 +233,7 @@ export default function SEKKBJCreatePage() {
               value={formData.rekomendasi_kebijakan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -240,7 +246,7 @@ export default function SEKKBJCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -254,7 +260,7 @@ export default function SEKKBJCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -267,11 +273,16 @@ export default function SEKKBJCreatePage() {
               name="is_sensitive"
               value={formData.is_sensitive}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Biasa">Biasa</option>
-              <option value="Sensitif">Sensitif</option>
+              <option style={{ color: "#111827" }} value="Biasa">
+                Biasa
+              </option>
+              <option style={{ color: "#111827" }} value="Sensitif">
+                Sensitif
+              </option>
             </select>
           </div>
 
@@ -283,13 +294,22 @@ export default function SEKKBJCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="draft">Draft</option>
-              <option value="review">Review</option>
-              <option value="finalisasi">Finalisasi</option>
-              <option value="disetujui">Disetujui</option>
+              <option style={{ color: "#111827" }} value="draft">
+                Draft
+              </option>
+              <option style={{ color: "#111827" }} value="review">
+                Review
+              </option>
+              <option style={{ color: "#111827" }} value="finalisasi">
+                Finalisasi
+              </option>
+              <option style={{ color: "#111827" }} value="disetujui">
+                Disetujui
+              </option>
             </select>
           </div>
 
@@ -302,7 +322,7 @@ export default function SEKKBJCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

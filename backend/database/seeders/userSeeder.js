@@ -1,3 +1,5 @@
+// backend/database/seeders/userSeeder.js
+
 module.exports = {
     up: async (queryInterface) => {
       await queryInterface.bulkInsert('Users', [

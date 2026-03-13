@@ -1,19 +1,3 @@
-// File: backend/middleware/auth.js
-// Mock export untuk test error handling & security
-export function validateInput({ username, password }) {
-  if (!username || !password) throw new Error("Invalid input");
-  return true;
-}
-
-export function generateJWT({ id, role }) {
-  // Simulasi token
-  return `mock-token-${id}-${role}`;
-}
-
-export function checkRBAC(token, role) {
-  // Simulasi RBAC
-  return token.includes(role);
-}
 import jwt from "jsonwebtoken";
 
 // @desc    Protect routes - require authentication
@@ -38,7 +22,9 @@ export const protect = async (req, res, next) => {
         id: decoded.id,
         username: decoded.username,
         email: decoded.email,
-        role: decoded.role,
+        role: decoded.role || decoded.role_code,
+        role_code: decoded.role_code || decoded.role,
+        role_id: decoded.role_id,
         unit_kerja: decoded.unit_kerja,
         nama_lengkap: decoded.nama_lengkap,
       };
@@ -86,7 +72,9 @@ export const optionalAuth = async (req, res, next) => {
         id: decoded.id,
         username: decoded.username,
         email: decoded.email,
-        role: decoded.role,
+        role: decoded.role || decoded.role_code,
+        role_code: decoded.role_code || decoded.role,
+        role_id: decoded.role_id,
         unit_kerja: decoded.unit_kerja,
         nama_lengkap: decoded.nama_lengkap,
       };
@@ -107,7 +95,9 @@ export const generateToken = (user) => {
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role,
+      role: user.role || user.role_code || null,
+      role_code: user.role_code || user.role || null,
+      role_id: user.role_id || null,
       unit_kerja: user.unit_kerja,
       nama_lengkap: user.nama_lengkap,
     },

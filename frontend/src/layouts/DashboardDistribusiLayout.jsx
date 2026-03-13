@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Chart,
   CategoryScale,
@@ -33,9 +34,35 @@ function normalizeRoleName(user) {
   );
 }
 
+function getModulePathId(moduleRow) {
+  const rawId = String(moduleRow?.modul_id || moduleRow?.id || "").trim();
+  if (rawId) return rawId.toLowerCase();
+
+  const moduleName = String(moduleRow?.nama_modul || moduleRow?.name || "")
+    .trim()
+    .toLowerCase();
+
+  const moduleMap = {
+    "harga pangan": "bds-hrg",
+    "cppd / perencanaan": "bds-cpd",
+    "cadangan pangan daerah (cppd)": "bds-cpd",
+    "monitoring & distribusi": "bds-mon",
+    "monitoring distribusi": "bds-mon",
+    "kebijakan distribusi": "bds-kbj",
+    "bimbingan & supervisi": "bds-bmb",
+    "bimbingan & pendampingan distribusi": "bds-bmb",
+    evaluasi: "bds-evl",
+    laporan: "bds-lap",
+    "pelaporan kinerja distribusi": "bds-lap",
+  };
+
+  return moduleMap[moduleName] || "";
+}
+
 export default function DashboardDistribusiSuperModern({
   fallbackModules = [],
 }) {
+  const navigate = useNavigate();
   // State
   const sidebarOpen = window.innerWidth > 768;
   const [avatarOpen, setAvatarOpen] = useState(false);
@@ -194,7 +221,13 @@ export default function DashboardDistribusiSuperModern({
                 label={label}
                 active={menuAktif === canonical}
                 sidebarOpen={sidebarOpen}
-                onClick={() => setMenuAktif(canonical)}
+                onClick={() => {
+                  const modulePathId = getModulePathId(modul);
+                  setMenuAktif(canonical);
+
+                  if (!modulePathId) return;
+                  navigate(`/module/${modulePathId}/create`);
+                }}
               />
             );
           })}

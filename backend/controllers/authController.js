@@ -87,7 +87,6 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      plain_password: password,
       role_id,
       unit_id,
       position_id,
@@ -103,7 +102,13 @@ export const register = async (req, res) => {
       pegawai_id: user.id,
     });
 
-    const token = generateToken(user);
+    const roleCode = roleRow?.code || String(roleRow?.name || "").toLowerCase();
+    const token = generateToken({
+      ...user.toJSON(),
+      role: roleCode,
+      role_code: roleCode,
+      role_id: user.role_id,
+    });
     const refreshToken = generateRefreshToken(user);
 
     res.status(201).json({
@@ -184,13 +189,24 @@ export const login = async (req, res) => {
     user.last_login = new Date();
     await user.save();
 
-    const token = generateToken(user);
-    const refreshToken = generateRefreshToken(user);
-
-    // Lookup role from Roles table (source of truth)
+    // Step 3: load role record
     const roleRow = user.role_id ? await Role.findByPk(user.role_id) : null;
     const roleName = roleRow?.name || null; // e.g. "GUBERNUR", "KEPALA_DINAS"
+    const roleCode = roleRow?.code || String(roleName || "").toLowerCase();
 
+    // Step 4: load role permissions (if needed for RBAC middleware)
+    // Example: const permissions = roleRow ? await RoleModulePermission.findAll({ where: { role_id: roleRow.id } }) : [];
+
+    // Step 5: generate JWT token
+    const token = generateToken({
+      ...user.toJSON(),
+      role: roleCode,
+      role_code: roleCode,
+      role_id: user.role_id,
+    });
+    const refreshToken = generateRefreshToken(user);
+
+    // Step 6: return user + role + permissions
     // Dashboard mapping (sesuai dokumenSistem: eksekutif -> /dashboard)
     const roleToDashboard = {
       SUPER_ADMIN: "/dashboard/superadmin",
@@ -332,10 +348,10 @@ export const getAllUsers = async (req, res) => {
       attributes: { exclude: ["password"] },
       order: [["created_at", "ASC"]],
     });
-    // attach `password` field for admin UI (maps to persisted plain_password)
+    // attach `password` field untuk admin UI (tidak lagi menggunakan plain_password)
     const mapped = users.map((u) => {
       const obj = u.toJSON ? u.toJSON() : u;
-      return { ...obj, password: obj.plain_password || "" };
+      return { ...obj, password: "" };
     });
     res.json({ success: true, data: mapped });
   } catch (error) {
@@ -404,48 +420,22 @@ export const createUser = async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
 
-    let user;
-    try {
-      user = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-        plain_password: password,
-        nama_lengkap,
-        role: role || null, // keep string role if you want legacy support
-        role_id: resolvedRoleId, // ALWAYS UUID or null
-        unit_kerja: unit_kerja || null,
-        unit_id: unit_id || unit_kerja || null,
-        nip,
-        jabatan,
-        is_verified: true,
-      });
-    } catch (err) {
-      const msg = String(err?.message || err);
-      if (
-        msg.includes("plain_password") ||
-        msg.includes('column "plain_password"')
-      ) {
-        user = await User.create({
-          username,
-          email,
-          password: hashedPassword,
-          nama_lengkap,
-          role: role || null,
-          role_id: resolvedRoleId,
-          unit_kerja: unit_kerja || null,
-          unit_id: unit_id || unit_kerja || null,
-          nip,
-          jabatan,
-          is_verified: true,
-        });
-      } else {
-        throw err;
-      }
-    }
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      nama_lengkap,
+      role: role || null, // legacy support
+      role_id: resolvedRoleId, // UUID atau null
+      unit_kerja: unit_kerja || null,
+      unit_id: unit_id || unit_kerja || null,
+      nip,
+      jabatan,
+      is_verified: true,
+    });
 
     const created = user.toJSON ? user.toJSON() : user;
-    created.password = created.plain_password || password || "";
+    created.password = "";
 
     res.status(201).json({
       success: true,
@@ -521,13 +511,12 @@ export const updateUser = async (req, res) => {
         });
       }
       user.password = await hashPassword(password);
-      user.plain_password = password;
     }
 
     await user.save();
 
     const updated = user.toJSON ? user.toJSON() : user;
-    updated.password = updated.plain_password || "";
+    updated.password = "";
 
     res.json({
       success: true,

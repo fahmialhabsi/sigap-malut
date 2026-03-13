@@ -25,6 +25,25 @@ import SEKLKTCreatePage from "./pages/SEKLKTCreatePage";
 import SEKLUPCreatePage from "./pages/SEKLUPCreatePage";
 import SEKRENCreatePage from "./pages/SEKRENCreatePage";
 import SEKRMHCreatePage from "./pages/SEKRMHCreatePage";
+import BKTPGDCreatePage from "./pages/BKTPGDCreatePage";
+import BKTKBJCreatePage from "./pages/BKTKBJCreatePage";
+import BKTKRWCreatePage from "./pages/BKTKRWCreatePage";
+import BKTMEVCreatePage from "./pages/BKTMEVCreatePage";
+import BKTFSLCreatePage from "./pages/BKTFSLCreatePage";
+import BKTBMBCreatePage from "./pages/BKTBMBCreatePage";
+import BDSHRGCreatePage from "./pages/BDSHRGCreatePage";
+import BDSCPDCreatePage from "./pages/BDSCPDCreatePage";
+import BDSMONCreatePage from "./pages/BDSMONCreatePage";
+import BDSKBJCreatePage from "./pages/BDSKBJCreatePage";
+import BDSBMBCreatePage from "./pages/BDSBMBCreatePage";
+import BDSEVLCreatePage from "./pages/BDSEVLCreatePage";
+import BDSLAPCreatePage from "./pages/BDSLAPCreatePage";
+import BKSKBJCreatePage from "./pages/BKSKBJCreatePage";
+import BKSDVRCreatePage from "./pages/BKSDVRCreatePage";
+import BKSKMNCreatePage from "./pages/BKSKMNCreatePage";
+import BKSBMBCreatePage from "./pages/BKSBMBCreatePage";
+import BKSEVLCreatePage from "./pages/BKSEVLCreatePage";
+import BKSLAPCreatePage from "./pages/BKSLAPCreatePage";
 import ViewDetailPage from "./pages/ViewDetailPage";
 import EditPage from "./pages/EditPage";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -316,6 +335,158 @@ function App() {
           element={
             <PrivateRoute>
               <SEKLUPCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-pgd/create"
+          element={
+            <PrivateRoute>
+              <BKTPGDCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-kbj/create"
+          element={
+            <PrivateRoute>
+              <BKTKBJCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-krw/create"
+          element={
+            <PrivateRoute>
+              <BKTKRWCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-mev/create"
+          element={
+            <PrivateRoute>
+              <BKTMEVCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-fsl/create"
+          element={
+            <PrivateRoute>
+              <BKTFSLCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-bmb/create"
+          element={
+            <PrivateRoute>
+              <BKTBMBCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-hrg/create"
+          element={
+            <PrivateRoute>
+              <BDSHRGCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-cpd/create"
+          element={
+            <PrivateRoute>
+              <BDSCPDCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-mon/create"
+          element={
+            <PrivateRoute>
+              <BDSMONCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-kbj/create"
+          element={
+            <PrivateRoute>
+              <BDSKBJCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-bmb/create"
+          element={
+            <PrivateRoute>
+              <BDSBMBCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-evl/create"
+          element={
+            <PrivateRoute>
+              <BDSEVLCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-lap/create"
+          element={
+            <PrivateRoute>
+              <BDSLAPCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bks-kbj/create"
+          element={
+            <PrivateRoute>
+              <BKSKBJCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bks-dvr/create"
+          element={
+            <PrivateRoute>
+              <BKSDVRCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bks-kmn/create"
+          element={
+            <PrivateRoute>
+              <BKSKMNCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bks-bmb/create"
+          element={
+            <PrivateRoute>
+              <BKSBMBCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bks-evl/create"
+          element={
+            <PrivateRoute>
+              <BKSEVLCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bks-lap/create"
+          element={
+            <PrivateRoute>
+              <BKSLAPCreatePage />
             </PrivateRoute>
           }
         />

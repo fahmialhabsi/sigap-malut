@@ -1,28 +1,7 @@
-console.log("Loaded: DashboardKetersediaanLayout");
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import {
-  Chart,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title as ChartTitle,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Line } from "react-chartjs-2";
+import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { roleIdToName } from "../utils/roleMap";
-
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ChartTitle,
-  Tooltip,
-  Legend,
-);
 
 function normalizeRoleName(user) {
   return (
@@ -34,9 +13,14 @@ function normalizeRoleName(user) {
   );
 }
 
+function getModuleCanonicalName(moduleRow) {
+  return moduleRow?.nama_modul || moduleRow?.name || moduleRow?.id || "";
+}
+
 const KEBIJAKAN_STORAGE_KEY = "ketersediaan_kebijakan_analisis_records";
 
 export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
+  const navigate = useNavigate();
   // State
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -135,6 +119,28 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     if (!authChecked) return;
     let mounted = true;
 
+    const loadFromStaticModules = () => {
+      if (Array.isArray(fallbackModules) && fallbackModules.length) {
+        applyModules(fallbackModules);
+        return;
+      }
+
+      fetch("/master-data/modules-ketersediaan.json")
+        .then((response) => response.json())
+        .then((json) => applyModules(json))
+        .catch(() => applyModules([]));
+    };
+
+    const syncSelectedMenu = (nextModules) => {
+      setMenuAktif((current) => {
+        if (!current) return "";
+        const exists = nextModules.some(
+          (row) => getModuleCanonicalName(row) === current,
+        );
+        return exists ? current : "";
+      });
+    };
+
     // helper: set modules safely
     const applyModules = (arr) => {
       if (!mounted) return;
@@ -172,94 +178,32 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
           });
 
           setModules(sorted);
-          setMenuAktif(
-            (m) => m || sorted[0].nama_modul || sorted[0].name || sorted[0].id,
-          );
+          syncSelectedMenu(sorted);
           return;
         }
 
         // fallback: use arr if no bidang match
         setModules(arr);
-        setMenuAktif((m) => m || arr[0].nama_modul || arr[0].name || arr[0].id);
+        syncSelectedMenu(arr);
         return;
       }
 
       if (Array.isArray(fallbackModules) && fallbackModules.length) {
         setModules(fallbackModules);
-        setMenuAktif(
-          (m) =>
-            m ||
-            fallbackModules[0].nama_modul ||
-            fallbackModules[0].name ||
-            fallbackModules[0].id,
-        );
+        syncSelectedMenu(fallbackModules);
         return;
       }
 
       setModules([]);
+      setMenuAktif("");
     };
 
-    api
-      .get("/modules")
-      .then((res) => {
-        if (!mounted) return;
-
-        const payload = res.data;
-        // normalize array candidates
-        const arr = Array.isArray(payload)
-          ? payload
-          : Array.isArray(payload?.data)
-            ? payload.data
-            : Array.isArray(payload?.result)
-              ? payload.result
-              : [];
-
-        // if API explicitly forbids: fallback to static
-        if (
-          payload &&
-          payload.success === false &&
-          String(payload.message || "")
-            .toLowerCase()
-            .includes("super admin")
-        ) {
-          return fetch("/master-data/modules-ketersediaan.json")
-            .then((r) => r.json())
-            .then((json) => applyModules(json))
-            .catch(() => applyModules(fallbackModules));
-        }
-
-        if (arr && arr.length) {
-          applyModules(arr);
-          return;
-        }
-
-        // deeper attempt
-        const possibleArr = Array.isArray(payload?.data?.modules)
-          ? payload.data.modules
-          : [];
-        if (possibleArr && possibleArr.length) {
-          applyModules(possibleArr);
-          return;
-        }
-
-        // fallback static
-        return fetch("/master-data/modules-ketersediaan.json")
-          .then((r) => r.json())
-          .then((json) => applyModules(json))
-          .catch(() => applyModules(fallbackModules));
-      })
-      .catch(() => {
-        // network / error -> fallback static
-        fetch("/master-data/modules-ketersediaan.json")
-          .then((r) => r.json())
-          .then((json) => applyModules(json))
-          .catch(() => applyModules(fallbackModules));
-      });
+    loadFromStaticModules();
 
     return () => {
       mounted = false;
     };
-  }, [authChecked]);
+  }, [authChecked, fallbackModules, user]);
 
   const activeModule = useMemo(
     () =>
@@ -300,45 +244,11 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
   useEffect(() => {
     if (!activeModule) return;
 
-    if (isKebijakanAnalisisMenu) {
-      setTableRows([]);
-      setChart({ labels: [], datasets: [] });
-      setNotifikasi([]);
-      setLoading(false);
-      return;
-    }
-
-    const activeModuleId = activeModule.modul_id || activeModule.id;
-
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get(`/data/${activeModuleId}`);
-        setTableRows(res.data.rows || []);
-        setKpi([
-          {
-            title: "Total Data",
-            value: (res.data.rows || []).length,
-            color: "green",
-          },
-        ]);
-        setChart({
-          labels: res.data.chart?.labels || [],
-          datasets: res.data.chart?.datasets || [],
-        });
-        setNotifikasi(res.data.notifications || []);
-      } catch (err) {
-        console.error("Fetch module data error:", err);
-        setTableRows([]);
-        setKpi([]);
-        setChart({ labels: [], datasets: [] });
-        setNotifikasi([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    setTableRows([]);
+    setKpi([]);
+    setChart({ labels: [], datasets: [] });
+    setNotifikasi([]);
+    setLoading(false);
   }, [activeModule, isKebijakanAnalisisMenu]);
 
   // Avatar logic
@@ -369,25 +279,43 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
     },
   };
 
-  const kpiShown = isKebijakanAnalisisMenu
+  const kpiShown = !activeModule
     ? [
         {
-          title: "Total Dokumen Kebijakan",
-          value: kebijakanRows.length,
+          title: "Total Modul",
+          value: modules.length,
           color: "green",
         },
         {
-          title: "Status Final",
-          value: kebijakanRows.filter((row) => row.status === "Final").length,
+          title: "Modul Aktif",
+          value: modules.filter((row) => row?.is_active !== false).length,
           color: "blue",
         },
         {
-          title: "Perlu Review",
-          value: kebijakanRows.filter((row) => row.status !== "Final").length,
+          title: "Status Dashboard",
+          value: "Siap",
           color: "yellow",
         },
       ]
-    : kpi;
+    : isKebijakanAnalisisMenu
+      ? [
+          {
+            title: "Total Dokumen Kebijakan",
+            value: kebijakanRows.length,
+            color: "green",
+          },
+          {
+            title: "Status Final",
+            value: kebijakanRows.filter((row) => row.status === "Final").length,
+            color: "blue",
+          },
+          {
+            title: "Perlu Review",
+            value: kebijakanRows.filter((row) => row.status !== "Final").length,
+            color: "yellow",
+          },
+        ]
+      : kpi;
 
   const handleKebijakanFormChange = (field, value) => {
     setKebijakanForm((prev) => ({ ...prev, [field]: value }));
@@ -490,8 +418,17 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
                   active={menuAktif === canonical}
                   sidebarOpen={sidebarOpen}
                   onClick={() => {
+                    const modulePathId = String(
+                      modul.modul_id || modul.id || "",
+                    )
+                      .trim()
+                      .toLowerCase();
                     setMenuAktif(canonical);
                     if (isMobile) setSidebarOpen(false);
+
+                    if (!modulePathId) return;
+
+                    navigate(`/module/${modulePathId}`);
                   }}
                 />
               );
@@ -600,7 +537,23 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
             ))}
           </div>
 
-          {isKebijakanAnalisisMenu ? (
+          {!activeModule ? (
+            <div className="w-full max-w-7xl mx-auto px-2">
+              <PanelBox title="Pilih Modul Ketersediaan">
+                <div className="space-y-3 text-green-100">
+                  <p>
+                    Dashboard ini sekarang berfungsi sebagai pintu masuk modul.
+                    Pilih salah satu modul di sidebar untuk membuka halaman
+                    list.
+                  </p>
+                  <p className="text-sm text-green-200/90">
+                    Dari halaman modul, Anda bisa lanjut ke Input, View, Edit,
+                    dan Delete seperti alur Sekretariat.
+                  </p>
+                </div>
+              </PanelBox>
+            </div>
+          ) : isKebijakanAnalisisMenu ? (
             <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
               <PanelBox title="Form Kebijakan & Analisis Ketersediaan">
                 <form onSubmit={handleKebijakanSubmit} className="space-y-4">
@@ -755,36 +708,46 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
               </PanelBox>
             </div>
           ) : (
-            <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-9 px-2">
-              <PanelBox title={`Tabel ${menuAktif}`}>
-                <DataTable data={tableRows} />
-              </PanelBox>
-              <PanelBox title="Grafik Tren Ketersediaan">
-                <div className="h-56 flex items-center justify-center">
-                  <Line data={chart} options={chartOptions} />
+            <div className="w-full max-w-7xl mx-auto px-2">
+              <PanelBox title={menuAktif || "Modul Ketersediaan"}>
+                <div className="space-y-4 text-green-100">
+                  <p>
+                    Anda akan diarahkan ke halaman list modul untuk mengelola
+                    data secara penuh.
+                  </p>
+                  <button
+                    type="button"
+                    className="inline-flex items-center rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-slate-900 hover:bg-yellow-300"
+                    onClick={() =>
+                      navigate(
+                        `/module/${String(activeModule?.modul_id || activeModule?.id || "").toLowerCase()}`,
+                      )
+                    }
+                  >
+                    Buka Halaman Modul
+                  </button>
                 </div>
               </PanelBox>
             </div>
           )}
 
-          <div className="w-full max-w-7xl mx-auto px-2">
-            <PanelBox title="Notifikasi Kritis">
-              <ul className="space-y-2 text-sm">
-                {(Array.isArray(notifikasi) && notifikasi.length
-                  ? notifikasi
-                  : []
-                ).map((n, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-center gap-2 text-yellow-300"
-                  >
-                    <span className="text-lg">{n.icon ?? "⚠️"}</span>
-                    {n.message || n.text || ""}
-                  </li>
-                ))}
-              </ul>
-            </PanelBox>
-          </div>
+          {Array.isArray(notifikasi) && notifikasi.length > 0 && (
+            <div className="w-full max-w-7xl mx-auto px-2">
+              <PanelBox title="Notifikasi Kritis">
+                <ul className="space-y-2 text-sm">
+                  {notifikasi.map((n, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-center gap-2 text-yellow-300"
+                    >
+                      <span className="text-lg">{n.icon ?? "⚠️"}</span>
+                      {n.message || n.text || ""}
+                    </li>
+                  ))}
+                </ul>
+              </PanelBox>
+            </div>
+          )}
         </main>
 
         <footer className="flex-none h-10 flex items-center text-xs justify-between px-10 w-full bg-gradient-to-r from-green-900 to-green-800/70 text-green-100/80">

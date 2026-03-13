@@ -192,15 +192,9 @@ const SekKeu = sequelize.define(
       comment: "Catatan",
     },
     created_by: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       allowNull: false,
       comment: "User ID",
-      references: {
-        model: "users",
-        key: "id",
-      },
-      onUpdate: "CASCADE",
-      onDelete: "RESTRICT",
     },
     created_at: {
       type: DataTypes.DATE,

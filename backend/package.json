@@ -12,8 +12,11 @@
     "generate:controllers": "node scripts/generateControllers.js",
     "generate:routes": "node scripts/generateRoutes.js",
     "generate:route-index": "node scripts/generateRouteIndex.js",
+    "generate:masterdata:migrations": "node scripts/generateMasterDataMigrations.js",
+    "generate:openapi": "node scripts/generateOpenApi.js",
     "generate:all": "npm run generate:schema && npm run generate:models && npm run generate:controllers && npm run generate:routes && npm run generate:route-index",
     "convert:tests:esm": "node scripts/convert-tests-to-esm.js",
+    "fix:sek-keu-created-by": "node scripts/fixSekKeuCreatedByType.js",
     "test": "mocha --file tests/setup.js \"tests/**/*.js\" --exit",
     "seed": "node database/seeders/seed.js",
     "undelete:users": "node scripts/undeleteUsers.js --all",
@@ -40,7 +43,8 @@
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "supertest": "^7.2.2"
   },
   "keywords": [],
   "author": "",

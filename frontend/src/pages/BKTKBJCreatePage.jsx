@@ -92,7 +92,7 @@ export default function BKTKBJCreatePage() {
               name="jenis_kebijakan"
               value={formData.jenis_kebijakan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="Analisis Ketersediaan">
@@ -118,7 +118,7 @@ export default function BKTKBJCreatePage() {
               name="tanggal_dokumen"
               value={formData.tanggal_dokumen}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -132,7 +132,7 @@ export default function BKTKBJCreatePage() {
               name="tahun"
               value={formData.tahun}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -146,7 +146,7 @@ export default function BKTKBJCreatePage() {
               name="judul_kebijakan"
               value={formData.judul_kebijakan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -160,7 +160,7 @@ export default function BKTKBJCreatePage() {
               value={formData.rekomendasi}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -173,7 +173,7 @@ export default function BKTKBJCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="draft">Draft</option>
@@ -193,7 +193,7 @@ export default function BKTKBJCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -207,7 +207,7 @@ export default function BKTKBJCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -220,7 +220,7 @@ export default function BKTKBJCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

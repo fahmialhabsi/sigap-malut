@@ -1,32 +1,21 @@
+import bcrypt from "bcrypt";
 import { sequelize } from "../../config/database.js";
-import { seedUsers } from "./userSeeder.js";
-import { seedMasterData } from "./masterDataSeeder.js";
-import { seedTransactionalData } from "./transactionalSeeder.js";
 
-async function runSeeders() {
-  console.log("🌱 Starting Database Seeding...\n");
+export async function seedUsers() {
+  const passwordHash = await bcrypt.hash("password123", 10);
 
-  try {
-    await sequelize.authenticate();
-    console.log("✅ Database connection established\n");
+  await sequelize.query(`
+    INSERT INTO Users (email, password, role, dashboardUrl, createdAt, updatedAt)
+    VALUES
+    ('superadmin@dinpangan.go.id', '${passwordHash}', 'super_admin', '/dashboard/superadmin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('gubernur@example.com', '${passwordHash}', 'gubernur', '/dashboard/superadmin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('sekretaris@example.com', '${passwordHash}', 'sekretaris', '/dashboard/sekretariat', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('kepala_bidang_ketersediaan@example.com', '${passwordHash}', 'kepala_bidang_ketersediaan', '/dashboard/ketersediaan', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('kepala_bidang_distribusi@example.com', '${passwordHash}', 'kepala_bidang_distribusi', '/dashboard/distribusi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('kepala_bidang_konsumsi@example.com', '${passwordHash}', 'kepala_bidang_konsumsi', '/dashboard/konsumsi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('kepala_uptd@example.com', '${passwordHash}', 'kepala_uptd', '/dashboard/uptd', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('publik@example.com', '${passwordHash}', 'publik', '/dashboard-publik', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+  `);
 
-    // 1. Seed Users
-    await seedUsers();
-
-    // 2. Seed Master Data
-    await seedMasterData();
-
-    // 3. Seed Transactional Data
-    await seedTransactionalData();
-
-    await sequelize.close();
-    console.log("✅ Database connection closed\n");
-
-    console.log("🎉 All seeders complete!\n");
-  } catch (error) {
-    console.error("❌ Seeding failed:", error);
-    process.exit(1);
-  }
+  console.log("✅ Users seeded");
 }
-
-runSeeders();

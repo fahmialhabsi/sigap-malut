@@ -125,15 +125,28 @@ export default function SEKRMHCreatePage() {
               name="jenis_layanan_rumah_tangga"
               value={formData.jenis_layanan_rumah_tangga}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Perjalanan Dinas">Perjalanan Dinas</option>
-              <option value="Kebersihan">Kebersihan</option>
-              <option value="Keamanan">Keamanan</option>
-              <option value="Fasilitas">Fasilitas</option>
-              <option value="Ruang Rapat">Ruang Rapat</option>
-              <option value="Kendaraan">Kendaraan</option>
+              <option style={{ color: "#111827" }} value="Perjalanan Dinas">
+                Perjalanan Dinas
+              </option>
+              <option style={{ color: "#111827" }} value="Kebersihan">
+                Kebersihan
+              </option>
+              <option style={{ color: "#111827" }} value="Keamanan">
+                Keamanan
+              </option>
+              <option style={{ color: "#111827" }} value="Fasilitas">
+                Fasilitas
+              </option>
+              <option style={{ color: "#111827" }} value="Ruang Rapat">
+                Ruang Rapat
+              </option>
+              <option style={{ color: "#111827" }} value="Kendaraan">
+                Kendaraan
+              </option>
             </select>
           </div>
 
@@ -145,13 +158,22 @@ export default function SEKRMHCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="pending">Pending</option>
-              <option value="disetujui">Disetujui</option>
-              <option value="ditolak">Ditolak</option>
-              <option value="selesai">Selesai</option>
+              <option style={{ color: "#111827" }} value="pending">
+                Pending
+              </option>
+              <option style={{ color: "#111827" }} value="disetujui">
+                Disetujui
+              </option>
+              <option style={{ color: "#111827" }} value="ditolak">
+                Ditolak
+              </option>
+              <option style={{ color: "#111827" }} value="selesai">
+                Selesai
+              </option>
             </select>
           </div>
 
@@ -164,7 +186,7 @@ export default function SEKRMHCreatePage() {
               name="nomor_sppd"
               value={formData.nomor_sppd}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -177,7 +199,7 @@ export default function SEKRMHCreatePage() {
               name="nomor_st"
               value={formData.nomor_st}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -190,7 +212,7 @@ export default function SEKRMHCreatePage() {
               name="nama_pegawai"
               value={formData.nama_pegawai}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -203,7 +225,7 @@ export default function SEKRMHCreatePage() {
               name="nip_pegawai"
               value={formData.nip_pegawai}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -216,7 +238,7 @@ export default function SEKRMHCreatePage() {
               name="tujuan"
               value={formData.tujuan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -229,7 +251,7 @@ export default function SEKRMHCreatePage() {
               name="keperluan"
               value={formData.keperluan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -242,7 +264,7 @@ export default function SEKRMHCreatePage() {
               name="tanggal_berangkat"
               value={formData.tanggal_berangkat}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -255,7 +277,7 @@ export default function SEKRMHCreatePage() {
               name="tanggal_kembali"
               value={formData.tanggal_kembali}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -268,7 +290,7 @@ export default function SEKRMHCreatePage() {
               name="area_kebersihan"
               value={formData.area_kebersihan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -281,7 +303,7 @@ export default function SEKRMHCreatePage() {
               name="pos_keamanan"
               value={formData.pos_keamanan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -294,7 +316,7 @@ export default function SEKRMHCreatePage() {
               name="jenis_fasilitas"
               value={formData.jenis_fasilitas}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -307,7 +329,7 @@ export default function SEKRMHCreatePage() {
               name="nama_ruang_rapat"
               value={formData.nama_ruang_rapat}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -320,7 +342,7 @@ export default function SEKRMHCreatePage() {
               name="nomor_polisi"
               value={formData.nomor_polisi}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -333,7 +355,7 @@ export default function SEKRMHCreatePage() {
               name="tanggal_pakai"
               value={formData.tanggal_pakai}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -346,7 +368,7 @@ export default function SEKRMHCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -360,7 +382,7 @@ export default function SEKRMHCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -373,11 +395,16 @@ export default function SEKRMHCreatePage() {
               name="is_sensitive"
               value={formData.is_sensitive}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Biasa">Biasa</option>
-              <option value="Sensitif">Sensitif</option>
+              <option style={{ color: "#111827" }} value="Biasa">
+                Biasa
+              </option>
+              <option style={{ color: "#111827" }} value="Sensitif">
+                Sensitif
+              </option>
             </select>
           </div>
 
@@ -390,7 +417,7 @@ export default function SEKRMHCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

@@ -87,7 +87,7 @@ export default function SEKLKSCreatePage() {
               name="periode"
               value={formData.periode}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -101,7 +101,7 @@ export default function SEKLKSCreatePage() {
               name="tahun"
               value={formData.tahun}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -115,7 +115,7 @@ export default function SEKLKSCreatePage() {
               name="bulan"
               value={formData.bulan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -129,7 +129,7 @@ export default function SEKLKSCreatePage() {
               name="skor_pph"
               value={formData.skor_pph}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -142,7 +142,7 @@ export default function SEKLKSCreatePage() {
               name="target_pph"
               value={formData.target_pph}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -154,11 +154,18 @@ export default function SEKLKSCreatePage() {
               name="status_pph"
               value={formData.status_pph}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
             >
-              <option value="">-</option>
-              <option value="On Target">On Target</option>
-              <option value="Di Bawah Target">Di Bawah Target</option>
+              <option style={{ color: "#111827" }} value="">
+                -
+              </option>
+              <option style={{ color: "#111827" }} value="On Target">
+                On Target
+              </option>
+              <option style={{ color: "#111827" }} value="Di Bawah Target">
+                Di Bawah Target
+              </option>
             </select>
           </div>
 
@@ -171,7 +178,7 @@ export default function SEKLKSCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -185,7 +192,7 @@ export default function SEKLKSCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -198,11 +205,16 @@ export default function SEKLKSCreatePage() {
               name="is_sensitive"
               value={formData.is_sensitive}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Biasa">Biasa</option>
-              <option value="Sensitif">Sensitif</option>
+              <option style={{ color: "#111827" }} value="Biasa">
+                Biasa
+              </option>
+              <option style={{ color: "#111827" }} value="Sensitif">
+                Sensitif
+              </option>
             </select>
           </div>
 
@@ -214,12 +226,19 @@ export default function SEKLKSCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="draft">Draft</option>
-              <option value="review">Review</option>
-              <option value="final">Final</option>
+              <option style={{ color: "#111827" }} value="draft">
+                Draft
+              </option>
+              <option style={{ color: "#111827" }} value="review">
+                Review
+              </option>
+              <option style={{ color: "#111827" }} value="final">
+                Final
+              </option>
             </select>
           </div>
 
@@ -232,7 +251,7 @@ export default function SEKLKSCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

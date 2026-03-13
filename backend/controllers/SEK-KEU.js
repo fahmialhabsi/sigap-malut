@@ -4,7 +4,7 @@
 // Generated: 2026-02-17T19:24:48.407Z
 // =====================================================
 
-import SekKeu from "../models/SEK-KEU.js";
+import sekKeuService from "../services/modules/sekKeuService.js";
 import { logAudit } from "../services/auditLogService.js";
 
 // @desc    Get all SekKeu records
@@ -18,7 +18,7 @@ export const getAllSekKeu = async (req, res) => {
 
     const where = { ...filters };
 
-    const { count, rows } = await SekKeu.findAndCountAll({
+    const { count, rows } = await sekKeuService.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -49,7 +49,7 @@ export const getAllSekKeu = async (req, res) => {
 // @access  Private
 export const getSekKeuById = async (req, res) => {
   try {
-    const record = await SekKeu.findByPk(req.params.id);
+    const record = await sekKeuService.findByPk(req.params.id);
 
     if (!record) {
       return res.status(404).json({
@@ -76,7 +76,7 @@ export const getSekKeuById = async (req, res) => {
 // @access  Private
 export const createSekKeu = async (req, res) => {
   try {
-    const record = await SekKeu.create({
+    const record = await sekKeuService.create({
       ...req.body,
       created_by: req.user?.id,
     });
@@ -107,7 +107,7 @@ export const createSekKeu = async (req, res) => {
 // @access  Private
 export const updateSekKeu = async (req, res) => {
   try {
-    const record = await SekKeu.findByPk(req.params.id);
+    const record = await sekKeuService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,
@@ -146,7 +146,7 @@ export const updateSekKeu = async (req, res) => {
 // @access  Private
 export const deleteSekKeu = async (req, res) => {
   try {
-    const record = await SekKeu.findByPk(req.params.id);
+    const record = await sekKeuService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,

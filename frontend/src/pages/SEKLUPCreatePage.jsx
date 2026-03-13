@@ -111,7 +111,7 @@ export default function SEKLUPCreatePage() {
               name="periode"
               value={formData.periode}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -125,7 +125,7 @@ export default function SEKLUPCreatePage() {
               name="tahun"
               value={formData.tahun}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -141,7 +141,7 @@ export default function SEKLUPCreatePage() {
               name="bulan"
               value={formData.bulan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -155,7 +155,7 @@ export default function SEKLUPCreatePage() {
               name="umkm_tersertifikasi"
               value={formData.umkm_tersertifikasi}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -168,7 +168,7 @@ export default function SEKLUPCreatePage() {
               name="industri_pangan_terdaftar"
               value={formData.industri_pangan_terdaftar}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -181,7 +181,7 @@ export default function SEKLUPCreatePage() {
               name="temuan_pangan_tidak_layak"
               value={formData.temuan_pangan_tidak_layak}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -194,7 +194,7 @@ export default function SEKLUPCreatePage() {
               value={formData.tindakan_pengawasan}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -207,7 +207,7 @@ export default function SEKLUPCreatePage() {
               value={formData.kendala_laboratorium}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -220,7 +220,7 @@ export default function SEKLUPCreatePage() {
               value={formData.kebutuhan_reagen}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -233,7 +233,7 @@ export default function SEKLUPCreatePage() {
               value={formData.kebutuhan_alat}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -246,7 +246,7 @@ export default function SEKLUPCreatePage() {
               value={formData.analisis}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -259,7 +259,7 @@ export default function SEKLUPCreatePage() {
               value={formData.rekomendasi}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -272,7 +272,7 @@ export default function SEKLUPCreatePage() {
               name="sumber_data"
               value={formData.sumber_data}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -285,7 +285,7 @@ export default function SEKLUPCreatePage() {
               name="file_laporan"
               value={formData.file_laporan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -298,7 +298,7 @@ export default function SEKLUPCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -312,7 +312,7 @@ export default function SEKLUPCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -325,11 +325,16 @@ export default function SEKLUPCreatePage() {
               name="is_sensitive"
               value={formData.is_sensitive}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Biasa">Biasa</option>
-              <option value="Sensitif">Sensitif</option>
+              <option style={{ color: "#111827" }} value="Biasa">
+                Biasa
+              </option>
+              <option style={{ color: "#111827" }} value="Sensitif">
+                Sensitif
+              </option>
             </select>
           </div>
 
@@ -341,12 +346,19 @@ export default function SEKLUPCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="draft">Draft</option>
-              <option value="review">Review</option>
-              <option value="final">Final</option>
+              <option style={{ color: "#111827" }} value="draft">
+                Draft
+              </option>
+              <option style={{ color: "#111827" }} value="review">
+                Review
+              </option>
+              <option style={{ color: "#111827" }} value="final">
+                Final
+              </option>
             </select>
           </div>
 
@@ -359,7 +371,7 @@ export default function SEKLUPCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

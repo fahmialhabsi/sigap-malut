@@ -231,7 +231,7 @@ export default function SEKKEPCreatePage() {
                 value={formData.pangkat_lama}
                 onChange={handleChange}
                 placeholder="Contoh: Penata Tingkat II"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -246,7 +246,7 @@ export default function SEKKEPCreatePage() {
                 onChange={handleChange}
                 placeholder="Contoh: Penata"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -260,7 +260,7 @@ export default function SEKKEPCreatePage() {
                 value={formData.golongan_lama}
                 onChange={handleChange}
                 placeholder="Contoh: III/d"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -288,7 +288,7 @@ export default function SEKKEPCreatePage() {
                 name="tmt_kenaikan"
                 value={formData.tmt_kenaikan}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
           </>
@@ -307,7 +307,7 @@ export default function SEKKEPCreatePage() {
                 value={formData.jabatan_lama}
                 onChange={handleChange}
                 placeholder="Contoh: Kepala Bidang Ketersediaan"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -322,7 +322,7 @@ export default function SEKKEPCreatePage() {
                 onChange={handleChange}
                 placeholder="Contoh: Kepala Bidang Distribusi"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -336,7 +336,7 @@ export default function SEKKEPCreatePage() {
                 value={formData.tmt_kenaikan}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
           </>
@@ -356,7 +356,7 @@ export default function SEKKEPCreatePage() {
                 onChange={handleChange}
                 placeholder="Contoh: 3500000"
                 step="100"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -371,7 +371,7 @@ export default function SEKKEPCreatePage() {
                 onChange={handleChange}
                 placeholder="Contoh: 1500000"
                 step="100"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
           </>
@@ -389,15 +389,31 @@ export default function SEKKEPCreatePage() {
                 value={formData.jenis_cuti}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                style={{ color: "#111827", backgroundColor: "#ffffff" }}
               >
-                <option value="">-- Pilih --</option>
-                <option value="Tahunan">Tahunan</option>
-                <option value="Sakit">Sakit</option>
-                <option value="Besar">Besar</option>
-                <option value="Melahirkan">Melahirkan</option>
-                <option value="Alasan Penting">Alasan Penting</option>
-                <option value="Luar Tanggungan Negara">
+                <option style={{ color: "#111827" }} value="">
+                  -- Pilih --
+                </option>
+                <option style={{ color: "#111827" }} value="Tahunan">
+                  Tahunan
+                </option>
+                <option style={{ color: "#111827" }} value="Sakit">
+                  Sakit
+                </option>
+                <option style={{ color: "#111827" }} value="Besar">
+                  Besar
+                </option>
+                <option style={{ color: "#111827" }} value="Melahirkan">
+                  Melahirkan
+                </option>
+                <option style={{ color: "#111827" }} value="Alasan Penting">
+                  Alasan Penting
+                </option>
+                <option
+                  style={{ color: "#111827" }}
+                  value="Luar Tanggungan Negara"
+                >
                   Luar Tanggungan Negara
                 </option>
               </select>
@@ -413,7 +429,7 @@ export default function SEKKEPCreatePage() {
                 value={formData.tanggal_mulai_cuti}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -426,7 +442,7 @@ export default function SEKKEPCreatePage() {
                 name="tanggal_selesai_cuti"
                 value={formData.tanggal_selesai_cuti}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -439,7 +455,7 @@ export default function SEKKEPCreatePage() {
                 name="lama_cuti"
                 value={formData.lama_cuti}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
               />
             </div>
           </>
@@ -462,7 +478,7 @@ export default function SEKKEPCreatePage() {
                 min="0"
                 max="100"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -475,14 +491,27 @@ export default function SEKKEPCreatePage() {
                 value={formData.predikat_kinerja}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                style={{ color: "#111827", backgroundColor: "#ffffff" }}
               >
-                <option value="">-- Pilih --</option>
-                <option value="Sangat Baik">Sangat Baik</option>
-                <option value="Baik">Baik</option>
-                <option value="Cukup">Cukup</option>
-                <option value="Kurang">Kurang</option>
-                <option value="Buruk">Buruk</option>
+                <option style={{ color: "#111827" }} value="">
+                  -- Pilih --
+                </option>
+                <option style={{ color: "#111827" }} value="Sangat Baik">
+                  Sangat Baik
+                </option>
+                <option style={{ color: "#111827" }} value="Baik">
+                  Baik
+                </option>
+                <option style={{ color: "#111827" }} value="Cukup">
+                  Cukup
+                </option>
+                <option style={{ color: "#111827" }} value="Kurang">
+                  Kurang
+                </option>
+                <option style={{ color: "#111827" }} value="Buruk">
+                  Buruk
+                </option>
               </select>
             </div>
           </>
@@ -499,12 +528,21 @@ export default function SEKKEPCreatePage() {
                 name="jenis_sanksi"
                 value={formData.jenis_sanksi}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                style={{ color: "#111827", backgroundColor: "#ffffff" }}
               >
-                <option value="">-- Pilih --</option>
-                <option value="Ringan">Ringan</option>
-                <option value="Sedang">Sedang</option>
-                <option value="Berat">Berat</option>
+                <option style={{ color: "#111827" }} value="">
+                  -- Pilih --
+                </option>
+                <option style={{ color: "#111827" }} value="Ringan">
+                  Ringan
+                </option>
+                <option style={{ color: "#111827" }} value="Sedang">
+                  Sedang
+                </option>
+                <option style={{ color: "#111827" }} value="Berat">
+                  Berat
+                </option>
               </select>
             </div>
 
@@ -518,7 +556,7 @@ export default function SEKKEPCreatePage() {
                 onChange={handleChange}
                 rows={3}
                 placeholder="Deskripsi pelanggaran dan sanksi yang diberikan"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
           </>
@@ -536,7 +574,7 @@ export default function SEKKEPCreatePage() {
                 name="tanggal_pensiun"
                 value={formData.tanggal_pensiun}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -548,16 +586,27 @@ export default function SEKKEPCreatePage() {
                 name="jenis_pensiun"
                 value={formData.jenis_pensiun}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                style={{ color: "#111827", backgroundColor: "#ffffff" }}
               >
-                <option value="">-- Pilih --</option>
-                <option value="BUP (Batas Usia Pensiun)">
+                <option style={{ color: "#111827" }} value="">
+                  -- Pilih --
+                </option>
+                <option
+                  style={{ color: "#111827" }}
+                  value="BUP (Batas Usia Pensiun)"
+                >
                   BUP (Batas Usia Pensiun)
                 </option>
-                <option value="Atas Permintaan Sendiri">
+                <option
+                  style={{ color: "#111827" }}
+                  value="Atas Permintaan Sendiri"
+                >
                   Atas Permintaan Sendiri
                 </option>
-                <option value="Alasan Lain">Alasan Lain</option>
+                <option style={{ color: "#111827" }} value="Alasan Lain">
+                  Alasan Lain
+                </option>
               </select>
             </div>
           </>
@@ -598,11 +647,18 @@ export default function SEKKEPCreatePage() {
                 value={formData.asn_id}
                 onChange={handleChangeASN}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                style={{ color: "#111827", backgroundColor: "#ffffff" }}
               >
-                <option value="">-- Pilih ASN --</option>
+                <option style={{ color: "#111827" }} value="">
+                  -- Pilih ASN --
+                </option>
                 {asnList.map((asn) => (
-                  <option key={asn.id} value={asn.id}>
+                  <option
+                    style={{ color: "#111827" }}
+                    key={asn.id}
+                    value={asn.id}
+                  >
                     {asn.nip} - {asn.nama}
                   </option>
                 ))}
@@ -618,7 +674,7 @@ export default function SEKKEPCreatePage() {
                 name="nip"
                 value={formData.nip}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
               />
             </div>
 
@@ -631,7 +687,7 @@ export default function SEKKEPCreatePage() {
                 name="nama_asn"
                 value={formData.nama_asn}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
               />
             </div>
           </div>
@@ -651,16 +707,33 @@ export default function SEKKEPCreatePage() {
               value={formData.jenis_layanan_kepegawaian}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
             >
-              <option value="Data Induk">Data Induk</option>
-              <option value="Kenaikan Pangkat">Kenaikan Pangkat</option>
-              <option value="Mutasi">Mutasi</option>
-              <option value="Gaji Tunjangan">Gaji & Tunjangan</option>
-              <option value="Cuti">Cuti</option>
-              <option value="Penilaian Kinerja">Penilaian Kinerja</option>
-              <option value="Disiplin">Disiplin</option>
-              <option value="Pensiun">Pensiun</option>
+              <option style={{ color: "#111827" }} value="Data Induk">
+                Data Induk
+              </option>
+              <option style={{ color: "#111827" }} value="Kenaikan Pangkat">
+                Kenaikan Pangkat
+              </option>
+              <option style={{ color: "#111827" }} value="Mutasi">
+                Mutasi
+              </option>
+              <option style={{ color: "#111827" }} value="Gaji Tunjangan">
+                Gaji & Tunjangan
+              </option>
+              <option style={{ color: "#111827" }} value="Cuti">
+                Cuti
+              </option>
+              <option style={{ color: "#111827" }} value="Penilaian Kinerja">
+                Penilaian Kinerja
+              </option>
+              <option style={{ color: "#111827" }} value="Disiplin">
+                Disiplin
+              </option>
+              <option style={{ color: "#111827" }} value="Pensiun">
+                Pensiun
+              </option>
             </select>
             <p className="text-xs text-gray-500 mt-2">
               Pilihan ini menentukan field tambahan yang ditampilkan
@@ -694,7 +767,7 @@ export default function SEKKEPCreatePage() {
                 value={formData.nomor_sk}
                 onChange={handleChange}
                 placeholder="Contoh: 001/SK/Disp.Pangan/II/2026"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -707,7 +780,7 @@ export default function SEKKEPCreatePage() {
                 name="tanggal_sk"
                 value={formData.tanggal_sk}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -738,7 +811,7 @@ export default function SEKKEPCreatePage() {
                 value={formData.penanggung_jawab}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -753,7 +826,7 @@ export default function SEKKEPCreatePage() {
                 onChange={handleChange}
                 placeholder="Nama yang melaksanakan"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
 
@@ -766,13 +839,24 @@ export default function SEKKEPCreatePage() {
                 value={formData.status}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                style={{ color: "#111827", backgroundColor: "#ffffff" }}
               >
-                <option value="pending">🔴 Pending</option>
-                <option value="proses">🟡 Proses</option>
-                <option value="disetujui">🟢 Disetujui</option>
-                <option value="ditolak">❌ Ditolak</option>
-                <option value="selesai">✅ Selesai</option>
+                <option style={{ color: "#111827" }} value="pending">
+                  🔴 Pending
+                </option>
+                <option style={{ color: "#111827" }} value="proses">
+                  🟡 Proses
+                </option>
+                <option style={{ color: "#111827" }} value="disetujui">
+                  🟢 Disetujui
+                </option>
+                <option style={{ color: "#111827" }} value="ditolak">
+                  ❌ Ditolak
+                </option>
+                <option style={{ color: "#111827" }} value="selesai">
+                  ✅ Selesai
+                </option>
               </select>
             </div>
 
@@ -785,10 +869,15 @@ export default function SEKKEPCreatePage() {
                 value={formData.is_sensitive}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                style={{ color: "#111827", backgroundColor: "#ffffff" }}
               >
-                <option value="Biasa">Biasa</option>
-                <option value="Sensitif">Sensitif</option>
+                <option style={{ color: "#111827" }} value="Biasa">
+                  Biasa
+                </option>
+                <option style={{ color: "#111827" }} value="Sensitif">
+                  Sensitif
+                </option>
               </select>
             </div>
           </div>
@@ -805,7 +894,7 @@ export default function SEKKEPCreatePage() {
             onChange={handleChange}
             rows={4}
             placeholder="Catatan tambahan atau keterangan lainnya"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
           />
         </div>
 

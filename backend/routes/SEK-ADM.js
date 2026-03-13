@@ -13,14 +13,22 @@ import {
   deleteSekAdm,
 } from "../controllers/SEK-ADM.js";
 import { protect } from "../middleware/auth.js";
+import { requirePermission } from "../middleware/rbacMiddleware.js";
 
 const router = express.Router();
 
 // All routes are protected
 router.use(protect);
 
-router.route("/").get(getAllSekAdm).post(createSekAdm);
+router
+  .route("/")
+  .get(requirePermission("read", { moduleKey: "sek-adm" }), getAllSekAdm)
+  .post(requirePermission("create", { moduleKey: "sek-adm" }), createSekAdm);
 
-router.route("/:id").get(getSekAdmById).put(updateSekAdm).delete(deleteSekAdm);
+router
+  .route("/:id")
+  .get(requirePermission("read", { moduleKey: "sek-adm" }), getSekAdmById)
+  .put(requirePermission("update", { moduleKey: "sek-adm" }), updateSekAdm)
+  .delete(requirePermission("delete", { moduleKey: "sek-adm" }), deleteSekAdm);
 
 export default router;

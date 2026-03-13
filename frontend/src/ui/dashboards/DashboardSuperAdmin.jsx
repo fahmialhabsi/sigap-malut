@@ -1,8 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { startTransition, useEffect, useRef, useState } from "react";
 import { NavLink, Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import api from "../../utils/api";
+import {
+  emptyDashboardSummary,
+  fetchDashboardSummary,
+} from "../../services/dashboardService";
 import superAdminModules from "../../data/superAdminModules";
 
 function normalizeRoleName(user) {
@@ -15,17 +19,17 @@ function normalizeRoleName(user) {
   );
 }
 
-// Data KPI untuk Super Admin
-const kpiData = [
-  {
-    label: "Indikator Monitoring",
-    value: "50",
-    info: "Monitoring 50 indikator",
-  },
-  { label: "Compliance Alur", value: "100%", info: "Compliance Alur" },
-  { label: "Bypass Terdeteksi", value: 0, info: "Bypass Terdeteksi" },
-  { label: "Data Valid", value: "99%", info: "Data Valid" },
-];
+function formatDateTime(value) {
+  if (!value) return "-";
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "-";
+
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(parsed);
+}
 
 // Hero Card Component
 function HeroCard({ title, value, info, accent = "blue" }) {
@@ -156,6 +160,11 @@ export default function DashboardSuperAdmin() {
   const [waktu, setWaktu] = useState(new Date());
   const [userData, setUserData] = useState(null);
   const [avatarOpen, setAvatarOpen] = useState(false);
+  const [dashboardSummary, setDashboardSummary] = useState(
+    emptyDashboardSummary,
+  );
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [summaryError, setSummaryError] = useState("");
   const avatarRef = useRef();
 
   // Auth check
@@ -202,6 +211,36 @@ export default function DashboardSuperAdmin() {
     };
   }, []);
 
+  useEffect(() => {
+    let mounted = true;
+
+    setSummaryLoading(true);
+    fetchDashboardSummary()
+      .then((summary) => {
+        if (!mounted) return;
+        startTransition(() => {
+          setDashboardSummary(summary);
+        });
+        setSummaryError("");
+      })
+      .catch((error) => {
+        if (!mounted) return;
+        setSummaryError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Gagal memuat ringkasan dashboard",
+        );
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setSummaryLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   // Avatar dropdown handler
   useEffect(() => {
     const handleClick = (e) => {
@@ -218,7 +257,7 @@ export default function DashboardSuperAdmin() {
     {
       id: "dashboard",
       name: "Dashboard Super Admin",
-      path: "/dashboard/super-admin",
+      path: "/dashboard/superadmin",
     },
     { id: "SA01", name: "Monitoring 50 indikator", path: "/module/sa01" },
     { id: "SA02", name: "Tool modul tanpa coding", path: "/module/sa02" },
@@ -254,6 +293,34 @@ export default function DashboardSuperAdmin() {
 
     return `${day}, ${date} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
   };
+
+  const serviceStats = dashboardSummary.service_statistics;
+  const workflowStats = dashboardSummary.workflow_statistics;
+  const approvalStats = dashboardSummary.approval_statistics;
+  const moduleActivity = dashboardSummary.module_activity;
+
+  const kpiData = [
+    {
+      label: "Modul Terdaftar",
+      value: serviceStats.total_registered_modules,
+      info: `${serviceStats.total_tasks} total tugas aktif di sistem`,
+    },
+    {
+      label: "Workflow Terbuka",
+      value: serviceStats.open_workflows,
+      info: `${serviceStats.total_workflows} total instance workflow`,
+    },
+    {
+      label: "Approval Hari Ini",
+      value: approvalStats.approvals_today,
+      info: `${approvalStats.total_approvals} total approval tercatat`,
+    },
+    {
+      label: "Aktivitas Modul",
+      value: moduleActivity.length,
+      info: "Jumlah modul dengan event audit terbaru",
+    },
+  ];
 
   return (
     <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-black via-slate-950 to-slate-900 text-slate-100 select-none">
@@ -402,6 +469,12 @@ export default function DashboardSuperAdmin() {
               <p className="text-slate-200/85 text-base leading-relaxed">
                 Executive Control Center — Semua Modul, KPI, dan Alert
               </p>
+              <div className="mt-3 text-sm text-slate-300/85">
+                {summaryLoading
+                  ? "Memuat statistik backend..."
+                  : summaryError ||
+                    `Sinkron terakhir ${formatDateTime(dashboardSummary.generated_at)}`}
+              </div>
               <div className="flex gap-3 mt-4">
                 <button
                   className="bg-blue-900 hover:bg-blue-800 text-blue-100 px-5 py-2 rounded-lg font-semibold shadow border border-blue-700/70 transition"
@@ -444,6 +517,91 @@ export default function DashboardSuperAdmin() {
                 info={kpiData[3].info}
                 accent="red"
               />
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <PanelBox title="Status Workflow" accent="amber">
+                {workflowStats.state_breakdown.length === 0 ? (
+                  <div className="text-sm text-slate-300/85">
+                    {summaryLoading
+                      ? "Menarik status workflow..."
+                      : "Belum ada data workflow yang dapat ditampilkan."}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {workflowStats.state_breakdown.map((item) => (
+                      <div
+                        key={item.state}
+                        className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-black/35 px-4 py-3"
+                      >
+                        <span className="text-slate-200 capitalize">
+                          {String(item.state || "unknown").replace(/_/g, " ")}
+                        </span>
+                        <span className="text-xl font-bold text-amber-200">
+                          {item.total}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PanelBox>
+
+              <PanelBox title="Approval Ringkas" accent="blue">
+                {approvalStats.action_breakdown.length === 0 ? (
+                  <div className="text-sm text-slate-300/85">
+                    {summaryLoading
+                      ? "Menarik statistik approval..."
+                      : "Belum ada aktivitas approval yang tercatat."}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {approvalStats.action_breakdown.map((item) => (
+                      <div
+                        key={item.action}
+                        className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-black/35 px-4 py-3"
+                      >
+                        <span className="text-slate-200 capitalize">
+                          {String(item.action || "unknown").replace(/_/g, " ")}
+                        </span>
+                        <span className="text-xl font-bold text-blue-200">
+                          {item.total}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PanelBox>
+
+              <PanelBox title="Aktivitas Modul" accent="emerald">
+                {moduleActivity.length === 0 ? (
+                  <div className="text-sm text-slate-300/85">
+                    {summaryLoading
+                      ? "Menarik aktivitas modul..."
+                      : "Belum ada event audit modul yang tersedia."}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {moduleActivity.slice(0, 6).map((item) => (
+                      <div
+                        key={`${item.module_id}-${item.last_event_at}`}
+                        className="rounded-xl border border-slate-800/80 bg-black/35 px-4 py-3"
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="font-semibold text-slate-100">
+                            {item.module_id}
+                          </span>
+                          <span className="text-emerald-200 font-bold">
+                            {item.total_events} event
+                          </span>
+                        </div>
+                        <div className="mt-1 text-xs text-slate-300/80">
+                          Event terakhir {formatDateTime(item.last_event_at)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PanelBox>
             </div>
 
             {/* Module Section */}

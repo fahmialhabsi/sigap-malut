@@ -4,8 +4,10 @@
 // Total Routes: 39
 // =====================================================
 
+import authRoutes from "./auth.js";
 import BDSBMBRoutes from "./BDS-BMB.js";
 import chatbotRoutes from "./chatbot.js";
+import dashboardRoutes from "./dashboard.js";
 import BDSCPDRoutes from "./BDS-CPD.js";
 import BDSEVLRoutes from "./BDS-EVL.js";
 import BDSHRGRoutes from "./BDS-HRG.js";
@@ -55,8 +57,17 @@ import perintahRoutes from "./perintah.js";
 import pegawaiRoutes from "./pegawai.js";
 import komoditasRoutes from "./komoditas.js";
 import modulesRoutes from "./modules.js";
+import moduleGeneratorRoutes from "./moduleGenerator.js";
+import tasksRoutes from "./tasks.js";
+import tablesRoutes from "./tables.js";
 
 export default function registerRoutes(app) {
+  // Core identity and generation endpoints
+  app.use("/api/auth", authRoutes);
+  app.use("/api/dashboard", dashboardRoutes);
+  app.use("/api/module-generator", moduleGeneratorRoutes);
+
+  // Domain module endpoints
   app.use("/api/chatbot", chatbotRoutes);
   app.use("/api/bds-bmb", BDSBMBRoutes);
   app.use("/api/bds-cpd", BDSCPDRoutes);
@@ -96,18 +107,24 @@ export default function registerRoutes(app) {
   app.use("/api/upt-keu", UPTKEURoutes);
   app.use("/api/upt-mtu", UPTMTURoutes);
   app.use("/api/upt-tkn", UPTTKNRoutes);
-  app.use("/approval", approvalRoutes);
-  app.use("/reminder", reminderRoutes);
-  app.use("/case", caseRoutes);
-  app.use("/comment", commentRoutes);
-  app.use("/report", reportRoutes);
-  app.use("/audit-trail", auditTrailRoutes);
-  app.use("/workflow-status", workflowStatusRoutes);
-  app.use("/notification", notificationRoutes);
-  app.use("/perintah", perintahRoutes);
+
+  // Cross-cutting workflow and collaboration endpoints
+  app.use("/api/approval", approvalRoutes);
+  app.use("/api/reminder", reminderRoutes);
+  app.use("/api/case", caseRoutes);
+  app.use("/api/comment", commentRoutes);
+  app.use("/api/report", reportRoutes);
+  app.use("/api/audit-trail", auditTrailRoutes);
+  app.use("/api/workflow-status", workflowStatusRoutes);
+  app.use("/api/notification", notificationRoutes);
+  app.use("/api/perintah", perintahRoutes);
+  app.use("/api/tasks", tasksRoutes);
 
   // Master Data Lookup
   app.use("/api/pegawai", pegawaiRoutes);
   app.use("/api/komoditas", komoditasRoutes);
-  app.use("/modules", modulesRoutes);
+  app.use("/api/modules", modulesRoutes);
+
+  // Generic table routes should be mounted after specific module routes
+  app.use("/api", tablesRoutes);
 }

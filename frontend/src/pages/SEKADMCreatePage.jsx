@@ -85,15 +85,28 @@ export default function SEKADMCreatePage() {
               name="layanan_id"
               value={formData.layanan_id}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="LY001">Administrasi Umum</option>
-              <option value="LY002">Tata Naskah Dinas</option>
-              <option value="LY003">Kearsipan Dinamis & Statis</option>
-              <option value="LY004">Agenda & Disposisi Pimpinan</option>
-              <option value="LY005">Administrasi Rapat</option>
-              <option value="LY006">Dokumentasi Administrasi</option>
+              <option value="LY001" style={{ color: "#111827" }}>
+                Administrasi Umum
+              </option>
+              <option value="LY002" style={{ color: "#111827" }}>
+                Tata Naskah Dinas
+              </option>
+              <option value="LY003" style={{ color: "#111827" }}>
+                Kearsipan Dinamis & Statis
+              </option>
+              <option value="LY004" style={{ color: "#111827" }}>
+                Agenda & Disposisi Pimpinan
+              </option>
+              <option value="LY005" style={{ color: "#111827" }}>
+                Administrasi Rapat
+              </option>
+              <option value="LY006" style={{ color: "#111827" }}>
+                Dokumentasi Administrasi
+              </option>
             </select>
           </div>
 
@@ -106,7 +119,7 @@ export default function SEKADMCreatePage() {
               name="nomor_surat"
               value={formData.nomor_surat}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -118,21 +131,46 @@ export default function SEKADMCreatePage() {
               name="jenis_naskah"
               value={formData.jenis_naskah}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Surat Masuk">Surat Masuk</option>
-              <option value="Surat Keluar">Surat Keluar</option>
-              <option value="SK">SK</option>
-              <option value="SE">SE</option>
-              <option value="ST">ST</option>
-              <option value="SU">SU</option>
-              <option value="ND">ND</option>
-              <option value="MEMO">MEMO</option>
-              <option value="BA">BA</option>
-              <option value="Nota Dinas">Nota Dinas</option>
-              <option value="Laporan">Laporan</option>
-              <option value="Lainnya">Lainnya</option>
+              <option value="Surat Masuk" style={{ color: "#111827" }}>
+                Surat Masuk
+              </option>
+              <option value="Surat Keluar" style={{ color: "#111827" }}>
+                Surat Keluar
+              </option>
+              <option value="SK" style={{ color: "#111827" }}>
+                SK
+              </option>
+              <option value="SE" style={{ color: "#111827" }}>
+                SE
+              </option>
+              <option value="ST" style={{ color: "#111827" }}>
+                ST
+              </option>
+              <option value="SU" style={{ color: "#111827" }}>
+                SU
+              </option>
+              <option value="ND" style={{ color: "#111827" }}>
+                ND
+              </option>
+              <option value="MEMO" style={{ color: "#111827" }}>
+                MEMO
+              </option>
+              <option value="BA" style={{ color: "#111827" }}>
+                BA
+              </option>
+              <option value="Nota Dinas" style={{ color: "#111827" }}>
+                Nota Dinas
+              </option>
+              <option value="Laporan" style={{ color: "#111827" }}>
+                Laporan
+              </option>
+              <option value="Lainnya" style={{ color: "#111827" }}>
+                Lainnya
+              </option>
             </select>
           </div>
 
@@ -145,7 +183,7 @@ export default function SEKADMCreatePage() {
               name="tanggal_surat"
               value={formData.tanggal_surat}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -159,7 +197,7 @@ export default function SEKADMCreatePage() {
               name="pengirim_penerima"
               value={formData.pengirim_penerima}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -171,13 +209,22 @@ export default function SEKADMCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="pending">Pending</option>
-              <option value="proses">Proses</option>
-              <option value="selesai">Selesai</option>
-              <option value="arsip">Arsip</option>
+              <option value="pending" style={{ color: "#111827" }}>
+                Pending
+              </option>
+              <option value="proses" style={{ color: "#111827" }}>
+                Proses
+              </option>
+              <option value="selesai" style={{ color: "#111827" }}>
+                Selesai
+              </option>
+              <option value="arsip" style={{ color: "#111827" }}>
+                Arsip
+              </option>
             </select>
           </div>
 
@@ -190,7 +237,7 @@ export default function SEKADMCreatePage() {
               name="perihal"
               value={formData.perihal}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -204,7 +251,7 @@ export default function SEKADMCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -218,7 +265,7 @@ export default function SEKADMCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -231,7 +278,7 @@ export default function SEKADMCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

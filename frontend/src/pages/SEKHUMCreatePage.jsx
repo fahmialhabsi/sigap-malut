@@ -112,14 +112,25 @@ export default function SEKHUMCreatePage() {
               name="jenis_layanan_humas"
               value={formData.jenis_layanan_humas}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Protokol">Protokol</option>
-              <option value="Acara Resmi">Acara Resmi</option>
-              <option value="Penerimaan Tamu">Penerimaan Tamu</option>
-              <option value="Publikasi">Publikasi</option>
-              <option value="Dokumentasi">Dokumentasi</option>
+              <option style={{ color: "#111827" }} value="Protokol">
+                Protokol
+              </option>
+              <option style={{ color: "#111827" }} value="Acara Resmi">
+                Acara Resmi
+              </option>
+              <option style={{ color: "#111827" }} value="Penerimaan Tamu">
+                Penerimaan Tamu
+              </option>
+              <option style={{ color: "#111827" }} value="Publikasi">
+                Publikasi
+              </option>
+              <option style={{ color: "#111827" }} value="Dokumentasi">
+                Dokumentasi
+              </option>
             </select>
           </div>
 
@@ -131,13 +142,22 @@ export default function SEKHUMCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="pending">Pending</option>
-              <option value="persiapan">Persiapan</option>
-              <option value="berlangsung">Berlangsung</option>
-              <option value="selesai">Selesai</option>
+              <option style={{ color: "#111827" }} value="pending">
+                Pending
+              </option>
+              <option style={{ color: "#111827" }} value="persiapan">
+                Persiapan
+              </option>
+              <option style={{ color: "#111827" }} value="berlangsung">
+                Berlangsung
+              </option>
+              <option style={{ color: "#111827" }} value="selesai">
+                Selesai
+              </option>
             </select>
           </div>
 
@@ -150,7 +170,7 @@ export default function SEKHUMCreatePage() {
               name="nama_kegiatan"
               value={formData.nama_kegiatan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -162,15 +182,30 @@ export default function SEKHUMCreatePage() {
               name="jenis_acara"
               value={formData.jenis_acara}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
             >
-              <option value="Rapat">Rapat</option>
-              <option value="Upacara">Upacara</option>
-              <option value="Kunjungan">Kunjungan</option>
-              <option value="Sosialisasi">Sosialisasi</option>
-              <option value="Workshop">Workshop</option>
-              <option value="Launching">Launching</option>
-              <option value="Lainnya">Lainnya</option>
+              <option style={{ color: "#111827" }} value="Rapat">
+                Rapat
+              </option>
+              <option style={{ color: "#111827" }} value="Upacara">
+                Upacara
+              </option>
+              <option style={{ color: "#111827" }} value="Kunjungan">
+                Kunjungan
+              </option>
+              <option style={{ color: "#111827" }} value="Sosialisasi">
+                Sosialisasi
+              </option>
+              <option style={{ color: "#111827" }} value="Workshop">
+                Workshop
+              </option>
+              <option style={{ color: "#111827" }} value="Launching">
+                Launching
+              </option>
+              <option style={{ color: "#111827" }} value="Lainnya">
+                Lainnya
+              </option>
             </select>
           </div>
 
@@ -183,7 +218,7 @@ export default function SEKHUMCreatePage() {
               name="tanggal_acara"
               value={formData.tanggal_acara}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -196,7 +231,7 @@ export default function SEKHUMCreatePage() {
               name="tempat"
               value={formData.tempat}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -209,7 +244,7 @@ export default function SEKHUMCreatePage() {
               name="nama_tamu"
               value={formData.nama_tamu}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -222,7 +257,7 @@ export default function SEKHUMCreatePage() {
               name="instansi_tamu"
               value={formData.instansi_tamu}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -235,7 +270,7 @@ export default function SEKHUMCreatePage() {
               name="judul_publikasi"
               value={formData.judul_publikasi}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -247,13 +282,24 @@ export default function SEKHUMCreatePage() {
               name="media_publikasi"
               value={formData.media_publikasi}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
             >
-              <option value="Website">Website</option>
-              <option value="Media Sosial">Media Sosial</option>
-              <option value="Media Massa">Media Massa</option>
-              <option value="Buletin">Buletin</option>
-              <option value="Lainnya">Lainnya</option>
+              <option style={{ color: "#111827" }} value="Website">
+                Website
+              </option>
+              <option style={{ color: "#111827" }} value="Media Sosial">
+                Media Sosial
+              </option>
+              <option style={{ color: "#111827" }} value="Media Massa">
+                Media Massa
+              </option>
+              <option style={{ color: "#111827" }} value="Buletin">
+                Buletin
+              </option>
+              <option style={{ color: "#111827" }} value="Lainnya">
+                Lainnya
+              </option>
             </select>
           </div>
 
@@ -266,7 +312,7 @@ export default function SEKHUMCreatePage() {
               name="link_publikasi"
               value={formData.link_publikasi}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -279,7 +325,7 @@ export default function SEKHUMCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -293,7 +339,7 @@ export default function SEKHUMCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -306,11 +352,16 @@ export default function SEKHUMCreatePage() {
               name="is_sensitive"
               value={formData.is_sensitive}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+              style={{ color: "#111827", backgroundColor: "#ffffff" }}
               required
             >
-              <option value="Biasa">Biasa</option>
-              <option value="Sensitif">Sensitif</option>
+              <option style={{ color: "#111827" }} value="Biasa">
+                Biasa
+              </option>
+              <option style={{ color: "#111827" }} value="Sensitif">
+                Sensitif
+              </option>
             </select>
           </div>
 
@@ -323,7 +374,7 @@ export default function SEKHUMCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

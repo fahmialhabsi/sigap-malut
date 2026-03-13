@@ -4,7 +4,7 @@
 // Generated: 2026-02-17T19:24:48.392Z
 // =====================================================
 
-import BksDvr from "../models/BKS-DVR.js";
+import bksDvrService from "../services/modules/bksDvrService.js";
 import { logAudit } from "../services/auditLogService.js";
 
 // @desc    Get all BksDvr records
@@ -18,7 +18,7 @@ export const getAllBksDvr = async (req, res) => {
 
     const where = { ...filters };
 
-    const { count, rows } = await BksDvr.findAndCountAll({
+    const { count, rows } = await bksDvrService.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -49,7 +49,7 @@ export const getAllBksDvr = async (req, res) => {
 // @access  Private
 export const getBksDvrById = async (req, res) => {
   try {
-    const record = await BksDvr.findByPk(req.params.id);
+    const record = await bksDvrService.findByPk(req.params.id);
 
     if (!record) {
       return res.status(404).json({
@@ -76,7 +76,7 @@ export const getBksDvrById = async (req, res) => {
 // @access  Private
 export const createBksDvr = async (req, res) => {
   try {
-    const record = await BksDvr.create({
+    const record = await bksDvrService.create({
       ...req.body,
       created_by: req.user?.id,
     });
@@ -107,7 +107,7 @@ export const createBksDvr = async (req, res) => {
 // @access  Private
 export const updateBksDvr = async (req, res) => {
   try {
-    const record = await BksDvr.findByPk(req.params.id);
+    const record = await bksDvrService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,
@@ -146,7 +146,7 @@ export const updateBksDvr = async (req, res) => {
 // @access  Private
 export const deleteBksDvr = async (req, res) => {
   try {
-    const record = await BksDvr.findByPk(req.params.id);
+    const record = await bksDvrService.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({
         success: false,

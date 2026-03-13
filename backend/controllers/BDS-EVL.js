@@ -5,6 +5,7 @@
 // =====================================================
 
 import BdsEvl from "../models/BDS-EVL.js";
+import { logAudit } from "../services/auditLogService.js";
 
 // @desc    Get all BdsEvl records
 // @route   GET /api/bds-evl

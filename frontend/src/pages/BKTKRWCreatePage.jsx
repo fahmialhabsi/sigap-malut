@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
 export default function BKTKRWCreatePage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [kabupatenList, setKabupatenList] = useState([]);
 
   const layananMap = {
     Identifikasi: "LY062",
@@ -24,6 +25,21 @@ export default function BKTKRWCreatePage() {
     pelaksana: "",
     keterangan: "",
   });
+
+  useEffect(() => {
+    setKabupatenList([
+      { id: 1, nama: "Halmahera Barat" },
+      { id: 2, nama: "Halmahera Tengah" },
+      { id: 3, nama: "Kepulauan Sula" },
+      { id: 4, nama: "Halmahera Selatan" },
+      { id: 5, nama: "Halmahera Utara" },
+      { id: 6, nama: "Halmahera Timur" },
+      { id: 7, nama: "Pulau Morotai" },
+      { id: 8, nama: "Pulau Taliabu" },
+      { id: 9, nama: "Kota Ternate" },
+      { id: 10, nama: "Kota Tidore Kepulauan" },
+    ]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -92,7 +108,7 @@ export default function BKTKRWCreatePage() {
               name="jenis_kerawanan"
               value={formData.jenis_kerawanan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="Identifikasi">Identifikasi</option>
@@ -113,7 +129,7 @@ export default function BKTKRWCreatePage() {
               name="periode"
               value={formData.periode}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -127,23 +143,29 @@ export default function BKTKRWCreatePage() {
               name="tahun"
               value={formData.tahun}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Kabupaten <span className="text-red-500">*</span>
+              Kabupaten/Kota <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <select
               name="kabupaten"
               value={formData.kabupaten}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
-            />
+            >
+              <option value="">Pilih Kabupaten/Kota</option>
+              {kabupatenList.map((k) => (
+                <option key={k.id} value={k.nama}>
+                  {k.nama}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -154,7 +176,7 @@ export default function BKTKRWCreatePage() {
               name="tingkat_kerawanan"
               value={formData.tingkat_kerawanan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="Prioritas 1">Prioritas 1</option>
@@ -174,7 +196,7 @@ export default function BKTKRWCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="draft">Draft</option>
@@ -193,7 +215,7 @@ export default function BKTKRWCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -207,7 +229,7 @@ export default function BKTKRWCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
 
@@ -220,7 +242,7 @@ export default function BKTKRWCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

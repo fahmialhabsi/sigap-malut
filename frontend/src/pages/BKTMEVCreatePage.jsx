@@ -89,7 +89,8 @@ export default function BKTMEVCreatePage() {
               name="jenis_monev"
               value={formData.jenis_monev}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             >
               <option value="Monev Pelaporan">Monev Pelaporan</option>
@@ -111,7 +112,8 @@ export default function BKTMEVCreatePage() {
               name="periode"
               value={formData.periode}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             />
           </div>
@@ -125,7 +127,8 @@ export default function BKTMEVCreatePage() {
               name="tahun"
               value={formData.tahun}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             />
           </div>
@@ -139,7 +142,8 @@ export default function BKTMEVCreatePage() {
               name="judul_laporan"
               value={formData.judul_laporan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             />
           </div>
@@ -152,7 +156,8 @@ export default function BKTMEVCreatePage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             >
               <option value="draft">Draft</option>
@@ -170,7 +175,8 @@ export default function BKTMEVCreatePage() {
               name="penanggung_jawab"
               value={formData.penanggung_jawab}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
               required
             />
           </div>
@@ -184,7 +190,8 @@ export default function BKTMEVCreatePage() {
               name="pelaksana"
               value={formData.pelaksana}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 
+focus:ring-blue-500"
             />
           </div>
 
@@ -197,7 +204,7 @@ export default function BKTMEVCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
             />
           </div>
         </div>

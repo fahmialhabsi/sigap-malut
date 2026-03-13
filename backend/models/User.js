@@ -32,10 +32,6 @@ if (sequelize.models && sequelize.models.User) {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      plain_password: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
 
       // IMPORTANT: role_id is UUID FK to roles.id
       role_id: {

@@ -1,11 +1,28 @@
 import React, { useEffect } from "react";
+import api from "../services/apiClient";
+import { getAuditTrailAPI } from "../services/auditTrailService";
 import { getAuditTrail, clearAuditTrail } from "../utils/auditTrail";
 
 export default function AuditTrailPage() {
   const [logs, setLogs] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const fetchLogs = async () => {
+    setLoading(true);
+    try {
+      const res = await getAuditTrailAPI();
+      setLogs(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setLogs(getAuditTrail().reverse());
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    queueMicrotask(() => setLogs(getAuditTrail().reverse()));
+    queueMicrotask(() => {
+      fetchLogs();
+    });
   }, []);
 
   return (
@@ -14,47 +31,58 @@ export default function AuditTrailPage() {
         <h2 className="text-2xl font-bold">Audit Trail (Log Aktivitas)</h2>
         <button
           className="bg-red-100 text-red-700 px-4 py-2 rounded font-semibold shadow"
-          onClick={() => {
+          onClick={async () => {
+            setLoading(true);
+            try {
+              await api.delete("/audit-trail");
+            } catch {
+              clearAuditTrail();
+            }
             clearAuditTrail();
             setLogs([]);
+            setLoading(false);
           }}
         >
           Hapus Log
         </button>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full border text-sm">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-2 py-1">Waktu</th>
-              <th className="border px-2 py-1">User</th>
-              <th className="border px-2 py-1">Role</th>
-              <th className="border px-2 py-1">Aksi</th>
-              <th className="border px-2 py-1">Detail</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-4 text-muted">
-                  Tidak ada log aktivitas.
-                </td>
+        {loading ? (
+          <div className="text-center py-8">Memuat audit trail...</div>
+        ) : (
+          <table className="min-w-full border text-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border px-2 py-1">Waktu</th>
+                <th className="border px-2 py-1">User</th>
+                <th className="border px-2 py-1">Role</th>
+                <th className="border px-2 py-1">Aksi</th>
+                <th className="border px-2 py-1">Detail</th>
               </tr>
-            ) : (
-              logs.map((log, i) => (
-                <tr key={i}>
-                  <td className="border px-2 py-1 whitespace-nowrap">
-                    {log.time}
+            </thead>
+            <tbody>
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-4 text-muted">
+                    Tidak ada log aktivitas.
                   </td>
-                  <td className="border px-2 py-1">{log.user}</td>
-                  <td className="border px-2 py-1">{log.role}</td>
-                  <td className="border px-2 py-1">{log.action}</td>
-                  <td className="border px-2 py-1">{log.detail}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                logs.map((log, i) => (
+                  <tr key={i}>
+                    <td className="border px-2 py-1 whitespace-nowrap">
+                      {log.time}
+                    </td>
+                    <td className="border px-2 py-1">{log.user}</td>
+                    <td className="border px-2 py-1">{log.role}</td>
+                    <td className="border px-2 py-1">{log.action}</td>
+                    <td className="border px-2 py-1">{log.detail}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

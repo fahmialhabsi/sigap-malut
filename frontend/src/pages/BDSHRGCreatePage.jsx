@@ -212,7 +212,7 @@ export default function BDSHRGCreatePage() {
               name="jenis_layanan_harga"
               value={formData.jenis_layanan_harga}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="Pemantauan Harga">Pemantauan Harga</option>
@@ -233,7 +233,7 @@ export default function BDSHRGCreatePage() {
               name="komoditas_id"
               value={formData.komoditas_id}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="">Pilih Komoditas</option>
@@ -254,7 +254,7 @@ export default function BDSHRGCreatePage() {
               name="nama_pasar"
               value={formData.nama_pasar}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="">Pilih Pasar</option>
@@ -276,7 +276,7 @@ export default function BDSHRGCreatePage() {
               name="tanggal_pantau"
               value={formData.tanggal_pantau}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -292,7 +292,7 @@ export default function BDSHRGCreatePage() {
               value={formData.harga}
               onChange={handleChange}
               placeholder="Contoh: 12500"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             />
           </div>
@@ -306,7 +306,7 @@ export default function BDSHRGCreatePage() {
               name="satuan"
               value={formData.satuan}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="kg">Kilogram (kg)</option>
@@ -325,7 +325,7 @@ export default function BDSHRGCreatePage() {
               name="tren_harga"
               value={formData.tren_harga}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               required
             >
               <option value="Stabil">Stabil</option>
@@ -344,7 +344,7 @@ export default function BDSHRGCreatePage() {
                   name="tingkat_fluktuasi"
                   value={formData.tingkat_fluktuasi}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 >
                   <option value="">Pilih</option>
                   <option value="Rendah">Rendah</option>
@@ -362,7 +362,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.penyebab_fluktuasi}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -375,7 +375,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.dampak_fluktuasi}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -388,7 +388,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.analisis_harga}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -401,7 +401,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.prediksi_harga}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
             </>
@@ -417,7 +417,7 @@ export default function BDSHRGCreatePage() {
                 value={formData.rekomendasi_stabilisasi}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               />
             </div>
           )}
@@ -432,7 +432,7 @@ export default function BDSHRGCreatePage() {
                   name="jenis_operasi_pasar"
                   value={formData.jenis_operasi_pasar}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 >
                   <option value="">Pilih</option>
                   <option value="Pasar Murah">Pasar Murah</option>
@@ -451,7 +451,7 @@ export default function BDSHRGCreatePage() {
                   name="tanggal_operasi_pasar"
                   value={formData.tanggal_operasi_pasar}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -464,7 +464,7 @@ export default function BDSHRGCreatePage() {
                   name="lokasi_operasi_pasar"
                   value={formData.lokasi_operasi_pasar}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -477,7 +477,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.komoditas_operasi_pasar}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -490,7 +490,7 @@ export default function BDSHRGCreatePage() {
                   name="harga_pasar_normal"
                   value={formData.harga_pasar_normal}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -503,7 +503,7 @@ export default function BDSHRGCreatePage() {
                   name="harga_operasi_pasar"
                   value={formData.harga_operasi_pasar}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -516,7 +516,7 @@ export default function BDSHRGCreatePage() {
                   name="subsidi_per_unit"
                   value={formData.subsidi_per_unit}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -529,7 +529,7 @@ export default function BDSHRGCreatePage() {
                   name="volume_operasi_pasar"
                   value={formData.volume_operasi_pasar}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -542,7 +542,7 @@ export default function BDSHRGCreatePage() {
                   name="jumlah_pembeli"
                   value={formData.jumlah_pembeli}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -555,7 +555,7 @@ export default function BDSHRGCreatePage() {
                   name="total_nilai_subsidi"
                   value={formData.total_nilai_subsidi}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -568,7 +568,7 @@ export default function BDSHRGCreatePage() {
                   name="sumber_anggaran"
                   value={formData.sumber_anggaran}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
             </>
@@ -585,7 +585,7 @@ export default function BDSHRGCreatePage() {
                   name="tanggal_rapat_tpid"
                   value={formData.tanggal_rapat_tpid}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -598,7 +598,7 @@ export default function BDSHRGCreatePage() {
                   name="tempat_rapat_tpid"
                   value={formData.tempat_rapat_tpid}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -611,7 +611,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.peserta_tpid}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -624,7 +624,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.agenda_tpid}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -637,7 +637,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.hasil_rapat_tpid}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -650,7 +650,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.rekomendasi_tpid}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -663,7 +663,7 @@ export default function BDSHRGCreatePage() {
                   value={formData.tindak_lanjut_tpid}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -676,7 +676,7 @@ export default function BDSHRGCreatePage() {
                   name="inflasi_pangan"
                   value={formData.inflasi_pangan}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -689,7 +689,7 @@ export default function BDSHRGCreatePage() {
                   name="target_inflasi_tpid"
                   value={formData.target_inflasi_tpid}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 />
               </div>
 
@@ -701,7 +701,7 @@ export default function BDSHRGCreatePage() {
                   name="status_inflasi"
                   value={formData.status_inflasi}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
                 >
                   <option value="">Pilih</option>
                   <option value="On Target">On Target</option>
@@ -722,7 +722,7 @@ export default function BDSHRGCreatePage() {
               value={formData.keterangan}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 text-gray-900 focus:ring-blue-500"
               placeholder="Catatan tambahan (opsional)"
             />
           </div>
