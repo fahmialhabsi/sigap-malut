@@ -1,0 +1,1852 @@
+openapi: "3.0.3"
+info:
+  title: SIGAP MALUT - Sistem Informasi Ketahanan Pangan Maluku Utara
+  description: |
+    API resmi SIGAP MALUT (Sistem Informasi Ketahanan Pangan Maluku Utara).
+    Platform ini melayani pengelolaan data ketahanan pangan mencakup:
+    - Sekretariat Dinas
+    - Bidang Ketersediaan & Kerawanan Pangan
+    - Bidang Distribusi & Cadangan Pangan
+    - Bidang Konsumsi & Keamanan Pangan
+    - UPTD Balai Pengawasan Mutu
+
+    Seluruh endpoint dilindungi dengan autentikasi JWT Bearer Token.
+    Role-Based Access Control (RBAC) diterapkan pada setiap endpoint.
+  version: "2.0.0"
+  contact:
+    name: Dinas Pangan Provinsi Maluku Utara
+    email: admin@sigap-malut.go.id
+  license:
+    name: Pemerintah Provinsi Maluku Utara
+    url: https://malutprov.go.id
+
+servers:
+  - url: http://localhost:5000/api
+    description: Server Pengembangan (Development)
+  - url: https://sigap-malut.go.id/api
+    description: Server Produksi (Production)
+
+tags:
+  - name: Autentikasi
+    description: Endpoint login, logout, dan manajemen sesi pengguna
+  - name: Sekretariat - Administrasi
+    description: Pengelolaan surat masuk, surat keluar, disposisi, dan agenda
+  - name: Sekretariat - Kepegawaian
+    description: Data ASN, cuti, SKP, perjalanan dinas, dan riwayat kepegawaian
+  - name: Sekretariat - Keuangan
+    description: RKA, DPA, SPJ, dan monitoring realisasi anggaran
+  - name: Sekretariat - Aset
+    description: Inventarisasi BMD, pemeliharaan, dan mutasi aset
+  - name: Sekretariat - Rumah Tangga
+    description: Fasilitas kantor, kendaraan dinas, dan kebutuhan operasional
+  - name: Sekretariat - Kehumasan
+    description: Protokol, publikasi kegiatan, dan penerimaan tamu
+  - name: Sekretariat - Perencanaan
+    description: Renstra, Renja, LAKIP, dan monitoring evaluasi program
+  - name: Bidang Ketersediaan
+    description: Kebijakan, pengendalian produksi, kerawanan, dan evaluasi ketersediaan pangan
+  - name: Bidang Distribusi
+    description: Harga pangan, cadangan pangan, monitoring distribusi, dan evaluasi
+  - name: Bidang Konsumsi
+    description: Kebijakan konsumsi, diversifikasi, keamanan pangan, dan pelaporan
+  - name: UPTD
+    description: Layanan teknis, inspeksi, manajemen mutu, dan administrasi UPTD
+  - name: Workflow
+    description: Manajemen alur kerja, persetujuan, dan status proses
+  - name: Audit Trail
+    description: Riwayat aktivitas pengguna dan log sistem
+  - name: Dashboard & KPI
+    description: Statistik dan indikator kinerja utama sistem
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT diperoleh dari endpoint /api/auth/login
+
+  schemas:
+    # ─────────────────────────────────────────────
+    # Common Schemas
+    # ─────────────────────────────────────────────
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Berhasil
+        data:
+          type: object
+      required: [success]
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Terjadi kesalahan
+        error:
+          type: string
+      required: [success, message]
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        totalPages:
+          type: integer
+          example: 10
+
+    # ─────────────────────────────────────────────
+    # Auth Schemas
+    # ─────────────────────────────────────────────
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: admin@sigap.go.id
+        password:
+          type: string
+          format: password
+          example: "••••••••"
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        token:
+          type: string
+          description: JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        user:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Administrator
+        username:
+          type: string
+          example: admin@sigap.go.id
+        role:
+          type: string
+          enum: [superadmin, sekretaris, kepala_bidang, staf, pelaksana]
+          example: superadmin
+        unit_kerja:
+          type: string
+          enum: [Sekretariat, "Bidang Ketersediaan", "Bidang Distribusi", "Bidang Konsumsi", UPTD]
+          example: Sekretariat
+
+    # ─────────────────────────────────────────────
+    # Module Schemas (Generic)
+    # ─────────────────────────────────────────────
+    ModuleRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        layanan_id:
+          type: string
+          example: LY001
+        unit_kerja:
+          type: string
+          example: Sekretariat
+        status:
+          type: string
+          enum: [draft, submitted, approved, rejected, completed]
+          example: approved
+        created_by:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # ─────────────────────────────────────────────
+    # Approval Schemas
+    # ─────────────────────────────────────────────
+    ApprovalRequest:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [approve, reject]
+          example: approve
+        catatan:
+          type: string
+          example: Disetujui sesuai prosedur
+
+    WorkflowStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+        module_id:
+          type: string
+          example: SEK-ADM
+        record_id:
+          type: integer
+        status:
+          type: string
+          enum: [draft, pending_review, approved, rejected, completed]
+        current_approver_role:
+          type: string
+        riwayat:
+          type: array
+          items:
+            type: object
+            properties:
+              action:
+                type: string
+              actor:
+                type: string
+              catatan:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+
+    # ─────────────────────────────────────────────
+    # Komoditas Schema
+    # ─────────────────────────────────────────────
+    Komoditas:
+      type: object
+      properties:
+        id:
+          type: integer
+        kode:
+          type: string
+          example: KMD001
+        nama:
+          type: string
+          example: Beras
+        satuan:
+          type: string
+          example: Kg
+        kategori:
+          type: string
+          example: Padi-padian
+        is_active:
+          type: boolean
+
+    # ─────────────────────────────────────────────
+    # Audit Log Schema
+    # ─────────────────────────────────────────────
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        action:
+          type: string
+          enum: [CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, APPROVE, REJECT]
+        resource:
+          type: string
+          example: SEK-ADM
+        resource_id:
+          type: string
+        ip_address:
+          type: string
+        user_agent:
+          type: string
+        status:
+          type: string
+          enum: [SUCCESS, FAILED]
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    Unauthorized:
+      description: Token tidak valid atau tidak tersedia
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Tidak terautentikasi. Silakan login terlebih dahulu.
+
+    Forbidden:
+      description: Tidak memiliki izin untuk mengakses resource ini
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Akses ditolak. Anda tidak memiliki izin.
+
+    NotFound:
+      description: Data tidak ditemukan
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Data tidak ditemukan.
+
+    InternalError:
+      description: Kesalahan internal server
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Terjadi kesalahan pada server.
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ════════════════════════════════════════════════
+  # AUTENTIKASI
+  # ════════════════════════════════════════════════
+  /auth/login:
+    post:
+      tags: [Autentikasi]
+      summary: Login pengguna
+      description: Autentikasi pengguna dengan username dan password. Mengembalikan JWT token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Kredensial tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags: [Autentikasi]
+      summary: Logout pengguna
+      description: Mengakhiri sesi pengguna dan menginvalidasi token.
+      responses:
+        '200':
+          description: Logout berhasil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/me:
+    get:
+      tags: [Autentikasi]
+      summary: Profil pengguna yang sedang login
+      description: Mengembalikan data profil pengguna yang sedang terautentikasi.
+      responses:
+        '200':
+          description: Data profil pengguna
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/users:
+    get:
+      tags: [Autentikasi]
+      summary: Daftar semua pengguna
+      description: Mengambil seluruh data pengguna sistem. Hanya dapat diakses oleh superadmin.
+      responses:
+        '200':
+          description: Daftar pengguna berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Autentikasi]
+      summary: Buat pengguna baru
+      description: Membuat akun pengguna baru. Hanya dapat dilakukan oleh superadmin.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, username, password, role]
+              properties:
+                name:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                role:
+                  type: string
+                  enum: [superadmin, sekretaris, kepala_bidang, staf, pelaksana]
+      responses:
+        '201':
+          description: Pengguna berhasil dibuat
+        '400':
+          description: Data tidak valid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/change-password:
+    put:
+      tags: [Autentikasi]
+      summary: Ubah kata sandi
+      description: Mengubah kata sandi pengguna yang sedang login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword:
+                  type: string
+                  format: password
+                newPassword:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Kata sandi berhasil diubah
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ════════════════════════════════════════════════
+  # SEKRETARIAT — ADMINISTRASI UMUM (SEK-ADM)
+  # ════════════════════════════════════════════════
+  /sek-adm:
+    get:
+      tags: [Sekretariat - Administrasi]
+      summary: Daftar data Administrasi Umum & Persuratan
+      description: Mengambil daftar surat masuk, surat keluar, disposisi, dan agenda kegiatan.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 10 }
+        - in: query
+          name: layanan_id
+          schema: { type: string }
+          description: Filter berdasarkan ID layanan (LY001-LY006)
+        - in: query
+          name: status
+          schema: { type: string, enum: [draft, submitted, approved, rejected] }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModuleRecord'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Sekretariat - Administrasi]
+      summary: Buat data Administrasi Umum baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                layanan_id:
+                  type: string
+                  example: LY001
+                nomor_surat:
+                  type: string
+                jenis_naskah:
+                  type: string
+                perihal:
+                  type: string
+                file_dokumen:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Data berhasil dibuat
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /sek-adm/{id}:
+    get:
+      tags: [Sekretariat - Administrasi]
+      summary: Detail data Administrasi Umum
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Sekretariat - Administrasi]
+      summary: Perbarui data Administrasi Umum
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Sekretariat - Administrasi]
+      summary: Hapus data Administrasi Umum
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ════════════════════════════════════════════════
+  # SEKRETARIAT — KEPEGAWAIAN (SEK-KEP)
+  # ════════════════════════════════════════════════
+  /sek-kep:
+    get:
+      tags: [Sekretariat - Kepegawaian]
+      summary: Daftar data Kepegawaian
+      description: Data ASN, KGB, kenaikan pangkat, cuti, SKP, diklat, dan perjalanan dinas.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 10 }
+        - in: query
+          name: layanan_id
+          schema: { type: string }
+          description: Filter berdasarkan ID layanan (LY008-LY015)
+      responses:
+        '200':
+          description: Daftar data kepegawaian berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Sekretariat - Kepegawaian]
+      summary: Buat data Kepegawaian baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                layanan_id:
+                  type: string
+                  example: LY008
+                nip:
+                  type: string
+                  example: "198501012010011001"
+                nama_lengkap:
+                  type: string
+                jabatan:
+                  type: string
+                file_dokumen:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Data kepegawaian berhasil dibuat
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /sek-kep/{id}:
+    get:
+      tags: [Sekretariat - Kepegawaian]
+      summary: Detail data Kepegawaian
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Sekretariat - Kepegawaian]
+      summary: Perbarui data Kepegawaian
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Sekretariat - Kepegawaian]
+      summary: Hapus data Kepegawaian
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  # ════════════════════════════════════════════════
+  # SEKRETARIAT — KEUANGAN (SEK-KEU)
+  # ════════════════════════════════════════════════
+  /sek-keu:
+    get:
+      tags: [Sekretariat - Keuangan]
+      summary: Daftar data Keuangan & Anggaran
+      description: RKA, DPA, SPJ, realisasi anggaran, belanja pegawai, barang, dan modal.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 10 }
+        - in: query
+          name: layanan_id
+          schema: { type: string }
+          description: Filter berdasarkan ID layanan (LY016-LY022)
+      responses:
+        '200':
+          description: Daftar data keuangan berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Sekretariat - Keuangan]
+      summary: Buat data Keuangan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data keuangan berhasil dibuat
+
+  /sek-keu/{id}:
+    get:
+      tags: [Sekretariat - Keuangan]
+      summary: Detail data Keuangan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+    put:
+      tags: [Sekretariat - Keuangan]
+      summary: Perbarui data Keuangan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Sekretariat - Keuangan]
+      summary: Hapus data Keuangan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  # ════════════════════════════════════════════════
+  # SEKRETARIAT — ASET (SEK-AST)
+  # ════════════════════════════════════════════════
+  /sek-ast:
+    get:
+      tags: [Sekretariat - Aset]
+      summary: Daftar data Aset & BMD
+      description: Inventarisasi barang milik daerah, kendaraan dinas, pemeliharaan, dan mutasi aset.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: layanan_id
+          schema: { type: string }
+      responses:
+        '200':
+          description: Daftar data aset berhasil diambil
+    post:
+      tags: [Sekretariat - Aset]
+      summary: Buat data Aset baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data aset berhasil dibuat
+
+  /sek-ast/{id}:
+    get:
+      tags: [Sekretariat - Aset]
+      summary: Detail data Aset
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data aset berhasil diambil
+    put:
+      tags: [Sekretariat - Aset]
+      summary: Perbarui data Aset
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Sekretariat - Aset]
+      summary: Hapus data Aset
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  # ════════════════════════════════════════════════
+  # SEKRETARIAT — RUMAH TANGGA (SEK-RMH)
+  # ════════════════════════════════════════════════
+  /sek-rmh:
+    get:
+      tags: [Sekretariat - Rumah Tangga]
+      summary: Daftar data Rumah Tangga & Umum
+      description: Perjalanan dinas, kebersihan, keamanan kantor, fasilitas, dan kendaraan dinas.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+    post:
+      tags: [Sekretariat - Rumah Tangga]
+      summary: Buat data Rumah Tangga baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /sek-rmh/{id}:
+    get:
+      tags: [Sekretariat - Rumah Tangga]
+      summary: Detail data Rumah Tangga
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+    put:
+      tags: [Sekretariat - Rumah Tangga]
+      summary: Perbarui data Rumah Tangga
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Sekretariat - Rumah Tangga]
+      summary: Hapus data Rumah Tangga
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  # ════════════════════════════════════════════════
+  # SEKRETARIAT — KEHUMASAN (SEK-HUM)
+  # ════════════════════════════════════════════════
+  /sek-hum:
+    get:
+      tags: [Sekretariat - Kehumasan]
+      summary: Daftar data Protokol & Kehumasan
+      description: Keprotokolan pimpinan, acara resmi, penerimaan tamu, dan publikasi kegiatan.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+    post:
+      tags: [Sekretariat - Kehumasan]
+      summary: Buat data Kehumasan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /sek-hum/{id}:
+    get:
+      tags: [Sekretariat - Kehumasan]
+      summary: Detail data Kehumasan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+    put:
+      tags: [Sekretariat - Kehumasan]
+      summary: Perbarui data Kehumasan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Sekretariat - Kehumasan]
+      summary: Hapus data Kehumasan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  # ════════════════════════════════════════════════
+  # SEKRETARIAT — PERENCANAAN (SEK-REN)
+  # ════════════════════════════════════════════════
+  /sek-ren:
+    get:
+      tags: [Sekretariat - Perencanaan]
+      summary: Daftar data Perencanaan & Evaluasi
+      description: Renstra, Renja, RKPD, LAKIP, dan monitoring evaluasi program.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: layanan_id
+          schema: { type: string }
+          description: Filter berdasarkan ID layanan (LY040-LY045)
+      responses:
+        '200':
+          description: Daftar data perencanaan berhasil diambil
+    post:
+      tags: [Sekretariat - Perencanaan]
+      summary: Buat data Perencanaan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data perencanaan berhasil dibuat
+
+  /sek-ren/{id}:
+    get:
+      tags: [Sekretariat - Perencanaan]
+      summary: Detail data Perencanaan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+    put:
+      tags: [Sekretariat - Perencanaan]
+      summary: Perbarui data Perencanaan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Sekretariat - Perencanaan]
+      summary: Hapus data Perencanaan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  # ════════════════════════════════════════════════
+  # BIDANG KETERSEDIAAN
+  # ════════════════════════════════════════════════
+  /bkt-kbj:
+    get:
+      tags: [Bidang Ketersediaan]
+      summary: Daftar Kebijakan & Analisis Ketersediaan Pangan
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+    post:
+      tags: [Bidang Ketersediaan]
+      summary: Buat Kebijakan Ketersediaan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /bkt-kbj/{id}:
+    get:
+      tags: [Bidang Ketersediaan]
+      summary: Detail Kebijakan Ketersediaan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+    put:
+      tags: [Bidang Ketersediaan]
+      summary: Perbarui Kebijakan Ketersediaan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Bidang Ketersediaan]
+      summary: Hapus Kebijakan Ketersediaan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  /bkt-pgd:
+    get:
+      tags: [Bidang Ketersediaan]
+      summary: Daftar data Pengendalian & Monitoring Produksi Pangan
+      description: Data luas panen, produktivitas, dan monitoring produksi per komoditas dan wilayah.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: komoditas_id
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Daftar data produksi berhasil diambil
+    post:
+      tags: [Bidang Ketersediaan]
+      summary: Buat data produksi baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data produksi berhasil dibuat
+
+  /bkt-krw:
+    get:
+      tags: [Bidang Ketersediaan]
+      summary: Daftar data Kerawanan Pangan
+      description: Peta kerawanan, indeks ketahanan pangan, early warning, dan dampak bencana.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data kerawanan berhasil diambil
+    post:
+      tags: [Bidang Ketersediaan]
+      summary: Buat data Kerawanan Pangan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /bkt-mev:
+    get:
+      tags: [Bidang Ketersediaan]
+      summary: Daftar data Monitoring Evaluasi Ketersediaan
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+    post:
+      tags: [Bidang Ketersediaan]
+      summary: Buat data Monitoring Evaluasi baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  # ════════════════════════════════════════════════
+  # BIDANG DISTRIBUSI
+  # ════════════════════════════════════════════════
+  /bds-hrg:
+    get:
+      tags: [Bidang Distribusi]
+      summary: Daftar data Harga & Stabilisasi Pangan
+      description: Harga pangan harian per pasar, inflasi pangan, dan dashboard inflasi TPID.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: komoditas_id
+          schema: { type: integer }
+        - in: query
+          name: pasar_id
+          schema: { type: integer }
+        - in: query
+          name: tanggal
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Daftar data harga berhasil diambil
+    post:
+      tags: [Bidang Distribusi]
+      summary: Input data harga pangan harian
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [komoditas_id, pasar_id, harga, tanggal]
+              properties:
+                komoditas_id:
+                  type: integer
+                pasar_id:
+                  type: integer
+                harga:
+                  type: number
+                  format: float
+                tanggal:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Data harga berhasil diinput
+
+  /bds-hrg/{id}:
+    get:
+      tags: [Bidang Distribusi]
+      summary: Detail data Harga Pangan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detail data berhasil diambil
+    put:
+      tags: [Bidang Distribusi]
+      summary: Perbarui data Harga Pangan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data berhasil diperbarui
+    delete:
+      tags: [Bidang Distribusi]
+      summary: Hapus data Harga Pangan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Data berhasil dihapus
+
+  /bds-cpd:
+    get:
+      tags: [Bidang Distribusi]
+      summary: Daftar data Cadangan Pangan Daerah (CPPD)
+      description: CPPD, CBP BULOG, pelepasan cadangan, operasi pasar, dan bantuan pangan.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data cadangan pangan berhasil diambil
+    post:
+      tags: [Bidang Distribusi]
+      summary: Buat data Cadangan Pangan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /bds-mon:
+    get:
+      tags: [Bidang Distribusi]
+      summary: Daftar data Monitoring Distribusi Pangan
+      description: Monitoring distribusi pangan antar wilayah dan analisis pasokan.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data monitoring distribusi berhasil diambil
+    post:
+      tags: [Bidang Distribusi]
+      summary: Buat data Monitoring Distribusi baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /bds-kbj:
+    get:
+      tags: [Bidang Distribusi]
+      summary: Daftar Kebijakan Distribusi Pangan
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+    post:
+      tags: [Bidang Distribusi]
+      summary: Buat Kebijakan Distribusi baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  # ════════════════════════════════════════════════
+  # BIDANG KONSUMSI
+  # ════════════════════════════════════════════════
+  /bks-kbj:
+    get:
+      tags: [Bidang Konsumsi]
+      summary: Daftar Kebijakan Konsumsi Pangan
+      description: Kebijakan konsumsi, pola pangan harapan (PPH), dan program B2SA.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+    post:
+      tags: [Bidang Konsumsi]
+      summary: Buat Kebijakan Konsumsi baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /bks-dvr:
+    get:
+      tags: [Bidang Konsumsi]
+      summary: Daftar data Penganekaragaman Pangan
+      description: Diversifikasi pangan, SPPG, program MBG, dan program B2SA.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data diversifikasi berhasil diambil
+    post:
+      tags: [Bidang Konsumsi]
+      summary: Buat data Penganekaragaman Pangan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /bks-kmn:
+    get:
+      tags: [Bidang Konsumsi]
+      summary: Daftar data Keamanan Pangan
+      description: Inspeksi keamanan pangan, data keracunan, dan edukasi konsumsi.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data keamanan pangan berhasil diambil
+    post:
+      tags: [Bidang Konsumsi]
+      summary: Buat data Keamanan Pangan baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /bks-evl:
+    get:
+      tags: [Bidang Konsumsi]
+      summary: Daftar data Evaluasi & Monitoring Konsumsi
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data berhasil diambil
+    post:
+      tags: [Bidang Konsumsi]
+      summary: Buat data Evaluasi Konsumsi baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  # ════════════════════════════════════════════════
+  # UPTD BALAI PENGAWASAN MUTU
+  # ════════════════════════════════════════════════
+  /upt-tkn:
+    get:
+      tags: [UPTD]
+      summary: Daftar data Layanan Teknis UPTD
+      description: Sertifikasi Prima, GMP/NKV, GFP, GHP, registrasi produk, dan uji laboratorium.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: jenis_layanan
+          schema: { type: string }
+      responses:
+        '200':
+          description: Daftar data layanan teknis berhasil diambil
+    post:
+      tags: [UPTD]
+      summary: Buat permohonan layanan teknis baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Permohonan berhasil diajukan
+
+  /upt-ins:
+    get:
+      tags: [UPTD]
+      summary: Daftar data Inspeksi & Pengawasan
+      description: Pengawasan pangan berisiko, sampling, dan audit pangan.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data inspeksi berhasil diambil
+    post:
+      tags: [UPTD]
+      summary: Buat data Inspeksi baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data inspeksi berhasil dibuat
+
+  /upt-mtu:
+    get:
+      tags: [UPTD]
+      summary: Daftar data Manajemen Mutu & SOP
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data manajemen mutu berhasil diambil
+    post:
+      tags: [UPTD]
+      summary: Buat data Manajemen Mutu baru
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  /upt-adm:
+    get:
+      tags: [UPTD]
+      summary: Daftar data Administrasi UPTD
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        '200':
+          description: Daftar data administrasi UPTD berhasil diambil
+    post:
+      tags: [UPTD]
+      summary: Buat data Administrasi UPTD baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Data berhasil dibuat
+
+  # ════════════════════════════════════════════════
+  # MASTER DATA — KOMODITAS
+  # ════════════════════════════════════════════════
+  /komoditas:
+    get:
+      tags: [Dashboard & KPI]
+      summary: Daftar Master Data Komoditas Pangan
+      description: Master data komoditas pangan yang digunakan sebagai referensi di seluruh modul.
+      security: []
+      parameters:
+        - in: query
+          name: is_active
+          schema: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Daftar komoditas berhasil diambil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Komoditas'
+    post:
+      tags: [Dashboard & KPI]
+      summary: Tambah komoditas baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kode, nama, satuan]
+              properties:
+                kode:
+                  type: string
+                nama:
+                  type: string
+                satuan:
+                  type: string
+                kategori:
+                  type: string
+      responses:
+        '201':
+          description: Komoditas berhasil ditambahkan
+
+  /stok:
+    get:
+      tags: [Dashboard & KPI]
+      summary: Daftar data Stok Pangan
+      description: Monitoring stok pangan di gudang per komoditas dan wilayah.
+      parameters:
+        - in: query
+          name: komoditas_id
+          schema: { type: integer }
+        - in: query
+          name: wilayah
+          schema: { type: string }
+      responses:
+        '200':
+          description: Daftar stok pangan berhasil diambil
+
+  # ════════════════════════════════════════════════
+  # WORKFLOW & APPROVAL
+  # ════════════════════════════════════════════════
+  /approval:
+    get:
+      tags: [Workflow]
+      summary: Daftar pengajuan yang memerlukan persetujuan
+      description: Daftar seluruh item yang sedang menunggu persetujuan dari pengguna yang sedang login.
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+          default: pending
+        - in: query
+          name: module
+          schema: { type: string }
+          description: Filter berdasarkan kode modul (contoh SEK-KEP, BDS-CPD)
+      responses:
+        '200':
+          description: Daftar pengajuan berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /approval/{id}/approve:
+    post:
+      tags: [Workflow]
+      summary: Setujui pengajuan
+      description: Menyetujui pengajuan yang sedang menunggu persetujuan.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRequest'
+      responses:
+        '200':
+          description: Pengajuan berhasil disetujui
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /approval/{id}/reject:
+    post:
+      tags: [Workflow]
+      summary: Tolak pengajuan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRequest'
+      responses:
+        '200':
+          description: Pengajuan berhasil ditolak
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /workflow-status:
+    get:
+      tags: [Workflow]
+      summary: Status workflow semua modul
+      description: Mendapatkan ringkasan status workflow untuk seluruh modul aktif.
+      responses:
+        '200':
+          description: Status workflow berhasil diambil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WorkflowStatus'
+
+  # ════════════════════════════════════════════════
+  # AUDIT TRAIL
+  # ════════════════════════════════════════════════
+  /audit-trail:
+    get:
+      tags: [Audit Trail]
+      summary: Riwayat aktivitas pengguna
+      description: |
+        Mengambil log seluruh aktivitas pengguna dalam sistem.
+        Hanya dapat diakses oleh superadmin dan sekretaris.
+      parameters:
+        - in: query
+          name: user_id
+          schema: { type: integer }
+          description: Filter berdasarkan ID pengguna
+        - in: query
+          name: action
+          schema:
+            type: string
+            enum: [CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, APPROVE, REJECT]
+        - in: query
+          name: resource
+          schema: { type: string }
+          description: Filter berdasarkan kode modul
+        - in: query
+          name: start_date
+          schema: { type: string, format: date }
+        - in: query
+          name: end_date
+          schema: { type: string, format: date }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: Riwayat aktivitas berhasil diambil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AuditLog'
+                      meta:
+                        $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ════════════════════════════════════════════════
+  # NOTIFIKASI
+  # ════════════════════════════════════════════════
+  /notification:
+    get:
+      tags: [Workflow]
+      summary: Daftar notifikasi pengguna
+      description: Mengambil semua notifikasi untuk pengguna yang sedang login.
+      parameters:
+        - in: query
+          name: is_read
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Daftar notifikasi berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notification/{id}/read:
+    put:
+      tags: [Workflow]
+      summary: Tandai notifikasi sudah dibaca
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Notifikasi berhasil ditandai sudah dibaca
+
+  # ════════════════════════════════════════════════
+  # REPORT & PEGAWAI
+  # ════════════════════════════════════════════════
+  /report:
+    get:
+      tags: [Dashboard & KPI]
+      summary: Laporan rekapitulasi data sistem
+      description: Menghasilkan laporan agregat untuk seluruh domain sistem.
+      parameters:
+        - in: query
+          name: domain
+          schema:
+            type: string
+            enum: [sekretariat, ketersediaan, distribusi, konsumsi, uptd, all]
+          default: all
+        - in: query
+          name: periode
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Laporan berhasil dihasilkan
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /pegawai:
+    get:
+      tags: [Sekretariat - Kepegawaian]
+      summary: Daftar data pegawai (shortcut)
+      description: Shortcut endpoint untuk mengambil data pegawai aktif.
+      responses:
+        '200':
+          description: Daftar pegawai berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /modules:
+    get:
+      tags: [Dashboard & KPI]
+      summary: Daftar modul yang tersedia
+      description: Mengambil seluruh konfigurasi modul yang aktif dalam sistem.
+      responses:
+        '200':
+          description: Daftar modul berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /tables:
+    get:
+      tags: [Dashboard & KPI]
+      summary: Daftar tabel database
+      description: Mengambil daftar tabel yang tersedia (digunakan oleh Dynamic Module Generator).
+      responses:
+        '200':
+          description: Daftar tabel berhasil diambil
+        '401':
+          $ref: '#/components/responses/Unauthorized'
