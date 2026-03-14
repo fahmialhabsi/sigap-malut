@@ -1,10 +1,13 @@
 import { Sequelize } from "sequelize";
+
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Load backend/.env secara eksplisit
-dotenv.config({ path: path.resolve(process.cwd(), "backend/.env") });
+// Load backend/.env secara eksplisit, selalu relatif terhadap file ini
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const required = [
   "DB_DIALECT",
@@ -48,3 +51,5 @@ export const sequelize = new Sequelize({
     idle: 10000,
   },
 });
+
+export default sequelize;

@@ -6,7 +6,7 @@ import cors from "cors";
 import helmet from "helmet";
 import path from "path";
 import { fileURLToPath } from "url";
-import { sequelize, testConnection } from "./config/database.js";
+import { sequelize } from "./config/database.js";
 import registerRoutes from "./routes/index.js";
 
 dotenv.config();
@@ -167,8 +167,6 @@ async function listenWithFallback(startPort) {
 // Start server
 async function startServer() {
   try {
-    await testConnection();
-
     if (enableStartupLogs) {
       console.log(`Database connected (${sequelize.getDialect()}).`);
     }
