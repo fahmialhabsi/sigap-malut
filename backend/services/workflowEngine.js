@@ -25,32 +25,64 @@ const PILOT_WORKFLOW_TEMPLATE = {
   },
 };
 
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const workflows = {
   default_workflow: {
     states: [
       "draft",
-      "diajukan",
-      "diverifikasi",
-      "disetujui",
-      "ditolak",
-      "selesai",
-      "arsip",
+      "submitted",
+      "verified",
+      "approved",
+      "rejected",
+      "completed",
+      "archived",
     ],
     transitions: {
-      draft: ["diajukan"],
-      diajukan: ["diverifikasi", "ditolak"],
-      diverifikasi: ["disetujui", "ditolak"],
-      disetujui: ["selesai"],
-      ditolak: ["diajukan"],
-      selesai: ["arsip"],
+      draft: ["submitted"],
+      submitted: ["verified"],
+      verified: ["approved", "rejected"],
+      approved: ["completed"],
+      completed: ["archived"],
     },
+    roles: [
+      "operator",
+      "verifikator",
+      "kepala_bidang",
+      "sekretaris",
+      "kepala_dinas",
+      "admin",
+    ],
   },
-  "SEK-ADM": PILOT_WORKFLOW_TEMPLATE,
-  "SEK-KEU": PILOT_WORKFLOW_TEMPLATE,
-  "BKT-KBJ": PILOT_WORKFLOW_TEMPLATE,
-  "BDS-HRG": PILOT_WORKFLOW_TEMPLATE,
-  "BKS-DVR": PILOT_WORKFLOW_TEMPLATE,
 };
+
+// Auto-load all workflow blueprints from master-data/WORKFLOW_*.json
+const workflowDir = path.resolve(__dirname, "../../master-data");
+if (fs.existsSync(workflowDir)) {
+  fs.readdirSync(workflowDir)
+    .filter((f) => f.startsWith("WORKFLOW_") && f.endsWith(".json"))
+    .forEach((f) => {
+      try {
+        const wf = JSON.parse(
+          fs.readFileSync(path.join(workflowDir, f), "utf-8"),
+        );
+        if (wf && wf.moduleKey) {
+          workflows[wf.moduleKey] = {
+            states: wf.states,
+            transitions: wf.transitions,
+            roles: wf.roles,
+          };
+        }
+      } catch (e) {
+        // skip invalid file
+      }
+    });
+}
 
 function getWorkflowDefinition(moduleId) {
   const normalizedModuleId = normalizeModuleId(moduleId);

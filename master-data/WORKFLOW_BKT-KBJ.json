@@ -1,0 +1,19 @@
+{
+  "moduleKey": "BKT-KBJ",
+  "domain": "BIDANG_KETERSEDIAAN",
+  "states": [
+    "draft",
+    "submitted",
+    "verified",
+    "approved",
+    "rejected",
+    "archived"
+  ],
+  "transitions": {
+    "draft": ["submitted"],
+    "submitted": ["verified"],
+    "verified": ["approved", "rejected"],
+    "approved": ["archived"]
+  },
+  "roles": ["operator", "verifikator", "kepala_bidang", "kepala_dinas", "admin"]
+}

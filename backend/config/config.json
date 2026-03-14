@@ -1,6 +1,26 @@
 {
   "development": {
-    "dialect": "sqlite",
-    "storage": "./database/database.sqlite"
+    "username": "sekretaris",
+    "password": "123",
+    "database": "sigap",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "sekretaris",
+    "password": "123",
+    "database": "sigap_test",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "sekretaris",
+    "password": "123",
+    "database": "sigap",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
   }
 }

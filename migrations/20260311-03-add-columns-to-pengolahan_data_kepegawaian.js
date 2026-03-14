@@ -6,12 +6,6 @@ export const up = async (queryInterface, Sequelize) => {
 
   // helper: check table exists for sqlite/postgres
   async function tableExists(tableName) {
-    if (dialect === "sqlite") {
-      const res = await queryInterface.sequelize.query(
-        `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
-      );
-      return Array.isArray(res) && res[0] && res[0].length > 0;
-    }
     if (dialect === "postgres") {
       const res = await queryInterface.sequelize.query(
         `SELECT to_regclass('${tableName}') as reg`,
@@ -19,6 +13,11 @@ export const up = async (queryInterface, Sequelize) => {
       return (
         Array.isArray(res) && res[0] && res[0][0] && res[0][0].reg !== null
       );
+    } else if (dialect === "sqlite") {
+      const res = await queryInterface.sequelize.query(
+        `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
+      );
+      return Array.isArray(res) && res[0] && res[0].length > 0;
     }
     // fallback
     try {

@@ -6,31 +6,27 @@ export const up = async (queryInterface, Sequelize) => {
 
   // helper: check table exists for sqlite/postgres
   async function tableExists(tableName) {
-    if (dialect === "sqlite" || dialect === "mssql") {
+    if (dialect === "postgres") {
+      const res = await queryInterface.sequelize.query(
+        `SELECT to_regclass('${tableName}') as reg`,
+      );
+      return (
+        Array.isArray(res) && res[0] && res[0][0] && res[0][0].reg !== null
+      );
+    } else if (dialect === "sqlite") {
       const res = await queryInterface.sequelize.query(
         `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
       );
       return Array.isArray(res) && res[0] && res[0].length > 0;
-    } else if (dialect === "postgres") {
-      const res = await queryInterface.sequelize.query(
-        `SELECT to_regclass('${tableName}')`,
+    }
+    // fallback
+    try {
+      await queryInterface.sequelize.query(
+        `SELECT 1 FROM ${tableName} LIMIT 1;`,
       );
-      return (
-        Array.isArray(res) &&
-        res[0] &&
-        res[0][0] &&
-        res[0][0].to_regclass !== null
-      );
-    } else {
-      // fallback: try createTable and catch if exists (but we prefer an explicit check)
-      try {
-        const res = await queryInterface.sequelize.query(
-          `SELECT 1 FROM ${tableName} LIMIT 1;`,
-        );
-        return true;
-      } catch (e) {
-        return false;
-      }
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 

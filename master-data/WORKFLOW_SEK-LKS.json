@@ -1,0 +1,28 @@
+{
+  "moduleKey": "SEK-LKS",
+  "domain": "SEKRETARIAT",
+  "states": [
+    "draft",
+    "submitted",
+    "verified",
+    "approved",
+    "rejected",
+    "completed",
+    "archived"
+  ],
+  "transitions": {
+    "draft": ["submitted"],
+    "submitted": ["verified"],
+    "verified": ["approved", "rejected"],
+    "approved": ["completed"],
+    "completed": ["archived"]
+  },
+  "roles": [
+    "operator",
+    "verifikator",
+    "kepala_bidang",
+    "sekretaris",
+    "kepala_dinas",
+    "admin"
+  ]
+}
