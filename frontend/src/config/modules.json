@@ -28,6 +28,12 @@
     "label": "Audit Log",
     "icon": "HiClipboardCheck",
     "route": "/audit-trail"
+  },
+  {
+    "id": "uptd_balai_pengawasan",
+    "label": "UPTD Balai Pengawasan",
+    "icon": "HiOfficeBuilding",
+    "route": "/module/uptd-balai-pengawasan"
   }
   // dst...
 ]

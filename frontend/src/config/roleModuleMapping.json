@@ -6,5 +6,8 @@
     "settings"
   ],
   // ... yang lain sesuai struktur role-unit organization SIGAP Malut ...
-  "publik": ["dashboard_publik"]
+  "publik": ["dashboard_publik"],
+  "uptd_admin": ["uptd_balai_pengawasan"],
+  "kepala_uptd": ["uptd_balai_pengawasan"],
+  "petugas_uptd": ["uptd_balai_pengawasan"]
 }
