@@ -5,15 +5,18 @@
  * curl -X POST http://localhost:3000/api/workflows/129/transition -H "Content-Type: application/json" -d '{"action":"submit","comment":"test","user":{"id":1}}'
  */
 
-const workflowService = require("../services/workflowService");
+import {
+  createWorkflow,
+  transitionWorkflow,
+} from "../services/workflowService.js";
 let WorkflowInstance;
 try {
-  WorkflowInstance = require("../models/WorkflowInstance");
+  WorkflowInstance = (await import("../models/WorkflowInstance.js")).default;
 } catch (e) {
   WorkflowInstance = null;
 }
 
-exports.create = async function create(req, res, next) {
+export async function create(req, res, next) {
   try {
     const { module, module_id, entity_id, domain_sequence, payload } =
       req.body || {};
@@ -45,7 +48,7 @@ exports.create = async function create(req, res, next) {
       ...(payload && typeof payload === "object" ? { payload } : {}),
     };
     const user = req.user || { id: 0 };
-    const instance = await workflowService.createWorkflow(data, user);
+    const instance = await createWorkflow(data, user);
     return res.status(201).json({ success: true, data: instance });
   } catch (err) {
     if (err.name === "SequelizeValidationError") {
@@ -54,9 +57,9 @@ exports.create = async function create(req, res, next) {
     if (typeof next === "function") return next(err);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
-};
+}
 
-exports.getById = async function getById(req, res, next) {
+export async function getById(req, res, next) {
   try {
     const id = req.params.id;
     if (!id)
@@ -66,8 +69,8 @@ exports.getById = async function getById(req, res, next) {
     let instance = null;
     if (WorkflowInstance && WorkflowInstance.findByPk) {
       instance = await WorkflowInstance.findByPk(id);
-    } else if (workflowService.getById) {
-      instance = await workflowService.getById(id);
+      // else if (workflowService.getById) {
+      //   instance = await workflowService.getById(id);
     }
     if (!instance)
       return res
@@ -78,9 +81,9 @@ exports.getById = async function getById(req, res, next) {
     if (typeof next === "function") return next(err);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
-};
+}
 
-exports.transition = async function transition(req, res, next) {
+export async function transition(req, res, next) {
   try {
     const id = req.params.id;
     const {
@@ -103,12 +106,7 @@ exports.transition = async function transition(req, res, next) {
         .status(404)
         .json({ success: false, error: "Workflow instance not found" });
     const user = req.user || userBody || { id: 0 };
-    const result = await workflowService.transitionWorkflow(
-      instance,
-      action,
-      user,
-      comment,
-    );
+    const result = await transitionWorkflow(instance, action, user, comment);
     // Reload instance after transition
     let updatedInstance = instance;
     if (WorkflowInstance && WorkflowInstance.findByPk) {
@@ -124,4 +122,4 @@ exports.transition = async function transition(req, res, next) {
     if (typeof next === "function") return next(err);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
-};
+}
