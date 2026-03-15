@@ -55,6 +55,7 @@ import DashboardKetersediaan from "./ui/dashboards/DashboardKetersediaan";
 import DashboardDistribusi from "./ui/dashboards/DashboardDistribusi";
 import DashboardKonsumsi from "./ui/dashboards/DashboardKonsumsi";
 import DashboardUPTD from "./ui/dashboards/DashboardUPTD";
+import UptdModulePage from "./pages/UptdModulePage";
 import LandingPage from "./pages/LandingPage";
 import DashboardSuperAdmin from "./ui/dashboards/DashboardSuperAdmin";
 import AuditTrailPage from "./pages/AuditTrailPage";
@@ -200,10 +201,10 @@ function App() {
           }
         />
         <Route
-          path="/uptd/:modulId"
+          path="/uptd/:modulId/*"
           element={
             <PrivateRoute>
-              <DashboardUPTD />
+              <UptdModulePage />
             </PrivateRoute>
           }
         />

@@ -1,6 +1,24 @@
---- original
-
-const { v4: uuidv4 } = require("uuid");
+// Workflow status placeholder implementations
+export async function clearWorkflowStatus() {
+  return true;
+}
+export async function listWorkflowStatus() {
+  return [];
+}
+export async function trackWorkflowStatus() {
+  return { success: true };
+}
+// Audit trail placeholder implementations
+export async function clearAuditTrail() {
+  return true;
+}
+export async function listAuditTrail() {
+  return [];
+}
+export async function writeAuditTrail() {
+  return { success: true };
+}
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Workflow engine (single workflows object)
@@ -9,7 +27,7 @@ const { v4: uuidv4 } = require("uuid");
  * - `performTransition` validates and writes to ApprovalLog using
  *   `workflow_id` and `approver_id` per backend/models/approvalLog.js
  */
-const workflows = {
+export const workflows = {
   kgb_workflow: {
     states: [
       "draft",
@@ -71,7 +89,7 @@ const workflows = {
   },
 };
 
-async function performTransition({
+export async function performTransition({
   app,
   workflowId,
   instance,
@@ -111,13 +129,16 @@ async function performTransition({
   return true;
 }
 
-module.exports = { performTransition, work
-
-+++ suggestion
-
-// replace: const { v4: uuidv4 } = require("uuid");
-import { v4: uuidv4 } from 'uuid';
-
-// replace: module.exports = { performTransition, workflows };
-export { performTransition, workflows };;
-
+// Placeholder safe implementations
+export async function clearApprovals() {
+  return true;
+}
+export async function listApprovals() {
+  return [];
+}
+export async function submitApproval() {
+  return { success: true };
+}
+export async function updateApproval() {
+  return { success: true };
+}

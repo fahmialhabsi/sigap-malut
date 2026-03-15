@@ -384,7 +384,7 @@ export default function DashboardSekretariat() {
       workflowStatusUpdateAPI({
         user,
         modulId: "SA01",
-        status: "akses",
+        status: "draft",
         detail: "Akses modul Monitoring 50 indikator",
       });
     }

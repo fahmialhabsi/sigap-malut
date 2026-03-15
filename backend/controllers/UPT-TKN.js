@@ -75,10 +75,103 @@ export const getUptTknById = async (req, res) => {
 // @access  Private
 export const createUptTkn = async (req, res) => {
   try {
-    const record = await UptTkn.create({
-      ...req.body,
-      created_by: req.user?.id,
-    });
+    // Debug log: cek isi req.body dan req.files
+    console.log("[UPT-TKN] req.body:", req.body);
+    console.log("[UPT-TKN] req.files:", req.files);
+
+    // Filter hanya field string/number dari req.body
+    const allowedFields = [
+      "layanan_id",
+      "jenis_layanan_teknis",
+      "tanggal_pengujian",
+      "pemohon",
+      "instansi_pemohon",
+      "jenis_sampel",
+      "jumlah_sampel",
+      "parameter_uji",
+      "metode_uji",
+      "hasil_uji",
+      "kesimpulan_uji",
+      "rekomendasi_uji",
+      "standar_acuan",
+      "analis",
+      "verifikator",
+      "tanggal_verifikasi",
+      "jenis_sertifikasi",
+      "nama_usaha",
+      "jenis_usaha",
+      "alamat_usaha",
+      "pemilik_usaha",
+      "kontak_usaha",
+      "tanggal_audit",
+      "tim_auditor",
+      "checklist_audit",
+      "skor_audit",
+      "hasil_audit",
+      "catatan_audit",
+      "tindakan_korektif",
+      "batas_waktu_perbaikan",
+      "status_sertifikat",
+      "tanggal_terbit_sertifikat",
+      "masa_berlaku_sertifikat",
+      "jenis_produk_audit",
+      "negara_asal",
+      "dokumen_pendukung",
+      "periode_laporan",
+      "jenis_laporan",
+      "total_pengujian",
+      "total_audit",
+      "total_sertifikat",
+      "persentase_kelulusan",
+      "ringkasan_laporan",
+      "rincian_layanan",
+      "penanggung_jawab",
+      "pelaksana",
+      "kelompok_penerima",
+      "jenis_data",
+      "is_sensitive",
+      "status",
+      "keterangan",
+    ];
+    const data = {};
+    for (const key of allowedFields) {
+      if (typeof req.body[key] !== "undefined") {
+        data[key] = req.body[key];
+      }
+    }
+    // Konversi otomatis field number dan JSON
+    const numberFields = [
+      "jumlah_sampel",
+      "skor_audit",
+      "total_pengujian",
+      "total_audit",
+      "total_sertifikat",
+      "persentase_kelulusan",
+    ];
+    const jsonFields = ["checklist_audit", "dokumen_pendukung"];
+    for (const key of numberFields) {
+      if (
+        typeof data[key] !== "undefined" &&
+        data[key] !== null &&
+        data[key] !== ""
+      ) {
+        data[key] = Number(data[key]);
+        if (isNaN(data[key])) data[key] = 0;
+      }
+    }
+    for (const key of jsonFields) {
+      if (typeof data[key] === "string" && data[key].trim() !== "") {
+        try {
+          data[key] = JSON.parse(data[key]);
+        } catch {
+          // Jika gagal parse, simpan sebagai string
+        }
+      }
+    }
+    data.created_by = req.user?.id;
+    // Debug log
+    console.log("[UPT-TKN] filtered data for create:", data);
+    const record = await UptTkn.create(data);
     // Audit trail
     await logAudit({
       action: "create",

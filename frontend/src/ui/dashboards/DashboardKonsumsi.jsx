@@ -173,7 +173,7 @@ export default function DashboardKonsumsi() {
     workflowStatusUpdateAPI({
       user,
       modulId: "C001",
-      status: "akses",
+      status: "draft",
       detail: "Akses modul Konsumsi pangan",
     });
 

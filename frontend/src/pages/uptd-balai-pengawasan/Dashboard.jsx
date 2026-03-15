@@ -11,7 +11,9 @@ export default function UPTDBalaiPengawasanDashboard() {
         {summary.map((item, idx) => (
           <div key={idx} className="bg-white rounded shadow p-4">
             <div className="text-gray-700 font-bold text-lg">{item.label}</div>
-            <div className="text-2xl font-extrabold text-blue-700">{item.value}</div>
+            <div className="text-2xl font-extrabold text-blue-700">
+              {item.value}
+            </div>
           </div>
         ))}
       </div>
@@ -25,16 +27,21 @@ export default function UPTDBalaiPengawasanDashboard() {
           <table className="w-full text-sm">
             <thead>
               <tr>
-                {latest.length > 0 && Object.keys(latest[0]).map((col) => (
-                  <th key={col} className="text-left font-semibold pr-4">{col}</th>
-                ))}
+                {latest.length > 0 &&
+                  Object.keys(latest[0]).map((col) => (
+                    <th key={col} className="text-left font-semibold pr-4">
+                      {col}
+                    </th>
+                  ))}
               </tr>
             </thead>
             <tbody>
               {latest.map((row, idx) => (
                 <tr key={idx}>
                   {Object.keys(row).map((col) => (
-                    <td key={col} className="pr-4">{row[col]}</td>
+                    <td key={col} className="pr-4">
+                      {row[col]}
+                    </td>
                   ))}
                 </tr>
               ))}

@@ -11,7 +11,22 @@ export async function workflowStatusUpdateAPI({
   detail,
 }) {
   try {
-    if (!user || !user.id || !modulId) return null;
+    // Extra validation: all required fields must be present and not undefined/null/empty
+    if (
+      !user ||
+      !user.id ||
+      !modulId ||
+      !status ||
+      status === "undefined" ||
+      modulId === "undefined"
+    ) {
+      console.warn("workflowStatusUpdateAPI: invalid payload", {
+        user,
+        modulId,
+        status,
+      });
+      return null;
+    }
     const key = `workflow_status_sent:${user.id}:${modulId}`;
     const now = Date.now();
     const last = parseInt(localStorage.getItem(key) || "0", 10) || 0;

@@ -29,7 +29,7 @@ export default function DashboardDistribusi() {
       workflowStatusUpdateAPI({
         user,
         modulId: "D001",
-        status: "akses",
+        status: "draft",
         detail: "Akses modul Data pasar",
       });
     }

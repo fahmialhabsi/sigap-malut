@@ -64,8 +64,8 @@ export default function DashboardUPTD() {
     if (user) {
       workflowStatusUpdateAPI({
         user,
-        modulId: "UPT-TKN",
-        status: "akses",
+        modulId: modulId || "UPT-TKN",
+        status: "draft",
         detail: "Akses modul layanan teknis UPTD",
       });
     }

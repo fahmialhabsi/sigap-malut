@@ -9,11 +9,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const MASTER_DATA_DIR = path.resolve(__dirname, "../../master-data");
-const FRONTEND_MODULES_DIR = path.resolve(
-  __dirname,
-  "../../frontend/src/modules",
-);
+const MASTER_DATA_DIR = path.resolve(__dirname, "../master-data");
+const FRONTEND_MODULES_DIR = path.resolve(__dirname, "../frontend/src/modules");
 const COMPONENTS_IMPORT = "../../components";
 const API_IMPORT = "../../lib/api";
 
@@ -174,35 +171,43 @@ function main() {
   const fieldFiles = fs
     .readdirSync(MASTER_DATA_DIR)
     .filter((f) => f.startsWith("FIELDS_") && f.endsWith(".json"));
+  // Pastikan folder modules ada
+  ensureDir(FRONTEND_MODULES_DIR);
   for (const file of fieldFiles) {
     const moduleKey = file.replace(/^FIELDS_/, "").replace(/\.json$/, "");
     const fields = readBlueprint(moduleKey, "FIELDS");
     if (!fields) continue;
     const moduleDir = path.join(FRONTEND_MODULES_DIR, moduleKey);
-    ensureDir(moduleDir);
-    fs.writeFileSync(path.join(moduleDir, "api.js"), generateApiJs(moduleKey));
-    fs.writeFileSync(
-      path.join(moduleDir, "ListPage.jsx"),
-      generateListPage(moduleKey, fields),
-    );
-    fs.writeFileSync(
-      path.join(moduleDir, "FormPage.jsx"),
-      generateFormPage(moduleKey, fields),
-    );
-    fs.writeFileSync(
-      path.join(moduleDir, "DetailPage.jsx"),
-      generateDetailPage(moduleKey, fields),
-    );
-    fs.writeFileSync(
-      path.join(moduleDir, "routes.js"),
-      generateRoutesJs(moduleKey),
-    );
-    // Optionally, copy fields.js for use in components
-    fs.writeFileSync(
-      path.join(moduleDir, "fields.js"),
-      `export const fields = ${JSON.stringify(fields, null, 2)};\n`,
-    );
-    console.log(`Generated module: ${moduleKey}`);
+    try {
+      ensureDir(moduleDir);
+      fs.writeFileSync(
+        path.join(moduleDir, "api.js"),
+        generateApiJs(moduleKey),
+      );
+      fs.writeFileSync(
+        path.join(moduleDir, "ListPage.jsx"),
+        generateListPage(moduleKey, fields),
+      );
+      fs.writeFileSync(
+        path.join(moduleDir, "FormPage.jsx"),
+        generateFormPage(moduleKey, fields),
+      );
+      fs.writeFileSync(
+        path.join(moduleDir, "DetailPage.jsx"),
+        generateDetailPage(moduleKey, fields),
+      );
+      fs.writeFileSync(
+        path.join(moduleDir, "routes.js"),
+        generateRoutesJs(moduleKey),
+      );
+      fs.writeFileSync(
+        path.join(moduleDir, "fields.js"),
+        `export const fields = ${JSON.stringify(fields, null, 2)};\n`,
+      );
+      console.log(`Generated module: ${moduleKey}`);
+    } catch (err) {
+      console.error(`Gagal generate module: ${moduleKey} -`, err);
+    }
   }
 }
 

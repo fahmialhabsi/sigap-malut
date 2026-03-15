@@ -12,7 +12,31 @@ export function workflowStatusUpdate({ user, modulId, status, detail }) {
   localStorage.setItem("workflowStatus", JSON.stringify(logs));
 
   // Fire and forget sync to backend workflow log.
-  workflowStatusUpdateAPI({ user, modulId, status, detail }).catch(() => {});
+  // Only send valid workflow states
+  const validStates = [
+    "draft",
+    "submitted",
+    "assigned",
+    "in_progress",
+    "submitted_for_verification",
+    "verified",
+    "analyzed",
+    "approved_by_unit",
+    "reviewed_by_secretary",
+    "approved_by_secretary",
+    "forwarded_to_kepala_dinas",
+    "closed",
+    "rejected",
+    "escalated",
+  ];
+  if (validStates.includes(status)) {
+    workflowStatusUpdateAPI({ user, modulId, status, detail }).catch(() => {});
+  } else {
+    // Optionally log or fallback
+    workflowStatusUpdateAPI({ user, modulId, status: "draft", detail }).catch(
+      () => {},
+    );
+  }
 
   // Audit trail juga
   logAuditTrail({

@@ -12,6 +12,7 @@ import {
   updateUptTkn,
   deleteUptTkn,
 } from "../controllers/UPT-TKN.js";
+import upload from "../middleware/multer.js";
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -19,7 +20,7 @@ const router = express.Router();
 // All routes are protected
 router.use(protect);
 
-router.route("/").get(getAllUptTkn).post(createUptTkn);
+router.route("/").get(getAllUptTkn).post(upload.any(), createUptTkn);
 
 router.route("/:id").get(getUptTknById).put(updateUptTkn).delete(deleteUptTkn);
 

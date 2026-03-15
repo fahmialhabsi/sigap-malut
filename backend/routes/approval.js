@@ -1,6 +1,9 @@
 import express from "express";
 import { protect } from "../middleware/auth.js";
-import { hasPermission, resolveRoleCode } from "../middleware/rbacMiddleware.js";
+import {
+  hasPermission,
+  resolveRoleCode,
+} from "../middleware/rbacMiddleware.js";
 import {
   clearApprovals,
   listApprovals,
@@ -16,7 +19,9 @@ function requireModulePermission(permission, moduleIdResolver) {
   return async (req, res, next) => {
     try {
       const moduleIdRaw = moduleIdResolver(req);
-      const moduleKey = String(moduleIdRaw || "").trim().toLowerCase();
+      const moduleKey = String(moduleIdRaw || "")
+        .trim()
+        .toLowerCase();
 
       if (!moduleKey) {
         return res.status(400).json({
@@ -67,46 +72,50 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.post("/", requireModulePermission("submit", (req) => req.body?.modulId), async (req, res) => {
-  try {
-    const entry = await submitApproval({
-      user: { ...(req.body?.user || {}), ...(req.user || {}) },
-      modulId: req.body?.modulId,
-      dataId: req.body?.dataId,
-      detail: req.body?.detail,
-    });
-    res.status(201).json(entry);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Gagal menyimpan approval",
-      error: error.message,
-    });
-  }
-});
+router.post(
+  "/",
+  requireModulePermission("submit", (req) => req.body?.modulId),
+  async (req, res) => {
+    try {
+      const entry = await submitApproval({
+        user: { ...(req.body?.user || {}), ...(req.user || {}) },
+        modulId: req.body?.modulId,
+        dataId: req.body?.dataId,
+        detail: req.body?.detail,
+      });
+      res.status(201).json(entry);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Gagal menyimpan approval",
+        error: error.message,
+      });
+    }
+  },
+);
 
 router.put(
   "/:modulId/:dataId",
   requireModulePermission("approve", (req) => req.params.modulId),
   async (req, res) => {
-  try {
-    const { modulId, dataId } = req.params;
-    const entry = await updateApproval({
-      user: { ...(req.body?.user || {}), ...(req.user || {}) },
-      modulId,
-      dataId,
-      status: req.body?.status,
-      detail: req.body?.detail,
-    });
-    res.json(entry);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Gagal memperbarui status approval",
-      error: error.message,
-    });
-  }
-},
+    try {
+      const { modulId, dataId } = req.params;
+      const entry = await updateApproval({
+        user: { ...(req.body?.user || {}), ...(req.user || {}) },
+        modulId,
+        dataId,
+        status: req.body?.status,
+        detail: req.body?.detail,
+      });
+      res.json(entry);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Gagal memperbarui status approval",
+        error: error.message,
+      });
+    }
+  },
 );
 
 router.delete("/", async (_req, res) => {
