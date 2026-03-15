@@ -1,22 +1,28 @@
 // backend/services/workflowService.js
-const WorkflowInstance = require("../models/WorkflowInstance");
-const WorkflowHistory = require("../models/WorkflowHistory");
-const workflowEngine = require("./workflowEngine");
+
+import WorkflowInstance from "../models/WorkflowInstance.js";
+// import WorkflowHistory from "../models/WorkflowHistory.js"; // Uncomment jika file ada
+import * as workflowEngine from "./workflowEngine.js";
+import WorkflowHistory from "../models/WorkflowHistory.js";
 
 async function createWorkflow(data, user) {
-  // Accept domain_sequence and persist
+  // Accept domain_sequence and persist (force persist as array, never override by ...data)
+  const { domain_sequence, ...otherData } = data || {};
+  const safeDomainSequence = Array.isArray(domain_sequence)
+    ? domain_sequence
+    : typeof domain_sequence === "string" && domain_sequence.startsWith("[")
+      ? JSON.parse(domain_sequence)
+      : [];
   const instance = await WorkflowInstance.create({
-    ...data,
-    domain_sequence: Array.isArray(data.domain_sequence)
-      ? data.domain_sequence
-      : [],
+    domain_sequence: safeDomainSequence,
     current_step_index: 0,
     current_domain:
-      Array.isArray(data.domain_sequence) && data.domain_sequence.length > 0
-        ? data.domain_sequence[0]
+      Array.isArray(safeDomainSequence) && safeDomainSequence.length > 0
+        ? safeDomainSequence[0]
         : null,
     current_state: "draft",
-  });
+    ...otherData,
+  }); // [CROSS_AGENCY_PERSIST]
   return instance;
 }
 
@@ -56,6 +62,7 @@ async function transitionWorkflow(instance, action, user, comment) {
     // Save WorkflowHistory
     await WorkflowHistory.create({
       workflow_instance_id: instance.id,
+      module_id: instance.module_id, // Pastikan module_id diisi
       user_id: user && user.id,
       action,
       from_state: result.fromState,
@@ -64,6 +71,7 @@ async function transitionWorkflow(instance, action, user, comment) {
       current_step_index: result.current_step_index,
       current_domain: result.current_domain,
       next_domain: result.nextDomain,
+      created_at: new Date(), // created_at biasanya NOT NULL
       timestamp: new Date(),
     });
   }
@@ -71,8 +79,4 @@ async function transitionWorkflow(instance, action, user, comment) {
   return instance;
 }
 
-module.exports = {
-  createWorkflow,
-  transitionWorkflow,
-  // ...other exports...
-};
+export { createWorkflow, transitionWorkflow };

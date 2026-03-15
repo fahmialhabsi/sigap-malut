@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 dotenv.config();
-
+console.log("DB_DIALECT:", process.env.DB_DIALECT);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

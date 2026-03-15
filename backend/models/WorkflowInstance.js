@@ -1,21 +1,69 @@
 // backend/models/WorkflowInstance.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database"); // adjust path if needed
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const WorkflowInstance = sequelize.define(
   "WorkflowInstance",
   {
-    // ...existing fields...
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    module_id: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+    },
+    entity_id: {
+      type: DataTypes.STRING(128),
+      allowNull: true,
+    },
+    current_state: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+      defaultValue: "draft",
+    },
+    status: {
+      type: DataTypes.STRING, // gunakan ENUM jika enum di DB
+      allowNull: false,
+      defaultValue: "active",
+    },
+    current_role: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+    },
+    next_role: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+    },
+    submitted_by: {
+      type: DataTypes.STRING(128),
+      allowNull: true,
+    },
+    metadata: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    started_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    closed_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     domain_sequence: {
       type: DataTypes.JSON,
       allowNull: true,
     },
     current_domain: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
     current_agency: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
     current_step_index: {
@@ -23,17 +71,22 @@ const WorkflowInstance = sequelize.define(
       allowNull: false,
       defaultValue: 0,
     },
-    current_state: {
-      type: DataTypes.STRING,
+    created_at: {
+      type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: "draft",
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     tableName: "workflow_instance",
     underscored: true,
-    timestamps: true,
-  }
+    timestamps: false, // karena created_at dan updated_at sudah didefinisikan manual
+  },
 );
 
-module.exports = WorkflowInstance;
+export default WorkflowInstance;
