@@ -1,6 +1,9 @@
 import express from "express";
 import { protect } from "../middleware/auth.js";
-import { hasPermission, resolveRoleCode } from "../middleware/rbacMiddleware.js";
+import {
+  hasPermission,
+  resolveRoleCode,
+} from "../middleware/rbacMiddleware.js";
 import {
   clearWorkflowStatus,
   listWorkflowStatus,
