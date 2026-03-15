@@ -1,3 +1,5 @@
+import * as workflowEngine from "../services/workflowEngine.js";
+import workflowsRoutes from "./workflows.js";
 // =====================================================
 // AUTO-GENERATED ROUTE INDEX
 // Generated: 2026-02-17T19:37:29.473Z
@@ -112,6 +114,9 @@ export default function registerRoutes(app) {
   app.use("/api/pegawai", pegawaiRoutes);
   app.use("/api/komoditas", komoditasRoutes);
   app.use("/modules", modulesRoutes);
+
+  // Workflow probe endpoint
+  app.use("/api/workflows", workflowsRoutes);
 
   console.log("✅ 39 API routes registered\n");
 }
