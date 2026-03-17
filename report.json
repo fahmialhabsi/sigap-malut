@@ -1,0 +1,64 @@
+{
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/workflows",
+      "file": "backend\\routes\\workflows.js",
+      "middlewares": ["protect"],
+      "handlerIdentifier": "controller.list",
+      "line": 8
+    },
+    {
+      "method": "POST",
+      "path": "/workflows",
+      "file": "backend\\routes\\workflows.js",
+      "middlewares": ["protect"],
+      "handlerIdentifier": "controller.create",
+      "line": 9
+    },
+    {
+      "method": "GET",
+      "path": "/workflows/:id",
+      "file": "backend\\routes\\workflows.js",
+      "middlewares": ["protect"],
+      "handlerIdentifier": "controller.getById",
+      "line": 10
+    },
+    {
+      "method": "PUT",
+      "path": "/workflows/:id",
+      "file": "backend\\routes\\workflows.js",
+      "middlewares": ["protect"],
+      "handlerIdentifier": "controller.update",
+      "line": 11
+    },
+    {
+      "method": "DELETE",
+      "path": "/workflows/:id",
+      "file": "backend\\routes\\workflows.js",
+      "middlewares": ["protect"],
+      "handlerIdentifier": "controller.remove",
+      "line": 12
+    },
+    {
+      "method": "POST",
+      "path": "/workflows/:id/transition",
+      "file": "backend\\routes\\workflows.js",
+      "middlewares": ["protect"],
+      "handlerIdentifier": "controller.transition",
+      "line": 13
+    },
+    {
+      "method": "GET",
+      "path": "/workflows/:id/transitions",
+      "file": "backend\\routes\\workflows.js",
+      "middlewares": ["protect"],
+      "handlerIdentifier": "controller.transitions",
+      "line": 14
+    }
+  ],
+  "authChecks": [],
+  "dataModelHints": [],
+  "crossInstitutionSupportDetected": true,
+  "recommendations": []
+}
