@@ -1,9 +1,9 @@
-import { expect } from "chai";
+import "../models/index.js";
 import { sequelize } from "../config/database.js";
 const User = sequelize.models.User;
 
 describe("Soft Delete Behavior", () => {
-  it("should set deleted_at instead of removing record", async () => {
+  test("should set deleted_at instead of removing record", async () => {
     const uniq = Date.now();
     const user = await User.create({
       username: `softdelete${uniq}`,
@@ -14,11 +14,8 @@ describe("Soft Delete Behavior", () => {
       role_id: "pelaksana",
       jabatan: "Staff",
     });
-    console.log(
-      "DEBUG: created user instance, softDelete type =",
-      typeof user.softDelete,
-    );
+    // DEBUG: created user instance, softDelete type = typeof user.softDelete
     const updated = await user.softDelete();
-    expect(updated.deleted_at).to.not.be.null;
+    expect(updated.deleted_at).not.toBeNull();
   });
 });

@@ -1,10 +1,11 @@
 import request from "supertest";
 import app from "../server.js";
 import Workflow from "../models/workflow.js";
+import { expect } from "chai";
 
 describe("Workflows API", () => {
   let token;
-  beforeAll(async () => {
+  before(async () => {
     // Mock token for admin
     token = "Bearer mock-admin-token";
   });
@@ -25,16 +26,16 @@ describe("Workflows API", () => {
           ],
         },
       });
-    expect(res.statusCode).toBe(201);
-    expect(res.body.name).toBe("Invoice Approval");
+    expect(res.statusCode).to.equal(201);
+    expect(res.body.name).to.equal("Invoice Approval");
   });
 
   it("should list workflows filtered by institution_id", async () => {
     const res = await request(app)
       .get("/api/workflows?institution_id=inst_123")
       .set("Authorization", token);
-    expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.statusCode).to.equal(200);
+    expect(Array.isArray(res.body)).to.equal(true);
   });
 
   it("should allow valid transition", async () => {
@@ -45,8 +46,8 @@ describe("Workflows API", () => {
       .post(`/api/workflows/${wf.id}/transition`)
       .set("Authorization", token)
       .send({ to: "approved" });
-    expect(res.statusCode).toBe(200);
-    expect(res.body.current_step).toBe("approved");
+    expect(res.statusCode).to.equal(200);
+    expect(res.body.current_step).to.equal("approved");
   });
 
   it("should reject invalid transition", async () => {
@@ -57,7 +58,7 @@ describe("Workflows API", () => {
       .post(`/api/workflows/${wf.id}/transition`)
       .set("Authorization", token)
       .send({ to: "draft" });
-    expect(res.statusCode).toBe(409);
+    expect(res.statusCode).to.equal(409);
   });
 
   it("should forbid cross-institution transition for regular user", async () => {
@@ -68,7 +69,7 @@ describe("Workflows API", () => {
       .post(`/api/workflows/${wf.id}/transition`)
       .set("Authorization", "Bearer mock-user-token")
       .send({ to: "approved", target_institution_id: "inst_456" });
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).to.equal(403);
   });
 
   it("should create audit log after transition", async () => {

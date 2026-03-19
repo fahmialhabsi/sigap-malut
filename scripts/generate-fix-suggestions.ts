@@ -46,13 +46,32 @@ interface RequirementResult {
 function generateFixSuggestions(report: { results: RequirementResult[] }) {
   const suggestions = report.results
     .filter((r) => r.status !== "OK")
-    .map((r) => ({
-      requirement: r.requirement,
-      severity: r.severity,
-      suggestion:
-        r.recommendation || `Perbaiki requirement: ${r.requirement.name}`,
-      evidence: r.evidence,
-    }));
+    .map((r) => {
+      // Tambahan: jika evidence ada field NOT_FOUND dari master-data, buat saran spesifik
+      let suggestion =
+        r.recommendation || `Perbaiki requirement: ${r.requirement.name}`;
+      if (r.evidence && Array.isArray(r.evidence)) {
+        const notFoundFields = r.evidence.filter(
+          (ev) =>
+            ev.snippet &&
+            ev.snippet.includes("tidak ditemukan di master-data CSV"),
+        );
+        if (notFoundFields.length > 0) {
+          suggestion =
+            `Tambahkan field berikut ke master-data CSV modul terkait: ` +
+            notFoundFields
+              .map((ev) => ev.snippet.match(/Field '(.+?)'/)?.[1])
+              .filter(Boolean)
+              .join(", ");
+        }
+      }
+      return {
+        requirement: r.requirement,
+        severity: r.severity,
+        suggestion,
+        evidence: r.evidence,
+      };
+    });
   return suggestions;
 }
 

@@ -1,44 +1,49 @@
-import { expect } from "chai";
-const BDSMON = sequelize.models.BdsMon || sequelize.models.BdsMon;
+import "../models/index.js";
 import { sequelize } from "../config/database.js";
+const BDSMON = sequelize.models.BdsMon;
 const Komoditas = sequelize.models.Komoditas;
 
 describe("Integrasi Master Data: BDS-MON", () => {
-  it("should only accept valid komoditas_id from master Komoditas", function (done) {
-    this.timeout(5000);
-    console.log(
-      "DEBUG BDSMON model:",
-      typeof BDSMON,
-      BDSMON && typeof BDSMON.create,
-    );
+  test("should only accept valid komoditas_id from master Komoditas", async () => {
     const uniq = Date.now();
-    Komoditas.create({
+    const komoditas = await Komoditas.create({
       nama: `Komoditas${uniq}`,
       satuan: "kg",
       kode: `K${uniq}`,
-    })
-      .then((komoditas) => {
-        return BDSMON.create({
-          komoditas_id: komoditas.id,
-          tahun: 2026,
-          stok: 100,
-        });
-      })
-      .then((bdsMon) => {
-        expect(bdsMon.komoditas_id).to.exist;
-        return BDSMON.create({
-          komoditas_id: 99999999,
-          tahun: 2026,
-          stok: 100,
-        });
-      })
-      .then(() => done(new Error("Should fail with FK constraint error")))
-      .catch((error) => {
-        expect(error).to.not.be.null;
-        expect(error.name).to.match(
-          /SequelizeForeignKeyConstraintError|ValidationError/,
-        );
-        done();
-      });
+    });
+    const bdsMon = await BDSMON.create({
+      komoditas_id: komoditas.id,
+      tahun: 2026,
+      stok: 100,
+      unit_kerja: "Sekretariat",
+      layanan_id: "LY082",
+      jenis_monitoring: "Arus Distribusi",
+      periode: "2026-01-01",
+      bulan: 1,
+      satuan: "kg",
+      penanggung_jawab: "Admin",
+      pelaksana: "Admin",
+      created_by: 1,
+    });
+    expect(bdsMon.komoditas_id).toBeDefined();
+    // Coba insert dengan komoditas_id tidak valid
+    await expect(
+      BDSMON.create({
+        komoditas_id: 99999999,
+        tahun: 2026,
+        stok: 100,
+        unit_kerja: "Sekretariat",
+        layanan_id: "LY082",
+        jenis_monitoring: "Arus Distribusi",
+        periode: "2026-01-01",
+        bulan: 1,
+        satuan: "kg",
+        penanggung_jawab: "Admin",
+        pelaksana: "Admin",
+        created_by: 1,
+      }),
+    ).rejects.toThrow(
+      /violates foreign key constraint|SequelizeForeignKeyConstraintError|ValidationError/,
+    );
   });
 });

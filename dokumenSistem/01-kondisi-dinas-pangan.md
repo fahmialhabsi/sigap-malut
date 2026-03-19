@@ -1,64 +1,32 @@
 ---
-
-# BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
+modul: Sekretariat
+tahun: 2026
+evidence: true
+---
 
 ## Struktur Peran dan Kewenangan Penilaian
-- Sekretaris menilai: Fungsional Perencanaan, Fungsional Keuangan, Kasubag, Bendahara, Staf Sekretariat
-- Kepala Bidang menilai: staf bidang masing-masing
-- Kepala UPTD menilai: staf UPTD masing-masing
 
 ## Indikator Penilaian
-- SKP (Bobot %)
-- Perilaku Kerja (Bobot %)
-- Target Output/Kinerja Jabatan
-- Disiplin (absensi, keterlambatan)
+
 - Catatan Kualitatif
 
-## Formula Perhitungan Nilai Akhir
-Nilai akhir = (SKP x bobot) + (Perilaku x bobot) + (Output x bobot) + (Disiplin x bobot) + Catatan
-Bobot dapat disesuaikan sesuai kebijakan.
-
-## Mekanisme Validasi
-1. Input oleh atasan langsung
 2. Submit penilaian
-3. Review oleh reviewer (jika multi-level)
-4. Approve/Reject
-5. Audit trail aktif (semua proses tercatat)
 
-## Integrasi dengan Proses Lain
-- KGB
 - Kenaikan Pangkat
 - Promosi Jabatan
 - Dashboard Monitoring
-DOKUMEN KOMPREHENSIF: KONDISI DINAS PANGAN PROVINSI MALUKU UTARA
+  A. Latar Belakang
+  • Jabatan: Sekretaris Dinas Pangan Provinsi Maluku Utara
 
----
+  • Staf yang melewati koordinasi dengan Sekretaris:
+  o Kasubag Kepegawaian
+  o Fungsional Perencana
+  o Fungsional Penata Usahaan Keuangan
 
-BAGIAN I: RINGKASAN KONDISI SAAT INI
-A. Latar Belakang
-• Jabatan: Sekretaris Dinas Pangan Provinsi Maluku Utara
-• Status: Pejabat baru hasil rotasi/mutasi dari Dinas Pendidikan
-• Kondisi Komunikasi: Baik dengan semua pihak, termasuk Kepala Dinas
+  • Dampak:
 
----
+  o Fungsi pengawasan dan koordinasi Sekretaris tidak berjalan
 
-B. Permasalahan Utama
-
-1. Masalah Kewenangan dan Koordinasi
-   • Tidak diberikan ruang atau kewenangan sesuai dengan struktur organisasi yang berlaku
-   • Sudah berkali-kali menyampaikan ke Kepala Dinas namun belum ada hasil yang memuaskan
-   • Merasa bingung dan tidak tahu langkah apa yang harus diambil selanjutnya
-   • Pelanggaran Alur Koordinasi oleh Staf Inti Sekretariat:
-   • Staf yang melewati koordinasi dengan Sekretaris:
-   o Kasubag Kepegawaian
-   o Fungsional Perencana
-   o Fungsional Penata Usahaan Keuangan
-   o Bendahara
-   • Pola yang terjadi: Staf inti langsung berkoordinasi/berkonsultasi ke Kepala Dinas, tanpa melalui Sekretaris
-   • Dampak:
-   o Sangat sulit menilai kinerja staf
-   o Tidak ada dasar objektif untuk melakukan penilaian
-   o Fungsi pengawasan dan koordinasi Sekretaris tidak berjalan
 2. Masalah Perencanaan yang Lemah
    • Dokumen Perencanaan yang Bermasalah:
    • Rencana Strategi 5 Tahun (Renstra)

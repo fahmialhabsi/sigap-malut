@@ -36,6 +36,11 @@ module.exports = {
       created_by: {
         type: Sequelize.STRING,
         allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+        onDelete: "RESTRICT",
       },
       created_at: {
         type: Sequelize.DATE,
@@ -73,6 +78,11 @@ module.exports = {
       actor_id: {
         type: Sequelize.STRING,
         allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+        onDelete: "RESTRICT",
       },
       metadata: {
         type: Sequelize.JSON,

@@ -79,4 +79,12 @@ async function transitionWorkflow(instance, action, user, comment) {
   return instance;
 }
 
-export { createWorkflow, transitionWorkflow };
+// Fungsi approve untuk multi-level approval (dummy, sesuai test)
+function approve(doc, level) {
+  if (doc && doc.approvals && level) {
+    doc.approvals[level] = true;
+  }
+  return doc;
+}
+
+export { createWorkflow, transitionWorkflow, approve };

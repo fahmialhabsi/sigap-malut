@@ -1,46 +1,45 @@
-import { expect } from "chai";
-const BDSCPD = sequelize.models.BdsCpd || sequelize.models.BdsCpd;
+import "../models/index.js";
 import { sequelize } from "../config/database.js";
+const BDSCPD = sequelize.models.BdsCpd;
 const Komoditas = sequelize.models.Komoditas;
 
 describe("Integrasi Master Data: BDS-CPD", () => {
-  it("should only accept valid komoditas_id from master Komoditas", function (done) {
-    this.timeout(5000);
-    console.log(
-      "DEBUG BDSCPD model:",
-      typeof BDSCPD,
-      BDSCPD && typeof BDSCPD.create,
-    );
+  test("should only accept valid komoditas_id from master Komoditas", async () => {
     const uniq = Date.now();
-    Komoditas.create({
+    const komoditas = await Komoditas.create({
       nama: `Komoditas${uniq}`,
       satuan: "kg",
       kode: `K${uniq}`,
-    })
-      .then((komoditas) => {
-        return BDSCPD.create({
-          komoditas_id: komoditas.id,
-          tahun: 2026,
-          stok: 100,
-          harga: 5000,
-        });
-      })
-      .then((bdsCpd) => {
-        expect(bdsCpd.komoditas_id).to.exist;
-        return BDSCPD.create({
-          komoditas_id: 99999999,
-          tahun: 2026,
-          stok: 100,
-          harga: 5000,
-        });
-      })
-      .then(() => done(new Error("Should fail with FK constraint error")))
-      .catch((error) => {
-        expect(error).to.not.be.null;
-        expect(error.name).to.match(
-          /SequelizeForeignKeyConstraintError|ValidationError/,
-        );
-        done();
-      });
+    });
+    const bdsCpd = await BDSCPD.create({
+      komoditas_id: komoditas.id,
+      tahun: 2026,
+      stok: 100,
+      harga: 5000,
+      unit_kerja: "Sekretariat",
+      layanan_id: "LY092",
+      jenis_layanan_cppd: "Perencanaan",
+      periode: "2026-01-01",
+      pelaksana: "Admin",
+      created_by: 1,
+    });
+    expect(bdsCpd.komoditas_id).toBeDefined();
+    // Coba insert dengan komoditas_id tidak valid
+    await expect(
+      BDSCPD.create({
+        komoditas_id: 99999999,
+        tahun: 2026,
+        stok: 100,
+        harga: 5000,
+        unit_kerja: "Sekretariat",
+        layanan_id: "LY092",
+        jenis_layanan_cppd: "Perencanaan",
+        periode: "2026-01-01",
+        pelaksana: "Admin",
+        created_by: 1,
+      }),
+    ).rejects.toThrow(
+      /violates foreign key constraint|SequelizeForeignKeyConstraintError|ValidationError/,
+    );
   });
 });

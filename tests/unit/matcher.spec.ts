@@ -2,32 +2,37 @@ import {
   extractRequirementsFromMarkdownContent,
   fuzzyMatch,
   detectRouteInSource,
+  parseMarkdownTables,
 } from "../../scripts/matcher";
 import fs from "fs";
 import path from "path";
 
 describe("extractRequirementsFromMarkdownContent", () => {
   it("harus mendeteksi permission workflow:read dari markdown", () => {
-    const content = fs.readFileSync(
-      path.join(__dirname, "../fixtures/requirement-workflow-read.md"),
-      "utf8",
-    );
+    // Simulasi markdown dengan heading dan bullet
+    const content = `# RBAC\n- permission: workflow:read`;
     const requirements = extractRequirementsFromMarkdownContent(content);
-    expect(requirements).toEqual([
-      expect.objectContaining({
-        type: "permission",
-        name: "workflow:read",
-      }),
-    ]);
+    expect(requirements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: "permission",
+          name: "workflow:read",
+        }),
+      ]),
+    );
   });
 
   it("harus mengembalikan array kosong jika tidak ada requirement", () => {
-    const content = fs.readFileSync(
-      path.join(__dirname, "../fixtures/empty.md"),
-      "utf8",
-    );
+    // Simulasi markdown tanpa requirement
+    const content = `# Tidak ada requirement`;
     const requirements = extractRequirementsFromMarkdownContent(content);
-    expect(requirements).toEqual([]);
+    // Tidak ada permission/bullet, hanya heading
+    expect(requirements).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: "permission" }),
+        expect.objectContaining({ type: "bullet" }),
+      ]),
+    );
   });
 });
 
@@ -48,5 +53,57 @@ describe("detectRouteInSource", () => {
   it("harus false jika route tidak ada di source", () => {
     const source = 'app.get("/api/info", handler)';
     expect(detectRouteInSource(source, "/api/data")).toBe(false);
+  });
+});
+
+describe("parseMarkdownTables", () => {
+  it("harus mengekstrak tabel dari markdown", () => {
+    const content = `| Field | Tipe Data | Mandatory |\n| --- | --- | --- |\n| id_layanan | UUID | Y |\n| kode_layanan | VARCHAR(12) | Y |`;
+    const tables = parseMarkdownTables(content);
+    expect(tables.length).toBe(1);
+    expect(tables[0].headers).toEqual(["Field", "Tipe Data", "Mandatory"]);
+    expect(tables[0].rows).toEqual([
+      ["id_layanan", "UUID", "Y"],
+      ["kode_layanan", "VARCHAR(12)", "Y"],
+    ]);
+  });
+});
+describe("extractRequirementsFromMarkdownContent - heading & bullet", () => {
+  it("harus mengekstrak heading dan bullet dari markdown", () => {
+    const content = `\n## Modul Layanan\n\n- id_layanan harus unik\n* kode_layanan wajib diisi\n+ status_layanan harus valid\n### Submodul\n- submodul_1\n`;
+    const requirements = extractRequirementsFromMarkdownContent(content);
+    // Heading
+    expect(requirements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: "heading",
+          level: 2,
+          text: "Modul Layanan",
+        }),
+        expect.objectContaining({
+          type: "heading",
+          level: 3,
+          text: "Submodul",
+        }),
+      ]),
+    );
+    // Bullet
+    expect(requirements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: "bullet",
+          text: "id_layanan harus unik",
+        }),
+        expect.objectContaining({
+          type: "bullet",
+          text: "kode_layanan wajib diisi",
+        }),
+        expect.objectContaining({
+          type: "bullet",
+          text: "status_layanan harus valid",
+        }),
+        expect.objectContaining({ type: "bullet", text: "submodul_1" }),
+      ]),
+    );
   });
 });

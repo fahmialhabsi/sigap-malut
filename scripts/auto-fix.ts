@@ -34,20 +34,33 @@ function logError(msg: string) {
 }
 
 function applyFix(suggestion: any) {
-  // Contoh: hanya tampilkan saran, implementasi auto-fix spesifik bisa dikembangkan sesuai kebutuhan
+  // Tampilkan saran
   console.log(chalk.yellow("[SUGGESTION]"), suggestion.suggestion);
   if (suggestion.evidence && suggestion.evidence.length > 0) {
     suggestion.evidence.forEach((ev: any) => {
       console.log(
         `  File: ${ev.file} | Line: ${ev.line}\n  Snippet: ${ev.snippet}`,
       );
+      // Auto-fix: tambahkan field ke master-data CSV jika NOT_FOUND
+      if (
+        !DRY_RUN &&
+        ev.snippet &&
+        ev.snippet.includes("tidak ditemukan di master-data CSV")
+      ) {
+        const match = ev.snippet.match(/Field '(.+?)'/);
+        const fieldName = match ? match[1] : null;
+        if (fieldName && ev.file && ev.file.endsWith(".csv")) {
+          // Tambahkan field baru ke CSV (append baris minimal)
+          const csvPath = path.resolve(ev.file);
+          let csvContent = fs.readFileSync(csvPath, "utf8");
+          // Tambahkan baris baru (field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text)
+          const newRow = `\n${fieldName},${fieldName},varchar,255,false,false,NULL,none,NULL,Auto-fix generated`;
+          csvContent += newRow;
+          fs.writeFileSync(csvPath, csvContent);
+          logInfo(`Field '${fieldName}' ditambahkan ke ${csvPath}`);
+        }
+      }
     });
-  }
-  // Contoh auto-fix: jika ada file dan snippet, bisa lakukan replace/insert (belum diimplementasikan)
-  if (!DRY_RUN && suggestion.autoFix) {
-    // Implementasi auto-fix spesifik sesuai suggestion.autoFix
-    // fs.writeFileSync(...)
-    logInfo("Auto-fix dijalankan (belum diimplementasikan)");
   }
 }
 

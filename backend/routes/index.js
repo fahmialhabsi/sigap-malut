@@ -50,6 +50,7 @@ import reminderRoutes from "./reminder.js";
 import caseRoutes from "./case.js";
 import commentRoutes from "./comment.js";
 import reportRoutes from "./report.js";
+import complianceRoutes from "./compliance.js";
 import auditTrailRoutes from "./audit-trail.js";
 import workflowStatusRoutes from "./workflow-status.js";
 import notificationRoutes from "./notification.js";
@@ -57,6 +58,8 @@ import perintahRoutes from "./perintah.js";
 import pegawaiRoutes from "./pegawai.js";
 import komoditasRoutes from "./komoditas.js";
 import modulesRoutes from "./modules.js";
+import masterDataSyncRoutes from "./masterDataSync.js";
+import integrationLogRoutes from "./integrationLog.js";
 
 export default function registerRoutes(app) {
   console.log("📡 Registering API routes...\n");
@@ -105,6 +108,7 @@ export default function registerRoutes(app) {
   app.use("/case", caseRoutes);
   app.use("/comment", commentRoutes);
   app.use("/report", reportRoutes);
+  app.use("/api/report", reportRoutes); // Register /api/report
   app.use("/audit-trail", auditTrailRoutes);
   app.use("/workflow-status", workflowStatusRoutes);
   app.use("/notification", notificationRoutes);
@@ -112,8 +116,11 @@ export default function registerRoutes(app) {
 
   // Master Data Lookup
   app.use("/api/pegawai", pegawaiRoutes);
+  app.use("/api/compliance/report", complianceRoutes); // Register /api/compliance/report
   app.use("/api/komoditas", komoditasRoutes);
   app.use("/modules", modulesRoutes);
+  app.use("/api/master-data-sync", masterDataSyncRoutes);
+  app.use("/api/integration-log", integrationLogRoutes);
 
   // Workflow probe endpoint
   app.use("/api/workflows", workflowsRoutes);

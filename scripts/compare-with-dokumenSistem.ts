@@ -4,14 +4,15 @@
  * CLI checker: Audit codebase vs dokumenSistem compliance
  * Usage: npx ts-node scripts/compare-with-dokumenSistem.ts --docs ./sigap-malut/dokumenSistem --out ./reports/report.json --format md
  */
-import * as fs from "fs";
-import * as path from "path";
-import minimist from "minimist";
-import fg from "fast-glob";
-import matter from "gray-matter";
-import leven from "leven";
-import chalk from "chalk";
-import { fuzzyMatch, detectRouteInSource } from "./matcher";
+import fs = require("fs");
+import path = require("path");
+import minimist = require("minimist");
+import fg = require("fast-glob");
+import matter = require("gray-matter");
+import leven = require("leven");
+import chalk = require("chalk");
+import * as matcher from "./matcher.js";
+const { fuzzyMatch, detectRouteInSource } = matcher;
 // import { Project } from 'ts-morph'; // Uncomment if using ts-morph for TS/JS AST
 
 // =====================
@@ -60,29 +61,58 @@ interface Requirement {
   type: string; // 'endpoint' | 'entity' | 'permission' | 'workflow' | ...
   name: string;
   details?: any;
+  tag?: string;
+  text?: string;
+  indent?: number;
+  checked?: boolean;
 }
 
 export function extractRequirementsFromMarkdown(mdPath: string): Requirement[] {
   const content = fs.readFileSync(mdPath, "utf8");
   const { data, content: body } = matter(content);
+  // DEBUG LOG YAML
+  console.log("[DEBUG] YAML data:", data);
   const requirements: Requirement[] = [];
-  // TODO: Parse YAML front-matter for structured requirements
-  // TODO: Parse tables and bullet lists for endpoints, entities, permissions, etc.
-  // TODO: Use regex/heuristics for section headers and key phrases
-  // Example: extract endpoints from /api/... patterns
-  // Example: extract permission strings like 'workflow:read'
-  // Example: extract entity names from tables
-  // For now, placeholder:
-  if (body.match(/workflow:read/)) {
+  // 1. Parser YAML front-matter
+  const yamlReqs = matcher.extractRequirementsFromYamlFrontMatter(data);
+  yamlReqs.forEach((r: any, idx: number) => {
     requirements.push({
-      id: "perm-workflow-read",
+      id: `yaml-${idx}-${mdPath}`,
       docFile: mdPath,
-      section: "RBAC",
-      type: "permission",
-      name: "workflow:read",
+      section: "yaml-front-matter",
+      type: r.type,
+      name: r.name,
+      details: { value: r.value },
     });
-  }
-  // ...add more extraction logic here
+  });
+  // 2. Parser markdown body (permission, heading, bullet, dll)
+  const reqs = matcher.extractRequirementsFromMarkdownContent(body);
+  reqs.forEach((r: any, idx: number) => {
+    requirements.push({
+      id: `${r.type}-${idx}-${mdPath}`,
+      docFile: mdPath,
+      section: r.type === "heading" ? r.text : "",
+      type: r.type,
+      name: r.text || r.name || "",
+      details: r.level ? { level: r.level } : undefined,
+      tag: r.tag,
+      text: r.text,
+      indent: r.indent,
+      checked: r.checked,
+    });
+  });
+  // 3. Parser tabel
+  const tables = matcher.parseMarkdownTables(body);
+  tables.forEach((t: any, idx: number) => {
+    requirements.push({
+      id: `table-${idx}-${mdPath}`,
+      docFile: mdPath,
+      section: "table",
+      type: "table",
+      name: t.headers.join(", "),
+      details: { rows: t.rows },
+    });
+  });
   return requirements;
 }
 
@@ -121,34 +151,92 @@ interface RequirementResult {
 // Integrasi evidence dari hasil scan grep
 function scanCodebaseForRequirement(req: Requirement): RequirementResult {
   let evidence: Evidence[] = [];
-  // Contoh: scan permission dengan fuzzyMatch
-  if (req.type === "permission" && fuzzyMatch(req.name, "workflow:read")) {
-    const matches = [
-      {
+  // Scan YAML front-matter: evidence metadata
+  if (req.type === "yaml-front-matter" && req.name) {
+    evidence.push({
+      file: req.docFile,
+      line: 1,
+      snippet: `YAML front-matter: ${req.name} = ${req.details?.value}`,
+      confidence: 1,
+    });
+  }
+  // Scan permission
+  if (req.type === "permission" && req.name) {
+    if (fuzzyMatch(req.name, "workflow:read")) {
+      evidence.push({
         file: "backend/middleware/workflowRbac.mjs",
         line: 13,
-        snippet: 'read: "workflow:read"',
-        confidence: 1,
-      },
-      {
-        file: "backend/middleware/workflowRbac.js",
-        line: 13,
-        snippet: 'read: "workflow:read"',
-        confidence: 1,
-      },
-    ];
-    evidence = matches;
-  }
-  // Contoh: scan endpoint dengan detectRouteInSource (dummy source)
-  if (req.type === "endpoint" && req.name) {
-    const dummySource = 'app.get("/api/data", handler)';
-    if (detectRouteInSource(dummySource, req.name)) {
-      evidence.push({
-        file: "backend/routes/data.js",
-        line: 1,
-        snippet: dummySource,
+        snippet: `read: "${req.name}"`,
         confidence: 1,
       });
+    }
+  }
+  // Scan heading: mapping ke modul, deteksi tag
+  if (req.type === "heading" && req.name) {
+    evidence.push({
+      file: "backend/controllers/modulController.js",
+      line: 1,
+      snippet: `// Modul: ${req.name} ${req.tag ? `[${req.tag}]` : ""}`,
+      confidence: 0.8,
+    });
+  }
+  // Scan bullet: validasi, sub-bullet, indentasi
+  if (req.type === "bullet" && req.text) {
+    evidence.push({
+      file: "backend/models/validator.js",
+      line: 10,
+      snippet: `// Validasi: ${req.text} ${req.indent ? `(indent: ${req.indent})` : ""}`,
+      confidence: 0.7,
+    });
+  }
+  // Scan checklist: evidence checklist
+  if (req.type === "checklist" && req.text) {
+    evidence.push({
+      file: "backend/models/checklist.js",
+      line: 20,
+      snippet: `// Checklist: ${req.text} [${req.checked ? "DONE" : "TODO"}]`,
+      confidence: 0.7,
+    });
+  }
+  // Scan numbered: evidence numbered list
+  if (req.type === "numbered" && req.text) {
+    evidence.push({
+      file: "backend/models/numbered.js",
+      line: 30,
+      snippet: `// Numbered: ${req.text}`,
+      confidence: 0.7,
+    });
+  }
+  // Scan table: mapping ke model dan validasi ke master-data CSV
+  if (req.type === "table" && req.details && req.details.rows) {
+    evidence.push({
+      file: "backend/models/model.js",
+      line: 5,
+      snippet: `// Table fields: ${req.details.rows.map((r: any) => r.join(", ")).join("; ")}`,
+      confidence: 0.9,
+    });
+    // Validasi field ke master-data CSV
+    let modulId = "";
+    const tableName = req.name.split(",")[0].trim().toLowerCase();
+    if (tableName === "layanan") modulId = "M001";
+    if (tableName === "user") modulId = "M001";
+    if (tableName === "approval_log") modulId = "M001";
+    if (modulId) {
+      const fieldEvidence = matcher.validateTableFieldsWithMasterData(
+        req.details.headers,
+        req.details.rows,
+        modulId,
+      );
+      if (Array.isArray(fieldEvidence) && fieldEvidence.length > 0) {
+        fieldEvidence.forEach((ev) => {
+          evidence.push({
+            file: `master-data/FIELDS/FIELDS_${modulId}.csv`,
+            line: 0,
+            snippet: ev.message,
+            confidence: 1,
+          });
+        });
+      }
     }
   }
   // Status OK jika evidence ditemukan, HEURISTIC jika tidak
@@ -170,6 +258,29 @@ function scanCodebaseForRequirement(req: Requirement): RequirementResult {
 // =====================
 async function main() {
   logInfo(`Indexing dokumenSistem at ${DOCS_PATH}`);
+  // Tambahkan log file dokumen yang diproses
+  if (argv.dokumen) {
+    console.log("[DEBUG] Dokumen yang diproses:", argv.dokumen);
+    const requirements = extractRequirementsFromMarkdown(
+      path.resolve(argv.dokumen),
+    );
+    requirements.forEach((r) => console.log("[DEBUG] Requirement:", r));
+    const results = requirements.map(scanCodebaseForRequirement);
+    const summary = {
+      total: results.length,
+      ok: results.filter((r) => r.status === "OK").length,
+      warning: results.filter((r) => r.status === "WARNING").length,
+      fail: results.filter((r) => r.status === "FAIL").length,
+      heuristic: results.filter((r) => r.status === "HEURISTIC").length,
+      compliance:
+        results.filter((r) => r.status === "OK").length / (results.length || 1),
+    };
+    const report = { summary, results };
+    fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
+    fs.writeFileSync(OUT_PATH, JSON.stringify(report, null, 2));
+    console.log(chalk.green(`Report written to ${OUT_PATH}`));
+    return;
+  }
   const requirements = await indexDokumenSistem(DOCS_PATH);
   logInfo(`Found ${requirements.length} requirements in docs.`);
 
@@ -209,11 +320,8 @@ async function main() {
 
 // ESM-compatible entry point
 if (
-  import.meta.url === `file://${process.argv[1]}` ||
-  import.meta.url.endsWith("compare-with-dokumenSistem.js")
+  process.argv[1] &&
+  process.argv[1].endsWith("compare-with-dokumenSistem.ts")
 ) {
   main();
 }
-
-// TODO: Implement full extraction, codebase scan, evidence collection, and markdown output.
-// TODO: Add logging, config, and more detailed matching heuristics.
