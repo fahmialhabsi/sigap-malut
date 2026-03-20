@@ -14,8 +14,8 @@ export function extractRequirementsFromYamlFrontMatter(data: any): any[] {
   }
   return requirements;
 }
-import fs = require("fs");
-import path = require("path");
+import fs from "fs";
+import path from "path";
 import { parse as csvParse } from "csv-parse/sync";
 
 // Validasi field tabel Markdown ke master-data CSV
@@ -56,9 +56,13 @@ export function validateTableFieldsWithMasterData(
   });
   return evidence;
 }
-// Fuzzy match: Levenshtein distance sederhana
-export function fuzzyMatch(a: string, b: string, threshold = 2): boolean {
-  if (a === b) return true;
+// Fuzzy match: Levenshtein distance dengan confidence score
+export function fuzzyMatch(
+  a: string,
+  b: string,
+  threshold = 1,
+): { match: boolean; confidence: number } {
+  if (a === b) return { match: true, confidence: 1.0 };
   // Levenshtein distance
   const matrix = Array(a.length + 1)
     .fill(null)
@@ -75,7 +79,11 @@ export function fuzzyMatch(a: string, b: string, threshold = 2): boolean {
       );
     }
   }
-  return matrix[a.length][b.length] <= threshold;
+  const distance = matrix[a.length][b.length];
+  const maxLen = Math.max(a.length, b.length);
+  const confidence = maxLen > 0 ? (maxLen - distance) / maxLen : 1.0;
+  const match = distance <= threshold && confidence >= 0.8; // Threshold lebih ketat + confidence minimum
+  return { match, confidence };
 }
 
 // Detect route in source code (regex sederhana)

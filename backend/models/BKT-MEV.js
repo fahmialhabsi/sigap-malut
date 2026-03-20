@@ -2,7 +2,7 @@
 // MODEL: BktMev
 // TABLE: bkt_mev
 // MODULE: BKT-MEV
-// Generated: 2026-02-17T19:24:47.427Z
+// Generated: 2026-03-19T23:39:22.933Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

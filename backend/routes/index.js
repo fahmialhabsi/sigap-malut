@@ -1,13 +1,10 @@
-import * as workflowEngine from "../services/workflowEngine.js";
-import workflowsRoutes from "./workflows.js";
 // =====================================================
 // AUTO-GENERATED ROUTE INDEX
-// Generated: 2026-02-17T19:37:29.473Z
-// Total Routes: 39
+// Generated: 2026-03-19T23:39:47.336Z
+// Total Routes: 84
 // =====================================================
 
 import BDSBMBRoutes from "./BDS-BMB.js";
-import chatbotRoutes from "./chatbot.js";
 import BDSCPDRoutes from "./BDS-CPD.js";
 import BDSEVLRoutes from "./BDS-EVL.js";
 import BDSHRGRoutes from "./BDS-HRG.js";
@@ -26,6 +23,7 @@ import BKTKBJRoutes from "./BKT-KBJ.js";
 import BKTKRWRoutes from "./BKT-KRW.js";
 import BKTMEVRoutes from "./BKT-MEV.js";
 import BKTPGDRoutes from "./BKT-PGD.js";
+import RoleRoutes from "./Role.js";
 import SEKADMRoutes from "./SEK-ADM.js";
 import SEKASTRoutes from "./SEK-AST.js";
 import SEKHUMRoutes from "./SEK-HUM.js";
@@ -45,57 +43,109 @@ import UPTKEPRoutes from "./UPT-KEP.js";
 import UPTKEURoutes from "./UPT-KEU.js";
 import UPTMTURoutes from "./UPT-MTU.js";
 import UPTTKNRoutes from "./UPT-TKN.js";
+import UserRoutes from "./User.js";
+import User_legacyRoutes from "./User_legacy.js";
+import WorkflowHistoryRoutes from "./WorkflowHistory.js";
+import WorkflowInstanceRoutes from "./WorkflowInstance.js";
 import approvalRoutes from "./approval.js";
-import reminderRoutes from "./reminder.js";
+import approvalLogRoutes from "./approvalLog.js";
+import approvalWorkflowRoutes from "./approvalWorkflow.js";
+import audittrailRoutes from "./audit-trail.js";
+import auditLogRoutes from "./auditLog.js";
+import auditLogControllerRoutes from "./auditLogController.js";
+import authRoutes from "./auth.js";
+import authControllerRoutes from "./authController.js";
+import bidangRoutes from "./bidang.js";
+import bypassDetectionRoutes from "./bypassDetection.js";
 import caseRoutes from "./case.js";
+import chatbotRoutes from "./chatbot.js";
 import commentRoutes from "./comment.js";
-import reportRoutes from "./report.js";
 import complianceRoutes from "./compliance.js";
-import auditTrailRoutes from "./audit-trail.js";
-import workflowStatusRoutes from "./workflow-status.js";
-import notificationRoutes from "./notification.js";
-import perintahRoutes from "./perintah.js";
-import pegawaiRoutes from "./pegawai.js";
-import komoditasRoutes from "./komoditas.js";
-import modulesRoutes from "./modules.js";
-import masterDataSyncRoutes from "./masterDataSync.js";
+import dataIntegrationLogRoutes from "./dataIntegrationLog.js";
 import integrationLogRoutes from "./integrationLog.js";
+import integrationLogControllerRoutes from "./integrationLogController.js";
+import kgbRoutes from "./kgb.js";
+import kgbControllerRoutes from "./kgbController.js";
+import komoditasRoutes from "./komoditas.js";
+import komoditasControllerRoutes from "./komoditasController.js";
+import layananRoutes from "./layanan.js";
+import masterDataSyncRoutes from "./masterDataSync.js";
+import masterDataSyncControllerRoutes from "./masterDataSyncController.js";
+import moduleGeneratorRoutes from "./moduleGenerator.js";
+import moduleGeneratorControllerRoutes from "./moduleGeneratorController.js";
+import modulesRoutes from "./modules.js";
+import notificationRoutes from "./notification.js";
+import pegawaiRoutes from "./pegawai.js";
+import pegawaiControllerRoutes from "./pegawaiController.js";
+import perintahRoutes from "./perintah.js";
+import reminderRoutes from "./reminder.js";
+import reportRoutes from "./report.js";
+import stokRoutes from "./stok.js";
+import stokControllerRoutes from "./stokController.js";
+import tablesRoutes from "./tables.js";
+import workflowstatusRoutes from "./workflow-status.js";
+import workflowRoutes from "./workflow.js";
+import workflowControllerRoutes from "./workflowController.js";
+import workflowTransitionLogRoutes from "./workflowTransitionLog.js";
+import workflowsRoutes from "./workflows.js";
+import { protect } from "../middleware/auth.js";
+import { createReplicationPilotGuard } from "../middleware/uptdPilotGuard.js";
+
+const sekretariatPilotGuard = createReplicationPilotGuard({
+  domainCode: "SEKRETARIAT_STANDARD_REPLIKA_UPTD",
+  sourceUnit: "Sekretariat",
+});
+
+const ketersediaanPilotGuard = createReplicationPilotGuard({
+  domainCode: "KETERSEDIAAN_STANDARD_REPLIKA_UPTD",
+  sourceUnit: "Bidang Ketersediaan",
+});
+
+const distribusiPilotGuard = createReplicationPilotGuard({
+  domainCode: "DISTRIBUSI_STANDARD_REPLIKA_UPTD",
+  sourceUnit: "Bidang Distribusi",
+});
+
+const konsumsiPilotGuard = createReplicationPilotGuard({
+  domainCode: "KONSUMSI_STANDARD_REPLIKA_UPTD",
+  sourceUnit: "Bidang Konsumsi",
+});
 
 export default function registerRoutes(app) {
   console.log("📡 Registering API routes...\n");
 
-  app.use("/api/chatbot", chatbotRoutes);
-  app.use("/api/bds-bmb", BDSBMBRoutes);
-  app.use("/api/bds-cpd", BDSCPDRoutes);
-  app.use("/api/bds-evl", BDSEVLRoutes);
-  app.use("/api/bds-hrg", BDSHRGRoutes);
-  app.use("/api/bds-kbj", BDSKBJRoutes);
-  app.use("/api/bds-lap", BDSLAPRoutes);
-  app.use("/api/bds-mon", BDSMONRoutes);
-  app.use("/api/bks-bmb", BKSBMBRoutes);
-  app.use("/api/bks-dvr", BKSDVRRoutes);
-  app.use("/api/bks-evl", BKSEVLRoutes);
-  app.use("/api/bks-kbj", BKSKBJRoutes);
-  app.use("/api/bks-kmn", BKSKMNRoutes);
-  app.use("/api/bks-lap", BKSLAPRoutes);
-  app.use("/api/bkt-bmb", BKTBMBRoutes);
-  app.use("/api/bkt-fsl", BKTFSLRoutes);
-  app.use("/api/bkt-kbj", BKTKBJRoutes);
-  app.use("/api/bkt-krw", BKTKRWRoutes);
-  app.use("/api/bkt-mev", BKTMEVRoutes);
-  app.use("/api/bkt-pgd", BKTPGDRoutes);
-  app.use("/api/sek-adm", SEKADMRoutes);
-  app.use("/api/sek-ast", SEKASTRoutes);
-  app.use("/api/sek-hum", SEKHUMRoutes);
-  app.use("/api/sek-kbj", SEKKBJRoutes);
-  app.use("/api/sek-kep", SEKKEPRoutes);
-  app.use("/api/sek-keu", SEKKEURoutes);
-  app.use("/api/sek-lds", SEKLDSRoutes);
-  app.use("/api/sek-lks", SEKLKSRoutes);
-  app.use("/api/sek-lkt", SEKLKTRoutes);
-  app.use("/api/sek-lup", SEKLUPRoutes);
-  app.use("/api/sek-ren", SEKRENRoutes);
-  app.use("/api/sek-rmh", SEKRMHRoutes);
+  app.use("/api/bds-bmb", protect, distribusiPilotGuard, BDSBMBRoutes);
+  app.use("/api/bds-cpd", protect, distribusiPilotGuard, BDSCPDRoutes);
+  app.use("/api/bds-evl", protect, distribusiPilotGuard, BDSEVLRoutes);
+  app.use("/api/bds-hrg", protect, distribusiPilotGuard, BDSHRGRoutes);
+  app.use("/api/bds-kbj", protect, distribusiPilotGuard, BDSKBJRoutes);
+  app.use("/api/bds-lap", protect, distribusiPilotGuard, BDSLAPRoutes);
+  app.use("/api/bds-mon", protect, distribusiPilotGuard, BDSMONRoutes);
+  app.use("/api/bks-bmb", protect, konsumsiPilotGuard, BKSBMBRoutes);
+  app.use("/api/bks-dvr", protect, konsumsiPilotGuard, BKSDVRRoutes);
+  app.use("/api/bks-evl", protect, konsumsiPilotGuard, BKSEVLRoutes);
+  app.use("/api/bks-kbj", protect, konsumsiPilotGuard, BKSKBJRoutes);
+  app.use("/api/bks-kmn", protect, konsumsiPilotGuard, BKSKMNRoutes);
+  app.use("/api/bks-lap", protect, konsumsiPilotGuard, BKSLAPRoutes);
+  app.use("/api/bkt-bmb", protect, ketersediaanPilotGuard, BKTBMBRoutes);
+  app.use("/api/bkt-fsl", protect, ketersediaanPilotGuard, BKTFSLRoutes);
+  app.use("/api/bkt-kbj", protect, ketersediaanPilotGuard, BKTKBJRoutes);
+  app.use("/api/bkt-krw", protect, ketersediaanPilotGuard, BKTKRWRoutes);
+  app.use("/api/bkt-mev", protect, ketersediaanPilotGuard, BKTMEVRoutes);
+  app.use("/api/bkt-pgd", protect, ketersediaanPilotGuard, BKTPGDRoutes);
+  app.use("/api/role", RoleRoutes);
+  app.use("/api/sek-adm", protect, sekretariatPilotGuard, SEKADMRoutes);
+  app.use("/api/sek-ast", protect, sekretariatPilotGuard, SEKASTRoutes);
+  app.use("/api/sek-hum", protect, sekretariatPilotGuard, SEKHUMRoutes);
+  app.use("/api/sek-kbj", protect, sekretariatPilotGuard, SEKKBJRoutes);
+  app.use("/api/sek-kep", protect, sekretariatPilotGuard, SEKKEPRoutes);
+  app.use("/api/sek-keu", protect, sekretariatPilotGuard, SEKKEURoutes);
+  app.use("/api/sek-lds", protect, sekretariatPilotGuard, SEKLDSRoutes);
+  app.use("/api/sek-lks", protect, sekretariatPilotGuard, SEKLKSRoutes);
+  app.use("/api/sek-lkt", protect, sekretariatPilotGuard, SEKLKTRoutes);
+  app.use("/api/sek-lup", protect, sekretariatPilotGuard, SEKLUPRoutes);
+  app.use("/api/sek-ren", protect, sekretariatPilotGuard, SEKRENRoutes);
+  app.use("/api/sek-rmh", protect, sekretariatPilotGuard, SEKRMHRoutes);
   app.use("/api/upt-adm", UPTADMRoutes);
   app.use("/api/upt-ast", UPTASTRoutes);
   app.use("/api/upt-ins", UPTINSRoutes);
@@ -103,27 +153,51 @@ export default function registerRoutes(app) {
   app.use("/api/upt-keu", UPTKEURoutes);
   app.use("/api/upt-mtu", UPTMTURoutes);
   app.use("/api/upt-tkn", UPTTKNRoutes);
-  app.use("/approval", approvalRoutes);
-  app.use("/reminder", reminderRoutes);
-  app.use("/case", caseRoutes);
-  app.use("/comment", commentRoutes);
-  app.use("/report", reportRoutes);
-  app.use("/api/report", reportRoutes); // Register /api/report
-  app.use("/audit-trail", auditTrailRoutes);
-  app.use("/workflow-status", workflowStatusRoutes);
-  app.use("/notification", notificationRoutes);
-  app.use("/perintah", perintahRoutes);
-
-  // Master Data Lookup
-  app.use("/api/pegawai", pegawaiRoutes);
-  app.use("/api/compliance/report", complianceRoutes); // Register /api/compliance/report
+  app.use("/api/user", UserRoutes);
+  app.use("/api/user_legacy", User_legacyRoutes);
+  app.use("/api/workflowhistory", WorkflowHistoryRoutes);
+  app.use("/api/workflowinstance", WorkflowInstanceRoutes);
+  app.use("/api/approval", approvalRoutes);
+  app.use("/api/approvallog", approvalLogRoutes);
+  app.use("/api/approvalworkflow", approvalWorkflowRoutes);
+  app.use("/api/audit-trail", audittrailRoutes);
+  app.use("/api/auditlog", auditLogRoutes);
+  app.use("/api/auditlogcontroller", auditLogControllerRoutes);
+  app.use("/api/auth", authRoutes);
+  app.use("/api/authcontroller", authControllerRoutes);
+  app.use("/api/bidang", bidangRoutes);
+  app.use("/api/bypassdetection", bypassDetectionRoutes);
+  app.use("/api/case", caseRoutes);
+  app.use("/api/chatbot", chatbotRoutes);
+  app.use("/api/comment", commentRoutes);
+  app.use("/api/compliance", complianceRoutes);
+  app.use("/api/dataintegrationlog", dataIntegrationLogRoutes);
+  app.use("/api/integrationlog", integrationLogRoutes);
+  app.use("/api/integrationlogcontroller", integrationLogControllerRoutes);
+  app.use("/api/kgb", kgbRoutes);
+  app.use("/api/kgbcontroller", kgbControllerRoutes);
   app.use("/api/komoditas", komoditasRoutes);
-  app.use("/modules", modulesRoutes);
-  app.use("/api/master-data-sync", masterDataSyncRoutes);
-  app.use("/api/integration-log", integrationLogRoutes);
-
-  // Workflow probe endpoint
+  app.use("/api/komoditascontroller", komoditasControllerRoutes);
+  app.use("/api/layanan", layananRoutes);
+  app.use("/api/masterdatasync", masterDataSyncRoutes);
+  app.use("/api/masterdatasynccontroller", masterDataSyncControllerRoutes);
+  app.use("/api/modulegenerator", moduleGeneratorRoutes);
+  app.use("/api/modulegeneratorcontroller", moduleGeneratorControllerRoutes);
+  app.use("/api/modules", modulesRoutes);
+  app.use("/api/notification", notificationRoutes);
+  app.use("/api/pegawai", pegawaiRoutes);
+  app.use("/api/pegawaicontroller", pegawaiControllerRoutes);
+  app.use("/api/perintah", perintahRoutes);
+  app.use("/api/reminder", reminderRoutes);
+  app.use("/api/report", reportRoutes);
+  app.use("/api/stok", stokRoutes);
+  app.use("/api/stokcontroller", stokControllerRoutes);
+  app.use("/api/tables", tablesRoutes);
+  app.use("/api/workflow-status", workflowstatusRoutes);
+  app.use("/api/workflow", workflowRoutes);
+  app.use("/api/workflowcontroller", workflowControllerRoutes);
+  app.use("/api/workflowtransitionlog", workflowTransitionLogRoutes);
   app.use("/api/workflows", workflowsRoutes);
 
-  console.log("✅ 39 API routes registered\n");
+  console.log("✅ 84 API routes registered\n");
 }

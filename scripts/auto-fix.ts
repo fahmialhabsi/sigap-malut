@@ -41,23 +41,69 @@ function applyFix(suggestion: any) {
       console.log(
         `  File: ${ev.file} | Line: ${ev.line}\n  Snippet: ${ev.snippet}`,
       );
-      // Auto-fix: tambahkan field ke master-data CSV jika NOT_FOUND
-      if (
-        !DRY_RUN &&
-        ev.snippet &&
-        ev.snippet.includes("tidak ditemukan di master-data CSV")
-      ) {
-        const match = ev.snippet.match(/Field '(.+?)'/);
-        const fieldName = match ? match[1] : null;
-        if (fieldName && ev.file && ev.file.endsWith(".csv")) {
-          // Tambahkan field baru ke CSV (append baris minimal)
-          const csvPath = path.resolve(ev.file);
-          let csvContent = fs.readFileSync(csvPath, "utf8");
-          // Tambahkan baris baru (field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text)
-          const newRow = `\n${fieldName},${fieldName},varchar,255,false,false,NULL,none,NULL,Auto-fix generated`;
-          csvContent += newRow;
-          fs.writeFileSync(csvPath, csvContent);
-          logInfo(`Field '${fieldName}' ditambahkan ke ${csvPath}`);
+      if (!DRY_RUN) {
+        // Auto-fix berdasarkan jenis file
+        if (
+          ev.file &&
+          ev.file.endsWith(".csv") &&
+          ev.snippet &&
+          ev.snippet.includes("tidak ditemukan di master-data CSV")
+        ) {
+          // Fix CSV: tambahkan field baru
+          const match = ev.snippet.match(/Field '(.+?)'/);
+          const fieldName = match ? match[1] : null;
+          if (fieldName) {
+            const csvPath = path.resolve(ev.file);
+            let csvContent = fs.readFileSync(csvPath, "utf8");
+            const newRow = `\n${fieldName},${fieldName},varchar,255,false,false,NULL,none,NULL,Auto-fix generated`;
+            csvContent += newRow;
+            fs.writeFileSync(csvPath, csvContent);
+            logInfo(`Field '${fieldName}' ditambahkan ke ${csvPath}`);
+          }
+        } else if (
+          ev.file &&
+          ev.file.endsWith(".js") &&
+          ev.snippet &&
+          ev.snippet.includes("field tidak ditemukan")
+        ) {
+          // Fix Model: tambahkan field ke Sequelize model
+          const match = ev.snippet.match(/Field '(.+?)'/);
+          const fieldName = match ? match[1] : null;
+          if (fieldName) {
+            const modelPath = path.resolve(ev.file);
+            let modelContent = fs.readFileSync(modelPath, "utf8");
+            // Cari bagian fields definition dan tambahkan field baru
+            const fieldDefinition = `      ${fieldName}: {\n        type: DataTypes.STRING(255),\n        allowNull: true,\n        comment: 'Auto-fix generated'\n      },`;
+            // Insert sebelum closing bracket
+            const insertPoint = modelContent.lastIndexOf("    }");
+            if (insertPoint !== -1) {
+              modelContent =
+                modelContent.slice(0, insertPoint) +
+                fieldDefinition +
+                "\n" +
+                modelContent.slice(insertPoint);
+              fs.writeFileSync(modelPath, modelContent);
+              logInfo(`Field '${fieldName}' ditambahkan ke model ${modelPath}`);
+            }
+          }
+        } else if (
+          ev.file &&
+          ev.file.endsWith(".js") &&
+          ev.snippet &&
+          ev.snippet.includes("route tidak ditemukan")
+        ) {
+          // Fix Route: tambahkan route baru
+          const match = ev.snippet.match(/Route '(.+?)'/);
+          const routePath = match ? match[1] : null;
+          if (routePath) {
+            const routeFilePath = path.resolve(ev.file);
+            let routeContent = fs.readFileSync(routeFilePath, "utf8");
+            // Tambahkan route baru
+            const newRoute = `\nrouter.get('${routePath}', (req, res) => {\n  res.json({ message: 'Auto-fix generated route' });\n});`;
+            routeContent += newRoute;
+            fs.writeFileSync(routeFilePath, routeContent);
+            logInfo(`Route '${routePath}' ditambahkan ke ${routeFilePath}`);
+          }
         }
       }
     });

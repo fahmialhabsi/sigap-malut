@@ -2,7 +2,7 @@
 // MODEL: BktFsl
 // TABLE: bkt_fsl
 // MODULE: BKT-FSL
-// Generated: 2026-02-17T19:24:47.420Z
+// Generated: 2026-03-19T23:39:22.902Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

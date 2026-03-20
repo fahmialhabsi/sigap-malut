@@ -2,7 +2,7 @@
 // MODEL: UptAst
 // TABLE: upt_ast
 // MODULE: UPT-AST
-// Generated: 2026-02-17T19:24:47.467Z
+// Generated: 2026-03-19T23:39:23.179Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

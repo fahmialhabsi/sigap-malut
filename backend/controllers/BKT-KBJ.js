@@ -1,11 +1,10 @@
 // =====================================================
 // CONTROLLER: BktKbjController
 // MODEL: BktKbj
-// Generated: 2026-02-17T19:24:48.401Z
+// Generated: 2026-03-19T23:39:27.512Z
 // =====================================================
 
-import BktKbj from "../models/BKT-KBJ.js";
-import { logAudit } from "../services/auditLogService.js";
+import BktKbj from '../models/BKT-KBJ.js';
 
 // @desc    Get all BktKbj records
 // @route   GET /api/bkt-kbj
@@ -13,18 +12,18 @@ import { logAudit } from "../services/auditLogService.js";
 export const getAllBktKbj = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-
+    
     const offset = (page - 1) * limit;
-
+    
     const where = { ...filters };
-
+    
     const { count, rows } = await BktKbj.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      order: [['created_at', 'DESC']]
     });
-
+    
     res.json({
       success: true,
       data: rows,
@@ -32,14 +31,14 @@ export const getAllBktKbj = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
-      },
+        totalPages: Math.ceil(count / limit)
+      }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching BktKbj",
-      error: error.message,
+      message: 'Error fetching BktKbj',
+      error: error.message
     });
   }
 };
@@ -50,23 +49,23 @@ export const getAllBktKbj = async (req, res) => {
 export const getBktKbjById = async (req, res) => {
   try {
     const record = await BktKbj.findByPk(req.params.id);
-
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BktKbj not found",
+        message: 'BktKbj not found'
       });
     }
-
+    
     res.json({
       success: true,
-      data: record,
+      data: record
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching BktKbj",
-      error: error.message,
+      message: 'Error fetching BktKbj',
+      error: error.message
     });
   }
 };
@@ -78,26 +77,19 @@ export const createBktKbj = async (req, res) => {
   try {
     const record = await BktKbj.create({
       ...req.body,
-      created_by: req.user?.id,
+      created_by: req.user?.id
     });
-    await logAudit({
-      modul: "BKT-KBJ",
-      entitas_id: record.id,
-      aksi: "CREATE",
-      data_lama: null,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.status(201).json({
       success: true,
-      message: "BktKbj created successfully",
-      data: record,
+      message: 'BktKbj created successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error creating BktKbj",
-      error: error.message,
+      message: 'Error creating BktKbj',
+      error: error.message
     });
   }
 };
@@ -108,35 +100,29 @@ export const createBktKbj = async (req, res) => {
 export const updateBktKbj = async (req, res) => {
   try {
     const record = await BktKbj.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BktKbj not found",
+        message: 'BktKbj not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.update({
       ...req.body,
-      updated_by: req.user?.id,
+      updated_by: req.user?.id
     });
-    await logAudit({
-      modul: "BKT-KBJ",
-      entitas_id: record.id,
-      aksi: "UPDATE",
-      data_lama: dataLama,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "BktKbj updated successfully",
-      data: record,
+      message: 'BktKbj updated successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error updating BktKbj",
-      error: error.message,
+      message: 'Error updating BktKbj',
+      error: error.message
     });
   }
 };
@@ -147,31 +133,25 @@ export const updateBktKbj = async (req, res) => {
 export const deleteBktKbj = async (req, res) => {
   try {
     const record = await BktKbj.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BktKbj not found",
+        message: 'BktKbj not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.destroy();
-    await logAudit({
-      modul: "BKT-KBJ",
-      entitas_id: req.params.id,
-      aksi: "DELETE",
-      data_lama: dataLama,
-      data_baru: null,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "BktKbj deleted successfully",
+      message: 'BktKbj deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting BktKbj",
-      error: error.message,
+      message: 'Error deleting BktKbj',
+      error: error.message
     });
   }
 };

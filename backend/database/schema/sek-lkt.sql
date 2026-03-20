@@ -1,7 +1,7 @@
 -- =====================================================
 -- TABLE: sek_lkt
 -- MODULE: SEK-LKT
--- Generated: 2026-02-17T19:24:46.439Z
+-- Generated: 2026-03-19T23:39:21.649Z
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS sek_lkt (
@@ -11,16 +11,16 @@ CREATE TABLE IF NOT EXISTS sek_lkt (
   tahun INTEGER NOT NULL,
   bulan INTEGER NOT NULL,
   total_komoditas INTEGER,
-  total_stok DECIMAL(15,2),
+  total_stok DECIMAL("15,2"),
   stok_aman INTEGER,
   stok_menipis INTEGER,
   stok_kritis INTEGER,
   wilayah_rawan_pangan INTEGER,
-  tingkat_kerawanan VARCHAR(100) CHECK(tingkat_kerawanan IN ('Aman', 'Waspada', 'Rawan', 'Sangat Rawan')) NOT NULL DEFAULT 'Aman',
+  tingkat_kerawanan VARCHAR(100) CHECK(tingkat_kerawanan IN ('"Aman', 'Waspada', 'Rawan', 'Sangat Rawan"')) NOT NULL DEFAULT 'Aman',
   komoditas_kritis TEXT,
-  produksi_pangan_total DECIMAL(15,2),
-  konsumsi_estimasi DECIMAL(15,2),
-  surplus_defisit DECIMAL(15,2),
+  produksi_pangan_total DECIMAL("15,2"),
+  konsumsi_estimasi DECIMAL("15,2"),
+  surplus_defisit DECIMAL("15,2"),
   analisis TEXT,
   rekomendasi TEXT,
   sumber_data VARCHAR(255) DEFAULT 'Bidang Ketersediaan & Kerawanan Pangan',
@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS sek_lkt (
   file_data_pendukung JSON,
   penanggung_jawab VARCHAR(255) NOT NULL DEFAULT 'Sekretaris',
   pelaksana VARCHAR(255) NOT NULL DEFAULT 'Bidang Ketersediaan',
-  is_sensitive VARCHAR(100) CHECK(is_sensitive IN ('Biasa', 'Sensitif')) NOT NULL DEFAULT 'Biasa',
-  status VARCHAR(100) CHECK(status IN ('draft', 'review', 'final')) NOT NULL DEFAULT 'draft',
+  is_sensitive VARCHAR(100) CHECK(is_sensitive IN ('"Biasa', 'Sensitif"')) NOT NULL DEFAULT 'Biasa',
+  status VARCHAR(100) CHECK(status IN ('"draft', 'review', 'final"')) NOT NULL DEFAULT 'draft',
   keterangan TEXT,
   created_by INTEGER NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

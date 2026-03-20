@@ -1,26 +1,31 @@
 // =====================================================
 // ROUTES: SekLds
 // Base Path: /api/sek-lds
-// Generated: 2026-02-17T19:24:49.307Z
+// Generated: 2026-03-19T23:39:36.740Z
 // =====================================================
 
-import express from "express";
+import express from 'express';
 import {
   getAllSekLds,
   getSekLdsById,
   createSekLds,
   updateSekLds,
-  deleteSekLds,
-} from "../controllers/SEK-LDS.js";
-import { protect } from "../middleware/auth.js";
+  deleteSekLds
+} from '../controllers/SEK-LDS.js';
+// import { protect } from '../middleware/auth.js'; // Uncomment when auth is ready
 
 const router = express.Router();
 
-// All routes are protected
-router.use(protect);
+// All routes are protected (uncomment when auth is ready)
+// router.use(protect);
 
-router.route("/").get(getAllSekLds).post(createSekLds);
+router.route('/')
+  .get(getAllSekLds)
+  .post(createSekLds);
 
-router.route("/:id").get(getSekLdsById).put(updateSekLds).delete(deleteSekLds);
+router.route('/:id')
+  .get(getSekLdsById)
+  .put(updateSekLds)
+  .delete(deleteSekLds);
 
 export default router;

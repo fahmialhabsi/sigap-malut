@@ -2,7 +2,7 @@
 // MODEL: SekKbj
 // TABLE: sek_kbj
 // MODULE: SEK-KBJ
-// Generated: 2026-02-17T19:24:47.384Z
+// Generated: 2026-03-19T23:39:22.820Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -20,7 +20,7 @@ const SekKbj = sequelize.define('SekKbj', {
     comment: 'FK ke layanan_menpanrb (LY046-LY047)',
   },
   jenis_layanan_kebijakan: {
-    type: DataTypes.ENUM('Bahan Kebijakan Teknis', 'Rekapitulasi Laporan'),
+    type: DataTypes.ENUM('"Bahan Kebijakan Teknis', 'Rekapitulasi Laporan"'),
     allowNull: false,
     comment: 'Jenis layanan',
   },
@@ -131,13 +131,13 @@ const SekKbj = sequelize.define('SekKbj', {
     comment: 'Yang menyusun',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Data kebijakan sensitif',
   },
   status: {
-    type: DataTypes.ENUM('draft', 'review', 'finalisasi', 'disetujui'),
+    type: DataTypes.ENUM('"draft', 'review', 'finalisasi', 'disetujui"'),
     allowNull: false,
     defaultValue: 'draft',
     comment: 'Status',

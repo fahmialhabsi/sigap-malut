@@ -1,11 +1,10 @@
 // =====================================================
 // CONTROLLER: SekRmhController
 // MODEL: SekRmh
-// Generated: 2026-02-17T19:24:48.414Z
+// Generated: 2026-03-19T23:39:27.553Z
 // =====================================================
 
-import SekRmh from "../models/SEK-RMH.js";
-import { logAudit } from "../services/auditLogService.js";
+import SekRmh from '../models/SEK-RMH.js';
 
 // @desc    Get all SekRmh records
 // @route   GET /api/sek-rmh
@@ -13,18 +12,18 @@ import { logAudit } from "../services/auditLogService.js";
 export const getAllSekRmh = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-
+    
     const offset = (page - 1) * limit;
-
+    
     const where = { ...filters };
-
+    
     const { count, rows } = await SekRmh.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      order: [['created_at', 'DESC']]
     });
-
+    
     res.json({
       success: true,
       data: rows,
@@ -32,14 +31,14 @@ export const getAllSekRmh = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
-      },
+        totalPages: Math.ceil(count / limit)
+      }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching SekRmh",
-      error: error.message,
+      message: 'Error fetching SekRmh',
+      error: error.message
     });
   }
 };
@@ -50,23 +49,23 @@ export const getAllSekRmh = async (req, res) => {
 export const getSekRmhById = async (req, res) => {
   try {
     const record = await SekRmh.findByPk(req.params.id);
-
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "SekRmh not found",
+        message: 'SekRmh not found'
       });
     }
-
+    
     res.json({
       success: true,
-      data: record,
+      data: record
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching SekRmh",
-      error: error.message,
+      message: 'Error fetching SekRmh',
+      error: error.message
     });
   }
 };
@@ -78,26 +77,19 @@ export const createSekRmh = async (req, res) => {
   try {
     const record = await SekRmh.create({
       ...req.body,
-      created_by: req.user?.id,
+      created_by: req.user?.id
     });
-    await logAudit({
-      modul: "SEK-RMH",
-      entitas_id: record.id,
-      aksi: "CREATE",
-      data_lama: null,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.status(201).json({
       success: true,
-      message: "SekRmh created successfully",
-      data: record,
+      message: 'SekRmh created successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error creating SekRmh",
-      error: error.message,
+      message: 'Error creating SekRmh',
+      error: error.message
     });
   }
 };
@@ -108,35 +100,29 @@ export const createSekRmh = async (req, res) => {
 export const updateSekRmh = async (req, res) => {
   try {
     const record = await SekRmh.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "SekRmh not found",
+        message: 'SekRmh not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.update({
       ...req.body,
-      updated_by: req.user?.id,
+      updated_by: req.user?.id
     });
-    await logAudit({
-      modul: "SEK-RMH",
-      entitas_id: record.id,
-      aksi: "UPDATE",
-      data_lama: dataLama,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "SekRmh updated successfully",
-      data: record,
+      message: 'SekRmh updated successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error updating SekRmh",
-      error: error.message,
+      message: 'Error updating SekRmh',
+      error: error.message
     });
   }
 };
@@ -147,31 +133,25 @@ export const updateSekRmh = async (req, res) => {
 export const deleteSekRmh = async (req, res) => {
   try {
     const record = await SekRmh.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "SekRmh not found",
+        message: 'SekRmh not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.destroy();
-    await logAudit({
-      modul: "SEK-RMH",
-      entitas_id: req.params.id,
-      aksi: "DELETE",
-      data_lama: dataLama,
-      data_baru: null,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "SekRmh deleted successfully",
+      message: 'SekRmh deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting SekRmh",
-      error: error.message,
+      message: 'Error deleting SekRmh',
+      error: error.message
     });
   }
 };

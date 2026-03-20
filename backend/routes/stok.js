@@ -1,32 +1,31 @@
+// =====================================================
+// ROUTES: Stok
+// Base Path: /api/stok
+// Generated: 2026-03-19T23:39:36.937Z
+// =====================================================
+
 import express from 'express';
-import { getController } from '../utils/dynamicImport.js';
+import {
+  getAllStok,
+  getStokById,
+  createStok,
+  updateStok,
+  deleteStok
+} from '../controllers/stok.js';
+// import { protect } from '../middleware/auth.js'; // Uncomment when auth is ready
 
-export default (app) => {
-  const models = app.get('models');
-  const router = express.Router();
-  // lazy-load controller (returns controller instance or object)
-  const ctrlPromise = getController('stok', models);
+const router = express.Router();
 
-  router.post('/', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.create(req, res, next);
-    } catch (e) { next(e); }
-  });
+// All routes are protected (uncomment when auth is ready)
+// router.use(protect);
 
-  router.get('/', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.list(req, res, next);
-    } catch (e) { next(e); }
-  });
+router.route('/')
+  .get(getAllStok)
+  .post(createStok);
 
-  router.get('/:id', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.get(req, res, next);
-    } catch (e) { next(e); }
-  });
+router.route('/:id')
+  .get(getStokById)
+  .put(updateStok)
+  .delete(deleteStok);
 
-  return router;
-};
+export default router;

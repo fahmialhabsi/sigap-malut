@@ -4,13 +4,13 @@
  * CLI checker: Audit codebase vs dokumenSistem compliance
  * Usage: npx ts-node scripts/compare-with-dokumenSistem.ts --docs ./sigap-malut/dokumenSistem --out ./reports/report.json --format md
  */
-import fs = require("fs");
-import path = require("path");
-import minimist = require("minimist");
-import fg = require("fast-glob");
-import matter = require("gray-matter");
-import leven = require("leven");
-import chalk = require("chalk");
+import fs from "fs";
+import path from "path";
+import minimist from "minimist";
+import fg from "fast-glob";
+import matter from "gray-matter";
+import leven from "leven";
+import chalk from "chalk";
 import * as matcher from "./matcher.js";
 const { fuzzyMatch, detectRouteInSource } = matcher;
 // import { Project } from 'ts-morph'; // Uncomment if using ts-morph for TS/JS AST
@@ -162,12 +162,13 @@ function scanCodebaseForRequirement(req: Requirement): RequirementResult {
   }
   // Scan permission
   if (req.type === "permission" && req.name) {
-    if (fuzzyMatch(req.name, "workflow:read")) {
+    const matchResult = fuzzyMatch(req.name, "workflow:read");
+    if (matchResult.match) {
       evidence.push({
         file: "backend/middleware/workflowRbac.mjs",
         line: 13,
         snippet: `read: "${req.name}"`,
-        confidence: 1,
+        confidence: matchResult.confidence,
       });
     }
   }

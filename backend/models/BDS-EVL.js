@@ -2,7 +2,7 @@
 // MODEL: BdsEvl
 // TABLE: bds_evl
 // MODULE: BDS-EVL
-// Generated: 2026-02-17T19:24:47.440Z
+// Generated: 2026-03-19T23:39:22.982Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

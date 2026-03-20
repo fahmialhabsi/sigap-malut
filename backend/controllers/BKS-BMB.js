@@ -1,11 +1,10 @@
 // =====================================================
 // CONTROLLER: BksBmbController
 // MODEL: BksBmb
-// Generated: 2026-02-17T19:24:48.391Z
+// Generated: 2026-03-19T23:39:27.505Z
 // =====================================================
 
-import BksBmb from "../models/BKS-BMB.js";
-import { logAudit } from "../services/auditLogService.js";
+import BksBmb from '../models/BKS-BMB.js';
 
 // @desc    Get all BksBmb records
 // @route   GET /api/bks-bmb
@@ -13,18 +12,18 @@ import { logAudit } from "../services/auditLogService.js";
 export const getAllBksBmb = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-
+    
     const offset = (page - 1) * limit;
-
+    
     const where = { ...filters };
-
+    
     const { count, rows } = await BksBmb.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      order: [['created_at', 'DESC']]
     });
-
+    
     res.json({
       success: true,
       data: rows,
@@ -32,14 +31,14 @@ export const getAllBksBmb = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
-      },
+        totalPages: Math.ceil(count / limit)
+      }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching BksBmb",
-      error: error.message,
+      message: 'Error fetching BksBmb',
+      error: error.message
     });
   }
 };
@@ -50,23 +49,23 @@ export const getAllBksBmb = async (req, res) => {
 export const getBksBmbById = async (req, res) => {
   try {
     const record = await BksBmb.findByPk(req.params.id);
-
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BksBmb not found",
+        message: 'BksBmb not found'
       });
     }
-
+    
     res.json({
       success: true,
-      data: record,
+      data: record
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching BksBmb",
-      error: error.message,
+      message: 'Error fetching BksBmb',
+      error: error.message
     });
   }
 };
@@ -78,26 +77,19 @@ export const createBksBmb = async (req, res) => {
   try {
     const record = await BksBmb.create({
       ...req.body,
-      created_by: req.user?.id,
+      created_by: req.user?.id
     });
-    await logAudit({
-      modul: "BKS-BMB",
-      entitas_id: record.id,
-      aksi: "CREATE",
-      data_lama: null,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.status(201).json({
       success: true,
-      message: "BksBmb created successfully",
-      data: record,
+      message: 'BksBmb created successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error creating BksBmb",
-      error: error.message,
+      message: 'Error creating BksBmb',
+      error: error.message
     });
   }
 };
@@ -108,35 +100,29 @@ export const createBksBmb = async (req, res) => {
 export const updateBksBmb = async (req, res) => {
   try {
     const record = await BksBmb.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BksBmb not found",
+        message: 'BksBmb not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.update({
       ...req.body,
-      updated_by: req.user?.id,
+      updated_by: req.user?.id
     });
-    await logAudit({
-      modul: "BKS-BMB",
-      entitas_id: record.id,
-      aksi: "UPDATE",
-      data_lama: dataLama,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "BksBmb updated successfully",
-      data: record,
+      message: 'BksBmb updated successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error updating BksBmb",
-      error: error.message,
+      message: 'Error updating BksBmb',
+      error: error.message
     });
   }
 };
@@ -147,31 +133,25 @@ export const updateBksBmb = async (req, res) => {
 export const deleteBksBmb = async (req, res) => {
   try {
     const record = await BksBmb.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BksBmb not found",
+        message: 'BksBmb not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.destroy();
-    await logAudit({
-      modul: "BKS-BMB",
-      entitas_id: req.params.id,
-      aksi: "DELETE",
-      data_lama: dataLama,
-      data_baru: null,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "BksBmb deleted successfully",
+      message: 'BksBmb deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting BksBmb",
-      error: error.message,
+      message: 'Error deleting BksBmb',
+      error: error.message
     });
   }
 };

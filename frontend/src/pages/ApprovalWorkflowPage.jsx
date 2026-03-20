@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import RoleSwitch from "../components/ui/RoleSwitch";
 import { APPROVAL_STATUS } from "../utils/approvalWorkflow";
 import {
@@ -8,12 +8,13 @@ import {
 } from "../services/approvalService";
 import api from "../services/apiClient";
 
-  const [logs, setLogs] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
-  const [statusFilter, setStatusFilter] = React.useState("");
-  const [notif, setNotif] = React.useState("");
-  const [currentRole, setCurrentRole] = React.useState("admin");
-  const [form, setForm] = React.useState({ modulId: "", dataId: "", detail: "" });
+const ApprovalWorkflowPage = () => {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [notif, setNotif] = useState("");
+  const [currentRole, setCurrentRole] = useState("admin");
+  const [form, setForm] = useState({ modulId: "", dataId: "", detail: "" });
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -57,7 +58,9 @@ import api from "../services/apiClient";
         </button>
       </div>
       {notif && (
-        <div className="mb-4 text-sm text-green-700 bg-green-100 rounded px-3 py-2">{notif}</div>
+        <div className="mb-4 text-sm text-green-700 bg-green-100 rounded px-3 py-2">
+          {notif}
+        </div>
       )}
       <div className="mb-6 border p-4 rounded bg-gray-50">
         <h3 className="font-semibold mb-2">Ajukan Approval</h3>
@@ -107,7 +110,9 @@ import api from "../services/apiClient";
             className="bg-blue-600 text-white px-4 py-2 rounded font-semibold shadow"
             type="submit"
             disabled={loading}
-          >Ajukan</button>
+          >
+            Ajukan
+          </button>
         </form>
       </div>
       <div className="mb-4 flex gap-2 items-center">
@@ -119,7 +124,9 @@ import api from "../services/apiClient";
         >
           <option value="">Semua</option>
           {APPROVAL_STATUS.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
       </div>
@@ -140,7 +147,9 @@ import api from "../services/apiClient";
               </tr>
             </thead>
             <tbody>
-              {logs.filter((log) => !statusFilter || log.status === statusFilter).length === 0 ? (
+              {logs.filter(
+                (log) => !statusFilter || log.status === statusFilter,
+              ).length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-4 text-muted">
                     Tidak ada log approval.
@@ -152,17 +161,28 @@ import api from "../services/apiClient";
                   .map((log, i) => {
                     // Role-based actions
                     let actions = [];
-                    if (currentRole === "verifikator" && log.status === "diajukan") {
-                      actions.push({ label: "Verifikasi", status: "diverifikasi" });
+                    if (
+                      currentRole === "verifikator" &&
+                      log.status === "diajukan"
+                    ) {
+                      actions.push({
+                        label: "Verifikasi",
+                        status: "diverifikasi",
+                      });
                     }
-                    if (currentRole === "approver" && log.status === "diverifikasi") {
+                    if (
+                      currentRole === "approver" &&
+                      log.status === "diverifikasi"
+                    ) {
                       actions.push({ label: "Setujui", status: "disetujui" });
                       actions.push({ label: "Tolak", status: "ditolak" });
                       actions.push({ label: "Revisi", status: "revisi" });
                     }
                     return (
                       <tr key={i}>
-                        <td className="border px-2 py-1 whitespace-nowrap">{log.time}</td>
+                        <td className="border px-2 py-1 whitespace-nowrap">
+                          {log.time}
+                        </td>
                         <td className="border px-2 py-1">{log.user}</td>
                         <td className="border px-2 py-1">{log.modulId}</td>
                         <td className="border px-2 py-1">{log.dataId}</td>
@@ -188,12 +208,16 @@ import api from "../services/apiClient";
                                       setNotif(`Status ${a.label} berhasil.`);
                                       await fetchLogs();
                                     } catch {
-                                      setNotif(`Gagal update status ${a.label}.`);
+                                      setNotif(
+                                        `Gagal update status ${a.label}.`,
+                                      );
                                     }
                                     setLoading(false);
                                   }}
                                   disabled={loading}
-                                >{a.label}</button>
+                                >
+                                  {a.label}
+                                </button>
                               ))}
                             </div>
                           )}
@@ -208,4 +232,6 @@ import api from "../services/apiClient";
       </div>
     </div>
   );
-}
+};
+
+export default ApprovalWorkflowPage;

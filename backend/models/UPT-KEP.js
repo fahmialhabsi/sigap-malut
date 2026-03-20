@@ -2,7 +2,7 @@
 // MODEL: UptKep
 // TABLE: upt_kep
 // MODULE: UPT-KEP
-// Generated: 2026-02-17T19:24:47.470Z
+// Generated: 2026-03-19T23:39:23.377Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -10,7 +10,7 @@ import sequelize from '../config/database.js';
 
 const UptKep = sequelize.define('UptKep', {
   unit_kerja: {
-    type: DataTypes.ENUM('Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi'),
+    type: DataTypes.ENUM('"Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi"'),
     allowNull: false,
     defaultValue: 'UPTD',
     comment: 'AUTO-SET ke UPTD (field khusus UPTD)',
@@ -22,7 +22,7 @@ const UptKep = sequelize.define('UptKep', {
     comment: 'UPTD hanya bisa akses pegawai UPTD (field khusus UPTD)',
   },
   hak_akses_uptd: {
-    type: DataTypes.ENUM('read_only', 'read_write'),
+    type: DataTypes.ENUM('"read_only', 'read_write"'),
     allowNull: false,
     defaultValue: 'read_write',
     comment: 'UPTD bisa update data tertentu (cuti SKP) (field khusus UPTD)',

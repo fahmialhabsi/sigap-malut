@@ -1,11 +1,10 @@
 // =====================================================
 // CONTROLLER: BksLapController
 // MODEL: BksLap
-// Generated: 2026-02-17T19:24:48.398Z
+// Generated: 2026-03-19T23:39:27.510Z
 // =====================================================
 
-import BksLap from "../models/BKS-LAP.js";
-import { logAudit } from "../services/auditLogService.js";
+import BksLap from '../models/BKS-LAP.js';
 
 // @desc    Get all BksLap records
 // @route   GET /api/bks-lap
@@ -13,18 +12,18 @@ import { logAudit } from "../services/auditLogService.js";
 export const getAllBksLap = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, ...filters } = req.query;
-
+    
     const offset = (page - 1) * limit;
-
+    
     const where = { ...filters };
-
+    
     const { count, rows } = await BksLap.findAndCountAll({
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      order: [['created_at', 'DESC']]
     });
-
+    
     res.json({
       success: true,
       data: rows,
@@ -32,14 +31,14 @@ export const getAllBksLap = async (req, res) => {
         total: count,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
-      },
+        totalPages: Math.ceil(count / limit)
+      }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching BksLap",
-      error: error.message,
+      message: 'Error fetching BksLap',
+      error: error.message
     });
   }
 };
@@ -50,23 +49,23 @@ export const getAllBksLap = async (req, res) => {
 export const getBksLapById = async (req, res) => {
   try {
     const record = await BksLap.findByPk(req.params.id);
-
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BksLap not found",
+        message: 'BksLap not found'
       });
     }
-
+    
     res.json({
       success: true,
-      data: record,
+      data: record
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching BksLap",
-      error: error.message,
+      message: 'Error fetching BksLap',
+      error: error.message
     });
   }
 };
@@ -78,26 +77,19 @@ export const createBksLap = async (req, res) => {
   try {
     const record = await BksLap.create({
       ...req.body,
-      created_by: req.user?.id,
+      created_by: req.user?.id
     });
-    await logAudit({
-      modul: "BKS-LAP",
-      entitas_id: record.id,
-      aksi: "CREATE",
-      data_lama: null,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.status(201).json({
       success: true,
-      message: "BksLap created successfully",
-      data: record,
+      message: 'BksLap created successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error creating BksLap",
-      error: error.message,
+      message: 'Error creating BksLap',
+      error: error.message
     });
   }
 };
@@ -108,35 +100,29 @@ export const createBksLap = async (req, res) => {
 export const updateBksLap = async (req, res) => {
   try {
     const record = await BksLap.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BksLap not found",
+        message: 'BksLap not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.update({
       ...req.body,
-      updated_by: req.user?.id,
+      updated_by: req.user?.id
     });
-    await logAudit({
-      modul: "BKS-LAP",
-      entitas_id: record.id,
-      aksi: "UPDATE",
-      data_lama: dataLama,
-      data_baru: record,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "BksLap updated successfully",
-      data: record,
+      message: 'BksLap updated successfully',
+      data: record
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Error updating BksLap",
-      error: error.message,
+      message: 'Error updating BksLap',
+      error: error.message
     });
   }
 };
@@ -147,31 +133,25 @@ export const updateBksLap = async (req, res) => {
 export const deleteBksLap = async (req, res) => {
   try {
     const record = await BksLap.findByPk(req.params.id);
+    
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: "BksLap not found",
+        message: 'BksLap not found'
       });
     }
-    const dataLama = { ...record.get() };
+    
     await record.destroy();
-    await logAudit({
-      modul: "BKS-LAP",
-      entitas_id: req.params.id,
-      aksi: "DELETE",
-      data_lama: dataLama,
-      data_baru: null,
-      pegawai_id: req.user?.id || null,
-    });
+    
     res.json({
       success: true,
-      message: "BksLap deleted successfully",
+      message: 'BksLap deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting BksLap",
-      error: error.message,
+      message: 'Error deleting BksLap',
+      error: error.message
     });
   }
 };
