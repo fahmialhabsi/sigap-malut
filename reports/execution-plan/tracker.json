@@ -1,0 +1,388 @@
+{
+  "generatedAt": "2026-03-20T12:21:31.673Z",
+  "config": {
+    "startDate": "2026-03-23",
+    "totalWeeks": 16,
+    "itemsPerWeek": 12,
+    "auditHours": 3,
+    "source": "14-Role-Service-Requirements-Matrix.md",
+    "matrixPath": "E:\\sigap-malut\\dokumenSistem\\14-Role-Service-Requirements-Matrix.md",
+    "autofillMonday": true
+  },
+  "phases": [
+    {
+      "key": "PHASE_1",
+      "name": "Phase 1",
+      "label": "CRITICAL (Week 1-4)",
+      "startWeek": 1,
+      "endWeek": 4,
+      "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+      "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+      "exitCriteria": "Gate 1 lulus"
+    },
+    {
+      "key": "PHASE_2",
+      "name": "Phase 2",
+      "label": "HIGH (Week 5-8)",
+      "startWeek": 5,
+      "endWeek": 8,
+      "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+      "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+      "exitCriteria": "Gate 2 lulus"
+    },
+    {
+      "key": "PHASE_3",
+      "name": "Phase 3",
+      "label": "MEDIUM (Week 9-16)",
+      "startWeek": 9,
+      "endWeek": 16,
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus"
+    }
+  ],
+  "backlogSummary": {
+    "totalExtracted": 42,
+    "phase_1": 30,
+    "phase_2": 12,
+    "phase_3": 0
+  },
+  "weeks": [
+    {
+      "week": 1,
+      "phase": {
+        "key": "PHASE_1",
+        "name": "Phase 1",
+        "label": "CRITICAL (Week 1-4)",
+        "startWeek": 1,
+        "endWeek": 4,
+        "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+        "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+        "exitCriteria": "Gate 1 lulus"
+      },
+      "startDate": "2026-03-23",
+      "endDate": "2026-03-29",
+      "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+      "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+      "exitCriteria": "Gate 1 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 2,
+      "phase": {
+        "key": "PHASE_1",
+        "name": "Phase 1",
+        "label": "CRITICAL (Week 1-4)",
+        "startWeek": 1,
+        "endWeek": 4,
+        "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+        "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+        "exitCriteria": "Gate 1 lulus"
+      },
+      "startDate": "2026-03-30",
+      "endDate": "2026-04-05",
+      "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+      "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+      "exitCriteria": "Gate 1 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 3,
+      "phase": {
+        "key": "PHASE_1",
+        "name": "Phase 1",
+        "label": "CRITICAL (Week 1-4)",
+        "startWeek": 1,
+        "endWeek": 4,
+        "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+        "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+        "exitCriteria": "Gate 1 lulus"
+      },
+      "startDate": "2026-04-06",
+      "endDate": "2026-04-12",
+      "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+      "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+      "exitCriteria": "Gate 1 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 4,
+      "phase": {
+        "key": "PHASE_1",
+        "name": "Phase 1",
+        "label": "CRITICAL (Week 1-4)",
+        "startWeek": 1,
+        "endWeek": 4,
+        "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+        "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+        "exitCriteria": "Gate 1 lulus"
+      },
+      "startDate": "2026-04-13",
+      "endDate": "2026-04-19",
+      "focus": "Super Admin, Sekretariat, UPTD + partial bidang routing",
+      "target": "Tutup isu KRITIS prioritas dan stabilkan akses inti lintas role kunci",
+      "exitCriteria": "Gate 1 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 5,
+      "phase": {
+        "key": "PHASE_2",
+        "name": "Phase 2",
+        "label": "HIGH (Week 5-8)",
+        "startWeek": 5,
+        "endWeek": 8,
+        "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+        "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+        "exitCriteria": "Gate 2 lulus"
+      },
+      "startDate": "2026-04-20",
+      "endDate": "2026-04-26",
+      "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+      "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+      "exitCriteria": "Gate 2 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 6,
+      "phase": {
+        "key": "PHASE_2",
+        "name": "Phase 2",
+        "label": "HIGH (Week 5-8)",
+        "startWeek": 5,
+        "endWeek": 8,
+        "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+        "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+        "exitCriteria": "Gate 2 lulus"
+      },
+      "startDate": "2026-04-27",
+      "endDate": "2026-05-03",
+      "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+      "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+      "exitCriteria": "Gate 2 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 7,
+      "phase": {
+        "key": "PHASE_2",
+        "name": "Phase 2",
+        "label": "HIGH (Week 5-8)",
+        "startWeek": 5,
+        "endWeek": 8,
+        "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+        "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+        "exitCriteria": "Gate 2 lulus"
+      },
+      "startDate": "2026-05-04",
+      "endDate": "2026-05-10",
+      "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+      "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+      "exitCriteria": "Gate 2 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 8,
+      "phase": {
+        "key": "PHASE_2",
+        "name": "Phase 2",
+        "label": "HIGH (Week 5-8)",
+        "startWeek": 5,
+        "endWeek": 8,
+        "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+        "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+        "exitCriteria": "Gate 2 lulus"
+      },
+      "startDate": "2026-05-11",
+      "endDate": "2026-05-17",
+      "focus": "Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD",
+      "target": "Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope",
+      "exitCriteria": "Gate 2 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 9,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-05-18",
+      "endDate": "2026-05-24",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 10,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-05-25",
+      "endDate": "2026-05-31",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 11,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-06-01",
+      "endDate": "2026-06-07",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 12,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-06-08",
+      "endDate": "2026-06-14",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 13,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-21",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 14,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-06-22",
+      "endDate": "2026-06-28",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 15,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-06-29",
+      "endDate": "2026-07-05",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    },
+    {
+      "week": 16,
+      "phase": {
+        "key": "PHASE_3",
+        "name": "Phase 3",
+        "label": "MEDIUM (Week 9-16)",
+        "startWeek": 9,
+        "endWeek": 16,
+        "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+        "target": "Selesaikan data classification, anonymization, dan readiness publik",
+        "exitCriteria": "Gate 3 lulus"
+      },
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-12",
+      "focus": "Bidang Konsumsi, Public Portal, privacy hardening",
+      "target": "Selesaikan data classification, anonymization, dan readiness publik",
+      "exitCriteria": "Gate 3 lulus",
+      "gateResult": "planned",
+      "mondaySeedSource": "matrix_backlog",
+      "mondaySeedCount": 12
+    }
+  ]
+}
