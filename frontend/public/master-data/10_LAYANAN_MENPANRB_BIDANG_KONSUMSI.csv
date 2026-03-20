@@ -1,0 +1,26 @@
+layanan_id,layanan_code,layanan_name,modul_ui_id,is_sensitive,penanggung_jawab,pelaksana,status_aktif,menu_order
+LY107,kebijakan_konsumsi_pangan,Kebijakan Konsumsi Pangan,BKS-KBJ,Sensitif,Kepala Bidang Konsumsi,Fungsional Analis,true,1
+LY108,pedoman_konsumsi_b2sa,Pedoman Konsumsi B2SA,BKS-KBJ,Sensitif,Kepala Bidang Konsumsi,Fungsional Analis,true,2
+LY109,kebijakan_penganekaragaman_pangan,Kebijakan Penganekaragaman Pangan,BKS-KBJ,Sensitif,Kepala Bidang Konsumsi,Fungsional Analis,true,3
+LY110,sinkronisasi_kebijakan_konsumsi,Sinkronisasi Kebijakan Konsumsi,BKS-KBJ,Sensitif,Kepala Bidang Konsumsi,Fungsional Analis,true,4
+LY111,rekomendasi_intervensi_konsumsi,Rekomendasi Intervensi Konsumsi,BKS-KBJ,Sensitif,Kepala Bidang Konsumsi,Fungsional Analis,true,5
+LY112,pengembangan_pangan_lokal,Pengembangan Pangan Lokal,BKS-DVR,Biasa,Kepala Bidang Konsumsi,Staff Penganekaragaman,true,1
+LY113,pemanfaatan_pekarangan,Pemanfaatan Pekarangan,BKS-DVR,Biasa,Kepala Bidang Konsumsi,Staff Penganekaragaman,true,2
+LY114,kampanye_konsumsi_pangan_lokal,Kampanye Konsumsi Pangan Lokal,BKS-DVR,Biasa,Kepala Bidang Konsumsi,Staff Penganekaragaman,true,3
+LY115,edukasi_b2sa,Edukasi B2SA,BKS-DVR,Biasa,Kepala Bidang Konsumsi,Staff Edukasi,true,4
+LY116,pendampingan_kelompok_pangan,Pendampingan Kelompok Pangan,BKS-DVR,Biasa,Kepala Bidang Konsumsi,Staff Pendamping,true,5
+LY117,pembinaan_keamanan_pangan_segar,Pembinaan Keamanan Pangan Segar,BKS-KMN,Sensitif,Kepala Bidang Konsumsi,Staff Keamanan Pangan,true,1
+LY118,sosialisasi_pangan_aman,Sosialisasi Pangan Aman,BKS-KMN,Sensitif,Kepala Bidang Konsumsi,Staff Keamanan Pangan,true,2
+LY119,fasilitasi_penerapan_psat,Fasilitasi Penerapan PSAT,BKS-KMN,Sensitif,Kepala Bidang Konsumsi,Staff PSAT,true,3
+LY120,koordinasi_pengawasan_psat,Koordinasi Pengawasan PSAT,BKS-KMN,Sensitif,Kepala Bidang Konsumsi,Staff PSAT,true,4
+LY121,rekomendasi_teknis_keamanan_pangan,Rekomendasi Teknis Keamanan Pangan,BKS-KMN,Sensitif,Kepala Bidang Konsumsi,Fungsional Analis,true,5
+LY122,bimtek_konsumsi_pangan,Bimtek Konsumsi Pangan,BKS-BMB,Biasa,Kepala Bidang Konsumsi,Staff Bimtek,true,1
+LY123,bimtek_keamanan_pangan,Bimtek Keamanan Pangan,BKS-BMB,Biasa,Kepala Bidang Konsumsi,Staff Bimtek,true,2
+LY124,pelatihan_pengolahan_pangan_lokal,Pelatihan Pengolahan Pangan Lokal,BKS-BMB,Biasa,Kepala Bidang Konsumsi,Staff Pelatihan,true,3
+LY125,penyuluhan_masyarakat,Penyuluhan Masyarakat,BKS-BMB,Biasa,Kepala Bidang Konsumsi,Penyuluh,true,4
+LY126,konsultasi_teknis_konsumsi,Konsultasi Teknis Konsumsi,BKS-BMB,Biasa,Kepala Bidang Konsumsi,Fungsional Analis,true,5
+LY127,evaluasi_program_konsumsi,Evaluasi Program Konsumsi,BKS-EVL,Sensitif,Kepala Bidang Konsumsi,Staff Monev,true,1
+LY128,evaluasi_penganekaragaman_pangan,Evaluasi Penganekaragaman Pangan,BKS-EVL,Sensitif,Kepala Bidang Konsumsi,Staff Monev,true,2
+LY129,evaluasi_keamanan_pangan,Evaluasi Keamanan Pangan,BKS-EVL,Sensitif,Kepala Bidang Konsumsi,Staff Monev,true,3
+LY130,laporan_kinerja_konsumsi,Laporan Kinerja Konsumsi,BKS-LAP,Sensitif,Kepala Bidang Konsumsi,Staff Pelaporan,true,1
+LY131,data_dukung_sakip_konsumsi,Data Dukung SAKIP Konsumsi,BKS-LAP,Sensitif,Kepala Bidang Konsumsi,Staff Perencanaan,true,2

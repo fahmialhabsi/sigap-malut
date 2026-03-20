@@ -1,22 +1,21 @@
-import { expect } from "chai";
-import User from "../models/User.js";
+import "../models/index.js";
+import { sequelize } from "../config/database.js";
+const User = sequelize.models.User;
 
 describe("Soft Delete Behavior", () => {
-  it("should set deleted_at instead of removing record", async () => {
+  test("should set deleted_at instead of removing record", async () => {
     const uniq = Date.now();
     const user = await User.create({
       username: `softdelete${uniq}`,
-      name: "SoftDelete",
       password: "password123",
-      unit_id: "unit-1",
-      role_id: "pelaksana",
-      nama_lengkap: "Soft Delete",
-      unit_kerja: "Sekretariat",
+      name: "SoftDelete",
+      unit_id: "Sekretariat",
       email: `soft${uniq}@delete.com`,
+      role_id: "pelaksana",
       jabatan: "Staff",
     });
-    await user.destroy();
-    const found = await User.findByPk(user.id, { paranoid: false });
-    expect(found.deleted_at).to.not.be.null;
+    // DEBUG: created user instance, softDelete type = typeof user.softDelete
+    const updated = await user.softDelete();
+    expect(updated.deleted_at).not.toBeNull();
   });
 });

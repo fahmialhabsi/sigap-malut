@@ -1,0 +1,35 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY046-LY047)
+jenis_layanan_kebijakan,Jenis Layanan,enum,NULL,true,false,NULL,none,"Bahan Kebijakan Teknis,Rekapitulasi Laporan",Jenis layanan
+judul,Judul,varchar,255,true,false,NULL,none,NULL,Judul kebijakan/laporan
+periode,Periode,varchar,50,true,false,NULL,none,NULL,Periode laporan (bulanan/triwulan/semester/tahunan)
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+ruang_lingkup,Ruang Lingkup,text,NULL,false,false,NULL,none,NULL,Cakupan kebijakan/laporan
+latar_belakang,Latar Belakang,text,NULL,false,false,NULL,none,NULL,Background
+permasalahan,Permasalahan,text,NULL,false,false,NULL,none,NULL,Masalah yang dihadapi
+analisis,Analisis,text,NULL,false,false,NULL,none,NULL,Analisis situasi
+opsi_kebijakan,Opsi Kebijakan,text,NULL,false,false,NULL,none,NULL,Alternatif kebijakan
+rekomendasi_kebijakan,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi kebijakan
+dampak,Dampak,text,NULL,false,false,NULL,none,NULL,Dampak yang diharapkan
+dasar_hukum,Dasar Hukum,text,NULL,false,false,NULL,none,NULL,Landasan hukum
+sumber_data_bidang_ketersediaan,Data Bidang Ketersediaan,text,NULL,false,false,NULL,none,NULL,Ringkasan dari Bidang Ketersediaan
+sumber_data_bidang_distribusi,Data Bidang Distribusi,text,NULL,false,false,NULL,none,NULL,Ringkasan dari Bidang Distribusi
+sumber_data_bidang_konsumsi,Data Bidang Konsumsi,text,NULL,false,false,NULL,none,NULL,Ringkasan dari Bidang Konsumsi
+sumber_data_uptd,Data UPTD,text,NULL,false,false,NULL,none,NULL,Ringkasan dari UPTD
+rekapitulasi_keuangan,Rekapitulasi Keuangan,text,NULL,false,false,NULL,none,NULL,Ringkasan keuangan
+rekapitulasi_program,Rekapitulasi Program,text,NULL,false,false,NULL,none,NULL,Ringkasan program
+rekapitulasi_capaian,Rekapitulasi Capaian,text,NULL,false,false,NULL,none,NULL,Ringkasan capaian kinerja
+kesimpulan,Kesimpulan,text,NULL,false,false,NULL,none,NULL,Kesimpulan
+tindak_lanjut,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Rencana tindak lanjut
+file_dokumen,File Dokumen,varchar,255,false,false,NULL,none,NULL,Upload dokumen PDF
+file_lampiran,File Lampiran,json,NULL,false,false,NULL,none,NULL,Array file lampiran
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,NULL,none,NULL,Kepada siapa ditujukan (Kepala Dinas/Gubernur)
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Sekretaris,none,NULL,PIC (Sekretaris)
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang menyusun
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data kebijakan sensitif
+status,Status,enum,NULL,true,false,draft,none,"draft,review,finalisasi,disetujui",Status
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

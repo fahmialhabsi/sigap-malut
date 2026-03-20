@@ -4,6 +4,10 @@ export const roleIdToName = {
   "aae6d80e-c865-434f-b6ef-850e16f29ca5": "jabatan_fungsional",
   "468f7103-2c95-4b1d-b288-cbb082bb0963": "kepala_bidang",
   "3b92b758-1521-481e-b22c-a7db0af47ed5": "kepala_dinas",
+
+  // NEW (role sungguhan):
+  "c1f2c0a3-0f5a-4b1d-9d2f-0a4b0c9b3c21": "gubernur",
+
   "a8a366fe-6a2b-47fd-8d71-e1259f2361ff": "kepala_seksi",
   "7e08eb1d-2ab8-454a-9556-a233abf7ce61": "pelaksana",
   "b2d5474c-8895-47fd-ae61-24f35d015c18": "role_test_auto_1771323729430",
@@ -11,3 +15,10 @@ export const roleIdToName = {
   "167289b5-bcdb-4749-a404-f6e1360a9c86": "super_admin",
   "80dcf548-d1c4-476d-922c-1e023a043e80": "viewer",
 };
+
+// inverse mapping: role name -> role id
+export const roleNameToId = Object.keys(roleIdToName).reduce((acc, id) => {
+  const name = roleIdToName[id];
+  if (name) acc[name] = id;
+  return acc;
+}, {});

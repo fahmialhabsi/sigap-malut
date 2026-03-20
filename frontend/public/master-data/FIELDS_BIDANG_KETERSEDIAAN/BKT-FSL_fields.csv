@@ -1,0 +1,44 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+unit_kerja,Unit Kerja,enum,NULL,true,false,NULL,none,"Sekretariat,UPTD,Bidang Ketersediaan,Bidang Distribusi,Bidang Konsumsi",Unit yang input data (AUTO-SET sesuai bidang)
+reported_to_sekretariat,Dilaporkan ke Sekretariat,boolean,NULL,true,false,0,none,NULL,Sudah dilaporkan ke Sekretariat untuk konsolidasi
+reported_at,Tanggal Lapor ke Sekretariat,timestamp,NULL,false,false,NULL,none,NULL,Kapan dilaporkan ke Sekretariat
+sekretariat_notes,Catatan Sekretariat,text,NULL,false,false,NULL,none,NULL,Catatan dari Sekretaris saat review/konsolidasi
+layanan_id,Layanan,varchar,10,true,false,LY066,none,NULL,FK ke layanan_menpanrb
+jenis_fasilitasi,Jenis Fasilitasi,enum,NULL,true,false,NULL,none,"Intervensi Produksi,Intervensi Distribusi,Intervensi Konsumsi,Bantuan Pangan,Lainnya",Jenis fasilitasi
+nama_program,Nama Program,varchar,255,true,false,NULL,none,NULL,Nama program intervensi
+periode,Periode,date,NULL,true,false,NULL,none,NULL,Periode pelaksanaan
+tahun,Tahun,int,4,true,false,NULL,none,NULL,Tahun
+wilayah_sasaran,Wilayah Sasaran,varchar,255,false,false,NULL,none,NULL,Kabupaten/kecamatan sasaran
+kelompok_sasaran,Kelompok Sasaran,varchar,255,false,false,NULL,none,NULL,Petani/nelayan/masyarakat
+jumlah_penerima,Jumlah Penerima,int,11,false,false,NULL,none,NULL,Total penerima manfaat
+jenis_intervensi,Jenis Intervensi,enum,NULL,false,false,NULL,none,"Bantuan Benih,Bantuan Pupuk,Bantuan Alat,Bantuan Pangan,Pelatihan,Pendampingan,Lainnya",Jenis intervensi
+volume_bantuan,Volume Bantuan,decimal,"15,2",false,false,NULL,none,NULL,Volume bantuan
+satuan,Satuan,varchar,50,false,false,NULL,none,NULL,Satuan (kg ton unit dll)
+nilai_bantuan,Nilai Bantuan,decimal,"15,2",false,false,NULL,none,NULL,Nilai dalam rupiah
+sumber_bantuan,Sumber Bantuan,varchar,255,false,false,NULL,none,NULL,APBN/APBD/Donor/Lainnya
+instansi_pemberi,Instansi Pemberi,varchar,255,false,false,NULL,none,NULL,Instansi pemberi bantuan
+tanggal_penyaluran,Tanggal Penyaluran,date,NULL,false,false,NULL,none,NULL,Kapan disalurkan
+lokasi_penyaluran,Lokasi Penyaluran,varchar,255,false,false,NULL,none,NULL,Dimana disalurkan
+penanggung_jawab_penyaluran,PJ Penyaluran,varchar,255,false,false,NULL,none,NULL,PIC penyaluran
+target_output,Target Output,text,NULL,false,false,NULL,none,NULL,Output yang diharapkan
+target_outcome,Target Outcome,text,NULL,false,false,NULL,none,NULL,Outcome yang diharapkan
+realisasi,Realisasi,text,NULL,false,false,NULL,none,NULL,Realisasi pelaksanaan
+kendala,Kendala,text,NULL,false,false,NULL,none,NULL,Kendala yang dihadapi
+solusi,Solusi,text,NULL,false,false,NULL,none,NULL,Solusi atas kendala
+dampak,Dampak,text,NULL,false,false,NULL,none,NULL,Dampak yang dirasakan
+dokumentasi_kegiatan,Dokumentasi Kegiatan,json,NULL,false,false,NULL,none,NULL,Array foto kegiatan
+file_proposal,File Proposal,varchar,255,false,false,NULL,none,NULL,Proposal program
+file_bast,File BAST,varchar,255,false,false,NULL,none,NULL,Berita Acara Serah Terima
+file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Laporan pelaksanaan
+rincian_layanan,Rincian Layanan,text,NULL,false,false,NULL,none,NULL,Detail layanan
+penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kepala Bidang Ketersediaan,none,NULL,PIC
+pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
+kelompok_penerima,Kelompok Penerima,varchar,255,false,false,NULL,none,NULL,Siapa yang terima
+jenis_data,Jenis Data,varchar,255,false,false,NULL,none,NULL,Jenis data
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Data fasilitasi biasa
+status,Status,enum,NULL,true,false,perencanaan,none,"perencanaan,pelaksanaan,selesai",Status pelaksanaan
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

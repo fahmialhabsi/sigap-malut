@@ -11,22 +11,24 @@ const mappingPath = path.join(
   "config",
   "roleModuleMapping.json",
 );
-let roleMap = {};
+
+let roleMap = { roles: {} };
 try {
-  roleMap = JSON.parse(fs.readFileSync(mappingPath, "utf8"));
+  const raw = fs.readFileSync(mappingPath, "utf8");
+  roleMap = JSON.parse(raw);
 } catch (e) {
   roleMap = { roles: {} };
 }
 
-export function hasPermission(role, permission) {
+function hasPermission(role, permission) {
   if (!role) return false;
   const r = roleMap.roles[role];
   if (!r) return false;
   if (r.permissions && r.permissions.includes("*")) return true;
-  return r.permissions && r.permissions.includes(permission);
+  return Array.isArray(r.permissions) && r.permissions.includes(permission);
 }
 
-export function authorize(permission) {
+function authorize(permission) {
   return (req, res, next) => {
     try {
       const user = req.user; // set by auth middleware
@@ -38,3 +40,5 @@ export function authorize(permission) {
     }
   };
 }
+
+export { authorize, hasPermission };

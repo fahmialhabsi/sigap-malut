@@ -2,7 +2,7 @@
 // MODEL: SekLkt
 // TABLE: sek_lkt
 // MODULE: SEK-LKT
-// Generated: 2026-02-17T19:24:47.402Z
+// Generated: 2026-03-19T23:39:22.849Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -40,7 +40,7 @@ const SekLkt = sequelize.define('SekLkt', {
     comment: 'Jumlah komoditas dipantau',
   },
   total_stok: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Total stok pangan',
   },
   stok_aman: {
@@ -60,7 +60,7 @@ const SekLkt = sequelize.define('SekLkt', {
     comment: 'Jumlah wilayah rawan',
   },
   tingkat_kerawanan: {
-    type: DataTypes.ENUM('Aman', 'Waspada', 'Rawan', 'Sangat Rawan'),
+    type: DataTypes.ENUM('"Aman', 'Waspada', 'Rawan', 'Sangat Rawan"'),
     allowNull: false,
     defaultValue: 'Aman',
     comment: 'Tingkat kerawanan pangan',
@@ -70,15 +70,15 @@ const SekLkt = sequelize.define('SekLkt', {
     comment: 'Daftar komoditas yang kritis',
   },
   produksi_pangan_total: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Total produksi bulan ini',
   },
   konsumsi_estimasi: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Estimasi kebutuhan',
   },
   surplus_defisit: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Produksi - Konsumsi',
   },
   analisis: {
@@ -115,13 +115,13 @@ const SekLkt = sequelize.define('SekLkt', {
     comment: 'Yang menyusun',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Biasa',
     comment: 'Klasifikasi data',
   },
   status: {
-    type: DataTypes.ENUM('draft', 'review', 'final'),
+    type: DataTypes.ENUM('"draft', 'review', 'final"'),
     allowNull: false,
     defaultValue: 'draft',
     comment: 'Status',

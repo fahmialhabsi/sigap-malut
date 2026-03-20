@@ -2,7 +2,7 @@
 // MODEL: SekRmh
 // TABLE: sek_rmh
 // MODULE: SEK-RMH
-// Generated: 2026-02-17T19:24:47.412Z
+// Generated: 2026-03-19T23:39:22.863Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -17,10 +17,10 @@ const SekRmh = sequelize.define('SekRmh', {
   layanan_id: {
     type: DataTypes.STRING(10),
     allowNull: false,
-    comment: 'FK ke layanan_menpanrb (LY007',
+    comment: 'FK ke layanan_menpanrb (LY007,LY030-LY034)',
   },
   jenis_layanan_rumah_tangga: {
-    type: DataTypes.ENUM('Perjalanan Dinas', 'Kebersihan', 'Keamanan', 'Fasilitas', 'Ruang Rapat', 'Kendaraan'),
+    type: DataTypes.ENUM('"Perjalanan Dinas', 'Kebersihan', 'Keamanan', 'Fasilitas', 'Ruang Rapat', 'Kendaraan"'),
     allowNull: false,
     comment: 'Jenis layanan RT',
   },
@@ -61,19 +61,19 @@ const SekRmh = sequelize.define('SekRmh', {
     comment: 'Jumlah hari',
   },
   biaya_transport: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Biaya transportasi',
   },
   biaya_penginapan: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Biaya hotel',
   },
   uang_harian: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Per hari',
   },
   total_biaya: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Total perjalanan dinas',
   },
   area_kebersihan: {
@@ -81,7 +81,7 @@ const SekRmh = sequelize.define('SekRmh', {
     comment: 'Area yang dibersihkan',
   },
   jadwal_kebersihan: {
-    type: DataTypes.ENUM('Harian', 'Mingguan', 'Bulanan'),
+    type: DataTypes.ENUM('"Harian', 'Mingguan', 'Bulanan"'),
     comment: 'Jadwal kebersihan',
   },
   petugas_kebersihan: {
@@ -93,7 +93,7 @@ const SekRmh = sequelize.define('SekRmh', {
     comment: 'Pos security',
   },
   shift_keamanan: {
-    type: DataTypes.ENUM('Pagi', 'Siang', 'Malam'),
+    type: DataTypes.ENUM('"Pagi', 'Siang', 'Malam"'),
     comment: 'Shift keamanan',
   },
   petugas_keamanan: {
@@ -105,7 +105,7 @@ const SekRmh = sequelize.define('SekRmh', {
     comment: 'AC printer dll',
   },
   kondisi_fasilitas: {
-    type: DataTypes.ENUM('Baik', 'Rusak', 'Perlu Perbaikan'),
+    type: DataTypes.ENUM('"Baik', 'Rusak', 'Perlu Perbaikan"'),
     defaultValue: 'Baik',
     comment: 'Kondisi fasilitas',
   },
@@ -138,7 +138,7 @@ const SekRmh = sequelize.define('SekRmh', {
     comment: 'Kendaraan dinas',
   },
   jenis_kendaraan: {
-    type: DataTypes.ENUM('Mobil Dinas', 'Motor Dinas', 'Mobil Operasional'),
+    type: DataTypes.ENUM('"Mobil Dinas', 'Motor Dinas', 'Mobil Operasional"'),
     comment: 'Jenis kendaraan',
   },
   driver: {
@@ -158,7 +158,7 @@ const SekRmh = sequelize.define('SekRmh', {
     comment: 'Odometer akhir',
   },
   bbm_liter: {
-    type: DataTypes.DECIMAL(10,2),
+    type: DataTypes.DECIMAL("10,2"),
     comment: 'Pengisian BBM',
   },
   file_sppd: {
@@ -181,13 +181,13 @@ const SekRmh = sequelize.define('SekRmh', {
     comment: 'Yang melaksanakan',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Biasa',
     comment: 'Klasifikasi (perjalanan dinas = sensitif)',
   },
   status: {
-    type: DataTypes.ENUM('pending', 'disetujui', 'ditolak', 'selesai'),
+    type: DataTypes.ENUM('"pending', 'disetujui', 'ditolak', 'selesai"'),
     allowNull: false,
     defaultValue: 'pending',
     comment: 'Status',

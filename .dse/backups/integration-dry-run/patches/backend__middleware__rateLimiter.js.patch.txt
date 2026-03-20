@@ -1,0 +1,21 @@
+--- original
+
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  message: { error: "too_many_requests" },
+});
+
+module.exports = limiter;
+
+
++++ suggestion
+
+// replace: const rateLimit = require("express-rate-limit");
+import rateLimit from 'express-rate-limit';
+
+// replace: module.exports = limiter;
+export default limiter;;
+

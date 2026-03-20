@@ -1,5 +1,4 @@
 import { expect } from "chai";
-import { randomUUID } from "crypto";
 import AuditLog from "../models/auditLog.js";
 
 describe("Audit Log", () => {
@@ -7,9 +6,9 @@ describe("Audit Log", () => {
     const before = await AuditLog.count();
     await AuditLog.create({
       modul: "testModul",
-      entitas_id: randomUUID(),
+      entitas_id: 1,
       aksi: "CREATE",
-      pegawai_id: randomUUID(),
+      pegawai_id: 1,
       data_lama: {},
       data_baru: {},
     });
@@ -20,9 +19,9 @@ describe("Audit Log", () => {
   it("should not allow modification of existing log", async () => {
     const entry = await AuditLog.create({
       modul: "testModul",
-      entitas_id: randomUUID(),
+      entitas_id: 2,
       aksi: "CREATE",
-      pegawai_id: randomUUID(),
+      pegawai_id: 2,
       data_lama: {},
       data_baru: {},
     });

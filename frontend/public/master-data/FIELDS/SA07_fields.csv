@@ -1,0 +1,15 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+config_key,Config Key,varchar,100,true,true,NULL,uppercase_underscore,NULL,Kunci config
+config_value,Nilai,text,NULL,true,false,NULL,none,NULL,Nilai config
+config_type,Tipe Data,enum,NULL,true,false,string,none,"string,number,boolean,json",Tipe data
+category,Kategori,enum,NULL,true,false,general,none,"general,kepegawaian,inflasi,sppg,notification,ai,security",Kategori config
+label,Label,varchar,255,true,false,NULL,none,NULL,Label UI
+description,Deskripsi,text,NULL,false,false,NULL,none,NULL,Penjelasan
+is_editable,Bisa Diedit,boolean,NULL,true,false,1,none,NULL,Editable via UI
+is_sensitive,Sensitif,boolean,NULL,true,false,0,none,NULL,Password API key
+validation_rule,Validasi,varchar,255,false,false,NULL,none,NULL,Regex validasi
+default_value,Nilai Default,text,NULL,false,false,NULL,none,NULL,Default saat reset
+updated_by,Diperbarui Oleh,int,11,false,false,NULL,none,NULL,User ID
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

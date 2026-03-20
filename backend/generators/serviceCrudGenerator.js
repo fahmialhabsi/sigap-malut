@@ -32,7 +32,7 @@ async function generate(projectRoot) {
     if (!fs.existsSync(modelFile)) {
       fs.writeFileSync(
         modelFile,
-        `export default (sequelize, DataTypes) => {
+        `module.exports = (sequelize, DataTypes) => {
   const ${code} = sequelize.define('${code}', {
     id: { type: DataTypes.UUID, primaryKey: true },
     layanan_id: { type: DataTypes.STRING },
@@ -48,8 +48,8 @@ async function generate(projectRoot) {
     if (!fs.existsSync(controllerFile)) {
       fs.writeFileSync(
         controllerFile,
-        `import BaseService from '../services/baseService.js';
-export default function(models){
+        `const BaseService = require('../services/baseService');
+module.exports = function(models){
   const svc = new BaseService(models['${code}']);
   return {
     create: async (req,res,next)=>{ try{ const r=await svc.create(req.body); return res.json(r);}catch(e){next(e)} },
@@ -65,13 +65,35 @@ export default function(models){
       fs.writeFileSync(
         routeFile,
         `import express from 'express';
-const router = express.Router();
+import { getController } from '../utils/dynamicImport.js';
+
 export default (app) => {
   const models = app.get('models');
-  const ctrl = (await import('../controllers/${code}Controller.js')).default(models);
-  router.post('/', ctrl.create);
-  router.get('/', ctrl.list);
-  router.get('/:id', ctrl.get);
+  const router = express.Router();
+  // lazy-load controller (returns controller instance or object)
+  const ctrlPromise = getController('${code}', models);
+
+  router.post('/', async (req, res, next) => {
+    try {
+      const ctrl = await ctrlPromise;
+      return ctrl.create(req, res, next);
+    } catch (e) { next(e); }
+  });
+
+  router.get('/', async (req, res, next) => {
+    try {
+      const ctrl = await ctrlPromise;
+      return ctrl.list(req, res, next);
+    } catch (e) { next(e); }
+  });
+
+  router.get('/:id', async (req, res, next) => {
+    try {
+      const ctrl = await ctrlPromise;
+      return ctrl.get(req, res, next);
+    } catch (e) { next(e); }
+  });
+
   return router;
 };
 `,
@@ -81,7 +103,10 @@ export default (app) => {
   return { generated: registry.map((r) => r.kode_layanan) };
 }
 
-if (require.main === module) {
+// ESM main guard — robust check for direct invocation
+const invokedPath = process.argv[1] ? path.resolve(process.argv[1]) : "";
+const selfPath = path.resolve(__filename);
+if (invokedPath === selfPath) {
   const projectRoot = path.resolve(__dirname, "..", "..");
   generate(projectRoot)
     .then((r) => console.log("generated", r))
@@ -91,4 +116,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { generate };
+export { generate };

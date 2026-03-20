@@ -1,0 +1,13 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+asn_id,ASN ID,int,11,true,false,NULL,none,NULL,FK ke tabel asn
+nip,NIP,varchar,18,true,false,NULL,nip_18_digit,NULL,Denormalized NIP
+nama_asn,Nama ASN,varchar,255,false,false,NULL,none,NULL,Denormalized nama
+jenis_kenaikan,Jenis Kenaikan,enum,NULL,true,false,NULL,none,"reguler,promosi,penghargaan",Jenis kenaikan
+tanggal_usulan,Tanggal Usulan,date,NULL,false,false,NULL,none,NULL,Tanggal usulan
+tanggal_efektif,Tanggal Efektif,date,NULL,false,false,NULL,none,NULL,Tanggal berlaku pangkat
+nomor_sk,Nomor SK,varchar,100,false,true,NULL,none,NULL,Nomor SK pangkat
+status,Status,enum,NULL,true,false,pending,none,"pending,approved,rejected",Status proses
+catatan,Catatan,text,NULL,false,false,NULL,none,NULL,
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

@@ -4,7 +4,7 @@
  */
 import { v4 as uuidv4 } from "uuid";
 
-export async function log(app, { userId, action, entity, entityId, meta }) {
+async function log(app, { userId, action, entity, entityId, meta }) {
   const models = app.get("models") || {};
   if (models.AuditLog) {
     return models.AuditLog.create({
@@ -20,3 +20,5 @@ export async function log(app, { userId, action, entity, entityId, meta }) {
   console.info("audit", { userId, action, entity, entityId, meta });
   return true;
 }
+
+export { log };
