@@ -1,3 +1,5 @@
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 # 02 - Dokumentasi Sistem SIGAP Malut
 
 ---
@@ -27,12 +29,16 @@ modul:
 - tata naskah dinas
 - repositori peraturan
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 ---
 
 # BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
 
 ## Flowchart Logika Penilaian
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 1. Atasan input penilaian → Submit
 2. Sistem simpan ke tabel_penilaian
 3. Reviewer (jika ada) review → Approve/Reject
@@ -40,22 +46,34 @@ modul:
 5. Nilai akhir otomatis direkap di dashboard
 
 ## Skema Database
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 - **tabel_penilaian**: id, asn_id, periode, indikator_id, nilai, catatan, status, created_by, created_at
 - **tabel_indikator**: id, nama_indikator, bobot, deskripsi
 - **tabel_approval_log**: id, penilaian_id, reviewer_id, action, catatan, timestamp
 
 ## Role-Based Access Control
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 - Sekretaris, Kepala Bidang, Kepala UPTD hanya dapat menilai bawahan sesuai struktur
 - Staf hanya dapat melihat hasil penilaian dirinya
 
 ## Approval Workflow
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+- Single-level: Atasan langsung → Approve
+- Multi-level: Atasan → Reviewer → Approve
+- Status: Draft, Submitted, Approved, Rejected
+========
 
 - Single-level: Atasan langsung → Approve
 - Multi-level: Atasan → Reviewer → Approve
 - Status: Draft, Submitted, Approved, Rejected
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 # DOKUMENTASI RESMI
 
 # SISTEM INFORMASI TERINTEGRASI DINAS PANGAN PROVINSI MALUKU UTARA

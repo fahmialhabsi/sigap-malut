@@ -1,0 +1,169 @@
+{
+  "roles": [
+    {
+      "code": "kepala_dinas",
+      "display_name": "Kepala Dinas",
+      "aliases": ["Kepala Dinas", "kepala_dinas"],
+      "description": "Pemegang otoritas tertinggi di Dinas Pangan; memiliki hak approve akhir untuk workflow strategis.",
+      "default_permissions": ["*"],
+      "owner": "governance",
+      "evidence": [
+        "dokumenSistem/09-Role-Module-Matrix.md",
+        ".dse/workflowEngine.js"
+      ]
+    },
+    {
+      "code": "sekretaris",
+      "display_name": "Sekretaris",
+      "aliases": ["Sekretaris", "sekretaris"],
+      "description": "Koordinator operasional internal; filter/koordinator alur staf ke Kepala Dinas.",
+      "default_permissions": [
+        "read:all",
+        "write:administration",
+        "approve:staff_level"
+      ],
+      "owner": "sekretariat",
+      "evidence": [
+        "dokumenSistem/01-kondisi-dinas-pangan.md",
+        "dokumenSistem/02-dokumentasi-sistem.md"
+      ]
+    },
+    {
+      "code": "kepala_bidang",
+      "display_name": "Kepala Bidang",
+      "aliases": ["Kepala Bidang", "kepala_bidang"],
+      "description": "Pemimpin tiap bidang teknis; reviewer dan approver untuk layanan bidang.",
+      "default_permissions": ["read:field_data", "approve:field_requests"],
+      "owner": "bidang",
+      "evidence": ["dokumenSistem/09-Role-Module-Matrix.md"]
+    },
+    {
+      "code": "kepala_uptd",
+      "display_name": "Kepala UPTD",
+      "aliases": ["Kepala UPTD", "kepala_uptd"],
+      "description": "Penanggung jawab UPTD; dapat approve permintaan UPTD.",
+      "default_permissions": ["read:uptd_data", "approve:uptd_requests"],
+      "owner": "uptd",
+      "evidence": ["dokumenSistem/01-kondisi-dinas-pangan.md"]
+    },
+    {
+      "code": "atasan",
+      "display_name": "Atasan Langsung",
+      "aliases": ["atasan", "supervisor"],
+      "description": "Peran generik untuk atasan langsung yang mengajukan/menilai tugas bawahan.",
+      "default_permissions": ["approve:direct_reports", "read:direct_reports"],
+      "owner": "hr",
+      "evidence": [
+        ".dse/serviceRegistry.json",
+        "dokumenSistem/08-Workflow-Specification.md"
+      ]
+    },
+    {
+      "code": "staf",
+      "display_name": "Staf",
+      "aliases": ["Staf", "staf"],
+      "description": "Pengguna level staf; dapat membuat permohonan dan melihat data sendiri.",
+      "default_permissions": ["create:own_requests", "read:own_records"],
+      "owner": "unit",
+      "evidence": ["dokumenSistem/02-dokumentasi-sistem.md"]
+    },
+    {
+      "code": "pelaksana",
+      "display_name": "Pelaksana",
+      "aliases": ["pelaksana"],
+      "description": "Pelaksana teknis di bidang; peran operasional pada workflow stok/komoditas.",
+      "default_permissions": ["create:stok_records", "read:stok_records"],
+      "owner": "bidang",
+      "evidence": [".dse/serviceRegistry.json", ".dse/workflowEngine.js"]
+    },
+    {
+      "code": "fungsional",
+      "display_name": "Fungsional",
+      "aliases": ["fungsional"],
+      "description": "Jabatan fungsional teknis untuk analisis dan verifikasi.",
+      "default_permissions": ["analyze:data", "verify:requests"],
+      "owner": "bidang",
+      "evidence": [".dse/serviceRegistry.json"]
+    },
+    {
+      "code": "bendahara",
+      "display_name": "Bendahara",
+      "aliases": ["bendahara"],
+      "description": "Bertanggung jawab atas verifikasi pembayaran dan dokumen keuangan (tidak membuat bukti pertanggungjawaban).",
+      "default_permissions": ["verify:payments", "read:financial_records"],
+      "owner": "finance",
+      "evidence": ["dokumenSistem/01-kondisi-dinas-pangan.md"]
+    },
+    {
+      "code": "data_steward",
+      "display_name": "Data Steward",
+      "aliases": ["data_steward", "steward"],
+      "description": "Penanggung jawab master-data (SSOT), validasi referensi, mapping dan transformasi.",
+      "default_permissions": ["manage:master_data", "approve:master_changes"],
+      "owner": "sekretariat",
+      "evidence": [
+        "dokumenSistem/04-Dokumen Integrasi Sistem & Mapping Modul SIGAP-MALUT.md"
+      ]
+    },
+    {
+      "code": "sysadmin",
+      "display_name": "System Administrator",
+      "aliases": ["sysadmin", "administrator"],
+      "description": "Operasional teknis: deploy, konfigurasi, integrasi, dan manajemen secrets.",
+      "default_permissions": ["manage:infrastructure", "manage:integrations"],
+      "owner": "it_ops",
+      "evidence": ["dokumenSistem/13-System-Architecture-Document.md"]
+    },
+    {
+      "code": "auditor",
+      "display_name": "Auditor",
+      "aliases": ["auditor"],
+      "description": "Akses read-only ke audit trail dan laporan compliance untuk kepentingan audit SPIP/SPBE.",
+      "default_permissions": ["read:audit_log", "read:compliance_reports"],
+      "owner": "governance",
+      "evidence": ["dokumenSistem/12-IT-Governance-SPBE-SPIP-Alignment.md"]
+    },
+    {
+      "code": "kepala_subbagian",
+      "display_name": "Kepala Subbagian",
+      "aliases": ["Kepala Subbagian", "kepala_subbagian"],
+      "description": "Penanggung jawab subbagian tata usaha/administrasi; reviewer operasional pada level subbagian.",
+      "default_permissions": ["read:subbag_data", "approve:subbag_requests"],
+      "owner": "sekretariat",
+      "evidence": [
+        ".dse/backups/2026-02-26_14-58-13/workflowEngine.js",
+        "dokumenSistem/01-kondisi-dinas-pangan.md"
+      ]
+    },
+    {
+      "code": "kepala_seksi",
+      "display_name": "Kepala Seksi",
+      "aliases": ["Kepala Seksi", "kepala_seksi"],
+      "description": "Penanggung jawab seksi teknis; reviewer/validator untuk kegiatan seksi.",
+      "default_permissions": ["read:seksi_data", "approve:seksi_requests"],
+      "owner": "bidang",
+      "evidence": [
+        ".dse/backups/2026-02-26_14-58-13/workflowEngine.js",
+        "dokumenSistem/01-kondisi-dinas-pangan.md"
+      ]
+    },
+    {
+      "code": "devops",
+      "display_name": "DevOps",
+      "aliases": ["devops"],
+      "description": "Operasional platform CI/CD dan runbook deployment; terkait pengelolaan infrastruktur aplikasi.",
+      "default_permissions": [
+        "deploy:applications",
+        "manage:ci_cd",
+        "read:infrastructure_metrics"
+      ],
+      "owner": "it_ops",
+      "evidence": ["dokumenSistem/13-System-Architecture-Document.md"]
+    }
+  ],
+  "metadata": {
+    "generated_by": "roles-canonical-generator",
+    "generated_at": "2026-02-26T00:00:00Z",
+    "notes": "Canonical role registry. Update `default_permissions` with CRUD granular permissions per resource after review. Aliases map names found across dokumenSistem and .dse files."
+  }
+}
