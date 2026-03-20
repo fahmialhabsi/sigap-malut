@@ -4,6 +4,8 @@ tahun: 2026
 evidence: true
 ---
 
+# 01 - Kondisi Dinas Pangan Provinsi Maluku Utara
+
 ## Struktur Peran dan Kewenangan Penilaian
 
 ## Indikator Penilaian

@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#57] Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
-| 2 | [#38] Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
-| 3 | [#56] Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 4 | [#37] Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
-| 5 | [#4] API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
-| 6 | [#39] Survey data model underspecified | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | Squad Lead | Planned |
-| 7 | [#40] Konsumsi & gizi scoring formula undocumented | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | FE Lead | Planned |
-| 8 | [#61] OpenAPI spec incomplete (not cover public data endpoint) | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 9 | [#60] Public API rate limiting missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | BE Lead | Planned |
-| 10 | [#58] API key management missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 11 | [#59] Data anonymization pipeline missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 12 | [#41] Keamanan pangan incident tracking belum ada | BIDANG KONSUMSI & KEAMANAN ... | Dashboard/Routing | FE Lead | Planned |
+| 1 | [#5][PLAN] Analisis acceptance criteria: User audit trail incomplete | SUPER ADMIN | Core Workflow | BE+QA | Planned |
+| 2 | [#35][PLAN] Analisis acceptance criteria: Distribution effectiveness metric unclear | BIDANG DISTRIBUSI PANGAN | Data Integrity | FE Lead | Planned |
+| 3 | [#6][PLAN] Analisis acceptance criteria: Master data export format limited | SUPER ADMIN | Data Integrity | FE Lead | Planned |
+| 4 | [#21][PLAN] Analisis acceptance criteria: KGB tracking SLA alerts missing | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 5 | [#36][PLAN] Analisis acceptance criteria: Price stability formula belum implement | BIDANG DISTRIBUSI PANGAN | Core Workflow | FE Lead | Planned |
+| 6 | [#52][PLAN] Analisis acceptance criteria: Chain of custody tracking belum implemented | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
+| 7 | [#55][PLAN] Analisis acceptance criteria: Equipment maintenance schedule not tracked | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 8 | [#7][PLAN] Analisis acceptance criteria: System health dashboard missing | SUPER ADMIN | Dashboard/Routing | FE Lead | Planned |
+| 9 | [#22][PLAN] Analisis acceptance criteria: Laporan agregasi 3 bidang tidak auto-generate | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 10 | [#42][PLAN] Analisis acceptance criteria: Halal certification integration missing | BIDANG KONSUMSI & KEAMANAN ... | Auth/RBAC | FE Lead | Planned |
+| 11 | [#53][PLAN] Analisis acceptance criteria: Certification auto-generation missing | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 12 | [#54][PLAN] Analisis acceptance criteria: SOP compliance check missing | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Analisis acceptance criteria: User audit trail incomplete | Implement | BE+QA | PR/Commit | Planned |
+| 2 | Implement: Analisis acceptance criteria: Distribution effectiveness m... | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Analisis acceptance criteria: Master data export format li... | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Analisis acceptance criteria: KGB tracking SLA alerts missing | Test | FE Lead | Test log | Planned |
+| 2 | Test: Analisis acceptance criteria: Price stability formula belum imp... | Test | FE Lead | Test log | Planned |
+| 3 | Test: Analisis acceptance criteria: Chain of custody tracking belum i... | Test | FE Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Analisis acceptance criteria: Equipment maintenance schedule ... | Review | FE Lead | Review note | Planned |
+| 2 | Review: Analisis acceptance criteria: System health dashboard missing | Review | FE Lead | Review note | Planned |
+| 3 | Review: Analisis acceptance criteria: Laporan agregasi 3 bidang tidak... | Review | FE Lead | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

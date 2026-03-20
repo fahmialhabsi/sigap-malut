@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#39] Survey data model underspecified | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | Squad Lead | Planned |
-| 2 | [#32] Daily harga feed belum otomatis | BIDANG DISTRIBUSI PANGAN | Dashboard/Routing | FE Lead | Planned |
-| 3 | [#8] Dashboard layout tidak customizable | KEPALA DINAS / GUBERNUR | API/Contract | FE Lead | Planned |
-| 4 | [#40] Konsumsi & gizi scoring formula undocumented | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | FE Lead | Planned |
-| 5 | [#61] OpenAPI spec incomplete (not cover public data endpoint) | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 6 | [#60] Public API rate limiting missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | BE Lead | Planned |
-| 7 | [#44] Dashboard sidebar route orphaned (/uptd/:id not in router) | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
-| 8 | [#47] Profile endpoint mismatch (/auth/profile vs /api/auth/me) | UPTD BALAI PENGAWASAN MUTU ... | API/Contract | BE Lead | Planned |
-| 9 | [#48] Role routing missing (kepala_uptd → /dashboard/uptd not in map) | UPTD BALAI PENGAWASAN MUTU ... | Auth/RBAC | FE Lead | Planned |
-| 10 | [#16] BaseTable fallback dummy data (bukan real Sekretariat data) | SEKRETARIAT | API/Contract | FE Lead | Planned |
-| 11 | [#46] BaseTable fallback dummy data (not real UPTD test result) | UPTD BALAI PENGAWASAN MUTU ... | API/Contract | FE Lead | Planned |
-| 12 | [#30] Dashboard routing orphaned | BIDANG DISTRIBUSI PANGAN | Dashboard/Routing | FE Lead | Planned |
+| 1 | [#57][PLAN] Analisis acceptance criteria: Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
+| 2 | [#1][PLAN] Analisis acceptance criteria: MFA tidak implemented | SUPER ADMIN | Core Workflow | Squad Lead | Planned |
+| 3 | [#31][PLAN] Analisis acceptance criteria: Real-time shipment tracking missing | BIDANG DISTRIBUSI PANGAN | API/Contract | FE Lead | Planned |
+| 4 | [#38][PLAN] Analisis acceptance criteria: Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
+| 5 | [#56][PLAN] Analisis acceptance criteria: Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 6 | [#37][PLAN] Analisis acceptance criteria: Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
+| 7 | [#2][TEST] Uji integrasi dan regresi: Session timeout tidak enforced | SUPER ADMIN | Core Workflow | Squad Lead | Planned |
+| 8 | [#15][TEST] Uji integrasi dan regresi: Dashboard tidak menampilkan 12 modul lengkap | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 9 | [#16][TEST] Uji integrasi dan regresi: BaseTable fallback dummy data (bukan real Sekretariat ... | SEKRETARIAT | API/Contract | FE Lead | Planned |
+| 10 | [#23][TEST] Uji integrasi dan regresi: Dashboard tidak terpasang (no route /module/:moduleId ... | BIDANG KETERSEDIAAN PANGAN | Dashboard/Routing | FE Lead | Planned |
+| 11 | [#30][TEST] Uji integrasi dan regresi: Dashboard routing orphaned | BIDANG DISTRIBUSI PANGAN | Dashboard/Routing | FE Lead | Planned |
+| 12 | [#45][TEST] Uji integrasi dan regresi: Frontend endpoint mismatch (/sertifikasi_prima vs /api... | UPTD BALAI PENGAWASAN MUTU ... | API/Contract | FE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Analisis acceptance criteria: Data classification policy t... | Implement | Squad Lead | PR/Commit | Planned |
+| 2 | Implement: Analisis acceptance criteria: MFA tidak implemented | Implement | Squad Lead | PR/Commit | Planned |
+| 3 | Implement: Analisis acceptance criteria: Real-time shipment tracking ... | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Analisis acceptance criteria: Data privacy/GDPR compliance missing | Test | BE+QA | Test log | Planned |
+| 2 | Test: Analisis acceptance criteria: Public portal tidak ada | Test | FE Lead | Test log | Planned |
+| 3 | Test: Analisis acceptance criteria: Dashboard tidak ada (modul belum ... | Test | FE Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Uji integrasi dan regresi: Session timeout tidak enforced | Review | Squad Lead | Review note | Planned |
+| 2 | Review: Uji integrasi dan regresi: Dashboard tidak menampilkan 12 mod... | Review | FE Lead | Review note | Planned |
+| 3 | Review: Uji integrasi dan regresi: BaseTable fallback dummy data (buk... | Review | FE Lead | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

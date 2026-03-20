@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#1] MFA tidak implemented | SUPER ADMIN | Core Workflow | Squad Lead | Planned |
-| 2 | [#31] Real-time shipment tracking missing | BIDANG DISTRIBUSI PANGAN | API/Contract | FE Lead | Planned |
-| 3 | [#38] Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
-| 4 | [#56] Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 5 | [#37] Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
-| 6 | [#58] API key management missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 7 | [#10] Compliance scorecard belum auto-compute | KEPALA DINAS / GUBERNUR | Dashboard/Routing | FE Lead | Planned |
-| 8 | [#59] Data anonymization pipeline missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 9 | [#34] Geographic route visualization missing | BIDANG DISTRIBUSI PANGAN | Dashboard/Routing | FE Lead | Planned |
-| 10 | [#26] Geographic visualization (map) missing | BIDANG KETERSEDIAAN PANGAN | Data Integrity | FE Lead | Planned |
-| 11 | [#41] Keamanan pangan incident tracking belum ada | BIDANG KONSUMSI & KEAMANAN ... | Dashboard/Routing | FE Lead | Planned |
-| 12 | [#33] CPPD system integration missing | BIDANG DISTRIBUSI PANGAN | API/Contract | FE Lead | Planned |
+| 1 | [#33][PLAN] Analisis acceptance criteria: CPPD system integration missing | BIDANG DISTRIBUSI PANGAN | API/Contract | FE Lead | Planned |
+| 2 | [#49][BUILD] Implementasi perbaikan: Master-data layanan count internal mismatch | UPTD BALAI PENGAWASAN MUTU ... | Data Integrity | FE Lead | Planned |
+| 3 | [#17][BUILD] Implementasi perbaikan: Field mapping path mismatch (FIELDS_SEKRETARIAT/SEK-\*.csv) | SEKRETARIAT | Data Integrity | FE Lead | Planned |
+| 4 | [#20][BUILD] Implementasi perbaikan: Approval workflow UI incomplete (no approve/reject buttons) | SEKRETARIAT | API/Contract | FE Lead | Planned |
+| 5 | [#27][BUILD] Implementasi perbaikan: Bidang-level data scope not enforced | BIDANG KETERSEDIAAN PANGAN | Auth/RBAC | Squad Lead | Planned |
+| 6 | [#50][BUILD] Implementasi perbaikan: Field mapping path convention (FIELDS_UPTD/ vs FIELDS/) | UPTD BALAI PENGAWASAN MUTU ... | Data Integrity | FE Lead | Planned |
+| 7 | [#3][BUILD] Implementasi perbaikan: IP whitelisting tidak enforced | SUPER ADMIN | Auth/RBAC | BE Lead | Planned |
+| 8 | [#4][BUILD] Implementasi perbaikan: API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
+| 9 | [#9][BUILD] Implementasi perbaikan: Historical KPI trend missing | KEPALA DINAS / GUBERNUR | Data Integrity | FE Lead | Planned |
+| 10 | [#18][BUILD] Implementasi perbaikan: Cross-modul validation rules missing | SEKRETARIAT | Core Workflow | BE Lead | Planned |
+| 11 | [#19][BUILD] Implementasi perbaikan: Data masking untuk salary belum ada | SEKRETARIAT | Data Integrity | Squad Lead | Planned |
+| 12 | [#25][BUILD] Implementasi perbaikan: Kerawanan index formula tidak dokumentasi | BIDANG KETERSEDIAAN PANGAN | Core Workflow | FE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Analisis acceptance criteria: CPPD system integration missing | Implement | FE Lead | PR/Commit | Planned |
+| 2 | Implement: Implementasi perbaikan: Master-data layanan count internal... | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Implementasi perbaikan: Field mapping path mismatch (FIELD... | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Implementasi perbaikan: Approval workflow UI incomplete (no app... | Test | FE Lead | Test log | Planned |
+| 2 | Test: Implementasi perbaikan: Bidang-level data scope not enforced | Test | Squad Lead | Test log | Planned |
+| 3 | Test: Implementasi perbaikan: Field mapping path convention (FIELDS_U... | Test | FE Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Implementasi perbaikan: IP whitelisting tidak enforced | Review | BE Lead | Review note | Planned |
+| 2 | Review: Implementasi perbaikan: API rate limiting partial | Review | BE Lead | Review note | Planned |
+| 3 | Review: Implementasi perbaikan: Historical KPI trend missing | Review | FE Lead | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-03-20T16:59:58.804Z",
+  "matrixPath": "E:\\sigap-malut\\dokumenSistem\\14-Role-Service-Requirements-Matrix.md",
+  "declared": {
+    "source": "summary_bullet",
+    "total": 65,
+    "kritis": 17,
+    "tinggi": 25,
+    "sedang": 23
+  },
+  "parsed": {
+    "total": 65,
+    "kritis": 17,
+    "tinggi": 25,
+    "sedang": 23
+  },
+  "delta": {
+    "total": 0,
+    "kritis": 0,
+    "tinggi": 0,
+    "sedang": 0
+  },
+  "isConsistent": true,
+  "roleSummary": [
+    {
+      "role": "BIDANG DISTRIBUSI PANGAN",
+      "total": 7,
+      "kritis": 2,
+      "tinggi": 3,
+      "sedang": 2
+    },
+    {
+      "role": "BIDANG KETERSEDIAAN PANGAN",
+      "total": 7,
+      "kritis": 2,
+      "tinggi": 3,
+      "sedang": 2
+    },
+    {
+      "role": "BIDANG KONSUMSI & KEAMANAN PANGAN",
+      "total": 7,
+      "kritis": 2,
+      "tinggi": 3,
+      "sedang": 2
+    },
+    {
+      "role": "KEPALA DINAS / GUBERNUR",
+      "total": 7,
+      "kritis": 0,
+      "tinggi": 3,
+      "sedang": 4
+    },
+    {
+      "role": "MASYARAKAT / PENELITI / PUBLIK",
+      "total": 10,
+      "kritis": 2,
+      "tinggi": 4,
+      "sedang": 4
+    },
+    {
+      "role": "SEKRETARIAT",
+      "total": 8,
+      "kritis": 2,
+      "tinggi": 4,
+      "sedang": 2
+    },
+    {
+      "role": "SUPER ADMIN",
+      "total": 7,
+      "kritis": 2,
+      "tinggi": 2,
+      "sedang": 3
+    },
+    {
+      "role": "UPTD BALAI PENGAWASAN MUTU PANGAN",
+      "total": 12,
+      "kritis": 5,
+      "tinggi": 3,
+      "sedang": 4
+    }
+  ]
+}

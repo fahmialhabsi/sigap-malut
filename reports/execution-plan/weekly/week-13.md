@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#57] Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
-| 2 | [#38] Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
-| 3 | [#56] Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 4 | [#37] Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
-| 5 | [#4] API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
-| 6 | [#39] Survey data model underspecified | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | Squad Lead | Planned |
-| 7 | [#40] Konsumsi & gizi scoring formula undocumented | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | FE Lead | Planned |
-| 8 | [#61] OpenAPI spec incomplete (not cover public data endpoint) | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 9 | [#60] Public API rate limiting missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | BE Lead | Planned |
-| 10 | [#58] API key management missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 11 | [#59] Data anonymization pipeline missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 12 | [#41] Keamanan pangan incident tracking belum ada | BIDANG KONSUMSI & KEAMANAN ... | Dashboard/Routing | FE Lead | Planned |
+| 1 | [#6][TEST] Uji integrasi dan regresi: Master data export format limited | SUPER ADMIN | Data Integrity | FE Lead | Planned |
+| 2 | [#21][TEST] Uji integrasi dan regresi: KGB tracking SLA alerts missing | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 3 | [#36][TEST] Uji integrasi dan regresi: Price stability formula belum implement | BIDANG DISTRIBUSI PANGAN | Core Workflow | FE Lead | Planned |
+| 4 | [#52][TEST] Uji integrasi dan regresi: Chain of custody tracking belum implemented | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
+| 5 | [#55][TEST] Uji integrasi dan regresi: Equipment maintenance schedule not tracked | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 6 | [#7][TEST] Uji integrasi dan regresi: System health dashboard missing | SUPER ADMIN | Dashboard/Routing | FE Lead | Planned |
+| 7 | [#22][TEST] Uji integrasi dan regresi: Laporan agregasi 3 bidang tidak auto-generate | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 8 | [#42][TEST] Uji integrasi dan regresi: Halal certification integration missing | BIDANG KONSUMSI & KEAMANAN ... | Auth/RBAC | FE Lead | Planned |
+| 9 | [#53][TEST] Uji integrasi dan regresi: Certification auto-generation missing | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 10 | [#54][TEST] Uji integrasi dan regresi: SOP compliance check missing | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
+| 11 | [#11][TEST] Uji integrasi dan regresi: Budget tracking tidak terintegrasi | KEPALA DINAS / GUBERNUR | API/Contract | BE Lead | Planned |
+| 12 | [#12][TEST] Uji integrasi dan regresi: Risk/Anomaly alert tidak real-time | KEPALA DINAS / GUBERNUR | Dashboard/Routing | FE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Uji integrasi dan regresi: Master data export format limited | Implement | FE Lead | PR/Commit | Planned |
+| 2 | Implement: Uji integrasi dan regresi: KGB tracking SLA alerts missing | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Uji integrasi dan regresi: Price stability formula belum i... | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Uji integrasi dan regresi: Chain of custody tracking belum impl... | Test | FE Lead | Test log | Planned |
+| 2 | Test: Uji integrasi dan regresi: Equipment maintenance schedule not t... | Test | FE Lead | Test log | Planned |
+| 3 | Test: Uji integrasi dan regresi: System health dashboard missing | Test | FE Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Uji integrasi dan regresi: Laporan agregasi 3 bidang tidak au... | Review | FE Lead | Review note | Planned |
+| 2 | Review: Uji integrasi dan regresi: Halal certification integration mi... | Review | FE Lead | Review note | Planned |
+| 3 | Review: Uji integrasi dan regresi: Certification auto-generation missing | Review | FE Lead | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

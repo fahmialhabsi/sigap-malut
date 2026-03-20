@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#57] Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
-| 2 | [#38] Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
-| 3 | [#56] Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 4 | [#37] Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
-| 5 | [#4] API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
-| 6 | [#39] Survey data model underspecified | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | Squad Lead | Planned |
-| 7 | [#40] Konsumsi & gizi scoring formula undocumented | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | FE Lead | Planned |
-| 8 | [#61] OpenAPI spec incomplete (not cover public data endpoint) | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 9 | [#60] Public API rate limiting missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | BE Lead | Planned |
-| 10 | [#58] API key management missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 11 | [#59] Data anonymization pipeline missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 12 | [#41] Keamanan pangan incident tracking belum ada | BIDANG KONSUMSI & KEAMANAN ... | Dashboard/Routing | FE Lead | Planned |
+| 1 | [#21][REVIEW] Review hasil dan evidence: KGB tracking SLA alerts missing | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 2 | [#36][REVIEW] Review hasil dan evidence: Price stability formula belum implement | BIDANG DISTRIBUSI PANGAN | Core Workflow | FE Lead | Planned |
+| 3 | [#52][REVIEW] Review hasil dan evidence: Chain of custody tracking belum implemented | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
+| 4 | [#55][REVIEW] Review hasil dan evidence: Equipment maintenance schedule not tracked | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 5 | [#7][REVIEW] Review hasil dan evidence: System health dashboard missing | SUPER ADMIN | Dashboard/Routing | FE Lead | Planned |
+| 6 | [#22][REVIEW] Review hasil dan evidence: Laporan agregasi 3 bidang tidak auto-generate | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 7 | [#42][REVIEW] Review hasil dan evidence: Halal certification integration missing | BIDANG KONSUMSI & KEAMANAN ... | Auth/RBAC | FE Lead | Planned |
+| 8 | [#53][REVIEW] Review hasil dan evidence: Certification auto-generation missing | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 9 | [#54][REVIEW] Review hasil dan evidence: SOP compliance check missing | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
+| 10 | [#11][REVIEW] Review hasil dan evidence: Budget tracking tidak terintegrasi | KEPALA DINAS / GUBERNUR | API/Contract | BE Lead | Planned |
+| 11 | [#12][REVIEW] Review hasil dan evidence: Risk/Anomaly alert tidak real-time | KEPALA DINAS / GUBERNUR | Dashboard/Routing | FE Lead | Planned |
+| 12 | [#28][REVIEW] Review hasil dan evidence: Intervention tracking modul belum di-scope | BIDANG KETERSEDIAAN PANGAN | Core Workflow | FE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Review hasil dan evidence: KGB tracking SLA alerts missing | Implement | FE Lead | PR/Commit | Planned |
+| 2 | Implement: Review hasil dan evidence: Price stability formula belum i... | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Review hasil dan evidence: Chain of custody tracking belum... | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Review hasil dan evidence: Equipment maintenance schedule not t... | Test | FE Lead | Test log | Planned |
+| 2 | Test: Review hasil dan evidence: System health dashboard missing | Test | FE Lead | Test log | Planned |
+| 3 | Test: Review hasil dan evidence: Laporan agregasi 3 bidang tidak auto... | Test | FE Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Review hasil dan evidence: Halal certification integration mi... | Review | FE Lead | Review note | Planned |
+| 2 | Review: Review hasil dan evidence: Certification auto-generation missing | Review | FE Lead | Review note | Planned |
+| 3 | Review: Review hasil dan evidence: SOP compliance check missing | Review | FE Lead | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

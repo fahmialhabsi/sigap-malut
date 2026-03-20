@@ -1,12 +1,20 @@
 {
-  "generatedAt": "2026-03-20T12:21:31.674Z",
+  "generatedAt": "2026-03-20T16:59:58.803Z",
   "matrixPath": "E:\\sigap-malut\\dokumenSistem\\14-Role-Service-Requirements-Matrix.md",
-  "filter": "KRITIS_TINGGI",
+  "filter": "ALL_SEVERITY",
   "summary": {
-    "total": 42,
-    "phase_1": 30,
-    "phase_2": 12,
-    "phase_3": 0
+    "total": 65,
+    "severity": {
+      "total": 65,
+      "kritis": 17,
+      "tinggi": 25,
+      "sedang": 23
+    },
+    "byPhase": {
+      "phase_1": 17,
+      "phase_2": 25,
+      "phase_3": 23
+    }
   },
   "items": [
     {
@@ -16,7 +24,7 @@
       "severity": "KRITIS",
       "solution": "Implement 2FA via SMS/email, store recovery codes",
       "timeline": "Week 5-6",
-      "phaseKey": "PHASE_2",
+      "phaseKey": "PHASE_1",
       "weekStart": 5,
       "moduleHint": "Core Workflow",
       "ownerHint": "Squad Lead"
@@ -40,7 +48,7 @@
       "severity": "TINGGI",
       "solution": "Check req.ip, enforce whitelist di auth middleware",
       "timeline": "Week 3-4",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "Auth/RBAC",
       "ownerHint": "BE Lead"
@@ -52,10 +60,46 @@
       "severity": "TINGGI",
       "solution": "Apply rate limiter ke semua public API endpoints",
       "timeline": "Week 3",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "API/Contract",
       "ownerHint": "BE Lead"
+    },
+    {
+      "id": 5,
+      "role": "SUPER ADMIN",
+      "issue": "User audit trail incomplete",
+      "severity": "SEDANG",
+      "solution": "Add logAudit untuk login/logout/failed attempts",
+      "timeline": "Week 2",
+      "phaseKey": "PHASE_3",
+      "weekStart": 2,
+      "moduleHint": "Core Workflow",
+      "ownerHint": "BE+QA"
+    },
+    {
+      "id": 6,
+      "role": "SUPER ADMIN",
+      "issue": "Master data export format limited",
+      "severity": "SEDANG",
+      "solution": "Add PDF export via pdf-lib atau similar",
+      "timeline": "Week 4",
+      "phaseKey": "PHASE_3",
+      "weekStart": 4,
+      "moduleHint": "Data Integrity",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 7,
+      "role": "SUPER ADMIN",
+      "issue": "System health dashboard missing",
+      "severity": "SEDANG",
+      "solution": "Build admin dashboard dengan real-time metrics",
+      "timeline": "Week 5-7",
+      "phaseKey": "PHASE_3",
+      "weekStart": 5,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
     },
     {
       "id": 8,
@@ -64,7 +108,7 @@
       "severity": "TINGGI",
       "solution": "Add dashboard_layout table, persist via API",
       "timeline": "Week 4-5",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 4,
       "moduleHint": "API/Contract",
       "ownerHint": "FE Lead"
@@ -76,7 +120,7 @@
       "severity": "TINGGI",
       "solution": "Create kpi_history table, backfill dengan existing data, daily job",
       "timeline": "Week 3-4",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "Data Integrity",
       "ownerHint": "FE Lead"
@@ -92,6 +136,54 @@
       "weekStart": 5,
       "moduleHint": "Dashboard/Routing",
       "ownerHint": "FE Lead"
+    },
+    {
+      "id": 11,
+      "role": "KEPALA DINAS / GUBERNUR",
+      "issue": "Budget tracking tidak terintegrasi",
+      "severity": "SEDANG",
+      "solution": "Integrate finance API, join dengan DPA master data, compute realisasi %",
+      "timeline": "Week 6",
+      "phaseKey": "PHASE_3",
+      "weekStart": 6,
+      "moduleHint": "API/Contract",
+      "ownerHint": "BE Lead"
+    },
+    {
+      "id": 12,
+      "role": "KEPALA DINAS / GUBERNUR",
+      "issue": "Risk/Anomaly alert tidak real-time",
+      "severity": "SEDANG",
+      "solution": "Build alert rule engine, check nightly, trigger notification via email/SMS",
+      "timeline": "Week 6-7",
+      "phaseKey": "PHASE_3",
+      "weekStart": 6,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 13,
+      "role": "KEPALA DINAS / GUBERNUR",
+      "issue": "Monthly report auto-generation missing",
+      "severity": "SEDANG",
+      "solution": "Build report generator (PDF/PPTX template), schedule monthly",
+      "timeline": "Week 7",
+      "phaseKey": "PHASE_3",
+      "weekStart": 7,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 14,
+      "role": "KEPALA DINAS / GUBERNUR",
+      "issue": "Strategic initiative tracking tidak ada",
+      "severity": "SEDANG",
+      "solution": "Add program/project tracking modul (future phase)",
+      "timeline": "Week 8+",
+      "phaseKey": "PHASE_3",
+      "weekStart": 8,
+      "moduleHint": "Core Workflow",
+      "ownerHint": "Squad Lead"
     },
     {
       "id": 15,
@@ -124,7 +216,7 @@
       "severity": "TINGGI",
       "solution": "Fix path construction, scan FIELDS_SEKRETARIAT folder",
       "timeline": "Week 2",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 2,
       "moduleHint": "Data Integrity",
       "ownerHint": "FE Lead"
@@ -136,7 +228,7 @@
       "severity": "TINGGI",
       "solution": "Define validation rules matrix, implement checks di controller",
       "timeline": "Week 3-4",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "Core Workflow",
       "ownerHint": "BE Lead"
@@ -148,7 +240,7 @@
       "severity": "TINGGI",
       "solution": "Add field-level permission, hide salary dari non-Bendahara",
       "timeline": "Week 3",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "Data Integrity",
       "ownerHint": "Squad Lead"
@@ -160,9 +252,33 @@
       "severity": "TINGGI",
       "solution": "Add ActionBar component, wire approve/reject endpoints",
       "timeline": "Week 2-3",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 2,
       "moduleHint": "API/Contract",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 21,
+      "role": "SEKRETARIAT",
+      "issue": "KGB tracking SLA alerts missing",
+      "severity": "SEDANG",
+      "solution": "Build SLA monitor, alert jika pending >2 bulan",
+      "timeline": "Week 4-5",
+      "phaseKey": "PHASE_3",
+      "weekStart": 4,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 22,
+      "role": "SEKRETARIAT",
+      "issue": "Laporan agregasi 3 bidang tidak auto-generate",
+      "severity": "SEDANG",
+      "solution": "Build aggregation query, schedule monthly report job",
+      "timeline": "Week 5-6",
+      "phaseKey": "PHASE_3",
+      "weekStart": 5,
+      "moduleHint": "Dashboard/Routing",
       "ownerHint": "FE Lead"
     },
     {
@@ -196,7 +312,7 @@
       "severity": "TINGGI",
       "solution": "Define kerawanan formula, implement calculation query",
       "timeline": "Week 3",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "Core Workflow",
       "ownerHint": "FE Lead"
@@ -220,10 +336,34 @@
       "severity": "TINGGI",
       "solution": "Add WHERE bidang_id = auth.bidang_id di all queries",
       "timeline": "Week 2",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 2,
       "moduleHint": "Auth/RBAC",
       "ownerHint": "Squad Lead"
+    },
+    {
+      "id": 28,
+      "role": "BIDANG KETERSEDIAAN PANGAN",
+      "issue": "Intervention tracking modul belum di-scope",
+      "severity": "SEDANG",
+      "solution": "Add intervention_programs table, status tracking, target metrics",
+      "timeline": "Week 6-7",
+      "phaseKey": "PHASE_3",
+      "weekStart": 6,
+      "moduleHint": "Core Workflow",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 29,
+      "role": "BIDANG KETERSEDIAAN PANGAN",
+      "issue": "Population & price data integration missing",
+      "severity": "SEDANG",
+      "solution": "Define data partnership, build integration API, scheduler untuk sync",
+      "timeline": "Week 7+",
+      "phaseKey": "PHASE_3",
+      "weekStart": 7,
+      "moduleHint": "API/Contract",
+      "ownerHint": "FE Lead"
     },
     {
       "id": 30,
@@ -244,7 +384,7 @@
       "severity": "KRITIS",
       "solution": "Define data partner (fleet mgmt system), build sync API",
       "timeline": "Week 5-7",
-      "phaseKey": "PHASE_2",
+      "phaseKey": "PHASE_1",
       "weekStart": 5,
       "moduleHint": "API/Contract",
       "ownerHint": "FE Lead"
@@ -256,7 +396,7 @@
       "severity": "TINGGI",
       "solution": "Define price data source (market, stat center), build import job",
       "timeline": "Week 4-5",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 4,
       "moduleHint": "Dashboard/Routing",
       "ownerHint": "FE Lead"
@@ -286,13 +426,37 @@
       "ownerHint": "FE Lead"
     },
     {
+      "id": 35,
+      "role": "BIDANG DISTRIBUSI PANGAN",
+      "issue": "Distribution effectiveness metric unclear",
+      "severity": "SEDANG",
+      "solution": "Define KPI formula, implement calculated field",
+      "timeline": "Week 3",
+      "phaseKey": "PHASE_3",
+      "weekStart": 3,
+      "moduleHint": "Data Integrity",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 36,
+      "role": "BIDANG DISTRIBUSI PANGAN",
+      "issue": "Price stability formula belum implement",
+      "severity": "SEDANG",
+      "solution": "Add price history table, compute volatility nightly",
+      "timeline": "Week 4",
+      "phaseKey": "PHASE_3",
+      "weekStart": 4,
+      "moduleHint": "Core Workflow",
+      "ownerHint": "FE Lead"
+    },
+    {
       "id": 37,
       "role": "BIDANG KONSUMSI & KEAMANAN PANGAN",
       "issue": "Dashboard tidak ada (modul belum fully implemented)",
       "severity": "KRITIS",
       "solution": "Build dashboard layout, wire to modul endpoints",
       "timeline": "Phase-2",
-      "phaseKey": "PHASE_2",
+      "phaseKey": "PHASE_1",
       "weekStart": 99,
       "moduleHint": "API/Contract",
       "ownerHint": "FE Lead"
@@ -304,7 +468,7 @@
       "severity": "KRITIS",
       "solution": "Implement field-level encryption, anonymization on import, privacy audit",
       "timeline": "Week 6-8",
-      "phaseKey": "PHASE_2",
+      "phaseKey": "PHASE_1",
       "weekStart": 6,
       "moduleHint": "Data Integrity",
       "ownerHint": "BE+QA"
@@ -316,7 +480,7 @@
       "severity": "TINGGI",
       "solution": "Define survey methodology, data schema, validation rules",
       "timeline": "Week 3-4",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "Data Integrity",
       "ownerHint": "Squad Lead"
@@ -328,7 +492,7 @@
       "severity": "TINGGI",
       "solution": "Define nutrition adequacy metric (e.g., FAO standard), implement calculation",
       "timeline": "Week 4-5",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 4,
       "moduleHint": "Core Workflow",
       "ownerHint": "FE Lead"
@@ -344,6 +508,30 @@
       "weekStart": 5,
       "moduleHint": "Dashboard/Routing",
       "ownerHint": "FE Lead"
+    },
+    {
+      "id": 42,
+      "role": "BIDANG KONSUMSI & KEAMANAN PANGAN",
+      "issue": "Halal certification integration missing",
+      "severity": "SEDANG",
+      "solution": "Define halal cert authority data, build lookup/import",
+      "timeline": "Week 5-6",
+      "phaseKey": "PHASE_3",
+      "weekStart": 5,
+      "moduleHint": "Auth/RBAC",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 43,
+      "role": "BIDANG KONSUMSI & KEAMANAN PANGAN",
+      "issue": "Campaign tracking & engagement metric missing",
+      "severity": "SEDANG",
+      "solution": "Add campaign master, participant tracking, engagement scoring",
+      "timeline": "Phase-2",
+      "phaseKey": "PHASE_3",
+      "weekStart": 99,
+      "moduleHint": "Core Workflow",
+      "ownerHint": "Squad Lead"
     },
     {
       "id": 44,
@@ -412,7 +600,7 @@
       "severity": "TINGGI",
       "solution": "Recount & reconcile mapping CSV counts",
       "timeline": "Week 1",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 1,
       "moduleHint": "Data Integrity",
       "ownerHint": "FE Lead"
@@ -424,7 +612,7 @@
       "severity": "TINGGI",
       "solution": "Fix path construction or reorganize files",
       "timeline": "Week 2",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 2,
       "moduleHint": "Data Integrity",
       "ownerHint": "FE Lead"
@@ -436,10 +624,58 @@
       "severity": "TINGGI",
       "solution": "Add 7 UPTD endpoint schemas, request/response spec",
       "timeline": "Week 3-4",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 3,
       "moduleHint": "API/Contract",
       "ownerHint": "BE Lead"
+    },
+    {
+      "id": 52,
+      "role": "UPTD BALAI PENGAWASAN MUTU PANGAN",
+      "issue": "Chain of custody tracking belum implemented",
+      "severity": "SEDANG",
+      "solution": "Add tracking_log table, record every movement, validation",
+      "timeline": "Week 4-5",
+      "phaseKey": "PHASE_3",
+      "weekStart": 4,
+      "moduleHint": "Core Workflow",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 53,
+      "role": "UPTD BALAI PENGAWASAN MUTU PANGAN",
+      "issue": "Certification auto-generation missing",
+      "severity": "SEDANG",
+      "solution": "Build cert template (PDF), auto-generate on pass result",
+      "timeline": "Week 5-6",
+      "phaseKey": "PHASE_3",
+      "weekStart": 5,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 54,
+      "role": "UPTD BALAI PENGAWASAN MUTU PANGAN",
+      "issue": "SOP compliance check missing",
+      "severity": "SEDANG",
+      "solution": "Define SOP checklist, implement validation form, track",
+      "timeline": "Week 5-6",
+      "phaseKey": "PHASE_3",
+      "weekStart": 5,
+      "moduleHint": "Core Workflow",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 55,
+      "role": "UPTD BALAI PENGAWASAN MUTU PANGAN",
+      "issue": "Equipment maintenance schedule not tracked",
+      "severity": "SEDANG",
+      "solution": "Add equipment_maintenance table, schedule tracking, alert jika due",
+      "timeline": "Week 4-5",
+      "phaseKey": "PHASE_3",
+      "weekStart": 4,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
     },
     {
       "id": 56,
@@ -448,7 +684,7 @@
       "severity": "KRITIS",
       "solution": "Build landing page, data catalog, visualization, download center",
       "timeline": "Phase-2 (Week 8-12)",
-      "phaseKey": "PHASE_2",
+      "phaseKey": "PHASE_1",
       "weekStart": 8,
       "moduleHint": "Dashboard/Routing",
       "ownerHint": "FE Lead"
@@ -496,7 +732,7 @@
       "severity": "TINGGI",
       "solution": "Implement rate limiter middleware",
       "timeline": "Week 4",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 4,
       "moduleHint": "API/Contract",
       "ownerHint": "BE Lead"
@@ -508,9 +744,57 @@
       "severity": "TINGGI",
       "solution": "Extend spec untuk public API, publish via Swagger UI",
       "timeline": "Week 4-5",
-      "phaseKey": "PHASE_1",
+      "phaseKey": "PHASE_2",
       "weekStart": 4,
       "moduleHint": "API/Contract",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 62,
+      "role": "MASYARAKAT / PENELITI / PUBLIK",
+      "issue": "Feedback/data request form missing",
+      "severity": "SEDANG",
+      "solution": "Build feedback form, route to admin, track response",
+      "timeline": "Week 6-7",
+      "phaseKey": "PHASE_3",
+      "weekStart": 6,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 63,
+      "role": "MASYARAKAT / PENELITI / PUBLIK",
+      "issue": "Alert subscription service missing",
+      "severity": "SEDANG",
+      "solution": "Build subscription manager, email/SMS service integration",
+      "timeline": "Week 7-8",
+      "phaseKey": "PHASE_3",
+      "weekStart": 7,
+      "moduleHint": "Dashboard/Routing",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 64,
+      "role": "MASYARAKAT / PENELITI / PUBLIK",
+      "issue": "Data visualization library missing",
+      "severity": "SEDANG",
+      "solution": "Add chart library (Chart.js/D3), leaflet untuk map",
+      "timeline": "Week 6-7",
+      "phaseKey": "PHASE_3",
+      "weekStart": 6,
+      "moduleHint": "Data Integrity",
+      "ownerHint": "FE Lead"
+    },
+    {
+      "id": 65,
+      "role": "MASYARAKAT / PENELITI / PUBLIK",
+      "issue": "Historical archive & versioning missing",
+      "severity": "SEDANG",
+      "solution": "Build data versioning, archive storage, query historical",
+      "timeline": "Phase-2",
+      "phaseKey": "PHASE_3",
+      "weekStart": 99,
+      "moduleHint": "Dashboard/Routing",
       "ownerHint": "FE Lead"
     }
   ]

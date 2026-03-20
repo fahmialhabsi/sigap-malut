@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#57] Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
-| 2 | [#38] Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
-| 3 | [#56] Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 4 | [#37] Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
-| 5 | [#4] API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
-| 6 | [#39] Survey data model underspecified | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | Squad Lead | Planned |
-| 7 | [#40] Konsumsi & gizi scoring formula undocumented | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | FE Lead | Planned |
-| 8 | [#61] OpenAPI spec incomplete (not cover public data endpoint) | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 9 | [#60] Public API rate limiting missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | BE Lead | Planned |
-| 10 | [#58] API key management missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 11 | [#59] Data anonymization pipeline missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 12 | [#41] Keamanan pangan incident tracking belum ada | BIDANG KONSUMSI & KEAMANAN ... | Dashboard/Routing | FE Lead | Planned |
+| 1 | [#62][REVIEW] Review hasil dan evidence: Feedback/data request form missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 2 | [#64][REVIEW] Review hasil dan evidence: Data visualization library missing | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | FE Lead | Planned |
+| 3 | [#13][REVIEW] Review hasil dan evidence: Monthly report auto-generation missing | KEPALA DINAS / GUBERNUR | Dashboard/Routing | FE Lead | Planned |
+| 4 | [#29][REVIEW] Review hasil dan evidence: Population & price data integration missing | BIDANG KETERSEDIAAN PANGAN | API/Contract | FE Lead | Planned |
+| 5 | [#63][REVIEW] Review hasil dan evidence: Alert subscription service missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 6 | [#14][REVIEW] Review hasil dan evidence: Strategic initiative tracking tidak ada | KEPALA DINAS / GUBERNUR | Core Workflow | Squad Lead | Planned |
+| 7 | [#43][REVIEW] Review hasil dan evidence: Campaign tracking & engagement metric missing | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | Squad Lead | Planned |
+| 8 | [#65][REVIEW] Review hasil dan evidence: Historical archive & versioning missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 9 | [P3-GATE] Uji privasi dataset publik batch A | Bidang Konsumsi + Publik | Privacy/Compliance | BE+QA | Planned |
+| 10 | [P3-GATE] Uji privasi dataset publik batch B | Bidang Konsumsi + Publik | Privacy/Compliance | BE+QA | Planned |
+| 11 | [P3-GATE] Audit kebijakan klasifikasi data publik | Super Admin + Publik | Privacy/Compliance | Squad Lead | Planned |
+| 12 | [P3-GATE] Validasi dokumentasi OpenAPI public endpoint | Masyarakat / Peneliti / Publik | API/Contract | BE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Review hasil dan evidence: Feedback/data request form missing | Implement | FE Lead | PR/Commit | Planned |
+| 2 | Implement: Review hasil dan evidence: Data visualization library missing | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Review hasil dan evidence: Monthly report auto-generation ... | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Review hasil dan evidence: Population & price data integration ... | Test | FE Lead | Test log | Planned |
+| 2 | Test: Review hasil dan evidence: Alert subscription service missing | Test | FE Lead | Test log | Planned |
+| 3 | Test: Review hasil dan evidence: Strategic initiative tracking tidak ada | Test | Squad Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Review hasil dan evidence: Campaign tracking & engagement met... | Review | Squad Lead | Review note | Planned |
+| 2 | Review: Review hasil dan evidence: Historical archive & versioning mi... | Review | FE Lead | Review note | Planned |
+| 3 | Review: Uji privasi dataset publik batch A | Review | BE+QA | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

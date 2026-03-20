@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#57] Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
-| 2 | [#38] Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
-| 3 | [#56] Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 4 | [#37] Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
-| 5 | [#4] API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
-| 6 | [#39] Survey data model underspecified | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | Squad Lead | Planned |
-| 7 | [#40] Konsumsi & gizi scoring formula undocumented | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | FE Lead | Planned |
-| 8 | [#61] OpenAPI spec incomplete (not cover public data endpoint) | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 9 | [#60] Public API rate limiting missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | BE Lead | Planned |
-| 10 | [#58] API key management missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 11 | [#59] Data anonymization pipeline missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 12 | [#41] Keamanan pangan incident tracking belum ada | BIDANG KONSUMSI & KEAMANAN ... | Dashboard/Routing | FE Lead | Planned |
+| 1 | [#35][BUILD] Implementasi perbaikan: Distribution effectiveness metric unclear | BIDANG DISTRIBUSI PANGAN | Data Integrity | FE Lead | Planned |
+| 2 | [#6][BUILD] Implementasi perbaikan: Master data export format limited | SUPER ADMIN | Data Integrity | FE Lead | Planned |
+| 3 | [#21][BUILD] Implementasi perbaikan: KGB tracking SLA alerts missing | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 4 | [#36][BUILD] Implementasi perbaikan: Price stability formula belum implement | BIDANG DISTRIBUSI PANGAN | Core Workflow | FE Lead | Planned |
+| 5 | [#52][BUILD] Implementasi perbaikan: Chain of custody tracking belum implemented | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
+| 6 | [#55][BUILD] Implementasi perbaikan: Equipment maintenance schedule not tracked | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 7 | [#7][BUILD] Implementasi perbaikan: System health dashboard missing | SUPER ADMIN | Dashboard/Routing | FE Lead | Planned |
+| 8 | [#22][BUILD] Implementasi perbaikan: Laporan agregasi 3 bidang tidak auto-generate | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
+| 9 | [#42][BUILD] Implementasi perbaikan: Halal certification integration missing | BIDANG KONSUMSI & KEAMANAN ... | Auth/RBAC | FE Lead | Planned |
+| 10 | [#53][BUILD] Implementasi perbaikan: Certification auto-generation missing | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 11 | [#54][BUILD] Implementasi perbaikan: SOP compliance check missing | UPTD BALAI PENGAWASAN MUTU ... | Core Workflow | FE Lead | Planned |
+| 12 | [#11][BUILD] Implementasi perbaikan: Budget tracking tidak terintegrasi | KEPALA DINAS / GUBERNUR | API/Contract | BE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Implementasi perbaikan: Distribution effectiveness metric ... | Implement | FE Lead | PR/Commit | Planned |
+| 2 | Implement: Implementasi perbaikan: Master data export format limited | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Implementasi perbaikan: KGB tracking SLA alerts missing | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Implementasi perbaikan: Price stability formula belum implement | Test | FE Lead | Test log | Planned |
+| 2 | Test: Implementasi perbaikan: Chain of custody tracking belum impleme... | Test | FE Lead | Test log | Planned |
+| 3 | Test: Implementasi perbaikan: Equipment maintenance schedule not tracked | Test | FE Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Implementasi perbaikan: System health dashboard missing | Review | FE Lead | Review note | Planned |
+| 2 | Review: Implementasi perbaikan: Laporan agregasi 3 bidang tidak auto-... | Review | FE Lead | Review note | Planned |
+| 3 | Review: Implementasi perbaikan: Halal certification integration missing | Review | FE Lead | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#15] Dashboard tidak menampilkan 12 modul lengkap | SEKRETARIAT | Dashboard/Routing | FE Lead | Planned |
-| 2 | [#23] Dashboard tidak terpasang (no route /module/:moduleId untuk modul Ketersediaan) | BIDANG KETERSEDIAAN PANGAN | Dashboard/Routing | FE Lead | Planned |
-| 3 | [#45] Frontend endpoint mismatch (/sertifikasi_prima vs /api/upt-tkn) | UPTD BALAI PENGAWASAN MUTU ... | API/Contract | FE Lead | Planned |
-| 4 | [#2] Session timeout tidak enforced | SUPER ADMIN | Core Workflow | Squad Lead | Planned |
-| 5 | [#57] Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
-| 6 | [#24] Stok monitoring tidak real-time | BIDANG KETERSEDIAAN PANGAN | API/Contract | FE Lead | Planned |
-| 7 | [#49] Master-data layanan count internal mismatch | UPTD BALAI PENGAWASAN MUTU ... | Data Integrity | FE Lead | Planned |
-| 8 | [#20] Approval workflow UI incomplete (no approve/reject buttons) | SEKRETARIAT | API/Contract | FE Lead | Planned |
-| 9 | [#27] Bidang-level data scope not enforced | BIDANG KETERSEDIAAN PANGAN | Auth/RBAC | Squad Lead | Planned |
-| 10 | [#50] Field mapping path convention (FIELDS_UPTD/ vs FIELDS/) | UPTD BALAI PENGAWASAN MUTU ... | Data Integrity | FE Lead | Planned |
-| 11 | [#17] Field mapping path mismatch (FIELDS_SEKRETARIAT/SEK-\*.csv) | SEKRETARIAT | Data Integrity | FE Lead | Planned |
-| 12 | [#4] API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
+| 1 | [#46][TEST] Uji integrasi dan regresi: BaseTable fallback dummy data (not real UPTD test result) | UPTD BALAI PENGAWASAN MUTU ... | API/Contract | FE Lead | Planned |
+| 2 | [#44][REVIEW] Review hasil dan evidence: Dashboard sidebar route orphaned (/uptd/:id not in r... | UPTD BALAI PENGAWASAN MUTU ... | Dashboard/Routing | FE Lead | Planned |
+| 3 | [#47][REVIEW] Review hasil dan evidence: Profile endpoint mismatch (/auth/profile vs /api/aut... | UPTD BALAI PENGAWASAN MUTU ... | API/Contract | BE Lead | Planned |
+| 4 | [#48][REVIEW] Review hasil dan evidence: Role routing missing (kepala_uptd → /dashboard/uptd ... | UPTD BALAI PENGAWASAN MUTU ... | Auth/RBAC | FE Lead | Planned |
+| 5 | [#24][BUILD] Implementasi perbaikan: Stok monitoring tidak real-time | BIDANG KETERSEDIAAN PANGAN | API/Contract | FE Lead | Planned |
+| 6 | [#57][BUILD] Implementasi perbaikan: Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
+| 7 | [#1][BUILD] Implementasi perbaikan: MFA tidak implemented | SUPER ADMIN | Core Workflow | Squad Lead | Planned |
+| 8 | [#31][BUILD] Implementasi perbaikan: Real-time shipment tracking missing | BIDANG DISTRIBUSI PANGAN | API/Contract | FE Lead | Planned |
+| 9 | [#38][BUILD] Implementasi perbaikan: Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
+| 10 | [#56][BUILD] Implementasi perbaikan: Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 11 | [#37][BUILD] Implementasi perbaikan: Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
+| 12 | [#24][TEST] Uji integrasi dan regresi: Stok monitoring tidak real-time | BIDANG KETERSEDIAAN PANGAN | API/Contract | FE Lead | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Uji integrasi dan regresi: BaseTable fallback dummy data (... | Implement | FE Lead | PR/Commit | Planned |
+| 2 | Implement: Review hasil dan evidence: Dashboard sidebar route orphane... | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Review hasil dan evidence: Profile endpoint mismatch (/aut... | Implement | BE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Review hasil dan evidence: Role routing missing (kepala_uptd → ... | Test | FE Lead | Test log | Planned |
+| 2 | Test: Implementasi perbaikan: Stok monitoring tidak real-time | Test | FE Lead | Test log | Planned |
+| 3 | Test: Implementasi perbaikan: Data classification policy tidak ada | Test | Squad Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Implementasi perbaikan: MFA tidak implemented | Review | Squad Lead | Review note | Planned |
+| 2 | Review: Implementasi perbaikan: Real-time shipment tracking missing | Review | FE Lead | Review note | Planned |
+| 3 | Review: Implementasi perbaikan: Data privacy/GDPR compliance missing | Review | BE+QA | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 

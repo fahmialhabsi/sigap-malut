@@ -1,3 +1,5 @@
+# Struktur Modul SIGAP-MALUT
+
 STRUKTUR 12 MODUL UI SEKRETARIAT
 o Modul UI Icon Layanan Menpan RB (Total) Layanan Detail
 1 Administrasi Umum & Persuratan document-text 6 layanan administrasi_umum, tata_naskah_dinas, kearsipan_dinamis_statis, agenda_disposisi_pimpinan, administrasi_rapat, dokumentasi_administrasi

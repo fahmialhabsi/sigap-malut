@@ -1,6 +1,6 @@
 # Execution Plan Generator Output
 
-Generated at: 2026-03-20T12:21:31.674Z  
+Generated at: 2026-03-20T16:59:58.800Z  
 Output directory: E:\sigap-malut\reports\execution-plan
 
 ## Runtime Configuration
@@ -9,6 +9,7 @@ Output directory: E:\sigap-malut\reports\execution-plan
 - Total weeks: 16
 - Monday priority items per week: 12
 - Friday audit duration: 3 jam
+- OpenAPI minimum paths threshold: 5
 - Monday autofill from matrix: enabled
 - Matrix source path: E:\sigap-malut\dokumenSistem\14-Role-Service-Requirements-Matrix.md
 
@@ -31,13 +32,34 @@ Output directory: E:\sigap-malut\reports\execution-plan
 | Phase 2 | Week 5-8 | Bidang Ketersediaan, Bidang Distribusi + penguatan UPTD | Kendalikan isu TINGGI pada dashboard, integrasi, dan data scope | Gate 2 lulus |
 | Phase 3 | Week 9-16 | Bidang Konsumsi, Public Portal, privacy hardening | Selesaikan data classification, anonymization, dan readiness publik | Gate 3 lulus |
 
-## Auto Backlog Summary (KRITIS/TINGGI)
+## Auto Backlog Summary (KRITIS/TINGGI/SEDANG)
 
-| Phase | Total Item | KRITIS | TINGGI |
-|---|---|---|---|
-| Phase 1 | 30 | 12 | 18 |
-| Phase 2 | 12 | 5 | 7 |
-| Phase 3 | 0 | 0 | 0 |
+| Severity | Total |
+|---|---|
+| KRITIS | 17 |
+| TINGGI | 25 |
+| SEDANG | 23 |
+| TOTAL | 65 |
+
+| Phase | Total Item | KRITIS | TINGGI | SEDANG |
+|---|---|---|---|---|
+| Phase 1 | 17 | 17 | 0 | 0 |
+| Phase 2 | 25 | 0 | 25 | 0 |
+| Phase 3 | 23 | 0 | 0 | 23 |
+
+## Matrix Reconciliation Snapshot
+
+- Status: CONSISTENT
+- Declared summary (matrix): 65 (K:17, T:25, S:23)
+- Parsed issue rows (generator): 65 (K:17, T:25, S:23)
+
+## DokumenSistem Completeness Snapshot
+
+- Status: COMPLETE
+- Missing required docs: 0
+- Quality issues: 0
+- Depth issues: 0
+- Docs root path: E:\sigap-malut\dokumenSistem
 
 ## Weekly Plan Index
 
@@ -62,4 +84,4 @@ Output directory: E:\sigap-malut\reports\execution-plan
 
 ## Suggested Command
 
-`node scripts/generate-execution-plan.js --start-date 2026-03-23 --weeks 16 --items 12 --hours 3`
+`node scripts/generate-execution-plan.js --start-date 2026-03-23 --weeks 16 --items 12 --hours 3 --min-openapi-paths 5`

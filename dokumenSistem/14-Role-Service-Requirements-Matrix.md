@@ -7,7 +7,7 @@ status: "Production Standard"
 evidence: true
 ---
 
-# 14. ROLE-BASED SERVICE REQUIREMENTS & COMPLIANCE MATRIX
+# 14 - Role-Based Service Requirements & Compliance Matrix
 
 **Dokumen Standar Akses, Layanan, dan Persyaratan untuk Setiap Role dalam SIGAP Malut**
 
@@ -846,17 +846,16 @@ Catatan: Seluruh role sudah memiliki struktur dokumentasi yang seragam dan dapat
 
 ---
 
-### Per Category - Critical Issues Count
+### Per Severity - Validated Issue Count (Single Source of Truth)
 
-| Category                      | KRITIS | TINGGI | SEDANG | Total  |
-| ----------------------------- | ------ | ------ | ------ | ------ |
-| **Dashboard & UI**            | 5      | 8      | 12     | 25     |
-| **Auth & Access Control**     | 3      | 6      | 3      | 12     |
-| **Data Integration**          | 4      | 7      | 6      | 17     |
-| **Workflow & Approval**       | 2      | 5      | 4      | 11     |
-| **Master Data & Consistency** | 2      | 5      | 3      | 10     |
-| **Privacy & Compliance**      | 2      | 3      | 5      | 10     |
-| **TOTAL**                     | **18** | **34** | **33** | **85** |
+| Severity   | Total  |
+| ---------- | ------ |
+| **KRITIS** | **17** |
+| **TINGGI** | **25** |
+| **SEDANG** | **23** |
+| **TOTAL**  | **65** |
+
+Catatan validasi: total di atas dihitung langsung dari tabel issue per role dan dijadikan acuan tunggal untuk perencanaan eksekusi.
 
 ---
 
@@ -868,7 +867,7 @@ Catatan: Seluruh role sudah memiliki struktur dokumentasi yang seragam dan dapat
 
 **Deliverables:**
 
-- ✅ Fix 18 KRITIS issue
+- ✅ Fix 17 KRITIS issue
 - ✅ UPTD dashboard fully functional (route, auth, real data)
 - ✅ Sekretariat dashboard 70%+ operational
 - ✅ Super Admin dashboard 60%+
@@ -890,7 +889,7 @@ Catatan: Seluruh role sudah memiliki struktur dokumentasi yang seragam dan dapat
 - ✅ Bidang Distribusi dashboard + real-time tracking (basic)
 - ✅ Kepala Dinas KPI dashboard
 - ✅ UPTD advanced features (chain of custody, cert auto-generation)
-- ✅ 34 TINGGI issue resolved
+- ✅ 25 TINGGI issue resolved
 - ✅ OpenAPI spec complete untuk internal API
 
 **Timeline:** 4 minggu
@@ -910,7 +909,7 @@ Catatan: Seluruh role sudah memiliki struktur dokumentasi yang seragam dan dapat
 - ✅ Real-time notification system (email/SMS alerts)
 - ✅ Advanced analytics (pivot, custom dashboard, AI/ML anomaly)
 - ✅ Geographic visualization (map-based monitoring)
-- ✅ 33 SEDANG issue resolved
+- ✅ 23 SEDANG issue resolved
 - ✅ Full compliance certification (SPBE/SPIP audit-ready)
 
 **Timeline:** 8 minggu
@@ -927,7 +926,7 @@ Sistem SIGAP Malut menunjukkan kemajuan stabilitas operasional lintas role, namu
 
 Koreksi atas narasi lama:
 
-- Bukan 20 masalah, melainkan **85 issue** total.
+- Bukan 20 masalah, melainkan **65 issue** total.
 - Bukan horizon 10-12 minggu, melainkan **Phase 1-3 selama 16 minggu**.
 - Cakupan verdict tidak boleh hanya UPTD; harus mencakup **8 role utama** dengan prioritas implementasi bertahap.
 
@@ -999,7 +998,7 @@ Kesimpulan 5 role operasional:
 ### 6. Pernyataan Kepatuhan Final
 
 - Dokumen ini telah mendokumentasikan **8 role utama** dengan struktur seragam dan dapat diaudit.
-- Total backlog perbaikan adalah **85 issue**: **18 KRITIS**, **34 TINGGI**, **33 SEDANG**.
+- Total backlog perbaikan adalah **65 issue**: **17 KRITIS**, **25 TINGGI**, **23 SEDANG**.
 - Target kepatuhan pasca-remediasi adalah **78-85%** setelah eksekusi **Phase 1-3 (16 minggu)**.
 - Go-live penuh lintas-role dinyatakan sah hanya jika kriteria Gate 1, Gate 2, dan Gate 3 tercapai.
 

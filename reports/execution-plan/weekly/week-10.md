@@ -11,18 +11,18 @@
 
 | No | Priority Item | Role | Module/Endpoint | Owner | Status |
 |---|---|---|---|---|---|
-| 1 | [#57] Data classification policy tidak ada | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | Squad Lead | Planned |
-| 2 | [#38] Data privacy/GDPR compliance missing | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | BE+QA | Planned |
-| 3 | [#56] Public portal tidak ada | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 4 | [#37] Dashboard tidak ada (modul belum fully implemented) | BIDANG KONSUMSI & KEAMANAN ... | API/Contract | FE Lead | Planned |
-| 5 | [#4] API rate limiting partial | SUPER ADMIN | API/Contract | BE Lead | Planned |
-| 6 | [#39] Survey data model underspecified | BIDANG KONSUMSI & KEAMANAN ... | Data Integrity | Squad Lead | Planned |
-| 7 | [#40] Konsumsi & gizi scoring formula undocumented | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | FE Lead | Planned |
-| 8 | [#61] OpenAPI spec incomplete (not cover public data endpoint) | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 9 | [#60] Public API rate limiting missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | BE Lead | Planned |
-| 10 | [#58] API key management missing | MASYARAKAT / PENELITI / PUBLIK | API/Contract | FE Lead | Planned |
-| 11 | [#59] Data anonymization pipeline missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
-| 12 | [#41] Keamanan pangan incident tracking belum ada | BIDANG KONSUMSI & KEAMANAN ... | Dashboard/Routing | FE Lead | Planned |
+| 1 | [#11][PLAN] Analisis acceptance criteria: Budget tracking tidak terintegrasi | KEPALA DINAS / GUBERNUR | API/Contract | BE Lead | Planned |
+| 2 | [#12][PLAN] Analisis acceptance criteria: Risk/Anomaly alert tidak real-time | KEPALA DINAS / GUBERNUR | Dashboard/Routing | FE Lead | Planned |
+| 3 | [#28][PLAN] Analisis acceptance criteria: Intervention tracking modul belum di-scope | BIDANG KETERSEDIAAN PANGAN | Core Workflow | FE Lead | Planned |
+| 4 | [#62][PLAN] Analisis acceptance criteria: Feedback/data request form missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 5 | [#64][PLAN] Analisis acceptance criteria: Data visualization library missing | MASYARAKAT / PENELITI / PUBLIK | Data Integrity | FE Lead | Planned |
+| 6 | [#13][PLAN] Analisis acceptance criteria: Monthly report auto-generation missing | KEPALA DINAS / GUBERNUR | Dashboard/Routing | FE Lead | Planned |
+| 7 | [#29][PLAN] Analisis acceptance criteria: Population & price data integration missing | BIDANG KETERSEDIAAN PANGAN | API/Contract | FE Lead | Planned |
+| 8 | [#63][PLAN] Analisis acceptance criteria: Alert subscription service missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 9 | [#14][PLAN] Analisis acceptance criteria: Strategic initiative tracking tidak ada | KEPALA DINAS / GUBERNUR | Core Workflow | Squad Lead | Planned |
+| 10 | [#43][PLAN] Analisis acceptance criteria: Campaign tracking & engagement metric missing | BIDANG KONSUMSI & KEAMANAN ... | Core Workflow | Squad Lead | Planned |
+| 11 | [#65][PLAN] Analisis acceptance criteria: Historical archive & versioning missing | MASYARAKAT / PENELITI / PUBLIK | Dashboard/Routing | FE Lead | Planned |
+| 12 | [#5][BUILD] Implementasi perbaikan: User audit trail incomplete | SUPER ADMIN | Core Workflow | BE+QA | Planned |
 
 ## Tuesday-Thursday Delivery
 
@@ -30,25 +30,25 @@
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Implement: Analisis acceptance criteria: Budget tracking tidak terint... | Implement | BE Lead | PR/Commit | Planned |
+| 2 | Implement: Analisis acceptance criteria: Risk/Anomaly alert tidak rea... | Implement | FE Lead | PR/Commit | Planned |
+| 3 | Implement: Analisis acceptance criteria: Intervention tracking modul ... | Implement | FE Lead | PR/Commit | Planned |
 
 ### Wednesday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Test: Analisis acceptance criteria: Feedback/data request form missing | Test | FE Lead | Test log | Planned |
+| 2 | Test: Analisis acceptance criteria: Data visualization library missing | Test | FE Lead | Test log | Planned |
+| 3 | Test: Analisis acceptance criteria: Monthly report auto-generation mi... | Test | FE Lead | Test log | Planned |
 
 ### Thursday
 
 | No | Task | Type | Owner | Evidence | Status |
 |---|---|---|---|---|---|
-| 1 | TBD | Implement | TBD | PR/Commit | Not Started |
-| 2 | TBD | Test | TBD | Test log | Not Started |
-| 3 | TBD | Review | TBD | Review note | Not Started |
+| 1 | Review: Analisis acceptance criteria: Population & price data integra... | Review | FE Lead | Review note | Planned |
+| 2 | Review: Analisis acceptance criteria: Alert subscription service missing | Review | FE Lead | Review note | Planned |
+| 3 | Review: Analisis acceptance criteria: Strategic initiative tracking t... | Review | Squad Lead | Review note | Planned |
 
 ## Friday 3-Hour Audit Session
 
