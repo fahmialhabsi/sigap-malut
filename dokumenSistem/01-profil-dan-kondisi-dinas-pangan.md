@@ -1,5 +1,8 @@
 ---
 <<<<<<<< HEAD:dokumenSistem/01-kondisi-dinas-pangan.md
+========
+<<<<<<<< HEAD:dokumenSistem/01-kondisi-dinas-pangan.md
+>>>>>>>> main:dokumenSistem/01-profil-dan-kondisi-dinas-pangan.md
 
 # BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
 

@@ -1,0 +1,40 @@
+<svg width="1200" height="850" viewBox="0 0 1200 850" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sidebar/Menu -->
+  <rect x="0" y="0" width="72" height="850" fill="#06A657"/>
+  <!-- Header -->
+  <rect x="72" y="0" width="1128" height="60" fill="#07723A"/>
+  <!-- LOGO area -->
+  <rect x="88" y="10" width="36" height="36" rx="8" fill="#FFF"/>
+  <text x="106" y="34" font-size="9" fill="#07723A" text-anchor="middle">LOGO</text>
+  <!-- Sidebar Menu Modul -->
+  <rect x="16" y="80" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="107" font-size="8" fill="#06A657" text-anchor="middle">Dash</text>
+  <rect x="16" y="130" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="157" font-size="8" fill="#06A657" text-anchor="middle">SMasuk</text>
+  <rect x="16" y="180" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="207" font-size="8" fill="#06A657" text-anchor="middle">SKeluar</text>
+  <rect x="16" y="230" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="257" font-size="8" fill="#F59E0B" text-anchor="middle">Dispo</text>
+  <rect x="16" y="280" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="307" font-size="8" fill="#0B5FFF" text-anchor="middle">Agenda</text>
+  <rect x="16" y="330" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="357" font-size="8" fill="#0B5FFF" text-anchor="middle">Notul</text>
+  <rect x="16" y="380" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="407" font-size="8" fill="#06A657" text-anchor="middle">Kepeg</text>
+  <rect x="16" y="430" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="457" font-size="8" fill="#06A657" text-anchor="middle">Keu</text>
+  <rect x="16" y="480" width="40" height="40" rx="8" fill="#f4f4f4"/><text x="36" y="507" font-size="8" fill="#06A657" text-anchor="middle">Aset</text>
+  <!-- Hero Widgets -->
+  <rect x="110" y="80" width="200" height="70" rx="12" fill="#fff" stroke="#06A657" stroke-width="2"/>
+  <text x="210" y="110" font-size="12" fill="#06A657" text-anchor="middle">Surat Masuk</text>
+  <rect x="330" y="80" width="200" height="70" rx="12" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <text x="430" y="110" font-size="12" fill="#0B5FFF" text-anchor="middle">Surat Keluar</text>
+  <rect x="550" y="80" width="200" height="70" rx="12" fill="#fff" stroke="#FACC15" stroke-width="2"/>
+  <text x="650" y="110" font-size="12" fill="#FACC15" text-anchor="middle">Disposisi</text>
+  <rect x="770" y="80" width="200" height="70" rx="12" fill="#fff" stroke="#EF4444" stroke-width="2"/>
+  <text x="870" y="110" font-size="12" fill="#EF4444" text-anchor="middle">Reminders</text>
+  <!-- Tabel Surat -->
+  <rect x="110" y="170" width="550" height="170" rx="14" fill="#fff" stroke="#06A657" stroke-width="2"/>
+  <text x="385" y="200" font-size="13" fill="#06A657" text-anchor="middle">Tabel Surat/Disposisi</text>
+  <!-- Agenda & Notulensi -->
+  <rect x="680" y="170" width="335" height="80" rx="14" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <text x="845" y="210" font-size="11" fill="#0B5FFF" text-anchor="middle">Agenda & Notulensi</text>
+  <!-- Quick Actions -->
+  <rect x="680" y="265" width="335" height="75" rx="14" fill="#fff" stroke="#F59E0B" stroke-width="2"/>
+  <text x="845" y="300" font-size="11" fill="#F59E0B" text-anchor="middle">Quick Action Panel</text>
+  <!-- Kepegawaian/Keuangan/Aset Grid -->
+  <rect x="110" y="375" width="905" height="70" rx="13" fill="#fff" stroke="#06A657" stroke-width="2"/>
+  <text x="562" y="410" font-size="11" fill="#06A657" text-anchor="middle">Kepegawaian · Keuangan · Aset</text>
+</svg>

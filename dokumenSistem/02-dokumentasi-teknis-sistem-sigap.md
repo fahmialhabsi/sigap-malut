@@ -1,5 +1,7 @@
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 # 02 - Dokumentasi Sistem SIGAP Malut
 
 ---
@@ -30,6 +32,7 @@ modul:
 - repositori peraturan
 
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 ---
 
 # BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
@@ -37,7 +40,10 @@ modul:
 ## Flowchart Logika Penilaian
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 1. Atasan input penilaian → Submit
 2. Sistem simpan ke tabel_penilaian
@@ -48,7 +54,10 @@ modul:
 ## Skema Database
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 - **tabel_penilaian**: id, asn_id, periode, indikator_id, nilai, catatan, status, created_by, created_at
 - **tabel_indikator**: id, nama_indikator, bobot, deskripsi
@@ -57,7 +66,10 @@ modul:
 ## Role-Based Access Control
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 - Sekretaris, Kepala Bidang, Kepala UPTD hanya dapat menilai bawahan sesuai struktur
 - Staf hanya dapat melihat hasil penilaian dirinya
@@ -68,11 +80,17 @@ modul:
 - Multi-level: Atasan → Reviewer → Approve
 - Status: Draft, Submitted, Approved, Rejected
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+- Single-level: Atasan langsung → Approve
+- Multi-level: Atasan → Reviewer → Approve
+- Status: Draft, Submitted, Approved, Rejected
+========
 
 - Single-level: Atasan langsung → Approve
 - Multi-level: Atasan → Reviewer → Approve
 - Status: Draft, Submitted, Approved, Rejected
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 # DOKUMENTASI RESMI
 
