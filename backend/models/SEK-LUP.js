@@ -2,7 +2,7 @@
 // MODEL: SekLup
 // TABLE: sek_lup
 // MODULE: SEK-LUP
-// Generated: 2026-02-17T19:24:47.405Z
+// Generated: 2026-03-19T23:39:22.855Z
 // =====================================================
 
 import { DataTypes } from "sequelize";

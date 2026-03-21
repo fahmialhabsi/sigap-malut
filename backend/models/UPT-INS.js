@@ -2,7 +2,7 @@
 // MODEL: UptIns
 // TABLE: upt_ins
 // MODULE: UPT-INS
-// Generated: 2026-02-17T19:24:47.468Z
+// Generated: 2026-03-19T23:39:23.240Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -20,7 +20,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'FK ke layanan_menpanrb (LY177-LY190)',
   },
   jenis_layanan_inspeksi: {
-    type: DataTypes.ENUM('Inspeksi Lapangan', 'Audit Sertifikasi', 'Audit Ulang', 'Pengambilan Sampel', 'Pengujian Mutu', 'Verifikasi Hasil Uji', 'Rekomendasi Pengawasan', 'Pembinaan', 'Koordinasi OPD', 'Monitoring Perbaikan', 'Penjadwalan', 'Pelaksanaan Lapangan', 'Pelaporan Teknis', 'Data Layanan'),
+    type: DataTypes.ENUM('"Inspeksi Lapangan', 'Audit Sertifikasi', 'Audit Ulang', 'Pengambilan Sampel', 'Pengujian Mutu', 'Verifikasi Hasil Uji', 'Rekomendasi Pengawasan', 'Pembinaan', 'Koordinasi OPD', 'Monitoring Perbaikan', 'Penjadwalan', 'Pelaksanaan Lapangan', 'Pelaporan Teknis', 'Data Layanan"'),
     allowNull: false,
     comment: 'Jenis layanan inspeksi',
   },
@@ -61,11 +61,11 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Nama-nama tim inspeksi',
   },
   jenis_sertifikasi_audit: {
-    type: DataTypes.ENUM('GMP', 'GHP', 'NKV', 'Prima 1', 'Prima 2', 'Prima 3', 'GFP', 'HACCP', 'Lainnya'),
+    type: DataTypes.ENUM('"GMP', 'GHP', 'NKV', 'Prima 1', 'Prima 2', 'Prima 3', 'GFP', 'HACCP', 'Lainnya"'),
     comment: 'Jenis sertifikasi yang diaudit',
   },
   audit_awal_ulang: {
-    type: DataTypes.ENUM('Awal', 'Ulang', 'Surveillance'),
+    type: DataTypes.ENUM('"Awal', 'Ulang', 'Surveillance"'),
     defaultValue: 'Awal',
     comment: 'Audit awal atau ulang',
   },
@@ -78,11 +78,11 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'JSON checklist inspeksi',
   },
   skor_inspeksi: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Skor hasil inspeksi',
   },
   hasil_inspeksi: {
-    type: DataTypes.ENUM('Lulus', 'Tidak Lulus', 'Lulus Bersyarat'),
+    type: DataTypes.ENUM('"Lulus', 'Tidak Lulus', 'Lulus Bersyarat"'),
     comment: 'Hasil inspeksi',
   },
   temuan_inspeksi: {
@@ -130,7 +130,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Metode pengambilan sampel',
   },
   kondisi_sampel: {
-    type: DataTypes.ENUM('Baik', 'Rusak', 'Kadaluarsa'),
+    type: DataTypes.ENUM('"Baik', 'Rusak', 'Kadaluarsa"'),
     defaultValue: 'Baik',
     comment: 'Kondisi sampel',
   },
@@ -167,7 +167,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Hasil pengujian',
   },
   kesimpulan_pengujian: {
-    type: DataTypes.ENUM('Memenuhi Syarat', 'Tidak Memenuhi Syarat'),
+    type: DataTypes.ENUM('"Memenuhi Syarat', 'Tidak Memenuhi Syarat"'),
     comment: 'Kesimpulan hasil uji',
   },
   tanggal_verifikasi_uji: {
@@ -179,7 +179,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Nama verifikator',
   },
   hasil_verifikasi_uji: {
-    type: DataTypes.ENUM('Approved', 'Rejected', 'Need Retest'),
+    type: DataTypes.ENUM('"Approved', 'Rejected', 'Need Retest"'),
     comment: 'Hasil verifikasi',
   },
   catatan_verifikasi_uji: {
@@ -187,7 +187,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Catatan verifikasi',
   },
   jenis_rekomendasi_pengawasan: {
-    type: DataTypes.ENUM('Rekomendasi Tindakan', 'Rekomendasi Sanksi', 'Rekomendasi Pembinaan', 'Rekomendasi Pemantauan'),
+    type: DataTypes.ENUM('"Rekomendasi Tindakan', 'Rekomendasi Sanksi', 'Rekomendasi Pembinaan', 'Rekomendasi Pemantauan"'),
     comment: 'Jenis rekomendasi',
   },
   isi_rekomendasi_pengawasan: {
@@ -199,12 +199,12 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Tindak lanjut rekomendasi',
   },
   status_rekomendasi_pengawasan: {
-    type: DataTypes.ENUM('Open', 'In Progress', 'Closed'),
+    type: DataTypes.ENUM('"Open', 'In Progress', 'Closed"'),
     defaultValue: 'Open',
     comment: 'Status rekomendasi',
   },
   jenis_pembinaan: {
-    type: DataTypes.ENUM('Pembinaan Langsung', 'Bimbingan Teknis', 'Konsultasi', 'Pelatihan', 'Lainnya'),
+    type: DataTypes.ENUM('"Pembinaan Langsung', 'Bimbingan Teknis', 'Konsultasi', 'Pelatihan', 'Lainnya"'),
     comment: 'Jenis pembinaan',
   },
   tanggal_pembinaan: {
@@ -260,7 +260,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Hasil monitoring perbaikan',
   },
   status_perbaikan_monitoring: {
-    type: DataTypes.ENUM('Belum', 'Proses', 'Selesai', 'Verified'),
+    type: DataTypes.ENUM('"Belum', 'Proses', 'Selesai', 'Verified"'),
     comment: 'Status perbaikan',
   },
   tanggal_penjadwalan: {
@@ -268,7 +268,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Tanggal kegiatan dijadwalkan',
   },
   jenis_kegiatan_jadwal: {
-    type: DataTypes.ENUM('Inspeksi', 'Audit', 'Sampling', 'Pengujian', 'Pembinaan', 'Monitoring'),
+    type: DataTypes.ENUM('"Inspeksi', 'Audit', 'Sampling', 'Pengujian', 'Pembinaan', 'Monitoring"'),
     comment: 'Jenis kegiatan yang dijadwalkan',
   },
   petugas_dijadwalkan: {
@@ -276,7 +276,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Petugas yang dijadwalkan',
   },
   status_jadwal: {
-    type: DataTypes.ENUM('Scheduled', 'Ongoing', 'Completed', 'Cancelled', 'Rescheduled'),
+    type: DataTypes.ENUM('"Scheduled', 'Ongoing', 'Completed', 'Cancelled', 'Rescheduled"'),
     defaultValue: 'Scheduled',
     comment: 'Status jadwal',
   },
@@ -305,7 +305,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Periode laporan teknis',
   },
   jenis_laporan_teknis: {
-    type: DataTypes.ENUM('Bulanan', 'Triwulanan', 'Semesteran', 'Tahunan'),
+    type: DataTypes.ENUM('"Bulanan', 'Triwulanan', 'Semesteran', 'Tahunan"'),
     comment: 'Jenis laporan',
   },
   total_inspeksi: {
@@ -325,7 +325,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Total pengujian dilakukan',
   },
   persentase_kelulusan_teknis: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Persentase kelulusan',
   },
   temuan_tidak_sesuai: {
@@ -345,7 +345,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Ringkasan laporan teknis',
   },
   jenis_data_layanan: {
-    type: DataTypes.ENUM('Data Inspeksi', 'Data Audit', 'Data Sampling', 'Data Pengujian', 'Data Sertifikasi', 'Data Pembinaan', 'Data Monitoring'),
+    type: DataTypes.ENUM('"Data Inspeksi', 'Data Audit', 'Data Sampling', 'Data Pengujian', 'Data Sertifikasi', 'Data Pembinaan', 'Data Monitoring"'),
     comment: 'Jenis data layanan',
   },
   periode_data: {
@@ -353,7 +353,7 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Periode data',
   },
   format_data: {
-    type: DataTypes.ENUM('Excel', 'PDF', 'CSV', 'JSON'),
+    type: DataTypes.ENUM('"Excel', 'PDF', 'CSV', 'JSON"'),
     defaultValue: 'Excel',
     comment: 'Format data',
   },
@@ -414,13 +414,13 @@ const UptIns = sequelize.define('UptIns', {
     comment: 'Jenis data',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Data inspeksi sensitif (kecuali penjadwalan & pelaksanaan umum)',
   },
   status: {
-    type: DataTypes.ENUM('pending', 'scheduled', 'ongoing', 'completed', 'verified'),
+    type: DataTypes.ENUM('"pending', 'scheduled', 'ongoing', 'completed', 'verified"'),
     allowNull: false,
     defaultValue: 'pending',
     comment: 'Status',

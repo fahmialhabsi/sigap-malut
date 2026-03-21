@@ -1,7 +1,7 @@
 // =====================================================
 // ROUTES: UptAst
 // Base Path: /api/upt-ast
-// Generated: 2026-02-17T19:24:49.313Z
+// Generated: 2026-03-19T23:39:37.171Z
 // =====================================================
 
 import express from "express";
@@ -13,14 +13,19 @@ import {
   deleteUptAst,
 } from "../controllers/UPT-AST.js";
 import { protect } from "../middleware/auth.js";
+import { enforceUptdPilotAccess } from "../middleware/uptdPilotGuard.js";
 
 const router = express.Router();
 
-// All routes are protected
-router.use(protect);
+router.use(protect, enforceUptdPilotAccess);
 
-router.route("/").get(getAllUptAst).post(createUptAst);
+router.route("/")
+  .get(getAllUptAst)
+  .post(createUptAst);
 
-router.route("/:id").get(getUptAstById).put(updateUptAst).delete(deleteUptAst);
+router.route("/:id")
+  .get(getUptAstById)
+  .put(updateUptAst)
+  .delete(deleteUptAst);
 
 export default router;

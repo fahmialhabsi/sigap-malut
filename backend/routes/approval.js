@@ -1,14 +1,17 @@
 import express from "express";
+import { authorize } from "../middleware/rbac.js";
 const router = express.Router();
 
 // In-memory store (replace with DB in production)
 let approvals = [];
 
-router.get("/", (req, res) => {
+// RBAC: read approval
+router.get("/", authorize("approval:read"), (req, res) => {
   res.json(approvals);
 });
 
-router.post("/", (req, res) => {
+// RBAC: submit approval
+router.post("/", authorize("approval:create"), (req, res) => {
   const { user, modulId, dataId, detail } = req.body;
   const entry = {
     user,
@@ -22,7 +25,8 @@ router.post("/", (req, res) => {
   res.status(201).json(entry);
 });
 
-router.put("/:modulId/:dataId", (req, res) => {
+// RBAC: update approval status
+router.put("/:modulId/:dataId", authorize("approval:update"), (req, res) => {
   const { user, status, detail } = req.body;
   const { modulId, dataId } = req.params;
   const entry = {

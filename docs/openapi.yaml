@@ -1,0 +1,41 @@
+openapi: 3.0.0
+info:
+  title: SIGAP Malut Dashboard API
+  version: 1.0.0
+paths:
+  /api/dashboard/sekretaris/summary:
+    get:
+      summary: Get dashboard summary Sekretaris
+      responses:
+        "200":
+          description: Summary data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kpis:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Kpi"
+                  alerts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Alert"
+components:
+  schemas:
+    Kpi:
+      type: object
+      properties:
+        id: { type: string }
+        label: { type: string }
+        value: { type: number }
+        unit: { type: string }
+        trend: { type: array, items: { type: number } }
+    Alert:
+      type: object
+      properties:
+        id: { type: string }
+        severity: { type: string }
+        title: { type: string }
+        summary: { type: string }

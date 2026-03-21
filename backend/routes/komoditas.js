@@ -1,20 +1,31 @@
-// Komoditas Routes (Master Data)
-import express from "express";
+// =====================================================
+// ROUTES: Komoditas
+// Base Path: /api/komoditas
+// Generated: 2026-03-19T23:39:36.598Z
+// =====================================================
+
+import express from 'express';
 import {
-  listKomoditas,
-  searchKomoditas,
+  getAllKomoditas,
   getKomoditasById,
-} from "../controllers/komoditasController.js";
+  createKomoditas,
+  updateKomoditas,
+  deleteKomoditas
+} from '../controllers/komoditas.js';
+// import { protect } from '../middleware/auth.js'; // Uncomment when auth is ready
 
 const router = express.Router();
 
-// GET /komoditas - List all komoditas
-router.get("/", listKomoditas);
+// All routes are protected (uncomment when auth is ready)
+// router.use(protect);
 
-// GET /komoditas/search?q= - Search komoditas by nama
-router.get("/search", searchKomoditas);
+router.route('/')
+  .get(getAllKomoditas)
+  .post(createKomoditas);
 
-// GET /komoditas/:id - Get komoditas by ID
-router.get("/:id", getKomoditasById);
+router.route('/:id')
+  .get(getKomoditasById)
+  .put(updateKomoditas)
+  .delete(deleteKomoditas);
 
 export default router;

@@ -1,151 +1,156 @@
-// File: backend/models/User.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-let User;
-if (sequelize.models && sequelize.models.User) {
-  User = sequelize.models.User;
-} else {
-  const _User = sequelize.define(
-    "User",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      plain_password: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      // IMPORTANT: role_id is UUID FK to roles.id
-      role_id: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
-
-      unit_id: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      nip: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      nama_lengkap: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      unit_kerja: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      jabatan: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      is_active: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
-      },
-      is_verified: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-      },
-      last_login_at: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
-      created_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
-      deleted_at: {
-        type: DataTypes.DATE,
-        allowNull: true,
+const User = sequelize.define(
+  "User",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    id_uuid: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    username: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: true,
+    },
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
       },
     },
-    {
-      tableName: "users",
-      timestamps: true,
-      underscored: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
+    password: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
     },
-  );
+    nama_lengkap: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    nip: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+    role: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: "pelaksana",
+    },
+    role_id: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+    },
+    unit_kerja: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    unit_id: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+    },
+    jabatan: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    foto: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    telepon: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+    alamat: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    email_verified_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    // Keep `last_login` attribute for controller compatibility, map it to DB column `last_login_at`.
+    last_login: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: "last_login_at",
+    },
+    last_login_ip: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    failed_login_attempts: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+    },
+    locked_until: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    plain_password: {
+      type: DataTypes.STRING(512),
+      allowNull: true,
+    },
+    dashboardUrl: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: "dashboardUrl",
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    tableName: "users",
+    timestamps: false,
+    hooks: {
+      beforeValidate: (user) => {
+        if (!user.nama_lengkap && user.name) {
+          user.nama_lengkap = user.name;
+        }
+        if (!user.name && user.nama_lengkap) {
+          user.name = user.nama_lengkap;
+        }
 
-  _User.addHook("beforeValidate", (user) => {
-    const data = user.dataValues || {};
-
-    if (!user.name && (user.nama_lengkap || data.nama_lengkap)) {
-      user.name = user.nama_lengkap || data.nama_lengkap;
-    }
-    if (!user.nama_lengkap && (user.name || data.name)) {
-      user.nama_lengkap = user.name || data.name;
-    }
-    if (!user.unit_kerja && (user.unit_id || data.unit_id)) {
-      user.unit_kerja = user.unit_id || data.unit_id;
-    }
-
-    // IMPORTANT: do NOT auto-fill role_id from `role` string anymore.
-    // role_id must always be UUID.
-
-    if (!user.unit_id && (user.unit_kerja || data.unit_kerja || user.unit_id)) {
-      user.unit_id = user.unit_kerja || data.unit_kerja || user.unit_id;
-    }
-  });
-
-  User = _User;
-
-  if (!User.prototype.softDelete) {
-    User.prototype.softDelete = async function () {
-      await User.update(
-        { deleted_at: new Date() },
-        { where: { id: this.id }, paranoid: false },
-      );
-      const found = await User.findByPk(this.id, { paranoid: false });
-      return found || this;
-    };
-  }
-}
+        if (!user.unit_kerja && user.unit_id) {
+          user.unit_kerja = user.unit_id;
+        }
+        if (!user.unit_id && user.unit_kerja) {
+          user.unit_id = user.unit_kerja;
+        }
+      },
+    },
+  },
+);
 
 export default User;
-
-if (User && !User.prototype.softDelete) {
-  User.prototype.softDelete = async function () {
-    await User.update(
-      { deleted_at: new Date() },
-      { where: { id: this.id }, paranoid: false },
-    );
-    const found = await User.findByPk(this.id, { paranoid: false });
-    return found || this;
-  };
-}

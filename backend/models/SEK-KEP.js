@@ -2,7 +2,7 @@
 // MODEL: SekKep
 // TABLE: sek_kep
 // MODULE: SEK-KEP
-// Generated: 2026-02-17T19:24:47.388Z
+// Generated: 2026-03-19T23:39:22.823Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -35,7 +35,7 @@ const SekKep = sequelize.define('SekKep', {
     comment: 'Denormalized dari tabel asn',
   },
   jenis_layanan_kepegawaian: {
-    type: DataTypes.ENUM('Data Induk', 'Kenaikan Pangkat', 'Mutasi', 'Gaji Tunjangan', 'Cuti', 'Penilaian Kinerja', 'Disiplin', 'Pensiun'),
+    type: DataTypes.ENUM('"Data Induk', 'Kenaikan Pangkat', 'Mutasi', 'Gaji Tunjangan', 'Cuti', 'Penilaian Kinerja', 'Disiplin', 'Pensiun"'),
     allowNull: false,
     comment: 'Layanan kepegawaian spesifik',
   },
@@ -76,7 +76,7 @@ const SekKep = sequelize.define('SekKep', {
     comment: 'Tanggal SK ditetapkan',
   },
   jenis_cuti: {
-    type: DataTypes.ENUM('Tahunan', 'Sakit', 'Besar', 'Melahirkan', 'Alasan Penting', 'Luar Tanggungan Negara'),
+    type: DataTypes.ENUM('"Tahunan', 'Sakit', 'Besar', 'Melahirkan', 'Alasan Penting', 'Luar Tanggungan Negara"'),
     comment: 'Untuk layanan cuti',
   },
   tanggal_mulai_cuti: {
@@ -92,15 +92,15 @@ const SekKep = sequelize.define('SekKep', {
     comment: 'Jumlah hari',
   },
   nilai_skp: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Nilai penilaian kinerja',
   },
   predikat_kinerja: {
-    type: DataTypes.ENUM('Sangat Baik', 'Baik', 'Cukup', 'Kurang', 'Buruk'),
+    type: DataTypes.ENUM('"Sangat Baik', 'Baik', 'Cukup', 'Kurang', 'Buruk"'),
     comment: 'Predikat penilaian kinerja',
   },
   jenis_sanksi: {
-    type: DataTypes.ENUM('Ringan', 'Sedang', 'Berat'),
+    type: DataTypes.ENUM('"Ringan', 'Sedang', 'Berat"'),
     comment: 'Untuk disiplin & sanksi',
   },
   uraian_sanksi: {
@@ -112,15 +112,15 @@ const SekKep = sequelize.define('SekKep', {
     comment: 'Untuk pensiun',
   },
   jenis_pensiun: {
-    type: DataTypes.ENUM('BUP (Batas Usia Pensiun)', 'Atas Permintaan Sendiri', 'Alasan Lain'),
+    type: DataTypes.ENUM('"BUP (Batas Usia Pensiun)', 'Atas Permintaan Sendiri', 'Alasan Lain"'),
     comment: 'Jenis pensiun',
   },
   gaji_pokok: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Untuk gaji & tunjangan',
   },
   total_tunjangan: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Untuk gaji & tunjangan',
   },
   file_sk: {
@@ -143,13 +143,13 @@ const SekKep = sequelize.define('SekKep', {
     comment: 'Yang melaksanakan',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Semua data kepegawaian sensitif',
   },
   status: {
-    type: DataTypes.ENUM('pending', 'proses', 'disetujui', 'ditolak', 'selesai'),
+    type: DataTypes.ENUM('"pending', 'proses', 'disetujui', 'ditolak', 'selesai"'),
     allowNull: false,
     defaultValue: 'pending',
     comment: 'Status proses',
