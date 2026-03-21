@@ -1,0 +1,262 @@
+<svg width="1600" height="940" viewBox="0 0 1600 940" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0" y1="0" x2="1600" y2="940" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B5FFF"/>
+      <stop offset="1" stop-color="#07723A"/>
+    </linearGradient>
+    <filter id="card-shadow" x="-10" y="-10" width="1800" height="1240" filterUnits="userSpaceOnUse">
+      <feOffset dy="8" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="12"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.027 0 0 0 0 0.212 0 0 0 0 0.133 0 0 0 0.07 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+  <!-- Background & Sidebar -->
+  <rect width="1600" height="940" fill="url(#bg-gradient)"/>
+  <rect x="0" y="0" width="80" height="940" rx="0" fill="#066D44"/>
+  <!-- Sidebar Icons (section example) -->
+  <rect x="20" y="90" width="40" height="40" rx="12" fill="#FACC15" opacity="0.91"/>
+  <rect x="20" y="150" width="40" height="40" rx="12" fill="#0B5FFF" opacity="0.91"/>
+  <rect x="20" y="210" width="40" height="40" rx="12" fill="#FFF" opacity="0.24"/>
+  <rect x="20" y="270" width="40" height="40" rx="12" fill="#06A657" opacity="0.3"/>
+  <rect x="20" y="330" width="40" height="40" rx="12" fill="#F59E0B" opacity="0.19"/>
+  <!-- Header -->
+  <rect x="80" y="0" width="1520" height="60" rx="0" fill="#07723A"/>
+  <!-- LOGO PLACEHOLDER AREA (replace with real logo in Figma) -->
+  <rect x="92" y="8" width="44" height="44" rx="7" fill="#FFF"/>
+  <text x="114" y="36" font-size="10" fill="#AAA" font-family="Inter" text-anchor="middle">LOGO</text>
+  <!-- Branding dan Title -->
+  <text x="160" y="38" font-size="21" fill="#FFF" font-family="Inter" font-weight="bold">SIGAP Malut · Dinas Pangan</text>
+  <rect x="340" y="17" width="130" height="28" rx="14" fill="#FACC15"/>
+  <text x="405" y="36" font-size="15" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">Mission Control</text>
+  <circle cx="1450" cy="30" r="14" fill="#14B8A6"/>
+  <rect x="1470" y="16" width="95" height="28" rx="13" fill="#0B5FFF"/>
+  <text x="1517" y="34" font-size="15" fill="#FFF" font-family="Inter" text-anchor="middle">Impersonate</text>
+  <circle cx="1585" cy="30" r="20" fill="#FACC15"/>
+  <text x="1585" y="36" font-size="20" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">@</text>
+  <!-- Health Indicator -->
+  <circle cx="1380" cy="30" r="8" fill="#00ED64" stroke="#FFF" stroke-width="3"/>
+  <text x="1395" y="35" font-size="13" fill="#FFF" font-family="Inter">SYSTEM: OK</text>
+  <!-- Hero Row (6 widgets) -->
+  <g filter="url(#card-shadow)">
+    <rect x="100" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="320" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="540" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="760" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="980" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="1200" y="80" width="370" height="110" rx="16" fill="#FFF"/>
+  </g>
+  <text x="205" y="110" font-size="15" fill="#07723A" font-family="Inter" text-anchor="middle">Active Users / Heatmap</text>
+  <text x="425" y="110" font-size="15" fill="#0B5FFF" font-family="Inter" text-anchor="middle">System Errors</text>
+  <text x="645" y="110" font-size="15" fill="#F59E0B" font-family="Inter" text-anchor="middle">Notif/Queue</text>
+  <text x="865" y="110" font-size="15" fill="#233441" font-family="Inter" text-anchor="middle">Backup & Recovery</text>
+  <text x="1085" y="110" font-size="15" fill="#FACC15" font-family="Inter" font-weight="bold" text-anchor="middle">Audit Alerts</text>
+  <text x="1385" y="110" font-size="15" fill="#06A657" font-family="Inter" text-anchor="middle">Compliance Badge</text>
+  <!-- Mission Control Panels -->
+  <rect x="100" y="210" width="900" height="230" rx="18" fill="#fff" stroke="#FACC15" stroke-width="2" opacity="0.99"/><svg width="1600" height="940" viewBox="0 0 1600 940" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0" y1="0" x2="1600" y2="940" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B5FFF"/>
+      <stop offset="1" stop-color="#07723A"/>
+    </linearGradient>
+    <filter id="card-shadow" x="-10" y="-10" width="1800" height="1240" filterUnits="userSpaceOnUse">
+      <feOffset dy="8" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="12"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.027 0 0 0 0 0.212 0 0 0 0 0.133 0 0 0 0.07 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+  <!-- Background & Sidebar -->
+  <rect width="1600" height="940" fill="url(#bg-gradient)"/>
+  <rect x="0" y="0" width="80" height="940" rx="0" fill="#066D44"/>
+  <!-- Sidebar Icons (section example) -->
+  <rect x="20" y="90" width="40" height="40" rx="12" fill="#FACC15" opacity="0.91"/>
+  <rect x="20" y="150" width="40" height="40" rx="12" fill="#0B5FFF" opacity="0.91"/>
+  <rect x="20" y="210" width="40" height="40" rx="12" fill="#FFF" opacity="0.24"/>
+  <rect x="20" y="270" width="40" height="40" rx="12" fill="#06A657" opacity="0.3"/>
+  <rect x="20" y="330" width="40" height="40" rx="12" fill="#F59E0B" opacity="0.19"/>
+  <!-- Header -->
+  <rect x="80" y="0" width="1520" height="60" rx="0" fill="#07723A"/>
+  <!-- LOGO PLACEHOLDER AREA (replace with real logo in Figma) -->
+  <rect x="92" y="8" width="44" height="44" rx="7" fill="#FFF"/>
+  <text x="114" y="36" font-size="10" fill="#AAA" font-family="Inter" text-anchor="middle">LOGO</text>
+  <!-- Branding dan Title -->
+  <text x="160" y="38" font-size="21" fill="#FFF" font-family="Inter" font-weight="bold">SIGAP Malut · Dinas Pangan</text>
+  <rect x="340" y="17" width="130" height="28" rx="14" fill="#FACC15"/>
+  <text x="405" y="36" font-size="15" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">Mission Control</text>
+  <circle cx="1450" cy="30" r="14" fill="#14B8A6"/>
+  <rect x="1470" y="16" width="95" height="28" rx="13" fill="#0B5FFF"/>
+  <text x="1517" y="34" font-size="15" fill="#FFF" font-family="Inter" text-anchor="middle">Impersonate</text>
+  <circle cx="1585" cy="30" r="20" fill="#FACC15"/>
+  <text x="1585" y="36" font-size="20" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">@</text>
+  <!-- Health Indicator -->
+  <circle cx="1380" cy="30" r="8" fill="#00ED64" stroke="#FFF" stroke-width="3"/>
+  <text x="1395" y="35" font-size="13" fill="#FFF" font-family="Inter">SYSTEM: OK</text>
+  <!-- Hero Row (6 widgets) -->
+  <g filter="url(#card-shadow)">
+    <rect x="100" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="320" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="540" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="760" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="980" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="1200" y="80" width="370" height="110" rx="16" fill="#FFF"/>
+  </g>
+  <text x="205" y="110" font-size="15" fill="#07723A" font-family="Inter" text-anchor="middle">Active Users / Heatmap</text>
+  <text x="425" y="110" font-size="15" fill="#0B5FFF" font-family="Inter" text-anchor="middle">System Errors</text>
+  <text x="645" y="110" font-size="15" fill="#F59E0B" font-family="Inter" text-anchor="middle">Notif/Queue</text>
+  <text x="865" y="110" font-size="15" fill="#233441" font-family="Inter" text-anchor="middle">Backup & Recovery</text>
+  <text x="1085" y="110" font-size="15" fill="#FACC15" font-family="Inter" font-weight="bold" text-anchor="middle">Audit Alerts</text>
+  <text x="1385" y="110" font-size="15" fill="#06A657" font-family="Inter" text-anchor="middle">Compliance Badge</text>
+  <!-- Mission Control Panels -->
+  <rect x="100" y="210" width="900" height="230" rx="18" fill="#fff" stroke="#FACC15" stroke-width="2" opacity="0.99"/>
+  <rect x="1020" y="210" width="480" height="230" rx="18" fill="#fff" stroke="#06A657" stroke-width="2" opacity="0.97"/>
+  <text x="550" y="250" font-size="19" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">Mission Control · App/Infra/API/DB/Audit</text>
+  <ellipse cx="1400" cy="275" rx="60" ry="52" fill="#49CCF9" opacity="0.10"/>
+  <text x="1260" y="255" font-size="16" fill="#0B5FFF" font-family="Inter" font-weight="bold">API Health</text>
+  <text x="1400" y="325" font-size="14" fill="#14B8A6" font-family="Inter" text-anchor="middle">REST latency</text>
+  <text x="1420" y="375" font-size="12" fill="#233441" font-family="Inter">OK: 99%</text>
+  <!-- Live Feed Panel -->
+  <rect x="120" y="260" width="430" height="146" rx="11" fill="#06A657" opacity="0.13"/>
+  <text x="335" y="285" font-size="13" fill="#07723A" font-family="Inter" text-anchor="middle">Live Event Feed</text>
+  <!-- Pie Role/Role Activity -->
+  <ellipse cx="800" cy="400" rx="60" ry="45" fill="#0B5FFF" opacity="0.08"/>
+  <text x="800" y="400" font-size="14" fill="#06A657" font-family="Inter" text-anchor="middle">User by Role</text>
+  <!-- Timeline/Audit -->
+  <rect x="100" y="465" width="685" height="180" rx="15" fill="#fff" stroke="#F59E0B" stroke-width="2"/>
+  <text x="440" y="500" font-size="14" fill="#F59E0B" font-family="Inter" font-weight="bold" text-anchor="middle">Audit Timeline</text>
+  <!-- Performance & ML -->
+  <rect x="805" y="465" width="335" height="180" rx="15" fill="#fff" stroke="#FACC15" stroke-width="2"/>
+  <text x="972" y="500" font-size="14" fill="#0B5FFF" font-family="Inter" font-weight="bold" text-anchor="middle">Performance / ML Predict</text>
+  <rect x="1160" y="465" width="340" height="180" rx="15" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <text x="1332" y="500" font-size="13" fill="#14B8A6" font-family="Inter" font-weight="bold" text-anchor="middle">Cache & Queue Panel</text>
+  <!-- Automation/Quick Action Panel -->
+  <rect x="1440" y="700" width="120" height="180" rx="16" fill="#00ED64" opacity="0.95"/>
+  <text x="1500" y="740" font-size="14" fill="#FFF" font-family="Inter" text-anchor="middle">Quick Actions</text>
+  <text x="1500" y="770" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">Restore</text>
+  <text x="1500" y="790" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">Broadcast</text>
+  <text x="1500" y="810" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">QA Report</text>
+  <text x="1500" y="830" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">ML Details</text>
+  <!-- Footer Bar -->
+  <rect x="80" y="910" width="1520" height="30" rx="0" fill="#066D44"/>
+  <text x="140" y="930" font-size="13" fill="#FACC15" font-family="Inter">SIGAP Malut v1.0 | Dinas Pangan Maluku Utara | Mission Control</text>
+</svg><svg width="1600" height="940" viewBox="0 0 1600 940" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0" y1="0" x2="1600" y2="940" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B5FFF"/>
+      <stop offset="1" stop-color="#07723A"/>
+    </linearGradient>
+    <filter id="card-shadow" x="-10" y="-10" width="1800" height="1240" filterUnits="userSpaceOnUse">
+      <feOffset dy="8" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="12"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.027 0 0 0 0 0.212 0 0 0 0 0.133 0 0 0 0.07 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+  <!-- Background & Sidebar -->
+  <rect width="1600" height="940" fill="url(#bg-gradient)"/>
+  <rect x="0" y="0" width="80" height="940" rx="0" fill="#066D44"/>
+  <!-- Sidebar Icons (section example) -->
+  <rect x="20" y="90" width="40" height="40" rx="12" fill="#FACC15" opacity="0.91"/>
+  <rect x="20" y="150" width="40" height="40" rx="12" fill="#0B5FFF" opacity="0.91"/>
+  <rect x="20" y="210" width="40" height="40" rx="12" fill="#FFF" opacity="0.24"/>
+  <rect x="20" y="270" width="40" height="40" rx="12" fill="#06A657" opacity="0.3"/>
+  <rect x="20" y="330" width="40" height="40" rx="12" fill="#F59E0B" opacity="0.19"/>
+  <!-- Header -->
+  <rect x="80" y="0" width="1520" height="60" rx="0" fill="#07723A"/>
+  <!-- LOGO PLACEHOLDER AREA (replace with real logo in Figma) -->
+  <rect x="92" y="8" width="44" height="44" rx="7" fill="#FFF"/>
+  <text x="114" y="36" font-size="10" fill="#AAA" font-family="Inter" text-anchor="middle">LOGO</text>
+  <!-- Branding dan Title -->
+  <text x="160" y="38" font-size="21" fill="#FFF" font-family="Inter" font-weight="bold">SIGAP Malut · Dinas Pangan</text>
+  <rect x="340" y="17" width="130" height="28" rx="14" fill="#FACC15"/>
+  <text x="405" y="36" font-size="15" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">Mission Control</text>
+  <circle cx="1450" cy="30" r="14" fill="#14B8A6"/>
+  <rect x="1470" y="16" width="95" height="28" rx="13" fill="#0B5FFF"/>
+  <text x="1517" y="34" font-size="15" fill="#FFF" font-family="Inter" text-anchor="middle">Impersonate</text>
+  <circle cx="1585" cy="30" r="20" fill="#FACC15"/>
+  <text x="1585" y="36" font-size="20" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">@</text>
+  <!-- Health Indicator -->
+  <circle cx="1380" cy="30" r="8" fill="#00ED64" stroke="#FFF" stroke-width="3"/>
+  <text x="1395" y="35" font-size="13" fill="#FFF" font-family="Inter">SYSTEM: OK</text>
+  <!-- Hero Row (6 widgets) -->
+  <g filter="url(#card-shadow)">
+    <rect x="100" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="320" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="540" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="760" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="980" y="80" width="210" height="110" rx="16" fill="#FFF"/>
+    <rect x="1200" y="80" width="370" height="110" rx="16" fill="#FFF"/>
+  </g>
+  <text x="205" y="110" font-size="15" fill="#07723A" font-family="Inter" text-anchor="middle">Active Users / Heatmap</text>
+  <text x="425" y="110" font-size="15" fill="#0B5FFF" font-family="Inter" text-anchor="middle">System Errors</text>
+  <text x="645" y="110" font-size="15" fill="#F59E0B" font-family="Inter" text-anchor="middle">Notif/Queue</text>
+  <text x="865" y="110" font-size="15" fill="#233441" font-family="Inter" text-anchor="middle">Backup & Recovery</text>
+  <text x="1085" y="110" font-size="15" fill="#FACC15" font-family="Inter" font-weight="bold" text-anchor="middle">Audit Alerts</text>
+  <text x="1385" y="110" font-size="15" fill="#06A657" font-family="Inter" text-anchor="middle">Compliance Badge</text>
+  <!-- Mission Control Panels -->
+  <rect x="100" y="210" width="900" height="230" rx="18" fill="#fff" stroke="#FACC15" stroke-width="2" opacity="0.99"/>
+  <rect x="1020" y="210" width="480" height="230" rx="18" fill="#fff" stroke="#06A657" stroke-width="2" opacity="0.97"/>
+  <text x="550" y="250" font-size="19" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">Mission Control · App/Infra/API/DB/Audit</text>
+  <ellipse cx="1400" cy="275" rx="60" ry="52" fill="#49CCF9" opacity="0.10"/>
+  <text x="1260" y="255" font-size="16" fill="#0B5FFF" font-family="Inter" font-weight="bold">API Health</text>
+  <text x="1400" y="325" font-size="14" fill="#14B8A6" font-family="Inter" text-anchor="middle">REST latency</text>
+  <text x="1420" y="375" font-size="12" fill="#233441" font-family="Inter">OK: 99%</text>
+  <!-- Live Feed Panel -->
+  <rect x="120" y="260" width="430" height="146" rx="11" fill="#06A657" opacity="0.13"/>
+  <text x="335" y="285" font-size="13" fill="#07723A" font-family="Inter" text-anchor="middle">Live Event Feed</text>
+  <!-- Pie Role/Role Activity -->
+  <ellipse cx="800" cy="400" rx="60" ry="45" fill="#0B5FFF" opacity="0.08"/>
+  <text x="800" y="400" font-size="14" fill="#06A657" font-family="Inter" text-anchor="middle">User by Role</text>
+  <!-- Timeline/Audit -->
+  <rect x="100" y="465" width="685" height="180" rx="15" fill="#fff" stroke="#F59E0B" stroke-width="2"/>
+  <text x="440" y="500" font-size="14" fill="#F59E0B" font-family="Inter" font-weight="bold" text-anchor="middle">Audit Timeline</text>
+  <!-- Performance & ML -->
+  <rect x="805" y="465" width="335" height="180" rx="15" fill="#fff" stroke="#FACC15" stroke-width="2"/>
+  <text x="972" y="500" font-size="14" fill="#0B5FFF" font-family="Inter" font-weight="bold" text-anchor="middle">Performance / ML Predict</text>
+  <rect x="1160" y="465" width="340" height="180" rx="15" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <text x="1332" y="500" font-size="13" fill="#14B8A6" font-family="Inter" font-weight="bold" text-anchor="middle">Cache & Queue Panel</text>
+  <!-- Automation/Quick Action Panel -->
+  <rect x="1440" y="700" width="120" height="180" rx="16" fill="#00ED64" opacity="0.95"/>
+  <text x="1500" y="740" font-size="14" fill="#FFF" font-family="Inter" text-anchor="middle">Quick Actions</text>
+  <text x="1500" y="770" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">Restore</text>
+  <text x="1500" y="790" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">Broadcast</text>
+  <text x="1500" y="810" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">QA Report</text>
+  <text x="1500" y="830" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">ML Details</text>
+  <!-- Footer Bar -->
+  <rect x="80" y="910" width="1520" height="30" rx="0" fill="#066D44"/>
+  <text x="140" y="930" font-size="13" fill="#FACC15" font-family="Inter">SIGAP Malut v1.0 | Dinas Pangan Maluku Utara | Mission Control</text>
+</svg>
+  <rect x="1020" y="210" width="480" height="230" rx="18" fill="#fff" stroke="#06A657" stroke-width="2" opacity="0.97"/>
+  <text x="550" y="250" font-size="19" fill="#233441" font-family="Inter" font-weight="bold" text-anchor="middle">Mission Control · App/Infra/API/DB/Audit</text>
+  <ellipse cx="1400" cy="275" rx="60" ry="52" fill="#49CCF9" opacity="0.10"/>
+  <text x="1260" y="255" font-size="16" fill="#0B5FFF" font-family="Inter" font-weight="bold">API Health</text>
+  <text x="1400" y="325" font-size="14" fill="#14B8A6" font-family="Inter" text-anchor="middle">REST latency</text>
+  <text x="1420" y="375" font-size="12" fill="#233441" font-family="Inter">OK: 99%</text>
+  <!-- Live Feed Panel -->
+  <rect x="120" y="260" width="430" height="146" rx="11" fill="#06A657" opacity="0.13"/>
+  <text x="335" y="285" font-size="13" fill="#07723A" font-family="Inter" text-anchor="middle">Live Event Feed</text>
+  <!-- Pie Role/Role Activity -->
+  <ellipse cx="800" cy="400" rx="60" ry="45" fill="#0B5FFF" opacity="0.08"/>
+  <text x="800" y="400" font-size="14" fill="#06A657" font-family="Inter" text-anchor="middle">User by Role</text>
+  <!-- Timeline/Audit -->
+  <rect x="100" y="465" width="685" height="180" rx="15" fill="#fff" stroke="#F59E0B" stroke-width="2"/>
+  <text x="440" y="500" font-size="14" fill="#F59E0B" font-family="Inter" font-weight="bold" text-anchor="middle">Audit Timeline</text>
+  <!-- Performance & ML -->
+  <rect x="805" y="465" width="335" height="180" rx="15" fill="#fff" stroke="#FACC15" stroke-width="2"/>
+  <text x="972" y="500" font-size="14" fill="#0B5FFF" font-family="Inter" font-weight="bold" text-anchor="middle">Performance / ML Predict</text>
+  <rect x="1160" y="465" width="340" height="180" rx="15" fill="#fff" stroke="#0B5FFF" stroke-width="2"/>
+  <text x="1332" y="500" font-size="13" fill="#14B8A6" font-family="Inter" font-weight="bold" text-anchor="middle">Cache & Queue Panel</text>
+  <!-- Automation/Quick Action Panel -->
+  <rect x="1440" y="700" width="120" height="180" rx="16" fill="#00ED64" opacity="0.95"/>
+  <text x="1500" y="740" font-size="14" fill="#FFF" font-family="Inter" text-anchor="middle">Quick Actions</text>
+  <text x="1500" y="770" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">Restore</text>
+  <text x="1500" y="790" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">Broadcast</text>
+  <text x="1500" y="810" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">QA Report</text>
+  <text x="1500" y="830" font-size="12" fill="#FFF" font-family="Inter" text-anchor="middle">ML Details</text>
+  <!-- Footer Bar -->
+  <rect x="80" y="910" width="1520" height="30" rx="0" fill="#066D44"/>
+  <text x="140" y="930" font-size="13" fill="#FACC15" font-family="Inter">SIGAP Malut v1.0 | Dinas Pangan Maluku Utara | Mission Control</text>
+</svg>

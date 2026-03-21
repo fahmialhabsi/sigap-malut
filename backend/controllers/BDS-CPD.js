@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BdsCpdController
 // MODEL: BdsCpd
-// Generated: 2026-02-17T19:24:48.387Z
+// Generated: 2026-03-19T23:39:27.499Z
 // =====================================================
 
 import * as komoditasService from "../services/komoditasService.js";

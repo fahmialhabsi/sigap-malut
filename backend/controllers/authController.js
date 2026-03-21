@@ -1,5 +1,5 @@
 // Clean ES module auth controller
-import { Op } from "sequelize";
+import { Op, fn, col, where } from "sequelize";
 import User from "../models/User.js";
 import Role from "../models/Role.js";
 import {
@@ -26,6 +26,72 @@ async function generateUniqueUsernameFromEmail(email) {
     candidate = `${base || "user"}${i}`;
     i += 1;
   }
+}
+
+function normalizeRoleInput(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function buildRoleCandidates(role) {
+  const normalizedRole = normalizeRoleInput(role);
+  if (!normalizedRole) {
+    return { codeCandidates: [], nameCandidates: [] };
+  }
+
+  const codeCandidates = Array.from(
+    new Set([
+      normalizedRole,
+      normalizedRole.replace(/\s+/g, "_"),
+      normalizedRole.replace(/[\s-]+/g, "_"),
+      normalizedRole.replace(/[\s_]+/g, "-"),
+    ]),
+  );
+
+  const nameCandidates = Array.from(
+    new Set(
+      codeCandidates.map((candidate) => candidate.replace(/[_-]+/g, " ")),
+    ),
+  );
+
+  return { codeCandidates, nameCandidates };
+}
+
+async function resolveRoleRow({ role, role_id }) {
+  if (role_id) {
+    const roleById = await Role.findByPk(String(role_id).trim());
+    if (!roleById) {
+      return {
+        roleRow: null,
+        error: `Role_id '${role_id}' tidak ditemukan di tabel roles`,
+      };
+    }
+    return { roleRow: roleById, error: null };
+  }
+
+  const { codeCandidates, nameCandidates } = buildRoleCandidates(role);
+  if (codeCandidates.length === 0) {
+    return { roleRow: null, error: null };
+  }
+
+  const roleRow = await Role.findOne({
+    where: {
+      [Op.or]: [
+        { code: { [Op.in]: codeCandidates } },
+        where(fn("LOWER", col("name")), { [Op.in]: nameCandidates }),
+      ],
+    },
+  });
+
+  if (!roleRow) {
+    return {
+      roleRow: null,
+      error: `Role '${role}' tidak ditemukan di tabel roles`,
+    };
+  }
+
+  return { roleRow, error: null };
 }
 
 // Register (POST /api/auth/register)
@@ -385,22 +451,24 @@ export const createUser = async (req, res) => {
       });
     }
 
-    // Resolve role_id safely:
-    // - Prefer role_id UUID if provided
-    // - Else map from role string -> roles table -> UUID
-    let resolvedRoleId = role_id || null;
-    if (!resolvedRoleId && role) {
-      const roleRow = await Role.findOne({
-        where: { name: String(role).toUpperCase() }, // expects stored as "SUPER_ADMIN", etc
+    if (!role && !role_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Role atau role_id wajib diisi",
       });
-      if (!roleRow) {
-        return res.status(400).json({
-          success: false,
-          message: `Role '${role}' tidak ditemukan di tabel roles`,
-        });
-      }
-      resolvedRoleId = roleRow.id;
     }
+
+    const { roleRow, error: roleError } = await resolveRoleRow({
+      role,
+      role_id,
+    });
+    if (roleError) {
+      return res.status(400).json({ success: false, message: roleError });
+    }
+
+    const resolvedRoleId = roleRow?.id || null;
+    const resolvedRoleCode =
+      roleRow?.code || normalizeRoleInput(role).replace(/\s+/g, "_") || null;
 
     const hashedPassword = await hashPassword(password);
 
@@ -412,7 +480,7 @@ export const createUser = async (req, res) => {
         password: hashedPassword,
         plain_password: password,
         nama_lengkap,
-        role: role || null, // keep string role if you want legacy support
+        role: resolvedRoleCode,
         role_id: resolvedRoleId, // ALWAYS UUID or null
         unit_kerja: unit_kerja || null,
         unit_id: unit_id || unit_kerja || null,
@@ -431,7 +499,7 @@ export const createUser = async (req, res) => {
           email,
           password: hashedPassword,
           nama_lengkap,
-          role: role || null,
+          role: resolvedRoleCode,
           role_id: resolvedRoleId,
           unit_kerja: unit_kerja || null,
           unit_id: unit_id || unit_kerja || null,
@@ -488,26 +556,24 @@ export const updateUser = async (req, res) => {
     user.username = username ?? user.username;
     user.email = email ?? user.email;
     user.nama_lengkap = nama_lengkap ?? user.nama_lengkap;
-    user.role = role ?? user.role;
     user.unit_kerja = unit_kerja ?? user.unit_kerja;
-    user.unit_id = unit_id ?? user.unit_id ?? unit_kerja ?? user.unit_kerja;
+    user.unit_id = unit_id ?? user.unit_id ?? user.unit_kerja;
     user.nip = nip ?? user.nip;
     user.jabatan = jabatan ?? user.jabatan;
 
     // Resolve role_id safely if role_id or role provided
-    if (role_id) {
-      user.role_id = role_id; // must be UUID from client
-    } else if (role) {
-      const roleRow = await Role.findOne({
-        where: { name: String(role).toUpperCase() },
+    if (role_id || role) {
+      const { roleRow, error: roleError } = await resolveRoleRow({
+        role,
+        role_id,
       });
-      if (!roleRow) {
-        return res.status(400).json({
-          success: false,
-          message: `Role '${role}' tidak ditemukan di tabel roles`,
-        });
+      if (roleError) {
+        return res.status(400).json({ success: false, message: roleError });
       }
-      user.role_id = roleRow.id;
+      if (roleRow) {
+        user.role_id = roleRow.id;
+        user.role = roleRow.code || user.role;
+      }
     }
     // else: keep existing user.role_id as-is
 

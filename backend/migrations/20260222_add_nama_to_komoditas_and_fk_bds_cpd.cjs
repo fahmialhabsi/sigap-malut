@@ -2,13 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Tambahkan kolom 'nama' ke tabel komoditas
-    await queryInterface.addColumn("komoditas", "nama", {
-      type: Sequelize.STRING(255),
-      allowNull: false,
-      defaultValue: "",
-      comment: "Nama komoditas",
-    });
+    // Kolom 'nama' sudah ada, tidak perlu ditambah lagi
     // Tambahkan constraint foreign key pada BDS-CPD
     await queryInterface.addConstraint("bds_cpd", {
       fields: ["komoditas_id"],
@@ -23,7 +17,7 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn("komoditas", "nama");
+    // Jangan hapus kolom 'nama' karena sudah ada sebelumnya
     await queryInterface.removeConstraint("bds_cpd", "fk_bds_cpd_komoditas_id");
   },
 };

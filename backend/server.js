@@ -1,33 +1,58 @@
-// backend/server.js
-
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import helmet from "helmet";
-import path from "path";
-import { fileURLToPath } from "url";
 import { sequelize, testConnection } from "./config/database.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
 import sekAdmRoutes from "./routes/SEK-ADM.js";
 import bdsHrgRoutes from "./routes/BDS-HRG.js";
 import bktPgdRoutes from "./routes/BKT-PGD.js";
-import tablesRoutes from "./routes/tables.js";
 import modulesRoutes from "./routes/modules.js";
 import bksEvlRoutes from "./routes/BKS-EVL.js";
-import workflowStatusRouter from "./routes/workflow-status.js";
-import tasksRouter from "./routes/tasks.js";
+// ...existing code...
+// backend/server.js
+
+import helmet from "helmet";
+import cors from "cors";
+import morgan from "morgan";
+import winston from "winston";
+import express from "express";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import path from "path";
+import client from "prom-client";
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics();
+
+const httpRequestCounter = new client.Counter({
+  name: "http_requests_total",
+  help: "Total HTTP requests",
+  labelNames: ["method", "route", "status"],
+});
 
 dotenv.config();
 
 const app = express();
-const PORT = Number.parseInt(process.env.PORT || "5000", 10) || 5000;
-const MAX_PORT_RETRIES = 10;
-const isDevelopment = process.env.NODE_ENV === "development";
-const enableStartupLogs =
-  process.env.STARTUP_LOGGING !== "false" && process.env.NODE_ENV !== "test";
+const PORT = process.env.PORT || 5000;
+import complianceRoutes from "./routes/compliance.js";
 
-// ESM __dirname shim
+// Prometheus middleware
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    httpRequestCounter.inc({
+      method: req.method,
+      route: req.path,
+      status: res.statusCode,
+    });
+  });
+  next();
+});
+
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", client.register.contentType);
+  res.end(await client.register.metrics());
+});
+
+app.use("/api/compliance", complianceRoutes);
+
+// ESM __filename shim
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -45,19 +70,30 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Morgan request logger
+app.use(morgan("dev"));
+
+// Winston logger setup
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json(),
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
+    new winston.transports.File({ filename: "logs/combined.log" }),
+  ],
+});
+
+// Example usage: logger.info("Server started");
+
 // Serve master-data static files from repository root
 app.use(
   "/master-data",
   express.static(path.join(__dirname, "..", "master-data")),
 );
-
-// Request logging (development only)
-if (isDevelopment) {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-  });
-}
 
 // Health check
 app.get("/health", (req, res) => {
@@ -105,95 +141,35 @@ app.use("/api/bks-evl", bksEvlRoutes);
 // Register all auto-generated routes
 registerRoutes(app);
 
-// Dynamic table routes (must be after specific routes)
-app.use("/api/workflow-status", workflowStatusRouter);
-app.use("/api/tasks", tasksRouter);
-app.use("/api", tablesRoutes);
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-    path: req.path,
-  });
-});
+// Error handler
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error("Error:", err);
-  res.status(err.status || 500).json({
+  logger.error(`Error: ${err.message}`, { stack: err.stack });
+  res.status(500).json({
     success: false,
-    message: err.message || "Internal server error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    message: "Internal server error",
+    error: err.message,
   });
 });
-
-function listen(port) {
-  return new Promise((resolve, reject) => {
-    const server = app.listen(port);
-
-    const handleListening = () => {
-      server.off("error", handleError);
-      resolve(server);
-    };
-
-    const handleError = (error) => {
-      server.off("listening", handleListening);
-      reject(error);
-    };
-
-    server.once("listening", handleListening);
-    server.once("error", handleError);
-  });
-}
-
-async function listenWithFallback(startPort) {
-  let currentPort = startPort;
-  const maxAttempts = isDevelopment ? MAX_PORT_RETRIES : 1;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-    try {
-      const server = await listen(currentPort);
-
-      if (attempt > 0) {
-        console.warn(
-          `Port ${startPort} is in use. Backend running on port ${currentPort}.`,
-        );
-      }
-
-      return { server, port: currentPort };
-    } catch (error) {
-      if (error.code !== "EADDRINUSE" || attempt === maxAttempts - 1) {
-        throw error;
-      }
-
-      currentPort += 1;
-    }
-  }
-
-  throw new Error(
-    `Unable to bind backend server after ${maxAttempts} attempts starting from port ${startPort}.`,
-  );
-}
 
 // Start server
 async function startServer() {
   try {
     await testConnection();
 
-    if (enableStartupLogs) {
-      console.log(`Database connected (${sequelize.getDialect()}).`);
-    }
-
     // Sync database models (only create tables if not exist)
     await sequelize.sync();
 
-    const { port } = await listenWithFallback(PORT);
-
-    if (enableStartupLogs) {
-      const envName = process.env.NODE_ENV || "development";
-      console.log(`Server running on http://localhost:${port} (${envName}).`);
-    }
+    app.listen(PORT, () => {
+      console.log(`\n${"=".repeat(60)}`);
+      console.log(`SIGAP Malut Backend Server`);
+      console.log(`${"=".repeat(60)}`);
+      console.log(`Server running on: http://localhost:${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`Database: ${sequelize.getDialect()}`);
+      console.log(`${"=".repeat(60)}\n`);
+    });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
     process.exit(1);
@@ -201,3 +177,6 @@ async function startServer() {
 }
 
 startServer();
+
+// Export default untuk kebutuhan testing (misal supertest/mocha)
+export default app;

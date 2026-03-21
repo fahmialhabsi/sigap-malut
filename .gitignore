@@ -35,3 +35,4 @@ coverage/
 ~$*.doc*
 ~$*.xls*
 ~$*.ppt*backup_fields_*/
+prometheus/

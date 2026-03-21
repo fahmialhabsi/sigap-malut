@@ -12,8 +12,8 @@ file_laporan,File Laporan,varchar,255,false,false,NULL,none,NULL,Upload laporan 
 file_data_pendukung,File Data Pendukung,json,NULL,false,false,NULL,none,NULL,Array file pendukung
 penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Sekretaris,none,NULL,PIC
 pelaksana,Pelaksana,varchar,255,true,false,UPTD,none,NULL,Yang menyusun
-is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Data uji lab sensitif
-status,Status,enum,NULL,true,false,draft,none,"draft,review,final",Status
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"""Biasa,Sensitif""",Data uji lab sensitif
+status,Status,enum,NULL,true,false,draft,none,"""draft,review,final""",Status
 keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
 created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
 created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

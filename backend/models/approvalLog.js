@@ -5,50 +5,35 @@ const ApprovalLog = sequelize.define(
   "ApprovalLog",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
-    workflow_id: {
-      type: DataTypes.INTEGER,
+    layanan_id: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
-    approver_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    approver_role: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-    },
-    approval_level: {
-      type: DataTypes.INTEGER,
+    reviewer_id: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
     action: {
       type: DataTypes.STRING(20),
       allowNull: false,
     },
-    notes: {
+    catatan: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    created_at: {
+    timestamp: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
-    },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      comment: "Soft delete timestamp",
     },
   },
   {
     tableName: "approval_log",
     timestamps: false,
-    paranoid: true,
-    deletedAt: "deleted_at",
   },
 );
 

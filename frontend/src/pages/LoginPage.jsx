@@ -6,10 +6,6 @@ import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
 import { getDashboardPath } from "../utils/getDashboardPath";
 
-// setAuthToken helpers (dua instance axios yang ada di project)
-import { setAuthToken as setApiToken } from "../utils/api";
-import { setAuthToken as setApiClientToken } from "../services/apiClient";
-
 function normalizeRoleName(user) {
   return (
     (user?.roleName && String(user.roleName).toLowerCase()) ||
@@ -46,41 +42,6 @@ export default function LoginPage() {
     const result = await login(email, password);
 
     if (result?.success) {
-      // --- NEW: persist token/profile & set axios Authorization header ---
-      try {
-        const token = result?.data?.token || result?.data?.access_token;
-        const refreshToken =
-          result?.data?.refreshToken || result?.data?.refresh_token;
-        const userFromResp = result?.data?.user;
-
-        if (token) {
-          // keep backward-compatible keys
-          localStorage.setItem("access_token", token);
-          localStorage.setItem("token", token);
-          if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
-
-          // set Authorization header on both axios instances used in the app
-          try {
-            setApiToken(token);
-          } catch (err) {
-            // ignore if utils/api not available
-            console.debug("setApiToken failed:", err?.message || err);
-          }
-          try {
-            setApiClientToken(token);
-          } catch (err) {
-            console.debug("setApiClientToken failed:", err?.message || err);
-          }
-        }
-
-        if (userFromResp) {
-          localStorage.setItem("user", JSON.stringify(userFromResp));
-        }
-      } catch (err) {
-        console.warn("Could not persist login tokens/profile:", err);
-      }
-      // --- end persist token/profile ---
-
       // Prefer backend dashboardUrl if available
       const dashboardUrlFromBackend = result?.data?.dashboardUrl;
 

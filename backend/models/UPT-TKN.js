@@ -2,7 +2,7 @@
 // MODEL: UptTkn
 // TABLE: upt_tkn
 // MODULE: UPT-TKN
-// Generated: 2026-02-17T19:24:47.474Z
+// Generated: 2026-03-19T23:39:23.652Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -20,7 +20,7 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'FK ke layanan_menpanrb (LY132-LY135)',
   },
   jenis_layanan_teknis: {
-    type: DataTypes.ENUM('Pengujian Sampel Pangan Berisiko', 'Hasil Pengujian GMP/GHP/NKV', 'Audit Produk', 'Pelaporan Teknis'),
+    type: DataTypes.ENUM('"Pengujian Sampel Pangan Berisiko', 'Hasil Pengujian GMP/GHP/NKV', 'Audit Produk', 'Pelaporan Teknis"'),
     allowNull: false,
     comment: 'Jenis layanan teknis',
   },
@@ -65,7 +65,7 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'Hasil pengujian',
   },
   kesimpulan_uji: {
-    type: DataTypes.ENUM('Memenuhi Syarat', 'Tidak Memenuhi Syarat', 'Perlu Uji Lanjutan'),
+    type: DataTypes.ENUM('"Memenuhi Syarat', 'Tidak Memenuhi Syarat', 'Perlu Uji Lanjutan"'),
     comment: 'Kesimpulan hasil uji',
   },
   rekomendasi_uji: {
@@ -89,7 +89,7 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'Tanggal verifikasi',
   },
   jenis_sertifikasi: {
-    type: DataTypes.ENUM('GMP', 'GHP', 'NKV', 'Prima 1', 'Prima 2', 'Prima 3', 'GFP', 'Lainnya'),
+    type: DataTypes.ENUM('"GMP', 'GHP', 'NKV', 'Prima 1', 'Prima 2', 'Prima 3', 'GFP', 'Lainnya"'),
     comment: 'Jenis sertifikasi',
   },
   nama_usaha: {
@@ -125,11 +125,11 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'JSON checklist audit',
   },
   skor_audit: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Skor hasil audit',
   },
   hasil_audit: {
-    type: DataTypes.ENUM('Lulus', 'Tidak Lulus', 'Lulus Bersyarat'),
+    type: DataTypes.ENUM('"Lulus', 'Tidak Lulus', 'Lulus Bersyarat"'),
     comment: 'Hasil audit',
   },
   catatan_audit: {
@@ -145,7 +145,7 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'Deadline perbaikan',
   },
   status_sertifikat: {
-    type: DataTypes.ENUM('Proses', 'Diterbitkan', 'Ditolak', 'Dicabut'),
+    type: DataTypes.ENUM('"Proses', 'Diterbitkan', 'Ditolak', 'Dicabut"'),
     comment: 'Status penerbitan sertifikat',
   },
   nomor_sertifikat: {
@@ -161,7 +161,7 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'Tanggal kadaluarsa sertifikat',
   },
   jenis_produk_audit: {
-    type: DataTypes.ENUM('Domestik', 'Impor'),
+    type: DataTypes.ENUM('"Domestik', 'Impor"'),
     comment: 'Produk domestik atau impor',
   },
   negara_asal: {
@@ -178,7 +178,7 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'Periode laporan teknis',
   },
   jenis_laporan: {
-    type: DataTypes.ENUM('Bulanan', 'Triwulanan', 'Semesteran', 'Tahunan'),
+    type: DataTypes.ENUM('"Bulanan', 'Triwulanan', 'Semesteran', 'Tahunan"'),
     comment: 'Jenis laporan',
   },
   total_pengujian: {
@@ -194,7 +194,7 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'Total sertifikat diterbitkan',
   },
   persentase_kelulusan: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Persentase kelulusan uji/audit',
   },
   ringkasan_laporan: {
@@ -241,13 +241,13 @@ const UptTkn = sequelize.define('UptTkn', {
     comment: 'Jenis data',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Data teknis UPTD sensitif',
   },
   status: {
-    type: DataTypes.ENUM('pending', 'proses', 'selesai', 'verifikasi', 'approved'),
+    type: DataTypes.ENUM('"pending', 'proses', 'selesai', 'verifikasi', 'approved"'),
     allowNull: false,
     defaultValue: 'pending',
     comment: 'Status',

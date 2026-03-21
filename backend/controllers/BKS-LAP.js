@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BksLapController
 // MODEL: BksLap
-// Generated: 2026-02-17T19:24:48.398Z
+// Generated: 2026-03-19T23:39:27.510Z
 // =====================================================
 
 import BksLap from "../models/BKS-LAP.js";

@@ -2,7 +2,7 @@
 // MODEL: UptKeu
 // TABLE: upt_keu
 // MODULE: UPT-KEU
-// Generated: 2026-02-17T19:24:47.471Z
+// Generated: 2026-03-19T23:39:23.520Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -10,7 +10,7 @@ import sequelize from '../config/database.js';
 
 const UptKeu = sequelize.define('UptKeu', {
   unit_kerja: {
-    type: DataTypes.ENUM('Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi'),
+    type: DataTypes.ENUM('"Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi"'),
     allowNull: false,
     defaultValue: 'UPTD',
     comment: 'AUTO-SET ke UPTD (field khusus UPTD)',

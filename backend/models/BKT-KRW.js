@@ -2,7 +2,7 @@
 // MODEL: BktKrw
 // TABLE: bkt_krw
 // MODULE: BKT-KRW
-// Generated: 2026-02-17T19:24:47.425Z
+// Generated: 2026-03-19T23:39:22.928Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

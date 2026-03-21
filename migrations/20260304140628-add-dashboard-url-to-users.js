@@ -1,10 +1,14 @@
-export const up = async (queryInterface, Sequelize) => {
-  await queryInterface.addColumn("users", "dashboardUrl", {
-    type: Sequelize.STRING,
-    allowNull: true,
-  });
-};
+"use strict";
 
-export const down = async (queryInterface) => {
-  await queryInterface.removeColumn("users", "dashboardUrl");
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.addColumn("users", "dashboardUrl", {
+      type: Sequelize.STRING,
+      allowNull: true,
+    });
+  },
+
+  down: async (queryInterface) => {
+    await queryInterface.removeColumn("users", "dashboardUrl");
+  },
 };
