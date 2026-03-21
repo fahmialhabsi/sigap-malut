@@ -1,7 +1,7 @@
 // =====================================================
 // ROUTES: UptTkn
 // Base Path: /api/upt-tkn
-// Generated: 2026-02-17T19:24:49.317Z
+// Generated: 2026-03-19T23:39:37.619Z
 // =====================================================
 
 import express from "express";
@@ -13,14 +13,19 @@ import {
   deleteUptTkn,
 } from "../controllers/UPT-TKN.js";
 import { protect } from "../middleware/auth.js";
+import { enforceUptdPilotAccess } from "../middleware/uptdPilotGuard.js";
 
 const router = express.Router();
 
-// All routes are protected
-router.use(protect);
+router.use(protect, enforceUptdPilotAccess);
 
-router.route("/").get(getAllUptTkn).post(createUptTkn);
+router.route("/")
+  .get(getAllUptTkn)
+  .post(createUptTkn);
 
-router.route("/:id").get(getUptTknById).put(updateUptTkn).delete(deleteUptTkn);
+router.route("/:id")
+  .get(getUptTknById)
+  .put(updateUptTkn)
+  .delete(deleteUptTkn);
 
 export default router;

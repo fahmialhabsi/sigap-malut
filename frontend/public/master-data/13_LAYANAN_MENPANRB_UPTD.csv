@@ -1,0 +1,60 @@
+layanan_id,layanan_code,layanan_name,modul_ui_id,is_sensitive,penanggung_jawab,pelaksana,status_aktif,menu_order
+LY132,pengujian_sampel_pangan_berisiko,Pengujian Sampel Pangan Berisiko,UPT-TKN,Sensitif,Kepala UPTD,Tim Teknis,true,1
+LY133,hasil_pengujian_gmp_ghp_nkv,Hasil Pengujian GMP/GHP/NKV,UPT-TKN,Sensitif,Kepala UPTD,Tim Teknis,true,2
+LY134,audit_produk_domestik_impor,Audit Produk Domestik & Impor,UPT-TKN,Sensitif,Kepala UPTD,Tim Auditor,true,3
+LY135,pelaporan_kegiatan_teknis_uptd,Pelaporan Kegiatan Teknis UPTD,UPT-TKN,Sensitif,Kepala UPTD,Staff Pelaporan,true,4
+LY136,pengelolaan_surat_masuk_keluar,Pengelolaan Surat Masuk Keluar,UPT-ADM,Sensitif,Kasubbag TU UPTD,Staff TU,true,1
+LY137,penomoran_tata_naskah_dinas,Penomoran Tata Naskah Dinas,UPT-ADM,Sensitif,Kasubbag TU UPTD,Staff TU,true,2
+LY138,pengarsipan_dokumen_layanan,Pengarsipan Dokumen Layanan,UPT-ADM,Sensitif,Kasubbag TU UPTD,Arsiparis,true,3
+LY139,penyediaan_dokumen_pemohon,Penyediaan Dokumen Pemohon,UPT-ADM,Sensitif,Kasubbag TU UPTD,Staff TU,true,4
+LY140,legalitas_administrasi_sertifikasi,Legalitas Administrasi Sertifikasi,UPT-ADM,Sensitif,Kasubbag TU UPTD,Staff Administrasi,true,5
+LY141,penerimaan_berkas_permohonan,Penerimaan Berkas Permohonan,UPT-ADM,Sensitif,Kasubbag TU UPTD,Staff Frontliner,true,6
+LY142,penjadwalan_audit_inspeksi,Penjadwalan Audit & Inspeksi,UPT-ADM,Biasa,Kasubbag TU UPTD,Staff Penjadwalan,true,7
+LY143,administrasi_sertifikat_uptd,Administrasi Sertifikat UPTD,UPT-ADM,Sensitif,Kasubbag TU UPTD,Staff Sertifikasi,true,8
+LY144,pelayanan_informasi_layanan,Pelayanan Informasi Layanan,UPT-ADM,Biasa,Kasubbag TU UPTD,Staff Frontliner,true,9
+LY145,pengelolaan_pengaduan_administrasi,Pengelolaan Pengaduan Administrasi,UPT-ADM,Biasa,Kasubbag TU UPTD,Staff Pengaduan,true,10
+LY146,penyusunan_rka_dpa_uptd,Penyusunan RKA/DPA UPTD,UPT-KEU,Sensitif,Kasubbag TU UPTD,Staff Perencanaan,true,1
+LY147,pengelolaan_spj_kegiatan,Pengelolaan SPJ Kegiatan,UPT-KEU,Sensitif,Kasubbag TU UPTD,Bendahara,true,2
+LY148,pembayaran_honor_tim_teknis,Pembayaran Honor Tim Teknis,UPT-KEU,Sensitif,Kasubbag TU UPTD,Bendahara,true,3
+LY149,pelaporan_keuangan_berkala,Pelaporan Keuangan Berkala,UPT-KEU,Sensitif,Kasubbag TU UPTD,Staff Keuangan,true,4
+LY150,dukungan_anggaran_layanan,Dukungan Anggaran Layanan,UPT-KEU,Sensitif,Kasubbag TU UPTD,Staff Keuangan,true,5
+LY151,pengelolaan_data_kepegawaian,Pengelolaan Data Kepegawaian,UPT-KEP,Sensitif,Kasubbag TU UPTD,Staff Kepegawaian,true,1
+LY152,penyusunan_skp_jf_pelaksana,Penyusunan SKP JF & Pelaksana,UPT-KEP,Sensitif,Kasubbag TU UPTD,Staff Kepegawaian,true,2
+LY153,pengusulan_penilaian_kinerja,Pengusulan Penilaian Kinerja,UPT-KEP,Sensitif,Kasubbag TU UPTD,Staff Kepegawaian,true,3
+LY154,pengelolaan_cuti_absensi,Pengelolaan Cuti & Absensi,UPT-KEP,Sensitif,Kasubbag TU UPTD,Staff Kepegawaian,true,4
+LY155,dukungan_pengembangan_sdm,Dukungan Pengembangan SDM,UPT-KEP,Biasa,Kasubbag TU UPTD,Staff Kepegawaian,true,5
+LY156,pengelolaan_alat_inspeksi,Pengelolaan Alat Inspeksi,UPT-AST,Biasa,Kasubbag TU UPTD,Staff Aset,true,1
+LY157,pemeliharaan_peralatan_lab,Pemeliharaan Peralatan Lab,UPT-AST,Biasa,Kasubbag TU UPTD,Teknisi Lab,true,2
+LY158,pengadaan_bahan_habis_pakai,Pengadaan Bahan Habis Pakai,UPT-AST,Biasa,Kasubbag TU UPTD,Staff Pengadaan,true,3
+LY159,distribusi_perlengkapan_kerja,Distribusi Perlengkapan Kerja,UPT-AST,Biasa,Kasubbag TU UPTD,Staff Gudang,true,4
+LY160,inventarisasi_aset_uptd,Inventarisasi Aset UPTD,UPT-AST,Sensitif,Kasubbag TU UPTD,Staff Aset,true,5
+LY161,penjaminan_mutu_sertifikasi,Penjaminan Mutu Sertifikasi,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Staff Mutu,true,1
+LY162,verifikasi_kepatuhan_standar,Verifikasi Kepatuhan Standar,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Auditor,true,2
+LY163,pengendalian_mutu_audit,Pengendalian Mutu Audit,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Auditor,true,3
+LY164,pengelolaan_temuan_mutu,Pengelolaan Temuan Mutu,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Staff Mutu,true,4
+LY165,penyusunan_sop_sertifikasi,Penyusunan SOP Sertifikasi,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Staff SOP,true,5
+LY166,review_pemutakhiran_sop,Review & Pemutakhiran SOP,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Staff SOP,true,6
+LY167,penyusunan_standar_layanan_publik,Penyusunan Standar Layanan Publik,UPT-MTU,Biasa,Kasi Manajemen Mutu,Staff SOP,true,7
+LY168,sosialisasi_sop,Sosialisasi SOP,UPT-MTU,Biasa,Kasi Manajemen Mutu,Staff Mutu,true,8
+LY169,pelatihan_auditor_pangan,Pelatihan Auditor Pangan,UPT-MTU,Biasa,Kasi Manajemen Mutu,Trainer,true,9
+LY170,sertifikasi_kompetensi_auditor,Sertifikasi Kompetensi Auditor,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Asesor,true,10
+LY171,evaluasi_kompetensi_auditor,Evaluasi Kompetensi Auditor,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Asesor,true,11
+LY172,database_kompetensi_auditor,Database Kompetensi Auditor,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Staff Mutu,true,12
+LY173,supervisi_audit_lapangan,Supervisi Audit Lapangan,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Supervisor,true,13
+LY174,evaluasi_hasil_sertifikasi,Evaluasi Hasil Sertifikasi,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Staff Mutu,true,14
+LY175,rekomendasi_perbaikan_mutu,Rekomendasi Perbaikan Mutu,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Auditor,true,15
+LY176,laporan_mutu_layanan_uptd,Laporan Mutu Layanan UPTD,UPT-MTU,Sensitif,Kasi Manajemen Mutu,Staff Mutu,true,16
+LY177,inspeksi_lapangan,Inspeksi Lapangan,UPT-INS,Sensitif,Kasi Manajemen Teknis,Inspektor,true,1
+LY178,audit_sertifikasi,Audit Sertifikasi,UPT-INS,Sensitif,Kasi Manajemen Teknis,Auditor,true,2
+LY179,audit_ulang,Audit Ulang,UPT-INS,Sensitif,Kasi Manajemen Teknis,Auditor,true,3
+LY180,pengambilan_sampel_pangan,Pengambilan Sampel Pangan,UPT-INS,Sensitif,Kasi Manajemen Teknis,Sampler,true,4
+LY181,pengujian_mutu_pangan,Pengujian Mutu Pangan,UPT-INS,Sensitif,Kasi Manajemen Teknis,Analis Lab,true,5
+LY182,verifikasi_hasil_uji,Verifikasi Hasil Uji,UPT-INS,Sensitif,Kasi Manajemen Teknis,QC Lab,true,6
+LY183,rekomendasi_hasil_pengawasan,Rekomendasi Hasil Pengawasan,UPT-INS,Sensitif,Kasi Manajemen Teknis,Auditor,true,7
+LY184,pembinaan_pasca_temuan,Pembinaan Pasca Temuan,UPT-INS,Sensitif,Kasi Manajemen Teknis,Pembina,true,8
+LY185,koordinasi_opd_terkait,Koordinasi OPD Terkait,UPT-INS,Sensitif,Kasi Manajemen Teknis,Staff Koordinasi,true,9
+LY186,monitoring_perbaikan,Monitoring Perbaikan,UPT-INS,Sensitif,Kasi Manajemen Teknis,Monitor,true,10
+LY187,penjadwalan_inspeksi,Penjadwalan Inspeksi,UPT-INS,Biasa,Kasi Manajemen Teknis,Staff Penjadwalan,true,11
+LY188,pelaksanaan_layanan_lapangan,Pelaksanaan Layanan Lapangan,UPT-INS,Biasa,Kasi Manajemen Teknis,Tim Lapangan,true,12
+LY189,pelaporan_teknis_uptd,Pelaporan Teknis UPTD,UPT-INS,Sensitif,Kasi Manajemen Teknis,Staff Pelaporan,true,13
+LY190,data_layanan_teknis,Data Layanan Teknis,UPT-INS,Sensitif,Kasi Manajemen Teknis,Staff Data,true,14

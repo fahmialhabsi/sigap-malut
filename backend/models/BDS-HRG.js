@@ -2,7 +2,7 @@
 // MODEL: BdsHrg
 // TABLE: bds_hrg
 // MODULE: BDS-HRG
-// Generated: 2026-02-17T19:24:47.442Z
+// Generated: 2026-03-19T23:39:23.036Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

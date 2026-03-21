@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BksKmnController
 // MODEL: BksKmn
-// Generated: 2026-02-17T19:24:48.397Z
+// Generated: 2026-03-19T23:39:27.508Z
 // =====================================================
 
 import BksKmn from "../models/BKS-KMN.js";

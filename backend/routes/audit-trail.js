@@ -1,21 +1,14 @@
 import express from "express";
+import {
+  getAuditLogs,
+  exportAuditLogs,
+} from "../controllers/auditLogController.js";
 const router = express.Router();
 
-let auditTrail = [];
+// GET /api/audit-trail?modul=&aksi=&pegawai_id=&entitas_id=&start=&end=&limit=&page=
+router.get("/", getAuditLogs);
 
-router.get("/", (req, res) => {
-  res.json(auditTrail);
-});
+// GET /api/audit-trail/export?format=csv|json&...filter
+router.get("/export", exportAuditLogs);
 
-router.post("/", (req, res) => {
-  const { user, action, detail } = req.body;
-  const entry = {
-    user,
-    action,
-    detail,
-    time: new Date().toISOString(),
-  };
-  auditTrail.push(entry);
-  res.status(201).json(entry);
-});
 export default router;

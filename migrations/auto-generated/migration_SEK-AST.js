@@ -1,0 +1,44 @@
+export async function up({ context: queryInterface }) {
+  await queryInterface.createTable('SEK-AST', {
+      id: { type: DataTypes.INTEGER, allowNull: false, unique: true, autoIncrement: true, primaryKey: true },
+      unit_kerja: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Sekretariat" },
+      layanan_id: { type: DataTypes.STRING(10), allowNull: false },
+      kode_aset: { type: DataTypes.STRING(50), allowNull: true },
+      nama_aset: { type: DataTypes.STRING(255), allowNull: false },
+      kategori_aset: { type: DataTypes.ENUM, allowNull: false },
+      merk_type: { type: DataTypes.STRING(255), allowNull: true },
+      nomor_seri: { type: DataTypes.STRING(100), allowNull: true },
+      tahun_perolehan: { type: DataTypes.INTEGER, allowNull: true },
+      cara_perolehan: { type: DataTypes.ENUM, allowNull: true },
+      harga_perolehan: { type: DataTypes.DECIMAL, allowNull: true },
+      nilai_buku: { type: DataTypes.DECIMAL, allowNull: true },
+      kondisi: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Baik" },
+      lokasi: { type: DataTypes.STRING(255), allowNull: true },
+      ruangan: { type: DataTypes.STRING(100), allowNull: true },
+      penanggung_jawab_aset: { type: DataTypes.STRING(255), allowNull: true },
+      qr_code: { type: DataTypes.STRING(255), allowNull: true },
+      tanggal_inventarisasi: { type: DataTypes.DATEONLY, allowNull: true },
+      tanggal_pemeliharaan_terakhir: { type: DataTypes.DATEONLY, allowNull: true },
+      tanggal_pemeliharaan_berikutnya: { type: DataTypes.DATEONLY, allowNull: true },
+      biaya_pemeliharaan: { type: DataTypes.DECIMAL, allowNull: true },
+      jenis_pemeliharaan: { type: DataTypes.ENUM, allowNull: true },
+      status_aset: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Aktif" },
+      alasan_penghapusan: { type: DataTypes.TEXT, allowNull: true },
+      tanggal_penghapusan: { type: DataTypes.DATEONLY, allowNull: true },
+      nomor_sk_penghapusan: { type: DataTypes.STRING(100), allowNull: true },
+      file_foto: { type: DataTypes.STRING(255), allowNull: true },
+      file_bast: { type: DataTypes.STRING(255), allowNull: true },
+      file_sk: { type: DataTypes.STRING(255), allowNull: true },
+      penanggung_jawab: { type: DataTypes.STRING(255), allowNull: false, defaultValue: "Kasubbag Umum" },
+      pelaksana: { type: DataTypes.STRING(255), allowNull: false },
+      is_sensitive: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Biasa" },
+      keterangan: { type: DataTypes.TEXT, allowNull: true },
+      created_by: { type: DataTypes.INTEGER, allowNull: false },
+      created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+      updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+    });
+}
+
+export async function down({ context: queryInterface }) {
+  await queryInterface.dropTable('SEK-AST');
+}

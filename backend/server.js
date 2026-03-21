@@ -1,23 +1,60 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import helmet from "helmet";
 import { sequelize, testConnection } from "./config/database.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
 import sekAdmRoutes from "./routes/SEK-ADM.js";
 import bdsHrgRoutes from "./routes/BDS-HRG.js";
 import bktPgdRoutes from "./routes/BKT-PGD.js";
-import tablesRoutes from "./routes/tables.js";
 import modulesRoutes from "./routes/modules.js";
+import bksEvlRoutes from "./routes/BKS-EVL.js";
+// ...existing code...
+// backend/server.js
 
-import workflowRoutes from "./routes/index.js"; // Added workflowRoutes import
-import workflowStatusRouter from "./routes/workflow-status.js";
+import helmet from "helmet";
+import cors from "cors";
+import morgan from "morgan";
+import winston from "winston";
+import express from "express";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import path from "path";
+import client from "prom-client";
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics();
+
+const httpRequestCounter = new client.Counter({
+  name: "http_requests_total",
+  help: "Total HTTP requests",
+  labelNames: ["method", "route", "status"],
+});
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+import complianceRoutes from "./routes/compliance.js";
+
+// Prometheus middleware
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    httpRequestCounter.inc({
+      method: req.method,
+      route: req.path,
+      status: res.statusCode,
+    });
+  });
+  next();
+});
+
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", client.register.contentType);
+  res.end(await client.register.metrics());
+});
+
+app.use("/api/compliance", complianceRoutes);
+
+// ESM __filename shim
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(helmet());
@@ -33,13 +70,30 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging (development only)
-if (process.env.NODE_ENV === "development") {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-  });
-}
+// Morgan request logger
+app.use(morgan("dev"));
+
+// Winston logger setup
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json(),
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
+    new winston.transports.File({ filename: "logs/combined.log" }),
+  ],
+});
+
+// Example usage: logger.info("Server started");
+
+// Serve master-data static files from repository root
+app.use(
+  "/master-data",
+  express.static(path.join(__dirname, "..", "master-data")),
+);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -82,30 +136,20 @@ app.use("/api/sek-adm", sekAdmRoutes);
 app.use("/api/bds-hrg", bdsHrgRoutes);
 app.use("/api/bkt-pgd", bktPgdRoutes);
 app.use("/api/modules", modulesRoutes);
+app.use("/api/bks-evl", bksEvlRoutes);
 
 // Register all auto-generated routes
 registerRoutes(app);
 
-// Dynamic table routes (must be after specific routes)
-app.use("/api/workflow-status", workflowStatusRouter);
-app.use("/api", tablesRoutes);
-app.use("/api", workflowRoutes);
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-    path: req.path,
-  });
-});
+// Error handler
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error("Error:", err);
-  res.status(err.status || 500).json({
+  logger.error(`Error: ${err.message}`, { stack: err.stack });
+  res.status(500).json({
     success: false,
-    message: err.message || "Internal server error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    message: "Internal server error",
+    error: err.message,
   });
 });
 
@@ -133,3 +177,6 @@ async function startServer() {
 }
 
 startServer();
+
+// Export default untuk kebutuhan testing (misal supertest/mocha)
+export default app;

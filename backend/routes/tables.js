@@ -297,10 +297,10 @@ const createTableFromMasterData = async (tableName) => {
 
   if (
     !columnDefs.some((definition) =>
-      definition.includes('"id" INTEGER PRIMARY KEY AUTOINCREMENT'),
+      definition.includes('"id" SERIAL PRIMARY KEY'),
     )
   ) {
-    columnDefs.unshift('"id" INTEGER PRIMARY KEY AUTOINCREMENT');
+    columnDefs.unshift('"id" SERIAL PRIMARY KEY');
   }
 
   const createTableSql = `CREATE TABLE IF NOT EXISTS "${tableName}" (${columnDefs.join(", ")})`;

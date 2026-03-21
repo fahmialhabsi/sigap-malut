@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BksKbjController
 // MODEL: BksKbj
-// Generated: 2026-02-17T19:24:48.396Z
+// Generated: 2026-03-19T23:39:27.507Z
 // =====================================================
 
 import BksKbj from "../models/BKS-KBJ.js";

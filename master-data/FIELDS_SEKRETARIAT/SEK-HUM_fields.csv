@@ -1,9 +1,9 @@
 field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
 id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
 layanan_id,Layanan,varchar,10,true,false,NULL,none,NULL,FK ke layanan_menpanrb (LY035-LY039)
-jenis_layanan_humas,Jenis Layanan,enum,NULL,true,false,NULL,none,"Protokol,Acara Resmi,Penerimaan Tamu,Publikasi,Dokumentasi",Jenis layanan humas
+jenis_layanan_humas,Jenis Layanan,enum,NULL,true,false,NULL,none,"""Protokol,Acara Resmi,Penerimaan Tamu,Publikasi,Dokumentasi""",Jenis layanan humas
 nama_kegiatan,Nama Kegiatan,varchar,255,false,false,NULL,none,NULL,Nama acara/kegiatan
-jenis_acara,Jenis Acara,enum,NULL,false,false,NULL,none,"Rapat,Upacara,Kunjungan,Sosialisasi,Workshop,Launching,Lainnya",Jenis acara
+jenis_acara,Jenis Acara,enum,NULL,false,false,NULL,none,"""Rapat,Upacara,Kunjungan,Sosialisasi,Workshop,Launching,Lainnya""",Jenis acara
 tanggal_acara,Tanggal Acara,date,NULL,false,false,NULL,none,NULL,Tanggal pelaksanaan
 waktu_mulai,Waktu Mulai,time,NULL,false,false,NULL,none,NULL,Jam mulai
 waktu_selesai,Waktu Selesai,time,NULL,false,false,NULL,none,NULL,Jam selesai
@@ -19,8 +19,8 @@ instansi_tamu,Instansi Tamu,varchar,255,false,false,NULL,none,NULL,Asal instansi
 keperluan_kunjungan,Keperluan Kunjungan,text,NULL,false,false,NULL,none,NULL,Maksud kunjungan
 penerima_tamu,Penerima Tamu,varchar,255,false,false,NULL,none,NULL,Pejabat yang menerima
 judul_publikasi,Judul Publikasi,varchar,255,false,false,NULL,none,NULL,Judul berita/publikasi
-jenis_publikasi,Jenis Publikasi,enum,NULL,false,false,NULL,none,"Berita,Press Release,Artikel,Video,Foto,Infografis",Jenis publikasi
-media_publikasi,Media Publikasi,enum,NULL,false,false,NULL,none,"Website,Media Sosial,Media Massa,Buletin,Lainnya",Media yang digunakan
+jenis_publikasi,Jenis Publikasi,enum,NULL,false,false,NULL,none,"""Berita,Press Release,Artikel,Video,Foto,Infografis""",Jenis publikasi
+media_publikasi,Media Publikasi,enum,NULL,false,false,NULL,none,"""Website,Media Sosial,Media Massa,Buletin,Lainnya""",Media yang digunakan
 link_publikasi,Link Publikasi,varchar,255,false,false,NULL,url,NULL,URL publikasi
 isi_publikasi,Isi Publikasi,text,NULL,false,false,NULL,none,NULL,Konten publikasi
 fotografer,Fotografer,varchar,255,false,false,NULL,none,NULL,Nama fotografer
@@ -33,8 +33,8 @@ file_rundown,File Rundown,varchar,255,false,false,NULL,none,NULL,Upload rundown 
 file_undangan,File Undangan,varchar,255,false,false,NULL,none,NULL,Surat undangan
 penanggung_jawab,Penanggung Jawab,varchar,255,true,false,Kasubbag Umum,none,NULL,PIC
 pelaksana,Pelaksana,varchar,255,true,false,NULL,none,NULL,Yang melaksanakan
-is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi data
-status,Status,enum,NULL,true,false,pending,none,"pending,persiapan,berlangsung,selesai",Status
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"""Biasa,Sensitif""",Klasifikasi data
+status,Status,enum,NULL,true,false,pending,none,"""pending,persiapan,berlangsung,selesai""",Status
 keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Catatan
 created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID
 created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

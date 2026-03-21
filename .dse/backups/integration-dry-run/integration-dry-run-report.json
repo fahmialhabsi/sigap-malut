@@ -1,0 +1,203 @@
+{
+  "scanned": 199,
+  "timestamp": "2026-03-01T12:05:15.251Z",
+  "files": [
+    {
+      "file": "backend/generators/serviceCrudGenerator.js",
+      "requires": 3,
+      "moduleExports": 3,
+      "notes": [
+        {
+          "type": "require",
+          "original": "const fs = require(\"fs\");",
+          "suggestion": "import fs from 'fs';"
+        },
+        {
+          "type": "require",
+          "original": "const path = require(\"path\");",
+          "suggestion": "import path from 'path';"
+        },
+        {
+          "type": "require",
+          "original": "const ctrl = require('../controllers/${code}Controller')",
+          "suggestion": "import ctrl from '../controllers/${code}Controller';"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = function(models){",
+          "suggestion": "export default function(models){;"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = (app) => {",
+          "suggestion": "export default (app) => {;"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = { generate };",
+          "suggestion": "export { generate };;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__generators__serviceCrudGenerator.js.patch.txt"
+    },
+    {
+      "file": "backend/middleware/errorHandler.js",
+      "requires": 0,
+      "moduleExports": 1,
+      "notes": [
+        {
+          "type": "module.exports",
+          "original": "module.exports = errorHandler;",
+          "suggestion": "export default errorHandler;;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__middleware__errorHandler.js.patch.txt"
+    },
+    {
+      "file": "backend/middleware/rateLimiter.js",
+      "requires": 1,
+      "moduleExports": 1,
+      "notes": [
+        {
+          "type": "require",
+          "original": "const rateLimit = require(\"express-rate-limit\");",
+          "suggestion": "import rateLimit from 'express-rate-limit';"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = limiter;",
+          "suggestion": "export default limiter;;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__middleware__rateLimiter.js.patch.txt"
+    },
+    {
+      "file": "backend/middleware/rbac.js",
+      "requires": 2,
+      "moduleExports": 1,
+      "notes": [
+        {
+          "type": "require",
+          "original": "const fs = require(\"fs\");",
+          "suggestion": "import fs from 'fs';"
+        },
+        {
+          "type": "require",
+          "original": "const path = require(\"path\");",
+          "suggestion": "import path from 'path';"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = { authorize, hasPermission };",
+          "suggestion": "export { authorize, hasPermission };;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__middleware__rbac.js.patch.txt"
+    },
+    {
+      "file": "backend/services/auditLogger.js",
+      "requires": 1,
+      "moduleExports": 1,
+      "notes": [
+        {
+          "type": "require",
+          "original": "const { v4: uuidv4 } = require(\"uuid\");",
+          "suggestion": "import { v4: uuidv4 } from 'uuid';"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = { log };",
+          "suggestion": "export { log };;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__services__auditLogger.js.patch.txt"
+    },
+    {
+      "file": "backend/services/baseService.js",
+      "requires": 0,
+      "moduleExports": 1,
+      "notes": [
+        {
+          "type": "module.exports",
+          "original": "module.exports = BaseService;",
+          "suggestion": "export default BaseService;;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__services__baseService.js.patch.txt"
+    },
+    {
+      "file": "backend/services/workflowEngine.js",
+      "requires": 1,
+      "moduleExports": 1,
+      "notes": [
+        {
+          "type": "require",
+          "original": "const { v4: uuidv4 } = require(\"uuid\");",
+          "suggestion": "import { v4: uuidv4 } from 'uuid';"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = { performTransition, workflows };",
+          "suggestion": "export { performTransition, workflows };;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__services__workflowEngine.js.patch.txt"
+    },
+    {
+      "file": "backend/services/workflowService.js",
+      "requires": 5,
+      "moduleExports": 0,
+      "notes": [
+        {
+          "type": "require",
+          "original": "const ApprovalWorkflow = require(\"../models/approvalWorkflow.js\");",
+          "suggestion": "import ApprovalWorkflow from '../models/approvalWorkflow.js';"
+        },
+        {
+          "type": "require",
+          "original": "const ApprovalLog = require(\"../models/approvalLog.js\");",
+          "suggestion": "import ApprovalLog from '../models/approvalLog.js';"
+        },
+        {
+          "type": "require",
+          "original": "const BypassDetection = require(\"../models/bypassDetection.js\");",
+          "suggestion": "import BypassDetection from '../models/bypassDetection.js';"
+        },
+        {
+          "type": "require",
+          "original": "const emailService = require(\"../utils/emailService\");",
+          "suggestion": "import emailService from '../utils/emailService';"
+        },
+        {
+          "type": "require",
+          "original": "const whatsappService = require(\"../utils/whatsappService\");",
+          "suggestion": "import whatsappService from '../utils/whatsappService';"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__services__workflowService.js.patch.txt"
+    },
+    {
+      "file": "backend/utils/jwt.js",
+      "requires": 2,
+      "moduleExports": 1,
+      "notes": [
+        {
+          "type": "require",
+          "original": "const jwt = require('jsonwebtoken');",
+          "suggestion": "import jwt from 'jsonwebtoken';"
+        },
+        {
+          "type": "require",
+          "original": "const fs = require('fs');",
+          "suggestion": "import fs from 'fs';"
+        },
+        {
+          "type": "module.exports",
+          "original": "module.exports = { signAccess, signRefresh, verifyAccess, verifyRefresh };",
+          "suggestion": "export { signAccess, signRefresh, verifyAccess, verifyRefresh };;"
+        }
+      ],
+      "patch": ".dse/backups/integration-dry-run/patches/backend__utils__jwt.js.patch.txt"
+    }
+  ]
+}

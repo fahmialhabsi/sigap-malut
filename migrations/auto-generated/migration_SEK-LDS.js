@@ -1,0 +1,42 @@
+export async function up({ context: queryInterface }) {
+  await queryInterface.createTable('SEK-LDS', {
+      id: { type: DataTypes.INTEGER, allowNull: false, unique: true, autoIncrement: true, primaryKey: true },
+      layanan_id: { type: DataTypes.STRING(10), allowNull: false, defaultValue: "LY049" },
+      periode: { type: DataTypes.DATEONLY, allowNull: false },
+      tahun: { type: DataTypes.INTEGER, allowNull: false },
+      bulan: { type: DataTypes.INTEGER, allowNull: false },
+      rencana_distribusi: { type: DataTypes.DECIMAL, allowNull: true },
+      realisasi_distribusi: { type: DataTypes.DECIMAL, allowNull: true },
+      persentase_realisasi: { type: DataTypes.DECIMAL, allowNull: true },
+      inflasi_pangan_persen: { type: DataTypes.DECIMAL, allowNull: true },
+      target_inflasi_tpid: { type: DataTypes.DECIMAL, allowNull: true, defaultValue: "2.50" },
+      status_inflasi: { type: DataTypes.ENUM, allowNull: true },
+      harga_stabil: { type: DataTypes.INTEGER, allowNull: true },
+      harga_naik: { type: DataTypes.INTEGER, allowNull: true },
+      harga_turun: { type: DataTypes.INTEGER, allowNull: true },
+      operasi_pasar_dilakukan: { type: DataTypes.INTEGER, allowNull: true },
+      volume_operasi_pasar: { type: DataTypes.DECIMAL, allowNull: true },
+      cppd_stok: { type: DataTypes.DECIMAL, allowNull: true },
+      cppd_pelepasan: { type: DataTypes.DECIMAL, allowNull: true },
+      cbp_bulog_stok: { type: DataTypes.DECIMAL, allowNull: true },
+      distribusi_antar_wilayah: { type: DataTypes.DECIMAL, allowNull: true },
+      analisis: { type: DataTypes.TEXT, allowNull: true },
+      kendala: { type: DataTypes.TEXT, allowNull: true },
+      rekomendasi: { type: DataTypes.TEXT, allowNull: true },
+      sumber_data: { type: DataTypes.STRING(255), allowNull: true, defaultValue: "Bidang Distribusi & Cadangan Pangan" },
+      file_laporan: { type: DataTypes.STRING(255), allowNull: true },
+      file_data_pendukung: { type: DataTypes.JSONB, allowNull: true },
+      penanggung_jawab: { type: DataTypes.STRING(255), allowNull: false, defaultValue: "Sekretaris" },
+      pelaksana: { type: DataTypes.STRING(255), allowNull: false, defaultValue: "Bidang Distribusi" },
+      is_sensitive: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Biasa" },
+      status: { type: DataTypes.ENUM, allowNull: false, defaultValue: "draft" },
+      keterangan: { type: DataTypes.TEXT, allowNull: true },
+      created_by: { type: DataTypes.INTEGER, allowNull: false },
+      created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+      updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+    });
+}
+
+export async function down({ context: queryInterface }) {
+  await queryInterface.dropTable('SEK-LDS');
+}
