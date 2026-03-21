@@ -4,6 +4,8 @@
 ========
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 # 02 - Dokumentasi Sistem SIGAP Malut
 
 ---
@@ -36,6 +38,7 @@ modul:
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 ---
 
 # BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
@@ -47,7 +50,10 @@ modul:
 ========
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
@@ -64,7 +70,10 @@ modul:
 ========
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
@@ -79,7 +88,10 @@ modul:
 ========
 <<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+========
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
@@ -102,11 +114,17 @@ modul:
 - Multi-level: Atasan → Reviewer → Approve
 - Status: Draft, Submitted, Approved, Rejected
 ========
+<<<<<<<< HEAD:dokumenSistem/02-dokumentasi-sistem.md
+- Single-level: Atasan langsung → Approve
+- Multi-level: Atasan → Reviewer → Approve
+- Status: Draft, Submitted, Approved, Rejected
+========
 
 - Single-level: Atasan langsung → Approve
 - Multi-level: Atasan → Reviewer → Approve
 - Status: Draft, Submitted, Approved, Rejected
 
+>>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
 >>>>>>>> main:dokumenSistem/02-dokumentasi-teknis-sistem-sigap.md
