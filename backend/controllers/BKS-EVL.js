@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BksEvlController
 // MODEL: BksEvl
-// Generated: 2026-02-17T19:24:48.394Z
+// Generated: 2026-03-19T23:39:27.506Z
 // =====================================================
 
 import BksEvl from "../models/BKS-EVL.js";

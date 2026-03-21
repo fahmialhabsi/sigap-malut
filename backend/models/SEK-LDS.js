@@ -2,7 +2,7 @@
 // MODEL: SekLds
 // TABLE: sek_lds
 // MODULE: SEK-LDS
-// Generated: 2026-02-17T19:24:47.394Z
+// Generated: 2026-03-19T23:39:22.832Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -36,28 +36,28 @@ const SekLds = sequelize.define('SekLds', {
     comment: 'Bulan (1-12)',
   },
   rencana_distribusi: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Rencana distribusi bulan ini',
   },
   realisasi_distribusi: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Realisasi distribusi',
   },
   persentase_realisasi: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Auto-calculate',
   },
   inflasi_pangan_persen: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Inflasi bulan ini',
   },
   target_inflasi_tpid: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     defaultValue: 2.50,
     comment: 'Target TPID',
   },
   status_inflasi: {
-    type: DataTypes.ENUM('On Target', 'Warning', 'Alert'),
+    type: DataTypes.ENUM('"On Target', 'Warning', 'Alert"'),
     comment: 'Status inflasi',
   },
   harga_stabil: {
@@ -77,23 +77,23 @@ const SekLds = sequelize.define('SekLds', {
     comment: 'Jumlah operasi pasar dilakukan',
   },
   volume_operasi_pasar: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Total volume operasi pasar',
   },
   cppd_stok: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Stok cadangan pangan daerah',
   },
   cppd_pelepasan: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'CPPD yang dilepas',
   },
   cbp_bulog_stok: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Cadangan Beras Pemerintah',
   },
   distribusi_antar_wilayah: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Volume distribusi antar daerah',
   },
   analisis: {
@@ -134,13 +134,13 @@ const SekLds = sequelize.define('SekLds', {
     comment: 'Yang menyusun',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Biasa',
     comment: 'Klasifikasi data',
   },
   status: {
-    type: DataTypes.ENUM('draft', 'review', 'final'),
+    type: DataTypes.ENUM('"draft', 'review', 'final"'),
     allowNull: false,
     defaultValue: 'draft',
     comment: 'Status',

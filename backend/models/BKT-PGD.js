@@ -2,7 +2,7 @@
 // MODEL: BktPgd
 // TABLE: bkt_pgd
 // MODULE: BKT-PGD
-// Generated: 2026-02-17T19:24:47.432Z
+// Generated: 2026-03-19T23:39:22.943Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

@@ -2,7 +2,7 @@
 // MODEL: UptMtu
 // TABLE: upt_mtu
 // MODULE: UPT-MTU
-// Generated: 2026-02-17T19:24:47.473Z
+// Generated: 2026-03-19T23:39:23.612Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -20,7 +20,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'FK ke layanan_menpanrb (LY161-LY176)',
   },
   jenis_layanan_mutu: {
-    type: DataTypes.ENUM('Penjaminan Mutu', 'Verifikasi Kepatuhan', 'Pengendalian Mutu', 'Pengelolaan Temuan', 'Penyusunan SOP', 'Review SOP', 'Standar Layanan', 'Sosialisasi', 'Pelatihan Auditor', 'Sertifikasi Auditor', 'Evaluasi Auditor', 'Database Auditor', 'Supervisi Audit', 'Evaluasi Sertifikasi', 'Rekomendasi Mutu', 'Laporan Mutu'),
+    type: DataTypes.ENUM('"Penjaminan Mutu', 'Verifikasi Kepatuhan', 'Pengendalian Mutu', 'Pengelolaan Temuan', 'Penyusunan SOP', 'Review SOP', 'Standar Layanan', 'Sosialisasi', 'Pelatihan Auditor', 'Sertifikasi Auditor', 'Evaluasi Auditor', 'Database Auditor', 'Supervisi Audit', 'Evaluasi Sertifikasi', 'Rekomendasi Mutu', 'Laporan Mutu"'),
     allowNull: false,
     comment: 'Jenis layanan manajemen mutu',
   },
@@ -42,7 +42,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Versi dokumen',
   },
   status_dokumen: {
-    type: DataTypes.ENUM('Draft', 'Review', 'Approved', 'Active', 'Obsolete'),
+    type: DataTypes.ENUM('"Draft', 'Review', 'Approved', 'Active', 'Obsolete"'),
     comment: 'Status dokumen',
   },
   objek_verifikasi: {
@@ -54,7 +54,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Standar yang harus dipenuhi (SNI ISO dll)',
   },
   hasil_verifikasi: {
-    type: DataTypes.ENUM('Sesuai', 'Tidak Sesuai', 'Perlu Perbaikan'),
+    type: DataTypes.ENUM('"Sesuai', 'Tidak Sesuai', 'Perlu Perbaikan"'),
     comment: 'Hasil verifikasi',
   },
   catatan_verifikasi: {
@@ -62,7 +62,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Catatan hasil verifikasi',
   },
   jenis_audit_mutu: {
-    type: DataTypes.ENUM('Audit Internal', 'Audit Eksternal', 'Surveillance', 'Witnessing'),
+    type: DataTypes.ENUM('"Audit Internal', 'Audit Eksternal', 'Surveillance', 'Witnessing"'),
     comment: 'Jenis audit mutu',
   },
   tanggal_audit_mutu: {
@@ -102,7 +102,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Deadline perbaikan',
   },
   status_perbaikan: {
-    type: DataTypes.ENUM('Open', 'In Progress', 'Closed', 'Verified'),
+    type: DataTypes.ENUM('"Open', 'In Progress', 'Closed', 'Verified"'),
     comment: 'Status tindakan korektif',
   },
   kode_sop: {
@@ -162,7 +162,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Alasan revisi SOP',
   },
   jenis_standar_layanan: {
-    type: DataTypes.ENUM('Persyaratan', 'Prosedur', 'Waktu', 'Biaya', 'Produk', 'Kompetensi', 'Sarana'),
+    type: DataTypes.ENUM('"Persyaratan', 'Prosedur', 'Waktu', 'Biaya', 'Produk', 'Kompetensi', 'Sarana"'),
     comment: 'Komponen standar layanan publik',
   },
   isi_standar: {
@@ -170,7 +170,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Isi standar layanan',
   },
   metode_sosialisasi: {
-    type: DataTypes.ENUM('Workshop', 'Rapat', 'Presentasi', 'Leaflet', 'Online'),
+    type: DataTypes.ENUM('"Workshop', 'Rapat', 'Presentasi', 'Leaflet', 'Online"'),
     comment: 'Metode sosialisasi SOP',
   },
   tanggal_sosialisasi: {
@@ -190,7 +190,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Nama pelatihan auditor',
   },
   jenis_pelatihan: {
-    type: DataTypes.ENUM('Basic Auditor', 'Lead Auditor', 'Refreshment', 'Advance'),
+    type: DataTypes.ENUM('"Basic Auditor', 'Lead Auditor', 'Refreshment', 'Advance"'),
     comment: 'Jenis pelatihan',
   },
   tanggal_pelatihan: {
@@ -234,7 +234,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Nomor sertifikat auditor',
   },
   jenis_sertifikat_auditor: {
-    type: DataTypes.ENUM('Basic Auditor', 'Lead Auditor', 'Auditor GMP', 'Auditor HACCP', 'Lainnya'),
+    type: DataTypes.ENUM('"Basic Auditor', 'Lead Auditor', 'Auditor GMP', 'Auditor HACCP', 'Lainnya"'),
     comment: 'Jenis sertifikat',
   },
   tanggal_sertifikat: {
@@ -259,12 +259,12 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Total audit yang dilakukan',
   },
   status_auditor: {
-    type: DataTypes.ENUM('Aktif', 'Nonaktif', 'Expired'),
+    type: DataTypes.ENUM('"Aktif', 'Nonaktif', 'Expired"'),
     defaultValue: 'Aktif',
     comment: 'Status auditor',
   },
   jenis_evaluasi_auditor: {
-    type: DataTypes.ENUM('Evaluasi Kinerja', 'Evaluasi Kompetensi', 'Evaluasi Post Training'),
+    type: DataTypes.ENUM('"Evaluasi Kinerja', 'Evaluasi Kompetensi', 'Evaluasi Post Training"'),
     comment: 'Jenis evaluasi auditor',
   },
   tanggal_evaluasi_auditor: {
@@ -272,11 +272,11 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Tanggal evaluasi',
   },
   skor_evaluasi: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Skor hasil evaluasi',
   },
   hasil_evaluasi_auditor: {
-    type: DataTypes.ENUM('Sangat Baik', 'Baik', 'Cukup', 'Kurang'),
+    type: DataTypes.ENUM('"Sangat Baik', 'Baik', 'Cukup', 'Kurang"'),
     comment: 'Hasil evaluasi',
   },
   rekomendasi_evaluasi: {
@@ -324,7 +324,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Jumlah tidak lulus',
   },
   persentase_kelulusan_sertifikasi: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Auto-calculate',
   },
   analisis_evaluasi: {
@@ -332,7 +332,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Analisis hasil evaluasi',
   },
   jenis_rekomendasi: {
-    type: DataTypes.ENUM('Rekomendasi Perbaikan Sistem', 'Rekomendasi Perbaikan Proses', 'Rekomendasi Pelatihan', 'Rekomendasi Investasi'),
+    type: DataTypes.ENUM('"Rekomendasi Perbaikan Sistem', 'Rekomendasi Perbaikan Proses', 'Rekomendasi Pelatihan', 'Rekomendasi Investasi"'),
     comment: 'Jenis rekomendasi',
   },
   isi_rekomendasi: {
@@ -345,7 +345,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Kepada siapa rekomendasi',
   },
   status_rekomendasi: {
-    type: DataTypes.ENUM('Open', 'In Progress', 'Closed'),
+    type: DataTypes.ENUM('"Open', 'In Progress', 'Closed"'),
     defaultValue: 'Open',
     comment: 'Status rekomendasi',
   },
@@ -362,7 +362,7 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Capaian indikator mutu',
   },
   persentase_kepuasan_pelanggan: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Hasil survei kepuasan',
   },
   temuan_mutu_periode: {
@@ -426,13 +426,13 @@ const UptMtu = sequelize.define('UptMtu', {
     comment: 'Jenis data',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Data mutu sensitif (kecuali sosialisasi & pelatihan)',
   },
   status: {
-    type: DataTypes.ENUM('draft', 'review', 'approved', 'active'),
+    type: DataTypes.ENUM('"draft', 'review', 'approved', 'active"'),
     allowNull: false,
     defaultValue: 'draft',
     comment: 'Status',

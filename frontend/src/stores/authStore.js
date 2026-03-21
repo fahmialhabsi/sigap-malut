@@ -1,73 +1,61 @@
+// frontend/src/stores/authStore.js
+
 import { create } from "zustand";
 import api from "../utils/api";
 import { logAuditTrail } from "../utils/auditTrail";
-import { roleIdToName } from "../utils/roleMap";
+import { roleIdToName } from "../utils/roleMap"; // <- sudah ada
+import unitNameToId from "../utils/unitMap"; // <- import untuk mapping unit
 
-// Map unit_kerja names to specific role names for bidang-level accounts
-const unitToRole = {
-  "Bidang Distribusi": "kepala_bidang_distribusi",
-  "Bidang Distribusi dan Cadangan Pangan": "kepala_bidang_distribusi",
-  "Bidang Ketersediaan": "kepala_bidang_ketersediaan",
-  "Bidang Ketersediaan dan Kerawanan Pangan": "kepala_bidang_ketersediaan",
-  "Bidang Konsumsi": "kepala_bidang_konsumsi",
-  "Bidang Konsumsi dan Keamanan Pangan": "kepala_bidang_konsumsi",
-  Sekretariat: "sekretaris",
-  "Sekretariat Dinas": "sekretaris",
-  "Sekretariat Dinas Pangan": "sekretaris",
-  UPTD: "kepala_uptd",
-  "UPTD Balai Pengawasan Mutu Pangan dan Obat Hewan": "kepala_uptd",
-};
+// Build inverse mapping unitId -> unitName (lowercased keys for tolerant lookup)
+const unitIdToName = Object.entries(unitNameToId || {}).reduce(
+  (acc, [name, id]) => {
+    if (id) acc[String(id).toLowerCase()] = name;
+    return acc;
+  },
+  {},
+);
 
-// Generic role names that should be further refined using unit_kerja
-const genericRoles = new Set([
-  "kepala_bidang",
-  "kepala_seksi",
-  "pelaksana",
-  "jabatan_fungsional",
-  "auditor",
-  "viewer",
-]);
+// Helper: normalisasi objek user agar frontend konsisten menggunakan field yang sama
+function normalizeUser(raw) {
+  if (!raw) return null;
+  const user = { ...raw };
 
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/**
- * Normalize a raw user payload from the backend so that role/roleName
- * is always a specific, RBAC-ready value and unit_kerja holds a human-
- * readable name rather than a UUID.
- */
-export function normalizeUser(raw) {
-  if (!raw) return raw;
-
-  const normalized = { ...raw };
-
-  // 1. Derive role name: prefer role_id mapping, then existing role string
-  let roleName = raw.role || "";
-  if (raw.role_id && roleIdToName[raw.role_id]) {
-    roleName = roleIdToName[raw.role_id];
+  // role: jika backend mengirim role (string) gunakan itu;
+  // jika hanya ada role_id (UUID) mapping ke nama role via roleIdToName
+  if (!user.role) {
+    const fromRoleId = user.role_id && roleIdToName?.[String(user.role_id)];
+    user.role = fromRoleId || user.role || null;
   }
 
-  // 2. Normalize unit_kerja – if it looks like a UUID use alternate name fields
-  let unitKerja = raw.unit_kerja || "";
-  if (UUID_REGEX.test(unitKerja)) {
-    unitKerja =
-      raw.unitName ||
-      raw.unit_name ||
-      raw.nama_unit ||
-      raw.bidang ||
-      unitKerja;
+  // roleName: variasi lain kalau ada
+  if (!user.roleName) {
+    user.roleName = user.roleName || user.role || null;
   }
 
-  // 3. If role is still generic, infer specific role from unit name
-  if (genericRoles.has(roleName) && unitToRole[unitKerja]) {
-    roleName = unitToRole[unitKerja];
+  // unit_kerja: konsistenkan dari unit_id / unit / unitName / unit_kerja
+  let unitVal =
+    user.unit_kerja ||
+    user.unit ||
+    user.unit_id ||
+    user.unitName ||
+    user.unit_name ||
+    null;
+
+  // Jika unitVal adalah UUID (atau adalah salah satu id dalam mapping), convert ke display name
+  if (unitVal) {
+    const lower = String(unitVal).toLowerCase();
+    if (unitIdToName[lower]) {
+      // gunakan display name seperti "Bidang Distribusi"
+      unitVal = unitIdToName[lower];
+    }
   }
 
-  normalized.role = roleName;
-  normalized.roleName = roleName;
-  normalized.unit_kerja = unitKerja;
+  user.unit_kerja = unitVal;
 
-  return normalized;
+  // jabatan: konsistenkan dari beberapa kemungkinan field
+  user.jabatan = user.jabatan || user.position || user.role_title || null;
+
+  return user;
 }
 
 const useAuthStore = create((set) => ({
@@ -84,8 +72,22 @@ const useAuthStore = create((set) => ({
         username: email,
         password,
       });
-      const { user: rawUser, token } = response.data.data;
-      const user = normalizeUser(rawUser);
+
+      // backend response shape: response.data.data.{ user, token, roleName } atau data.data
+      const payload = response.data.data || response.data || {};
+      const rawUser = payload.user || payload;
+      const token = payload.token || null;
+      const roleNameFromResp = payload.roleName || payload.role_name || null;
+
+      let user = normalizeUser(rawUser);
+
+      // Jika backend mengirim roleName terpisah, pastikan kita menyimpannya ke user
+      if (roleNameFromResp && user) {
+        // normalisasi casing ke nilai yang konsisten (frontend memakai role / roleName)
+        user.roleName = user.roleName || roleNameFromResp;
+        // juga set user.role jika belum ada dan roleName bisa dipakai langsung
+        user.role = user.role || roleNameFromResp;
+      }
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
@@ -98,7 +100,7 @@ const useAuthStore = create((set) => ({
       });
 
       logAuditTrail({ user, action: "login", detail: "User login" });
-      return { success: true };
+      return { success: true, data: payload };
     } catch (error) {
       // Reset state on failed login
       set({
@@ -141,7 +143,8 @@ const useAuthStore = create((set) => ({
 
     if (token && userStr) {
       try {
-        const user = normalizeUser(JSON.parse(userStr));
+        const raw = JSON.parse(userStr);
+        const user = normalizeUser(raw);
         set({
           user,
           token,

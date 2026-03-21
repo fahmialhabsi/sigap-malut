@@ -15,9 +15,9 @@ const AuditLog = sequelize.define(
       comment: "Nama modul yang diubah",
     },
     entitas_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(100),
       allowNull: false,
-      comment: "ID entitas yang diubah",
+      comment: "ID entitas yang diubah (flexible: integer or uuid)",
     },
     aksi: {
       type: DataTypes.STRING(50),
@@ -33,9 +33,9 @@ const AuditLog = sequelize.define(
       comment: "Snapshot data setelah perubahan",
     },
     pegawai_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(100),
       allowNull: false,
-      comment: "ID pegawai pelaku",
+      comment: "ID pegawai pelaku (flexible: integer or uuid)",
     },
     created_at: {
       type: DataTypes.DATE,

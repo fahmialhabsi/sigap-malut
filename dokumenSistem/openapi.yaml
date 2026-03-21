@@ -1,0 +1,743 @@
+openapi: 3.0.0
+info:
+  title: SIGAP Malut Dashboard API
+  version: 1.0.0
+  description: >
+    API resmi SIGAP-MALUT mencakup autentikasi, manajemen workflow, audit log,
+    approval workflow, master data layanan, dan dashboard. Semua endpoint
+    kecuali /api/auth/login dan /api/auth/register memerlukan Bearer token.
+  contact:
+    name: Tim SIGAP-MALUT
+  license:
+    name: Internal Use Only
+
+servers:
+  - url: /
+    description: Backend server SIGAP-MALUT
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/auth/login:
+    post:
+      summary: Login pengguna
+      description: Autentikasi pengguna dan kembalikan JWT token.
+      security: []
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  format: password
+                  example: "secret"
+      responses:
+        "200":
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Kredensial tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/auth/logout:
+    post:
+      summary: Logout pengguna
+      description: Invalidasi sesi aktif pengguna.
+      tags: [Auth]
+      responses:
+        "200":
+          description: Logout berhasil
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auth/me:
+    get:
+      summary: Ambil profil pengguna aktif
+      description: Kembalikan data pengguna berdasarkan token yang aktif.
+      tags: [Auth]
+      responses:
+        "200":
+          description: Data profil pengguna
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auth/change-password:
+    put:
+      summary: Ganti password pengguna
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [oldPassword, newPassword]
+              properties:
+                oldPassword:
+                  type: string
+                  format: password
+                newPassword:
+                  type: string
+                  format: password
+      responses:
+        "200":
+          description: Password berhasil diubah
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Password lama tidak cocok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/workflow:
+    get:
+      summary: Daftar semua workflow
+      description: Ambil seluruh workflow yang terdaftar di sistem.
+      tags: [Workflow]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, submitted, approved, rejected]
+          description: Filter berdasarkan status workflow
+      responses:
+        "200":
+          description: Daftar workflow
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workflow"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      summary: Buat workflow baru
+      tags: [Workflow]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowInput"
+      responses:
+        "201":
+          description: Workflow berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "400":
+          description: Input tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/workflow/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID workflow
+    get:
+      summary: Ambil workflow berdasarkan ID
+      tags: [Workflow]
+      responses:
+        "200":
+          description: Data workflow
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    put:
+      summary: Perbarui workflow
+      tags: [Workflow]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowInput"
+      responses:
+        "200":
+          description: Workflow berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      summary: Hapus workflow
+      tags: [Workflow]
+      responses:
+        "200":
+          description: Workflow berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/approvalworkflow:
+    get:
+      summary: Daftar semua approval workflow
+      description: Ambil seluruh data approval workflow untuk audit dan pelacakan persetujuan.
+      tags: [ApprovalWorkflow]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+          description: Filter berdasarkan status approval
+      responses:
+        "200":
+          description: Daftar approval workflow
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApprovalWorkflow"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      summary: Buat approval workflow baru
+      description: Kirim permintaan approval baru ke dalam antrian persetujuan.
+      tags: [ApprovalWorkflow]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalWorkflowInput"
+      responses:
+        "201":
+          description: Approval workflow berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalWorkflow"
+        "400":
+          description: Input tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/approvalworkflow/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID approval workflow
+    get:
+      summary: Ambil approval workflow berdasarkan ID
+      tags: [ApprovalWorkflow]
+      responses:
+        "200":
+          description: Data approval workflow
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalWorkflow"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    put:
+      summary: Perbarui status approval workflow
+      description: Setujui atau tolak sebuah approval workflow.
+      tags: [ApprovalWorkflow]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [approved, rejected]
+                catatan:
+                  type: string
+      responses:
+        "200":
+          description: Status approval berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalWorkflow"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auditlog:
+    get:
+      summary: Daftar audit log
+      description: Ambil log aktivitas sistem untuk keperluan audit forensik.
+      tags: [AuditLog]
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: integer
+          description: Filter berdasarkan user ID
+        - name: action
+          in: query
+          schema:
+            type: string
+          description: Filter berdasarkan jenis aksi (login, approve, reject, dll.)
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Tanggal mulai (YYYY-MM-DD)
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Tanggal akhir (YYYY-MM-DD)
+      responses:
+        "200":
+          description: Daftar audit log
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditLog"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auditlog/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID audit log
+    get:
+      summary: Ambil detail satu entri audit log
+      tags: [AuditLog]
+      responses:
+        "200":
+          description: Detail audit log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLog"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/layanan:
+    get:
+      summary: Daftar semua layanan
+      description: Kembalikan katalog master data layanan yang tersedia di sistem.
+      tags: [Layanan]
+      responses:
+        "200":
+          description: Daftar layanan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Layanan"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      summary: Tambah layanan baru
+      tags: [Layanan]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LayananInput"
+      responses:
+        "201":
+          description: Layanan berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Layanan"
+        "400":
+          description: Input tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/layanan/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID layanan
+    get:
+      summary: Ambil layanan berdasarkan ID
+      tags: [Layanan]
+      responses:
+        "200":
+          description: Data layanan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Layanan"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    put:
+      summary: Perbarui layanan
+      tags: [Layanan]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LayananInput"
+      responses:
+        "200":
+          description: Layanan berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Layanan"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      summary: Hapus layanan
+      tags: [Layanan]
+      responses:
+        "200":
+          description: Layanan berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/dashboard/sekretaris/summary:
+    get:
+      summary: Dashboard summary Sekretaris
+      description: Kembalikan KPI dan alert ringkasan untuk role Sekretariat.
+      tags: [Dashboard]
+      responses:
+        "200":
+          description: Summary data dashboard Sekretaris
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kpis:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Kpi"
+                  alerts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Alert"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Token tidak ada atau tidak valid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Data tidak ditemukan
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operasi berhasil
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Terjadi kesalahan
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        token:
+          type: string
+          description: JWT token
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+          enum:
+            [
+              super_admin,
+              sekretariat,
+              uptd,
+              bidang_ketersediaan,
+              bidang_distribusi,
+              bidang_konsumsi,
+              kepala_dinas,
+              publik,
+            ]
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+          enum: [draft, submitted, approved, rejected]
+        createdBy:
+          type: integer
+          description: User ID pembuat
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    WorkflowInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [draft, submitted]
+          default: draft
+
+    ApprovalWorkflow:
+      type: object
+      properties:
+        id:
+          type: integer
+        workflowId:
+          type: integer
+        approver:
+          type: integer
+          description: User ID approver
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        catatan:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ApprovalWorkflowInput:
+      type: object
+      required: [workflowId]
+      properties:
+        workflowId:
+          type: integer
+        catatan:
+          type: string
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        role:
+          type: string
+        action:
+          type: string
+          description: Jenis aksi (login, approve, reject, update, delete, dll.)
+        endpoint:
+          type: string
+        entityId:
+          type: string
+        statusResult:
+          type: string
+        ipAddress:
+          type: string
+        userAgent:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Layanan:
+      type: object
+      properties:
+        id:
+          type: integer
+        kode:
+          type: string
+        nama:
+          type: string
+        deskripsi:
+          type: string
+        sla:
+          type: string
+          description: SLA target (e.g. "2 hari kerja")
+        owner:
+          type: string
+        aktif:
+          type: boolean
+
+    LayananInput:
+      type: object
+      required: [kode, nama]
+      properties:
+        kode:
+          type: string
+        nama:
+          type: string
+        deskripsi:
+          type: string
+        sla:
+          type: string
+        owner:
+          type: string
+        aktif:
+          type: boolean
+          default: true
+
+    Kpi:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        value:
+          type: number
+        unit:
+          type: string
+        trend:
+          type: array
+          items:
+            type: number
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: string
+        severity:
+          type: string
+          enum: [KRITIS, TINGGI, SEDANG, INFO]
+        title:
+          type: string
+        summary:
+          type: string

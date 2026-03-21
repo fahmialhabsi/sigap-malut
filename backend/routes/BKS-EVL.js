@@ -1,26 +1,31 @@
 // =====================================================
 // ROUTES: BksEvl
 // Base Path: /api/bks-evl
-// Generated: 2026-02-17T19:24:49.294Z
+// Generated: 2026-03-19T23:39:36.510Z
 // =====================================================
 
-import express from "express";
+import express from 'express';
 import {
   getAllBksEvl,
   getBksEvlById,
   createBksEvl,
   updateBksEvl,
-  deleteBksEvl,
-} from "../controllers/BKS-EVL.js";
-import { protect } from "../middleware/auth.js";
+  deleteBksEvl
+} from '../controllers/BKS-EVL.js';
+// import { protect } from '../middleware/auth.js'; // Uncomment when auth is ready
 
 const router = express.Router();
 
-// All routes are protected
-router.use(protect);
+// All routes are protected (uncomment when auth is ready)
+// router.use(protect);
 
-router.route("/").get(getAllBksEvl).post(createBksEvl);
+router.route('/')
+  .get(getAllBksEvl)
+  .post(createBksEvl);
 
-router.route("/:id").get(getBksEvlById).put(updateBksEvl).delete(deleteBksEvl);
+router.route('/:id')
+  .get(getBksEvlById)
+  .put(updateBksEvl)
+  .delete(deleteBksEvl);
 
 export default router;

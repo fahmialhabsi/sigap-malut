@@ -2,7 +2,7 @@
 // MODEL: SekAst
 // TABLE: sek_ast
 // MODULE: SEK-AST
-// Generated: 2026-02-17T19:24:47.373Z
+// Generated: 2026-03-19T23:39:22.807Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -15,7 +15,7 @@ const SekAst = sequelize.define('SekAst', {
     autoIncrement: true
   },
   unit_kerja: {
-    type: DataTypes.ENUM('Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi'),
+    type: DataTypes.ENUM('"Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi"'),
     allowNull: false,
     defaultValue: 'Sekretariat',
     comment: 'Unit pengelola aset (BARU - untuk integrasi multi-unit)',
@@ -35,7 +35,7 @@ const SekAst = sequelize.define('SekAst', {
     comment: 'Nama barang',
   },
   kategori_aset: {
-    type: DataTypes.ENUM('Tanah', 'Peralatan dan Mesin', 'Gedung dan Bangunan', 'Jalan Irigasi dan Jaringan', 'Aset Tetap Lainnya', 'Konstruksi Dalam Pengerjaan'),
+    type: DataTypes.ENUM('"Tanah', 'Peralatan dan Mesin', 'Gedung dan Bangunan', 'Jalan Irigasi dan Jaringan', 'Aset Tetap Lainnya', 'Konstruksi Dalam Pengerjaan"'),
     allowNull: false,
     comment: 'Kategori aset',
   },
@@ -52,19 +52,19 @@ const SekAst = sequelize.define('SekAst', {
     comment: 'Tahun dapat aset',
   },
   cara_perolehan: {
-    type: DataTypes.ENUM('Pembelian', 'Hibah', 'Donasi', 'Transfer', 'Lainnya'),
+    type: DataTypes.ENUM('"Pembelian', 'Hibah', 'Donasi', 'Transfer', 'Lainnya"'),
     comment: 'Cara dapat aset',
   },
   harga_perolehan: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Harga saat perolehan',
   },
   nilai_buku: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Nilai buku saat ini',
   },
   kondisi: {
-    type: DataTypes.ENUM('Baik', 'Rusak Ringan', 'Rusak Berat'),
+    type: DataTypes.ENUM('"Baik', 'Rusak Ringan', 'Rusak Berat"'),
     allowNull: false,
     defaultValue: 'Baik',
     comment: 'Kondisi aset',
@@ -98,15 +98,15 @@ const SekAst = sequelize.define('SekAst', {
     comment: 'Jadwal pemeliharaan',
   },
   biaya_pemeliharaan: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Biaya maintenance',
   },
   jenis_pemeliharaan: {
-    type: DataTypes.ENUM('Rutin', 'Berkala', 'Darurat'),
+    type: DataTypes.ENUM('"Rutin', 'Berkala', 'Darurat"'),
     comment: 'Jenis pemeliharaan',
   },
   status_aset: {
-    type: DataTypes.ENUM('Aktif', 'Tidak Digunakan', 'Rusak', 'Dalam Perbaikan', 'Akan Dihapus', 'Dihapuskan'),
+    type: DataTypes.ENUM('"Aktif', 'Tidak Digunakan', 'Rusak', 'Dalam Perbaikan', 'Akan Dihapus', 'Dihapuskan"'),
     allowNull: false,
     defaultValue: 'Aktif',
     comment: 'Status',
@@ -147,7 +147,7 @@ const SekAst = sequelize.define('SekAst', {
     comment: 'Yang melaksanakan',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Biasa',
     comment: 'Klasifikasi data',

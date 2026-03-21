@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BktBmbController
 // MODEL: BktBmb
-// Generated: 2026-02-17T19:24:48.399Z
+// Generated: 2026-03-19T23:39:27.510Z
 // =====================================================
 
 import BktBmb from "../models/BKT-BMB.js";

@@ -2,7 +2,7 @@
 // MODEL: BksLap
 // TABLE: bks_lap
 // MODULE: BKS-LAP
-// Generated: 2026-02-17T19:24:47.461Z
+// Generated: 2026-03-19T23:39:23.149Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

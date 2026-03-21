@@ -1,0 +1,14 @@
+{
+  "summary": {
+    "total": 0,
+    "ok": 0,
+    "warning": 0,
+    "fail": 0,
+    "heuristic": 0,
+    "compliance": 0
+  },
+  "results": [
+    { "status": "approved", "category": "finance", "date": "2026-03-18" },
+    { "status": "pending", "category": "hr", "date": "2026-03-17" }
+  ]
+}

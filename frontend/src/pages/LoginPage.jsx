@@ -1,64 +1,31 @@
+// frontend/src/pages/LoginPage.jsx
+
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+import { roleIdToName } from "../utils/roleMap";
+import { getDashboardPath } from "../utils/getDashboardPath";
 
-// Map normalized role names to dashboard paths
-const roleToDashboard = {
-  super_admin: "/dashboard/superadmin",
-  kepala_dinas: "/dashboard/superadmin",
-  gubernur: "/dashboard/superadmin",
-  sekretaris: "/dashboard/sekretariat",
-  kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
-  kepala_bidang_distribusi: "/dashboard/distribusi",
-  kepala_bidang_konsumsi: "/dashboard/konsumsi",
-  kepala_uptd: "/dashboard/uptd",
-  publik: "/dashboard-publik",
-};
+function normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
 
-// Map unit_kerja name to dashboard path as secondary fallback
-const unitToDashboard = {
-  "Bidang Distribusi": "/dashboard/distribusi",
-  "Bidang Distribusi dan Cadangan Pangan": "/dashboard/distribusi",
-  "Bidang Ketersediaan": "/dashboard/ketersediaan",
-  "Bidang Ketersediaan dan Kerawanan Pangan": "/dashboard/ketersediaan",
-  "Bidang Konsumsi": "/dashboard/konsumsi",
-  "Bidang Konsumsi dan Keamanan Pangan": "/dashboard/konsumsi",
-  Sekretariat: "/dashboard/sekretariat",
-  "Sekretariat Dinas": "/dashboard/sekretariat",
-  "Sekretariat Dinas Pangan": "/dashboard/sekretariat",
-  UPTD: "/dashboard/uptd",
-  "UPTD Balai Pengawasan Mutu Pangan dan Obat Hewan": "/dashboard/uptd",
-};
-
-/**
- * Derive the correct dashboard path for a normalized user object.
- * Falls back to the role query param hint, then to /dashboard.
- */
-function getDashboardPath(user, roleHint) {
-  if (!user) return "/dashboard";
-
-  // 1. Specific role mapping
-  if (user.role && roleToDashboard[user.role]) {
-    return roleToDashboard[user.role];
-  }
-
-  // 2. unit_kerja name mapping
-  if (user.unit_kerja && unitToDashboard[user.unit_kerja]) {
-    return unitToDashboard[user.unit_kerja];
-  }
-
-  // 3. Use role query param hint from landing page as last resort
-  if (roleHint && roleToDashboard[roleHint]) {
-    return roleToDashboard[roleHint];
-  }
-
-  return "/dashboard";
+function normalizeUnit(user) {
+  const v = user?.unit_kerja || user?.unit_id || "";
+  return v ? String(v).toLowerCase() : "";
 }
 
 export default function LoginPage() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const roleHint = params.get("role") || "";
+  const roleParam = params.get("role"); // UI only: gubernur / kepala_bidang_konsumsi / dll
+
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -74,26 +41,114 @@ export default function LoginPage() {
 
     const result = await login(email, password);
 
-    if (result.success) {
+    if (result?.success) {
+      // Prefer backend dashboardUrl if available
+      const dashboardUrlFromBackend = result?.data?.dashboardUrl;
+
+      // Pull stored user (authStore should persist it)
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem("user"));
-      } catch (_e) {
-        // ignore JSON parse error
+      } catch {}
+
+      const roleName = normalizeRoleName(user);
+      const unit = normalizeUnit(user);
+
+      // 1) Backend dashboardUrl
+      if (dashboardUrlFromBackend) {
+        navigate(dashboardUrlFromBackend, { replace: true });
+        setLoading(false);
+        return;
       }
 
-      navigate(getDashboardPath(user, roleHint));
-    } else {
-      setError(result.message);
+      // 2) Role param from landing page (intent)
+      if (roleParam) {
+        // Executive
+        if (roleParam === "gubernur") {
+          navigate("/dashboard", { replace: true });
+          setLoading(false);
+          return;
+        }
+
+        // Bidang
+        if (roleParam === "kepala_bidang_ketersediaan") {
+          navigate("/dashboard/ketersediaan", { replace: true });
+          setLoading(false);
+          return;
+        }
+        if (roleParam === "kepala_bidang_distribusi") {
+          navigate("/dashboard/distribusi", { replace: true });
+          setLoading(false);
+          return;
+        }
+        if (roleParam === "kepala_bidang_konsumsi") {
+          navigate("/dashboard/konsumsi", { replace: true });
+          setLoading(false);
+          return;
+        }
+        if (roleParam === "kepala_uptd") {
+          navigate("/dashboard/uptd", { replace: true });
+          setLoading(false);
+          return;
+        }
+        if (roleParam === "sekretaris") {
+          navigate("/dashboard/sekretariat", { replace: true });
+          setLoading(false);
+          return;
+        }
+        if (roleParam === "super_admin") {
+          navigate("/dashboard/superadmin", { replace: true });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // === tambahan: inference via getDashboardPath util ===
+      try {
+        const inferredPath = getDashboardPath(user);
+        if (inferredPath && inferredPath !== "/dashboard") {
+          navigate(inferredPath, { replace: true });
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        // ignore error here but you can uncomment to debug
+        // console.error("getDashboardPath error:", err);
+      }
+      // ======================================================
+
+      // 3) Fallback based on actual user role/unit
+      if (roleName === "super_admin")
+        return navigate("/dashboard/superadmin", { replace: true });
+      if (roleName === "sekretaris")
+        return navigate("/dashboard/sekretariat", { replace: true });
+      if (roleName === "gubernur" || roleName === "kepala_dinas")
+        return navigate("/dashboard", { replace: true });
+
+      // Generic kepala_bidang -> infer by unit
+      if (roleName === "kepala_bidang") {
+        if (unit.includes("ketersediaan"))
+          return navigate("/dashboard/ketersediaan", { replace: true });
+        if (unit.includes("distribusi"))
+          return navigate("/dashboard/distribusi", { replace: true });
+        if (unit.includes("konsumsi"))
+          return navigate("/dashboard/konsumsi", { replace: true });
+        return navigate("/dashboard", { replace: true });
+      }
+
+      if (roleName === "kepala_uptd")
+        return navigate("/dashboard/uptd", { replace: true });
+
+      return navigate("/dashboard", { replace: true });
     }
 
+    setError(result?.message || "Login gagal");
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-        {/* Logo & Title */}
         <div className="text-center mb-8">
           <div className="mx-auto w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4">
             <svg
@@ -106,16 +161,18 @@ export default function LoginPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                d="M12 11c1.656 0 3-1.567 3-3.5S13.656 4 12 4 9 5.567 9 7.5 10.344 11 12 11zm0 2c-3.314 0-6 1.791-6 4v1h12v-1c0-2.209-2.686-4-6-4z"
               />
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-800">SIGAP Malut</h1>
-          <p className="text-gray-500 mt-2">Sistem Informasi Dinas Pangan</p>
-          <p className="text-sm text-gray-400">Provinsi Maluku Utara</p>
+          {roleParam && (
+            <p className="text-xs text-gray-500 mt-2">
+              Login untuk: <span className="font-semibold">{roleParam}</span>
+            </p>
+          )}
         </div>
 
-        {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -125,13 +182,13 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              email
+              Email
             </label>
             <input
-              type="text"
+              type="email"
               value={email}
               onChange={(e) => setemail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
               placeholder="Masukkan email"
               required
             />
@@ -145,7 +202,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
               placeholder="Masukkan password"
               required
             />
@@ -154,39 +211,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg disabled:opacity-50"
           >
             {loading ? "Memproses..." : "Login"}
           </button>
         </form>
-
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-600 font-semibold mb-2">
-            Demo Credentials:
-          </p>
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>
-              • Super Admin:
-              <code>
-                super_admin-sekretariat-dinas-pangan-maluku-utara@dinpangan.go.id
-                / Admin123
-              </code>
-            </p>
-            <p>
-              • Kepala Dinas:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                kepala.dinas / Kadis123
-              </code>
-            </p>
-            <p>
-              • Staff:{" "}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">
-                staff.sekretariat / Staff123
-              </code>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

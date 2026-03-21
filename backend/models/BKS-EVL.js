@@ -2,7 +2,7 @@
 // MODEL: BksEvl
 // TABLE: bks_evl
 // MODULE: BKS-EVL
-// Generated: 2026-02-17T19:24:47.455Z
+// Generated: 2026-03-19T23:39:23.121Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

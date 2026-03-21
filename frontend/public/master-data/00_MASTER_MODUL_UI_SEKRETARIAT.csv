@@ -1,0 +1,13 @@
+modul_id,nama_modul,kategori,bidang,icon,has_approval,has_file_upload,is_public,menu_order,is_active,total_layanan
+SEK-ADM,Administrasi Umum & Persuratan,Sekretariat,Sekretariat,document-text,true,true,false,1,true,6
+SEK-KEP,Kepegawaian,Sekretariat,Sekretariat,users,true,true,false,2,true,8
+SEK-KEU,Keuangan & Anggaran,Sekretariat,Sekretariat,banknotes,true,true,false,3,true,7
+SEK-AST,Aset & BMD,Sekretariat,Sekretariat,cube,true,true,false,4,true,7
+SEK-RMH,Rumah Tangga & Umum,Sekretariat,Sekretariat,home,false,true,false,5,true,6
+SEK-HUM,Protokol & Kehumasan,Sekretariat,Sekretariat,megaphone,false,true,false,6,true,5
+SEK-REN,Perencanaan & Evaluasi,Sekretariat,Sekretariat,chart-bar,true,true,false,7,true,6
+SEK-KBJ,Kebijakan & Koordinasi,Sekretariat,Sekretariat,scale,true,true,false,8,true,2
+SEK-LKT,Laporan Ketersediaan Pangan,Sekretariat,Sekretariat,archive-box,false,true,false,9,true,1
+SEK-LDS,Laporan Distribusi Pangan,Sekretariat,Sekretariat,truck,false,true,false,10,true,1
+SEK-LKS,Laporan Konsumsi & Keamanan Pangan,Sekretariat,Sekretariat,shield-check,false,true,false,11,true,1
+SEK-LUP,Laporan UPTD,Sekretariat,Sekretariat,beaker,false,true,false,12,true,1
