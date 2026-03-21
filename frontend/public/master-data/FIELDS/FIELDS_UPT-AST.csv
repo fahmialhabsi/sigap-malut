@@ -1,0 +1,18 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+kode_aset,Kode Aset,varchar,50,true,true,NULL,none,NULL,Kode unik identifikasi aset
+nama_aset,Nama Aset,varchar,255,true,false,NULL,none,NULL,Nama/deskripsi aset
+jenis_aset,Jenis Aset,enum,NULL,true,false,NULL,none,"peralatan_lab,peralatan_kantor,kendaraan,mebel,bangunan,perlengkapan_lapangan,komputer_it,lainnya",Kategori jenis aset
+merek,Merek/Model,varchar,100,false,false,NULL,none,NULL,Merek atau model aset
+spesifikasi,Spesifikasi,text,NULL,false,false,NULL,none,NULL,Spesifikasi teknis aset
+lokasi,Lokasi/Ruangan,varchar,255,false,false,NULL,none,NULL,Lokasi atau ruangan penempatan aset
+kondisi,Kondisi Aset,enum,NULL,true,false,baik,none,"baik,rusak_ringan,rusak_berat,tidak_dapat_digunakan",Kondisi fisik aset saat ini
+tahun_pengadaan,Tahun Pengadaan,year,4,false,false,NULL,none,NULL,Tahun aset diadakan
+nilai_perolehan,Nilai Perolehan,decimal,"16,2",false,false,0,none,NULL,Nilai perolehan/harga beli aset (Rupiah)
+status_aset,Status Aset,enum,NULL,true,false,aktif,none,"aktif,dipinjam,dalam_perbaikan,dihapus,diserahkan",Status penggunaan aset
+catatan,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan
+is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,Flag data aktif
+is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Biasa,none,"Biasa,Sensitif",Klasifikasi sensitivitas data
+created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID pembuat
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

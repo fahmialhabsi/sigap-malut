@@ -1,32 +1,31 @@
+// =====================================================
+// ROUTES: Kgb
+// Base Path: /api/kgb
+// Generated: 2026-03-19T23:39:36.592Z
+// =====================================================
+
 import express from 'express';
-import { getController } from '../utils/dynamicImport.js';
+import {
+  getAllKgb,
+  getKgbById,
+  createKgb,
+  updateKgb,
+  deleteKgb
+} from '../controllers/kgb.js';
+// import { protect } from '../middleware/auth.js'; // Uncomment when auth is ready
 
-export default (app) => {
-  const models = app.get('models');
-  const router = express.Router();
-  // lazy-load controller (returns controller instance or object)
-  const ctrlPromise = getController('kgb', models);
+const router = express.Router();
 
-  router.post('/', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.create(req, res, next);
-    } catch (e) { next(e); }
-  });
+// All routes are protected (uncomment when auth is ready)
+// router.use(protect);
 
-  router.get('/', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.list(req, res, next);
-    } catch (e) { next(e); }
-  });
+router.route('/')
+  .get(getAllKgb)
+  .post(createKgb);
 
-  router.get('/:id', async (req, res, next) => {
-    try {
-      const ctrl = await ctrlPromise;
-      return ctrl.get(req, res, next);
-    } catch (e) { next(e); }
-  });
+router.route('/:id')
+  .get(getKgbById)
+  .put(updateKgb)
+  .delete(deleteKgb);
 
-  return router;
-};
+export default router;

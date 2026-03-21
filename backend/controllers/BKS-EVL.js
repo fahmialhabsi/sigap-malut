@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BksEvlController
 // MODEL: BksEvl
-// Generated: 2026-02-17T19:24:48.394Z
+// Generated: 2026-03-19T23:39:27.506Z
 // =====================================================
 
 import BksEvl from "../models/BKS-EVL.js";
@@ -16,10 +16,10 @@ export const getAllBksEvl = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    const whereClause = { ...filters };
+    const where = { ...filters };
 
     const { count, rows } = await BksEvl.findAndCountAll({
-      where: whereClause,
+      where,
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [["created_at", "DESC"]],
@@ -171,86 +171,6 @@ export const deleteBksEvl = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error deleting BksEvl",
-      error: error.message,
-    });
-  }
-};
-
-// @desc    Get KPI summary for Dashboard Konsumsi (latest record by unit_kerja)
-// @route   GET /api/bks-evl/summary
-// @access  Private
-export const getBksEvlSummary = async (req, res) => {
-  try {
-    const unitKerjaRaw =
-      req.user?.unit_kerja || req.user?.unit_id || "Bidang Konsumsi";
-
-    // lebih toleran: match sebagian (case-insensitive)
-    const record = await BksEvl.findOne({
-      where: { unit_kerja: unitKerjaRaw },
-      order: [["created_at", "DESC"]],
-    });
-
-    if (!record) {
-      return res.json({
-        success: true,
-        data: {
-          konsumsi_pangan: {
-            energi_kkal_per_kapita: null,
-            protein_g_per_kapita: null,
-          },
-          skor_pph: {
-            capaian: null,
-            target: null,
-            status: null,
-          },
-          meta: {
-            source: "bks_evl",
-            hasData: false,
-            filter_unit_kerja: unitKerjaRaw,
-          },
-        },
-      });
-    }
-
-    const energi = record.konsumsi_energi_per_kapita ?? null;
-    const protein = record.konsumsi_protein_per_kapita ?? null;
-
-    const capaian = record.skor_pph_capaian ?? null;
-    const target = record.skor_pph_target ?? null;
-
-    const status =
-      capaian == null || target == null
-        ? null
-        : Number(capaian) >= Number(target)
-          ? "On Target"
-          : "Di Bawah Target";
-
-    return res.json({
-      success: true,
-      data: {
-        konsumsi_pangan: {
-          energi_kkal_per_kapita: energi,
-          protein_g_per_kapita: protein,
-        },
-        skor_pph: { capaian, target, status },
-        meta: {
-          source: "bks_evl",
-          hasData: true,
-          filter_unit_kerja: unitKerjaRaw,
-          record_id: record.id,
-          periode: record.periode ?? null,
-          tahun: record.tahun ?? null,
-          bulan: record.bulan ?? null,
-          triwulan: record.triwulan ?? null,
-          semester: record.semester ?? null,
-          created_at: record.created_at ?? null,
-        },
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error fetching BksEvl summary",
       error: error.message,
     });
   }

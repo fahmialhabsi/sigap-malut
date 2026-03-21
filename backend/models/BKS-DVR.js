@@ -2,7 +2,7 @@
 // MODEL: BksDvr
 // TABLE: bks_dvr
 // MODULE: BKS-DVR
-// Generated: 2026-02-17T19:24:47.453Z
+// Generated: 2026-03-19T23:39:23.112Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

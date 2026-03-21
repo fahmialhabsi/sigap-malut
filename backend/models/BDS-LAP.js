@@ -2,7 +2,7 @@
 // MODEL: BdsLap
 // TABLE: bds_lap
 // MODULE: BDS-LAP
-// Generated: 2026-02-17T19:24:47.448Z
+// Generated: 2026-03-19T23:39:23.072Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

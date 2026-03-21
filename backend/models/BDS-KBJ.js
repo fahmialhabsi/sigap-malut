@@ -2,7 +2,7 @@
 // MODEL: BdsKbj
 // TABLE: bds_kbj
 // MODULE: BDS-KBJ
-// Generated: 2026-02-17T19:24:47.444Z
+// Generated: 2026-03-19T23:39:23.062Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

@@ -25,6 +25,8 @@ import DashboardKonsumsi from "./ui/dashboards/DashboardKonsumsi";
 import DashboardUPTD from "./ui/dashboards/DashboardUPTD";
 import LandingPage from "./pages/LandingPage";
 import DashboardSuperAdmin from "./ui/dashboards/DashboardSuperAdmin";
+import MasterDataSyncPanel from "./components/MasterDataSyncPanel.jsx";
+import IntegrationLogPanel from "./components/IntegrationLogPanel.jsx";
 import AuditTrailPage from "./pages/AuditTrailPage";
 import WorkflowStatusPage from "./pages/WorkflowStatusPage";
 import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
@@ -98,6 +100,8 @@ function App() {
           element={
             <PrivateRoute>
               <DashboardSuperAdmin />
+              <MasterDataSyncPanel />
+              <IntegrationLogPanel />
             </PrivateRoute>
           }
         />

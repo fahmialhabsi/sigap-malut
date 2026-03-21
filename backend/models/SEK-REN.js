@@ -2,7 +2,7 @@
 // MODEL: SekRen
 // TABLE: sek_ren
 // MODULE: SEK-REN
-// Generated: 2026-02-17T19:24:47.408Z
+// Generated: 2026-03-19T23:39:22.859Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -20,7 +20,7 @@ const SekRen = sequelize.define('SekRen', {
     comment: 'FK ke layanan_menpanrb (LY040-LY045)',
   },
   jenis_layanan_perencanaan: {
-    type: DataTypes.ENUM('Renstra', 'Renja', 'Fasilitasi Program', 'Sinkronisasi', 'LKJIP/LAKIP', 'Laporan Kinerja'),
+    type: DataTypes.ENUM('"Renstra', 'Renja', 'Fasilitasi Program', 'Sinkronisasi', 'LKJIP/LAKIP', 'Laporan Kinerja"'),
     allowNull: false,
     comment: 'Jenis layanan perencanaan',
   },
@@ -86,11 +86,11 @@ const SekRen = sequelize.define('SekRen', {
     comment: 'Realisasi pencapaian',
   },
   persentase_capaian: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Persen capaian target',
   },
   pagu_anggaran: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Pagu anggaran program/kegiatan',
   },
   bidang_pelaksana: {
@@ -126,7 +126,7 @@ const SekRen = sequelize.define('SekRen', {
     comment: 'Rekomendasi perbaikan',
   },
   status_sinkronisasi: {
-    type: DataTypes.ENUM('Belum', 'Proses', 'Sesuai', 'Tidak Sesuai'),
+    type: DataTypes.ENUM('"Belum', 'Proses', 'Sesuai', 'Tidak Sesuai"'),
     comment: 'Sinkronisasi dengan RPJMD/RKPD',
   },
   file_renstra: {
@@ -161,13 +161,13 @@ const SekRen = sequelize.define('SekRen', {
     comment: 'Yang melaksanakan',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Data perencanaan sensitif',
   },
   status: {
-    type: DataTypes.ENUM('draft', 'finalisasi', 'disetujui', 'final'),
+    type: DataTypes.ENUM('"draft', 'finalisasi', 'disetujui', 'final"'),
     allowNull: false,
     defaultValue: 'draft',
     comment: 'Status dokumen',

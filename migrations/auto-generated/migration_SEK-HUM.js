@@ -1,0 +1,48 @@
+export async function up({ context: queryInterface }) {
+  await queryInterface.createTable('SEK-HUM', {
+      id: { type: DataTypes.INTEGER, allowNull: false, unique: true, autoIncrement: true, primaryKey: true },
+      layanan_id: { type: DataTypes.STRING(10), allowNull: false },
+      jenis_layanan_humas: { type: DataTypes.ENUM, allowNull: false },
+      nama_kegiatan: { type: DataTypes.STRING(255), allowNull: true },
+      jenis_acara: { type: DataTypes.ENUM, allowNull: true },
+      tanggal_acara: { type: DataTypes.DATEONLY, allowNull: true },
+      waktu_mulai: { type: DataTypes.STRING, allowNull: true },
+      waktu_selesai: { type: DataTypes.STRING, allowNull: true },
+      tempat: { type: DataTypes.STRING(255), allowNull: true },
+      pimpinan_hadir: { type: DataTypes.STRING(255), allowNull: true },
+      tamu_vip: { type: DataTypes.TEXT, allowNull: true },
+      jumlah_peserta: { type: DataTypes.INTEGER, allowNull: true },
+      rundown_acara: { type: DataTypes.TEXT, allowNull: true },
+      mc: { type: DataTypes.STRING(255), allowNull: true },
+      protokoler: { type: DataTypes.STRING(255), allowNull: true },
+      nama_tamu: { type: DataTypes.STRING(255), allowNull: true },
+      instansi_tamu: { type: DataTypes.STRING(255), allowNull: true },
+      keperluan_kunjungan: { type: DataTypes.TEXT, allowNull: true },
+      penerima_tamu: { type: DataTypes.STRING(255), allowNull: true },
+      judul_publikasi: { type: DataTypes.STRING(255), allowNull: true },
+      jenis_publikasi: { type: DataTypes.ENUM, allowNull: true },
+      media_publikasi: { type: DataTypes.ENUM, allowNull: true },
+      link_publikasi: { type: DataTypes.STRING(255), allowNull: true },
+      isi_publikasi: { type: DataTypes.TEXT, allowNull: true },
+      fotografer: { type: DataTypes.STRING(255), allowNull: true },
+      videografer: { type: DataTypes.STRING(255), allowNull: true },
+      jumlah_foto: { type: DataTypes.INTEGER, allowNull: true },
+      jumlah_video: { type: DataTypes.INTEGER, allowNull: true },
+      file_foto: { type: DataTypes.JSONB, allowNull: true },
+      file_video: { type: DataTypes.JSONB, allowNull: true },
+      file_rundown: { type: DataTypes.STRING(255), allowNull: true },
+      file_undangan: { type: DataTypes.STRING(255), allowNull: true },
+      penanggung_jawab: { type: DataTypes.STRING(255), allowNull: false, defaultValue: "Kasubbag Umum" },
+      pelaksana: { type: DataTypes.STRING(255), allowNull: false },
+      is_sensitive: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Biasa" },
+      status: { type: DataTypes.ENUM, allowNull: false, defaultValue: "pending" },
+      keterangan: { type: DataTypes.TEXT, allowNull: true },
+      created_by: { type: DataTypes.INTEGER, allowNull: false },
+      created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+      updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+    });
+}
+
+export async function down({ context: queryInterface }) {
+  await queryInterface.dropTable('SEK-HUM');
+}

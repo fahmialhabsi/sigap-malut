@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: SekKbjController
 // MODEL: SekKbj
-// Generated: 2026-02-17T19:24:48.406Z
+// Generated: 2026-03-19T23:39:27.532Z
 // =====================================================
 
 import SekKbj from "../models/SEK-KBJ.js";

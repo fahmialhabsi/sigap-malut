@@ -1,18 +1,23 @@
 import { Sequelize } from "sequelize";
+
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-dotenv.config();
-
+// Selalu load .env dari root project (dua folder di atas config/database.js)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+console.log("DB_DIALECT:", process.env.DB_DIALECT);
 
 const sequelize = new Sequelize({
   dialect: process.env.DB_DIALECT || "sqlite",
   storage:
     process.env.DB_STORAGE ||
-    path.join(__dirname, "../database/database.sqlite"),
+    // Use in-memory SQLite for tests to avoid native binary issues in CI/runners
+    (process.env.NODE_ENV === "test"
+      ? ":memory:"
+      : path.join(__dirname, "../database/database.sqlite")),
 
   // PostgreSQL config (for production)
   ...(process.env.DB_DIALECT === "postgres" && {

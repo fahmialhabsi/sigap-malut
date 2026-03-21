@@ -2,7 +2,7 @@
 // MODEL: SekLks
 // TABLE: sek_lks
 // MODULE: SEK-LKS
-// Generated: 2026-02-17T19:24:47.399Z
+// Generated: 2026-03-19T23:39:22.842Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -36,24 +36,24 @@ const SekLks = sequelize.define('SekLks', {
     comment: 'Bulan (1-12)',
   },
   skor_pph: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Skor Pola Pangan Harapan',
   },
   target_pph: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     defaultValue: 90,
     comment: 'Target PPH',
   },
   status_pph: {
-    type: DataTypes.ENUM('On Target', 'Di Bawah Target'),
+    type: DataTypes.ENUM('"On Target', 'Di Bawah Target"'),
     comment: 'Status PPH',
   },
   konsumsi_kalori_per_kapita: {
-    type: DataTypes.DECIMAL(10,2),
+    type: DataTypes.DECIMAL("10,2"),
     comment: 'Rata-rata konsumsi kalori',
   },
   konsumsi_protein_per_kapita: {
-    type: DataTypes.DECIMAL(10,2),
+    type: DataTypes.DECIMAL("10,2"),
     comment: 'Rata-rata konsumsi protein',
   },
   total_penerima_sppg: {
@@ -61,7 +61,7 @@ const SekLks = sequelize.define('SekLks', {
     comment: 'Jumlah penerima SPPG',
   },
   distribusi_sppg_realisasi: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Realisasi distribusi SPPG',
   },
   program_mbg_penerima: {
@@ -140,13 +140,13 @@ const SekLks = sequelize.define('SekLks', {
     comment: 'Yang menyusun',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Biasa',
     comment: 'Klasifikasi data',
   },
   status: {
-    type: DataTypes.ENUM('draft', 'review', 'final'),
+    type: DataTypes.ENUM('"draft', 'review', 'final"'),
     allowNull: false,
     defaultValue: 'draft',
     comment: 'Status',

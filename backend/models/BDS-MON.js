@@ -2,7 +2,7 @@
 // MODEL: BdsMon
 // TABLE: bds_mon
 // MODULE: BDS-MON
-// Generated: 2026-02-17T19:24:47.450Z
+// Generated: 2026-03-19T23:39:23.079Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
