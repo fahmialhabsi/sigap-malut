@@ -1,13 +1,13 @@
 -- =====================================================
 -- TABLE: sek_kbj
 -- MODULE: SEK-KBJ
--- Generated: 2026-02-17T19:24:46.422Z
+-- Generated: 2026-03-19T23:39:21.634Z
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS sek_kbj (
   id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
   layanan_id VARCHAR(10) NOT NULL,
-  jenis_layanan_kebijakan VARCHAR(100) CHECK(jenis_layanan_kebijakan IN ('Bahan Kebijakan Teknis', 'Rekapitulasi Laporan')) NOT NULL,
+  jenis_layanan_kebijakan VARCHAR(100) CHECK(jenis_layanan_kebijakan IN ('"Bahan Kebijakan Teknis', 'Rekapitulasi Laporan"')) NOT NULL,
   judul VARCHAR(255) NOT NULL,
   periode VARCHAR(50) NOT NULL,
   tahun INTEGER NOT NULL,
@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS sek_kbj (
   ditujukan_kepada VARCHAR(255),
   penanggung_jawab VARCHAR(255) NOT NULL DEFAULT 'Sekretaris',
   pelaksana VARCHAR(255) NOT NULL,
-  is_sensitive VARCHAR(100) CHECK(is_sensitive IN ('Biasa', 'Sensitif')) NOT NULL DEFAULT 'Sensitif',
-  status VARCHAR(100) CHECK(status IN ('draft', 'review', 'finalisasi', 'disetujui')) NOT NULL DEFAULT 'draft',
+  is_sensitive VARCHAR(100) CHECK(is_sensitive IN ('"Biasa', 'Sensitif"')) NOT NULL DEFAULT 'Sensitif',
+  status VARCHAR(100) CHECK(status IN ('"draft', 'review', 'finalisasi', 'disetujui"')) NOT NULL DEFAULT 'draft',
   keterangan TEXT,
   created_by INTEGER NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

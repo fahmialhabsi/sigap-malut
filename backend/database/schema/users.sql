@@ -4,7 +4,7 @@
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   username VARCHAR(50) UNIQUE NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
@@ -15,6 +15,9 @@ CREATE TABLE IF NOT EXISTS users (
   role VARCHAR(50) NOT NULL DEFAULT 'pelaksana',
   unit_kerja VARCHAR(100) NOT NULL,
   jabatan VARCHAR(255),
+  name VARCHAR(255),
+  role_id VARCHAR(64),
+  unit_id VARCHAR(64),
   
   -- Profile
   foto VARCHAR(255),
@@ -22,8 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
   alamat TEXT,
   
   -- Status
-  is_active BOOLEAN NOT NULL DEFAULT 1,
-  is_verified BOOLEAN NOT NULL DEFAULT 0,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  is_verified BOOLEAN NOT NULL DEFAULT FALSE,
   email_verified_at TIMESTAMP,
   
   -- Security
@@ -34,7 +37,8 @@ CREATE TABLE IF NOT EXISTS users (
   
   -- Timestamps
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
@@ -48,7 +52,7 @@ CREATE INDEX IF NOT EXISTS idx_users_unit_kerja ON users(unit_kerja);
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS user_sessions (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL,
   refresh_token VARCHAR(500) NOT NULL,
   device_info VARCHAR(255),

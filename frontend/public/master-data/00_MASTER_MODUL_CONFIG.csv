@@ -93,3 +93,4 @@ M081,Laporan Masyarakat,Partisipasi,Sekretariat,laporan_masyarakat,Laporan masal
 M082,Portal Data Terbuka,Open Data,Sekretariat,portal_data,Portal data pangan untuk publik,globe-alt,false,false,true,92,true
 M083,Dataset Publik,Open Data,Sekretariat,dataset_publik,Dataset yang bisa didownload publik,folder-arrow-down,false,true,true,93,true
 M084,Request Data Peneliti,Open Data,Sekretariat,request_data,Request data khusus untuk peneliti,document-magnifying-glass,true,false,true,94,true
+WF01,Workflow Management,Workflow,General,workflows,Manajemen workflow custom,arrows-path,true,false,false,99,true

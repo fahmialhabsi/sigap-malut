@@ -1,0 +1,19 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+asn_id,ASN ID,int,11,true,false,NULL,none,NULL,FK ke tabel asn
+nip,NIP,varchar,18,true,false,NULL,nip_18_digit,NULL,
+nama_asn,Nama ASN,varchar,255,false,false,NULL,none,NULL,
+nomor_sppd,Nomor SPPD,varchar,100,false,false,NULL,none,NULL,
+nomor_st,Nomor ST,varchar,100,false,false,NULL,none,NULL,
+tujuan,Tujuan,varchar,255,false,false,NULL,none,NULL,
+keperluan,Keperluan,text,NULL,false,false,NULL,none,NULL,
+tanggal_berangkat,Tanggal Berangkat,date,NULL,true,false,NULL,none,NULL,
+tanggal_kembali,Tanggal Kembali,date,NULL,true,false,NULL,none,NULL,
+lama_hari,Lama Hari,int,11,false,false,NULL,none,NULL,
+biaya_transport,Transport(decimal),decimal,"15,2",false,false,NULL,none,NULL,
+biaya_penginapan,Penginapan(decimal),decimal,"15,2",false,false,NULL,none,NULL,
+uang_harian,Uang Harian(decimal),decimal,"15,2",false,false,NULL,none,NULL,
+status,Status,enum,NULL,true,false,pending,none,"pending,approved,completed",Status perjalanan
+file_sppd,File SPPD,varchar,255,false,false,NULL,none,NULL,Path file upload
+created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

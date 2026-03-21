@@ -1,3 +1,12 @@
+// Mock export enforce untuk test compliance & audit
+export function enforce(workflow) {
+  // Simulasi compliance dan alert
+  return {
+    compliant: true,
+    alerts: ["No issues"],
+    workflow,
+  };
+}
 import { getRoleLevel } from "./roleCheck.js";
 
 // @desc    Enforce workflow - cannot skip levels

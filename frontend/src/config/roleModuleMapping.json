@@ -1,0 +1,10 @@
+{
+  "super_admin": [
+    "dashboard_superadmin",
+    "dynamic_module_creator",
+    "audit_log",
+    "settings"
+  ],
+  // ... yang lain sesuai struktur role-unit organization SIGAP Malut ...
+  "publik": ["dashboard_publik"]
+}

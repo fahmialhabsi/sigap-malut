@@ -2,7 +2,7 @@
 // MODEL: UptAdm
 // TABLE: upt_adm
 // MODULE: UPT-ADM
-// Generated: 2026-02-17T19:24:47.465Z
+// Generated: 2026-03-19T23:39:23.166Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

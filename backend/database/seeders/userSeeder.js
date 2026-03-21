@@ -1,61 +1,66 @@
-import User from "../../models/User.js";
-import { hashPassword } from "../../config/auth.js";
-
-const users = [
+module.exports = {
+    up: async (queryInterface) => {
+      await queryInterface.bulkInsert('Users', [
   {
-    username: "superadmin",
-    email: "superadmin@dinpangan.go.id",
-    password: "superadmin123",
-    nama_lengkap: "Super Administrator",
-    role: "super_admin",
-    unit_kerja: "Sekretariat",
-    jabatan: "Super Admin System",
-    is_verified: true,
-    is_active: true,
+    "id": 1,
+    "email": "super_admin@example.com",
+    "password": "password123",
+    "role": "super_admin",
+    "dashboardUrl": "/dashboard/superadmin"
   },
   {
-    username: "sekretaris",
-    email: "sekretaris@dinpangan.go.id",
-    password: "123",
-    nama_lengkap: "Sekretaris Dinas",
-    role: "sekretaris",
-    unit_kerja: "Sekretariat",
-    jabatan: "Sekretaris",
-    is_verified: true,
-    is_active: true,
+    "id": 2,
+    "email": "gubernur@example.com",
+    "password": "password123",
+    "role": "gubernur",
+    "dashboardUrl": "/dashboard/superadmin"
   },
-];
-
-async function seedUsers() {
-  console.log("🌱 Seeding users (superadmin only)...");
-
-  // Hapus semua user lama
-  await User.destroy({ where: {}, truncate: true });
-
-  for (const userData of users) {
-    try {
-      // Hash password
-      const hashedPassword = await hashPassword(userData.password);
-
-      await User.create({
-        ...userData,
-        password: hashedPassword,
-      });
-
-      console.log(`  ✅ Created: ${userData.username}`);
-    } catch (error) {
-      if (error.name === "SequelizeUniqueConstraintError") {
-        console.log(`  ⚠️  Skipped (exists): ${userData.username}`);
-      } else {
-        console.error(
-          `  ❌ Error creating ${userData.username}:`,
-          error.message,
-        );
-      }
-    }
+  {
+    "id": 3,
+    "email": "sekretaris@example.com",
+    "password": "password123",
+    "role": "sekretaris",
+    "dashboardUrl": "/dashboard/sekretariat"
+  },
+  {
+    "id": 4,
+    "email": "kepala_bidang_ketersediaan@example.com",
+    "password": "password123",
+    "role": "kepala_bidang_ketersediaan",
+    "dashboardUrl": "/dashboard/ketersediaan"
+  },
+  {
+    "id": 5,
+    "email": "kepala_bidang_distribusi@example.com",
+    "password": "password123",
+    "role": "kepala_bidang_distribusi",
+    "dashboardUrl": "/dashboard/distribusi"
+  },
+  {
+    "id": 6,
+    "email": "kepala_bidang_konsumsi@example.com",
+    "password": "password123",
+    "role": "kepala_bidang_konsumsi",
+    "dashboardUrl": "/dashboard/konsumsi"
+  },
+  {
+    "id": 7,
+    "email": "kepala_uptd@example.com",
+    "password": "password123",
+    "role": "kepala_uptd",
+    "dashboardUrl": "/dashboard/uptd"
+  },
+  {
+    "id": 8,
+    "email": "publik@example.com",
+    "password": "password123",
+    "role": "publik",
+    "dashboardUrl": "/dashboard-publik"
   }
+], {});
+    },
 
-  console.log("✅ User seeding complete!\n");
-}
-
-seedUsers();
+    down: async (queryInterface) => {
+      await queryInterface.bulkDelete('Users', null, {});
+    },
+  };

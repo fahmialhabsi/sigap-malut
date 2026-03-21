@@ -1,7 +1,7 @@
 // =====================================================
 // CONTROLLER: BdsMonController
 // MODEL: BdsMon
-// Generated: 2026-02-17T19:24:48.391Z
+// Generated: 2026-03-19T23:39:27.503Z
 // =====================================================
 
 import BdsMon from "../models/BDS-MON.js";

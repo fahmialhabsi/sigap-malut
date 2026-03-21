@@ -1,0 +1,42 @@
+export async function up({ context: queryInterface }) {
+  await queryInterface.createTable('SEK-KBJ', {
+      id: { type: DataTypes.INTEGER, allowNull: false, unique: true, autoIncrement: true, primaryKey: true },
+      layanan_id: { type: DataTypes.STRING(10), allowNull: false },
+      jenis_layanan_kebijakan: { type: DataTypes.ENUM, allowNull: false },
+      judul: { type: DataTypes.STRING(255), allowNull: false },
+      periode: { type: DataTypes.STRING(50), allowNull: false },
+      tahun: { type: DataTypes.INTEGER, allowNull: false },
+      ruang_lingkup: { type: DataTypes.TEXT, allowNull: true },
+      latar_belakang: { type: DataTypes.TEXT, allowNull: true },
+      permasalahan: { type: DataTypes.TEXT, allowNull: true },
+      analisis: { type: DataTypes.TEXT, allowNull: true },
+      opsi_kebijakan: { type: DataTypes.TEXT, allowNull: true },
+      rekomendasi_kebijakan: { type: DataTypes.TEXT, allowNull: true },
+      dampak: { type: DataTypes.TEXT, allowNull: true },
+      dasar_hukum: { type: DataTypes.TEXT, allowNull: true },
+      sumber_data_bidang_ketersediaan: { type: DataTypes.TEXT, allowNull: true },
+      sumber_data_bidang_distribusi: { type: DataTypes.TEXT, allowNull: true },
+      sumber_data_bidang_konsumsi: { type: DataTypes.TEXT, allowNull: true },
+      sumber_data_uptd: { type: DataTypes.TEXT, allowNull: true },
+      rekapitulasi_keuangan: { type: DataTypes.TEXT, allowNull: true },
+      rekapitulasi_program: { type: DataTypes.TEXT, allowNull: true },
+      rekapitulasi_capaian: { type: DataTypes.TEXT, allowNull: true },
+      kesimpulan: { type: DataTypes.TEXT, allowNull: true },
+      tindak_lanjut: { type: DataTypes.TEXT, allowNull: true },
+      file_dokumen: { type: DataTypes.STRING(255), allowNull: true },
+      file_lampiran: { type: DataTypes.JSONB, allowNull: true },
+      ditujukan_kepada: { type: DataTypes.STRING(255), allowNull: true },
+      penanggung_jawab: { type: DataTypes.STRING(255), allowNull: false, defaultValue: "Sekretaris" },
+      pelaksana: { type: DataTypes.STRING(255), allowNull: false },
+      is_sensitive: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Sensitif" },
+      status: { type: DataTypes.ENUM, allowNull: false, defaultValue: "draft" },
+      keterangan: { type: DataTypes.TEXT, allowNull: true },
+      created_by: { type: DataTypes.INTEGER, allowNull: false },
+      created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+      updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+    });
+}
+
+export async function down({ context: queryInterface }) {
+  await queryInterface.dropTable('SEK-KBJ');
+}

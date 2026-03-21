@@ -2,7 +2,7 @@
 // MODEL: BksKmn
 // TABLE: bks_kmn
 // MODULE: BKS-KMN
-// Generated: 2026-02-17T19:24:47.458Z
+// Generated: 2026-03-19T23:39:23.139Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';

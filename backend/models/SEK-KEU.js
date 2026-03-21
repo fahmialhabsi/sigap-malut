@@ -2,7 +2,7 @@
 // MODEL: SekKeu
 // TABLE: sek_keu
 // MODULE: SEK-KEU
-// Generated: 2026-02-17T19:24:47.391Z
+// Generated: 2026-03-19T23:39:22.828Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -15,7 +15,7 @@ const SekKeu = sequelize.define('SekKeu', {
     autoIncrement: true
   },
   unit_kerja: {
-    type: DataTypes.ENUM('Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi'),
+    type: DataTypes.ENUM('"Sekretariat', 'UPTD', 'Bidang Ketersediaan', 'Bidang Distribusi', 'Bidang Konsumsi"'),
     allowNull: false,
     defaultValue: 'Sekretariat',
     comment: 'Unit pengelola anggaran (BARU - untuk integrasi multi-unit)',
@@ -37,7 +37,7 @@ const SekKeu = sequelize.define('SekKeu', {
     comment: 'Tahun anggaran',
   },
   jenis_layanan_keuangan: {
-    type: DataTypes.ENUM('RKA/DPA', 'Belanja', 'Pencairan', 'SPJ', 'Laporan', 'Revisi', 'Monitoring'),
+    type: DataTypes.ENUM('"RKA/DPA', 'Belanja', 'Pencairan', 'SPJ', 'Laporan', 'Revisi', 'Monitoring"'),
     allowNull: false,
     comment: 'Jenis layanan keuangan',
   },
@@ -54,24 +54,24 @@ const SekKeu = sequelize.define('SekKeu', {
     comment: 'Nama rekening',
   },
   pagu_anggaran: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Total pagu',
   },
   realisasi: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     defaultValue: 0,
     comment: 'Realisasi pengeluaran',
   },
   sisa_anggaran: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Pagu - Realisasi',
   },
   persentase_realisasi: {
-    type: DataTypes.DECIMAL(5,2),
+    type: DataTypes.DECIMAL("5,2"),
     comment: 'Auto-calculate',
   },
   jenis_belanja: {
-    type: DataTypes.ENUM('Belanja Pegawai', 'Belanja Barang', 'Belanja Modal'),
+    type: DataTypes.ENUM('"Belanja Pegawai', 'Belanja Barang', 'Belanja Modal"'),
     comment: 'Jenis belanja',
   },
   uraian_belanja: {
@@ -91,7 +91,7 @@ const SekKeu = sequelize.define('SekKeu', {
     comment: 'Tanggal dana cair',
   },
   jumlah_pencairan: {
-    type: DataTypes.DECIMAL(15,2),
+    type: DataTypes.DECIMAL("15,2"),
     comment: 'Nominal pencairan',
   },
   nomor_spj: {
@@ -103,11 +103,11 @@ const SekKeu = sequelize.define('SekKeu', {
     comment: 'Tanggal SPJ',
   },
   status_spj: {
-    type: DataTypes.ENUM('Belum SPJ', 'SPJ Lengkap', 'SPJ Kurang', 'Diverifikasi', 'Ditolak'),
+    type: DataTypes.ENUM('"Belum SPJ', 'SPJ Lengkap', 'SPJ Kurang', 'Diverifikasi', 'Ditolak"'),
     comment: 'Status SPJ',
   },
   jenis_revisi: {
-    type: DataTypes.ENUM('Revisi Anggaran', 'Pergeseran', 'Tambahan'),
+    type: DataTypes.ENUM('"Revisi Anggaran', 'Pergeseran', 'Tambahan"'),
     comment: 'Jenis revisi',
   },
   alasan_revisi: {
@@ -142,13 +142,13 @@ const SekKeu = sequelize.define('SekKeu', {
     comment: 'Yang melaksanakan',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Data keuangan sensitif',
   },
   status: {
-    type: DataTypes.ENUM('pending', 'proses', 'diverifikasi', 'disetujui', 'ditolak', 'selesai'),
+    type: DataTypes.ENUM('"pending', 'proses', 'diverifikasi', 'disetujui', 'ditolak', 'selesai"'),
     allowNull: false,
     defaultValue: 'pending',
     comment: 'Status',
