@@ -2,7 +2,7 @@
 // MODEL: SekHum
 // TABLE: sek_hum
 // MODULE: SEK-HUM
-// Generated: 2026-02-17T19:24:47.380Z
+// Generated: 2026-03-19T23:39:22.812Z
 // =====================================================
 
 import { DataTypes } from 'sequelize';
@@ -20,7 +20,7 @@ const SekHum = sequelize.define('SekHum', {
     comment: 'FK ke layanan_menpanrb (LY035-LY039)',
   },
   jenis_layanan_humas: {
-    type: DataTypes.ENUM('Protokol', 'Acara Resmi', 'Penerimaan Tamu', 'Publikasi', 'Dokumentasi'),
+    type: DataTypes.ENUM('"Protokol', 'Acara Resmi', 'Penerimaan Tamu', 'Publikasi', 'Dokumentasi"'),
     allowNull: false,
     comment: 'Jenis layanan humas',
   },
@@ -29,7 +29,7 @@ const SekHum = sequelize.define('SekHum', {
     comment: 'Nama acara/kegiatan',
   },
   jenis_acara: {
-    type: DataTypes.ENUM('Rapat', 'Upacara', 'Kunjungan', 'Sosialisasi', 'Workshop', 'Launching', 'Lainnya'),
+    type: DataTypes.ENUM('"Rapat', 'Upacara', 'Kunjungan', 'Sosialisasi', 'Workshop', 'Launching', 'Lainnya"'),
     comment: 'Jenis acara',
   },
   tanggal_acara: {
@@ -93,11 +93,11 @@ const SekHum = sequelize.define('SekHum', {
     comment: 'Judul berita/publikasi',
   },
   jenis_publikasi: {
-    type: DataTypes.ENUM('Berita', 'Press Release', 'Artikel', 'Video', 'Foto', 'Infografis'),
+    type: DataTypes.ENUM('"Berita', 'Press Release', 'Artikel', 'Video', 'Foto', 'Infografis"'),
     comment: 'Jenis publikasi',
   },
   media_publikasi: {
-    type: DataTypes.ENUM('Website', 'Media Sosial', 'Media Massa', 'Buletin', 'Lainnya'),
+    type: DataTypes.ENUM('"Website', 'Media Sosial', 'Media Massa', 'Buletin', 'Lainnya"'),
     comment: 'Media yang digunakan',
   },
   link_publikasi: {
@@ -152,13 +152,13 @@ const SekHum = sequelize.define('SekHum', {
     comment: 'Yang melaksanakan',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('Biasa', 'Sensitif'),
+    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
     allowNull: false,
     defaultValue: 'Biasa',
     comment: 'Klasifikasi data',
   },
   status: {
-    type: DataTypes.ENUM('pending', 'persiapan', 'berlangsung', 'selesai'),
+    type: DataTypes.ENUM('"pending', 'persiapan', 'berlangsung', 'selesai"'),
     allowNull: false,
     defaultValue: 'pending',
     comment: 'Status',

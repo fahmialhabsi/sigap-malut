@@ -1,21 +1,26 @@
+import DataIntegrationLog from "../models/dataIntegrationLog.js";
+
 class IntegrationService {
   // Log data integration
   async logIntegration(data) {
-    // TODO: Save to data_integration_log table
-    const log = {
-      source_unit: data.source_unit,
-      source_table: data.source_table,
-      source_record_id: data.source_record_id,
-      destination_table: data.destination_table || "sekretariat_consolidated",
-      integration_type: data.integration_type || "manual",
-      status: "success",
-      integrated_by: data.user_id,
-      integrated_at: new Date(),
-      data_snapshot: data.data_snapshot,
-    };
-
-    console.log("Integration logged:", log);
-    return log;
+    try {
+      const log = await DataIntegrationLog.create({
+        source_unit: data.source_unit,
+        source_table: data.source_table,
+        source_record_id: data.source_record_id,
+        destination_table: data.destination_table || "sekretariat_consolidated",
+        integration_type: data.integration_type || "manual",
+        status: data.status || "success",
+        integrated_by: data.user_id,
+        integrated_at: new Date(),
+        data_snapshot: data.data_snapshot,
+        error_message: data.error_message || null,
+      });
+      return log;
+    } catch (err) {
+      console.error("Integration log DB error:", err);
+      return null;
+    }
   }
 
   // Sync data from Bidang to Sekretariat

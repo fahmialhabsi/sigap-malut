@@ -1,0 +1,44 @@
+export async function up({ context: queryInterface }) {
+  await queryInterface.createTable('SEK-KEU', {
+      id: { type: DataTypes.INTEGER, allowNull: false, unique: true, autoIncrement: true, primaryKey: true },
+      unit_kerja: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Sekretariat" },
+      kode_unit: { type: DataTypes.STRING(10), allowNull: false, defaultValue: "00" },
+      layanan_id: { type: DataTypes.STRING(10), allowNull: false },
+      tahun_anggaran: { type: DataTypes.INTEGER, allowNull: false },
+      jenis_layanan_keuangan: { type: DataTypes.ENUM, allowNull: false },
+      nomor_dpa: { type: DataTypes.STRING(100), allowNull: true },
+      kode_rekening: { type: DataTypes.STRING(50), allowNull: true },
+      nama_rekening: { type: DataTypes.STRING(255), allowNull: true },
+      pagu_anggaran: { type: DataTypes.DECIMAL, allowNull: true },
+      realisasi: { type: DataTypes.DECIMAL, allowNull: true, defaultValue: "0" },
+      sisa_anggaran: { type: DataTypes.DECIMAL, allowNull: true },
+      persentase_realisasi: { type: DataTypes.DECIMAL, allowNull: true },
+      jenis_belanja: { type: DataTypes.ENUM, allowNull: true },
+      uraian_belanja: { type: DataTypes.TEXT, allowNull: true },
+      keperluan: { type: DataTypes.TEXT, allowNull: true },
+      penerima_uang: { type: DataTypes.STRING(255), allowNull: true },
+      tanggal_pencairan: { type: DataTypes.DATEONLY, allowNull: true },
+      jumlah_pencairan: { type: DataTypes.DECIMAL, allowNull: true },
+      nomor_spj: { type: DataTypes.STRING(100), allowNull: true },
+      tanggal_spj: { type: DataTypes.DATEONLY, allowNull: true },
+      status_spj: { type: DataTypes.ENUM, allowNull: true },
+      jenis_revisi: { type: DataTypes.ENUM, allowNull: true },
+      alasan_revisi: { type: DataTypes.TEXT, allowNull: true },
+      file_dpa: { type: DataTypes.STRING(255), allowNull: true },
+      file_spj: { type: DataTypes.STRING(255), allowNull: true },
+      file_bukti: { type: DataTypes.JSONB, allowNull: true },
+      file_laporan: { type: DataTypes.STRING(255), allowNull: true },
+      penanggung_jawab: { type: DataTypes.STRING(255), allowNull: false, defaultValue: "Bendahara" },
+      pelaksana: { type: DataTypes.STRING(255), allowNull: false },
+      is_sensitive: { type: DataTypes.ENUM, allowNull: false, defaultValue: "Sensitif" },
+      status: { type: DataTypes.ENUM, allowNull: false, defaultValue: "pending" },
+      keterangan: { type: DataTypes.TEXT, allowNull: true },
+      created_by: { type: DataTypes.INTEGER, allowNull: false },
+      created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+      updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: "CURRENT_TIMESTAMP" },
+    });
+}
+
+export async function down({ context: queryInterface }) {
+  await queryInterface.dropTable('SEK-KEU');
+}

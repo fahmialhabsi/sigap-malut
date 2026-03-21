@@ -2,13 +2,11 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("users", "plain_password", {
-      type: Sequelize.STRING(512),
-      allowNull: true,
-      comment: "Plaintext password (admin only; use with caution)",
-    });
+    // Kolom 'plain_password' sudah ada, tidak perlu ditambah lagi
+    // await queryInterface.addColumn("users", "plain_password", { ... });
   },
   down: async (queryInterface) => {
-    await queryInterface.removeColumn("users", "plain_password");
+    // Jangan hapus kolom 'plain_password'
+    // await queryInterface.removeColumn("users", "plain_password");
   },
 };

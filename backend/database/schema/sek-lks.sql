@@ -1,7 +1,7 @@
 -- =====================================================
 -- TABLE: sek_lks
 -- MODULE: SEK-LKS
--- Generated: 2026-02-17T19:24:46.437Z
+-- Generated: 2026-03-19T23:39:21.646Z
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS sek_lks (
@@ -10,13 +10,13 @@ CREATE TABLE IF NOT EXISTS sek_lks (
   periode DATE NOT NULL,
   tahun INTEGER NOT NULL,
   bulan INTEGER NOT NULL,
-  skor_pph DECIMAL(5,2),
-  target_pph DECIMAL(5,2) DEFAULT 90,
-  status_pph VARCHAR(100) CHECK(status_pph IN ('On Target', 'Di Bawah Target')),
-  konsumsi_kalori_per_kapita DECIMAL(10,2),
-  konsumsi_protein_per_kapita DECIMAL(10,2),
+  skor_pph DECIMAL("5,2"),
+  target_pph DECIMAL("5,2") DEFAULT 90,
+  status_pph VARCHAR(100) CHECK(status_pph IN ('"On Target', 'Di Bawah Target"')),
+  konsumsi_kalori_per_kapita DECIMAL("10,2"),
+  konsumsi_protein_per_kapita DECIMAL("10,2"),
   total_penerima_sppg INTEGER,
-  distribusi_sppg_realisasi DECIMAL(15,2),
+  distribusi_sppg_realisasi DECIMAL("15,2"),
   program_mbg_penerima INTEGER,
   program_diversifikasi INTEGER,
   inspeksi_keamanan_pangan INTEGER,
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS sek_lks (
   file_data_pendukung JSON,
   penanggung_jawab VARCHAR(255) NOT NULL DEFAULT 'Sekretaris',
   pelaksana VARCHAR(255) NOT NULL DEFAULT 'Bidang Konsumsi',
-  is_sensitive VARCHAR(100) CHECK(is_sensitive IN ('Biasa', 'Sensitif')) NOT NULL DEFAULT 'Biasa',
-  status VARCHAR(100) CHECK(status IN ('draft', 'review', 'final')) NOT NULL DEFAULT 'draft',
+  is_sensitive VARCHAR(100) CHECK(is_sensitive IN ('"Biasa', 'Sensitif"')) NOT NULL DEFAULT 'Biasa',
+  status VARCHAR(100) CHECK(status IN ('"draft', 'review', 'final"')) NOT NULL DEFAULT 'draft',
   keterangan TEXT,
   created_by INTEGER NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,44 +1,49 @@
-import { expect } from "chai";
-const BDSHRG = sequelize.models.BdsHrg || sequelize.models.BdsHrg;
+import "../models/index.js";
 import { sequelize } from "../config/database.js";
+const BDSHRG = sequelize.models.BdsHrg;
 const Komoditas = sequelize.models.Komoditas;
 
 describe("Integrasi Master Data: BDS-HRG", () => {
-  it("should only accept valid komoditas_id from master Komoditas", function (done) {
-    this.timeout(5000);
-    console.log(
-      "DEBUG BDSHRG model:",
-      typeof BDSHRG,
-      BDSHRG && typeof BDSHRG.create,
-    );
+  test("should only accept valid komoditas_id from master Komoditas", async () => {
     const uniq = Date.now();
-    Komoditas.create({
+    const komoditas = await Komoditas.create({
       nama: `Komoditas${uniq}`,
       satuan: "kg",
       kode: `K${uniq}`,
-    })
-      .then((komoditas) => {
-        return BDSHRG.create({
-          komoditas_id: komoditas.id,
-          tahun: 2026,
-          harga: 5000,
-        });
-      })
-      .then((bdsHrg) => {
-        expect(bdsHrg.komoditas_id).to.exist;
-        return BDSHRG.create({
-          komoditas_id: 99999999,
-          tahun: 2026,
-          harga: 5000,
-        });
-      })
-      .then(() => done(new Error("Should fail with FK constraint error")))
-      .catch((error) => {
-        expect(error).to.not.be.null;
-        expect(error.name).to.match(
-          /SequelizeForeignKeyConstraintError|ValidationError/,
-        );
-        done();
-      });
+    });
+    const bdsHrg = await BDSHRG.create({
+      komoditas_id: komoditas.id,
+      tahun: 2026,
+      harga: 5000,
+      unit_kerja: "Sekretariat",
+      layanan_id: "LY087",
+      jenis_layanan_harga: "Pemantauan Harga",
+      periode: "2026-01-01",
+      bulan: 1,
+      satuan: "kg",
+      penanggung_jawab: "Admin",
+      pelaksana: "Admin",
+      created_by: 1,
+    });
+    expect(bdsHrg.komoditas_id).toBeDefined();
+    // Coba insert dengan komoditas_id tidak valid
+    await expect(
+      BDSHRG.create({
+        komoditas_id: 99999999,
+        tahun: 2026,
+        harga: 5000,
+        unit_kerja: "Sekretariat",
+        layanan_id: "LY087",
+        jenis_layanan_harga: "Pemantauan Harga",
+        periode: "2026-01-01",
+        bulan: 1,
+        satuan: "kg",
+        penanggung_jawab: "Admin",
+        pelaksana: "Admin",
+        created_by: 1,
+      }),
+    ).rejects.toThrow(
+      /violates foreign key constraint|SequelizeForeignKeyConstraintError|ValidationError/,
+    );
   });
 });

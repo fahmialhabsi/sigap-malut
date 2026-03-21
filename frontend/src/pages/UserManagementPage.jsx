@@ -5,6 +5,20 @@ import unitNameToId from "../utils/unitMap";
 import { FaUserEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { Navigate } from "react-router-dom";
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const asUuid = (value) => {
+  const normalized = String(value || "").trim();
+  return UUID_REGEX.test(normalized) ? normalized : null;
+};
+
+const normalizeRoleKey = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+
 export default function UserManagementPage() {
   // Hooks harus dipanggil sebelum conditional return
   const user = useAuthStore((state) => state.user);
@@ -139,15 +153,20 @@ export default function UserManagementPage() {
         return;
       }
       let res;
+      const normalizedRole = normalizeRoleKey(form.role);
+      const mappedRoleId = asUuid(roleNameToId[normalizedRole]);
+      const mappedUnitId =
+        asUuid(unitNameToId[derivedUnit]) || asUuid(derivedUnit);
+
       // Ensure backend-required role_id and unit_id are provided.
       const payload = {
         ...form,
         name: form.nama_lengkap || form.name || form.username,
-        // set both role and role_id to be safe for legacy hooks
-        role: form.role,
-        role_id: roleNameToId[form.role] || form.role,
+        // Always send canonical role key; send role_id only when it's a UUID.
+        role: normalizedRole,
+        role_id: mappedRoleId,
         unit_kerja: derivedUnit,
-        unit_id: unitNameToId[derivedUnit] || derivedUnit,
+        unit_id: mappedUnitId,
       };
 
       if (editUser) {

@@ -6,9 +6,6 @@ import { logAuditTrail } from "../utils/auditTrail";
 import { roleIdToName } from "../utils/roleMap"; // <- sudah ada
 import unitNameToId from "../utils/unitMap"; // <- import untuk mapping unit
 
-// Import helper untuk set Authorization header pada axios instance utils/api
-import { setAuthToken as setApiAuthToken } from "../utils/api";
-
 // Build inverse mapping unitId -> unitName (lowercased keys for tolerant lookup)
 const unitIdToName = Object.entries(unitNameToId || {}).reduce(
   (acc, [name, id]) => {
@@ -79,7 +76,7 @@ const useAuthStore = create((set) => ({
       // backend response shape: response.data.data.{ user, token, roleName } atau data.data
       const payload = response.data.data || response.data || {};
       const rawUser = payload.user || payload;
-      const token = payload.token || payload?.access_token || null;
+      const token = payload.token || null;
       const roleNameFromResp = payload.roleName || payload.role_name || null;
 
       let user = normalizeUser(rawUser);
@@ -92,38 +89,13 @@ const useAuthStore = create((set) => ({
         user.role = user.role || roleNameFromResp;
       }
 
-      // persist token + user to localStorage (key 'token' used by apiClient interceptor)
-      if (token) {
-        try {
-          localStorage.setItem("token", token);
-          // also store access_token for compatibility with other code that may use it
-          localStorage.setItem("access_token", token);
-          // set Authorization header on utils/api axios instance
-          setApiAuthToken(token);
-        } catch (e) {
-          console.warn("Failed to persist token or set axios header:", e);
-        }
-      } else {
-        // ensure any previous token storage is cleared if login returns no token
-        localStorage.removeItem("token");
-        localStorage.removeItem("access_token");
-        try {
-          setApiAuthToken(null);
-        } catch (e) {
-          /* ignore */
-        }
-      }
-
-      try {
-        localStorage.setItem("user", JSON.stringify(user));
-      } catch (e) {
-        console.warn("Failed to persist user to localStorage:", e);
-      }
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
       set({
         user,
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: true,
         isInitialized: true,
       });
 
@@ -138,13 +110,7 @@ const useAuthStore = create((set) => ({
         isInitialized: true,
       });
       localStorage.removeItem("token");
-      localStorage.removeItem("access_token");
       localStorage.removeItem("user");
-      try {
-        setApiAuthToken(null);
-      } catch (e) {
-        /* ignore */
-      }
       logAuditTrail({
         user: null,
         action: "login_failed",
@@ -162,13 +128,7 @@ const useAuthStore = create((set) => ({
     const user = JSON.parse(localStorage.getItem("user") || "null");
     logAuditTrail({ user, action: "logout", detail: "User logout" });
     localStorage.removeItem("token");
-    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
-    try {
-      setApiAuthToken(null);
-    } catch (e) {
-      /* ignore */
-    }
     set({
       user: null,
       token: null,
@@ -178,23 +138,13 @@ const useAuthStore = create((set) => ({
   },
 
   initAuth: () => {
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     const userStr = localStorage.getItem("user");
 
     if (token && userStr) {
       try {
         const raw = JSON.parse(userStr);
         const user = normalizeUser(raw);
-        // ensure axios instance has Authorization header
-        try {
-          setApiAuthToken(token);
-        } catch (e) {
-          console.debug(
-            "setApiAuthToken failed during initAuth:",
-            e?.message || e,
-          );
-        }
         set({
           user,
           token,
@@ -203,11 +153,6 @@ const useAuthStore = create((set) => ({
         });
       } catch (error) {
         console.error("Parse user error:", error);
-        try {
-          setApiAuthToken(null);
-        } catch (e) {
-          /* ignore */
-        }
         set({
           user: null,
           token: null,
@@ -216,11 +161,6 @@ const useAuthStore = create((set) => ({
         });
       }
     } else {
-      try {
-        setApiAuthToken(null);
-      } catch (e) {
-        /* ignore */
-      }
       set({
         user: null,
         token: null,

@@ -1,0 +1,37 @@
+name: Compare Docs Compliance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  compliance-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run compliance checker
+        run: |
+          npx tsc
+          node dist/compare-with-dokumenSistem.js --docs ./sigap-malut/dokumenSistem --out ./reports/report.json --format json --verbose
+
+      - name: Upload compliance report artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: compliance-report
+          path: reports/report.json
+
+      - name: Fail on critical compliance issues
+        run: |
+          node dist/compare-with-dokumenSistem.js --docs ./sigap-malut/dokumenSistem --out ./reports/report.json --format json --verbose || exit 1
