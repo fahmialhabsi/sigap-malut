@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function ModulePage() {
   const { moduleId } = useParams();
@@ -32,9 +33,9 @@ export default function ModulePage() {
     try {
       await api.delete(`/${moduleId}/${id}`);
       fetchData(); // Refresh data
-      alert("Data berhasil dihapus");
+      notifyWarning("Data berhasil dihapus");
     } catch (err) {
-      alert(
+      notifyWarning(
         "Error: " + (err.response?.data?.message || "Gagal menghapus data"),
       );
     }

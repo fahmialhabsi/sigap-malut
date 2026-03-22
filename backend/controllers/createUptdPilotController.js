@@ -150,6 +150,10 @@ export const createUptdPilotController = ({
       const offset = (page - 1) * limit;
 
       const where = buildWhereFromQuery(req.query, attributeMap, hasUnitKerja);
+      // Hanya tampilkan data yang belum di-soft-delete
+      if (Object.prototype.hasOwnProperty.call(attributeMap, "is_deleted")) {
+        where.is_deleted = false;
+      }
       const order = resolveOrder(req.query, attributeMap);
 
       const queryOptions = {
@@ -188,7 +192,11 @@ export const createUptdPilotController = ({
     try {
       const record = await model.findByPk(req.params.id);
 
-      if (!record || !recordInPilotScope(record, hasUnitKerja)) {
+      if (
+        !record ||
+        record.is_deleted ||
+        !recordInPilotScope(record, hasUnitKerja)
+      ) {
         return res.status(404).json({
           success: false,
           message: `${entityName} not found`,
@@ -251,7 +259,11 @@ export const createUptdPilotController = ({
     try {
       const record = await model.findByPk(req.params.id);
 
-      if (!record || !recordInPilotScope(record, hasUnitKerja)) {
+      if (
+        !record ||
+        record.is_deleted ||
+        !recordInPilotScope(record, hasUnitKerja)
+      ) {
         return res.status(404).json({
           success: false,
           message: `${entityName} not found`,
@@ -299,7 +311,11 @@ export const createUptdPilotController = ({
     try {
       const record = await model.findByPk(req.params.id);
 
-      if (!record || !recordInPilotScope(record, hasUnitKerja)) {
+      if (
+        !record ||
+        record.is_deleted ||
+        !recordInPilotScope(record, hasUnitKerja)
+      ) {
         return res.status(404).json({
           success: false,
           message: `${entityName} not found`,
@@ -309,7 +325,11 @@ export const createUptdPilotController = ({
       const before = record.toJSON();
       const entityId = record.id;
 
-      await record.destroy();
+      await record.update({
+        is_deleted: true,
+        deleted_at: new Date(),
+        deleted_by: req.user?.id || null,
+      });
 
       await logAudit({
         modul: moduleCode,

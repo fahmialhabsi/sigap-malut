@@ -12,6 +12,6 @@ export async function getIntegrationLogs({
   params.push(`page=${page}`);
   params.push(`limit=${limit}`);
   const query = params.length ? `?${params.join("&")}` : "";
-  const res = await api.get(`/integration-log${query}`);
+  const res = await api.get(`/integrationlog${query}`);
   return res.data;
 }

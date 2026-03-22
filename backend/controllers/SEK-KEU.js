@@ -154,7 +154,7 @@ export const deleteSekKeu = async (req, res) => {
       });
     }
     const dataLama = { ...record.get() };
-    await record.destroy();
+    await record.update({ is_deleted: true, deleted_at: new Date(), deleted_by: req.user?.id || null });
     await logAudit({
       modul: "SEK-KEU",
       entitas_id: req.params.id,

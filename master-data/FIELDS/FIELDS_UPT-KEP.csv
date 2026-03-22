@@ -1,19 +1,15 @@
 field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
 id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
-nip,NIP,varchar,18,true,true,NULL,nip_18_digit,NULL,Nomor Induk Pegawai 18 digit
-nama_lengkap,Nama Lengkap,varchar,255,true,false,NULL,none,NULL,Nama lengkap pegawai
-jabatan,Jabatan,varchar,255,false,false,NULL,none,NULL,Jabatan/posisi di UPTD
-pangkat,Pangkat,varchar,100,false,false,NULL,none,NULL,Pangkat terakhir
-golongan,Golongan,varchar,10,false,false,NULL,none,NULL,Golongan ruang kepegawaian
-unit_kerja,Unit Kerja,varchar,255,false,false,UPTD,none,NULL,Unit kerja di UPTD
-status_kepegawaian,Status Kepegawaian,enum,NULL,true,false,aktif,none,"aktif,cuti,tugas_belajar,mutasi,pensiun,nonaktif",Status kepegawaian saat ini
-tanggal_masuk,Tanggal Masuk,date,NULL,false,false,NULL,none,NULL,Tanggal mulai bertugas di UPTD
-jenis_kegiatan,Jenis Kegiatan Kepegawaian,enum,NULL,false,false,NULL,none,"kenaikan_pangkat,mutasi,cuti,pelatihan,penilaian_kinerja,pemberhentian,pengangkatan",Jenis kegiatan kepegawaian
-nomor_sk,Nomor SK,varchar,100,false,false,NULL,none,NULL,Nomor Surat Keputusan terkait
-tanggal_sk,Tanggal SK,date,NULL,false,false,NULL,none,NULL,Tanggal Surat Keputusan
-catatan,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan kepegawaian
-is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,Flag data aktif
-is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Klasifikasi sensitivitas data
-created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID pembuat
-created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
-updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+nip,NIP,varchar,18,true,false,NULL,none,NULL,Nomor Induk Pegawai
+nama_pegawai,Nama Pegawai,varchar,255,true,false,NULL,none,NULL,Nama lengkap pegawai
+jabatan,Jabatan,varchar,255,true,false,NULL,none,NULL,Jabatan atau posisi pegawai
+golongan_ruang,Golongan/Ruang,varchar,10,false,false,NULL,none,"I/a,I/b,I/c,I/d,II/a,II/b,II/c,II/d,III/a,III/b,III/c,III/d,IV/a,IV/b,IV/c,IV/d",Golongan dan ruang pegawai
+jenis_kegiatan,Jenis Kegiatan,varchar,100,true,false,NULL,none,"Diklat,Mutasi,Kenaikan Pangkat,Pensiun,Cuti,Penilaian,Lainnya",Jenis kegiatan kepegawaian
+tanggal_kegiatan,Tanggal Kegiatan,date,NULL,true,false,NULL,none,NULL,Tanggal kegiatan kepegawaian
+nomor_sk,Nomor SK,varchar,100,false,false,NULL,none,NULL,Nomor SK terkait kegiatan
+keterangan_kegiatan,Keterangan Kegiatan,text,NULL,false,false,NULL,none,NULL,Deskripsi lengkap kegiatan
+status_kegiatan,Status Kegiatan,varchar,50,true,false,Proses,none,"Proses,Selesai,Ditolak",Status pelaksanaan kegiatan
+unit_kerja,Unit Kerja,varchar,255,false,false,NULL,none,NULL,Unit kerja pegawai
+diproses_oleh,Diproses Oleh,varchar,255,false,false,NULL,none,NULL,Nama petugas yang memproses
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Keterangan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

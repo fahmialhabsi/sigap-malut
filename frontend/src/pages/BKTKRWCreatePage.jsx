@@ -1,6 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function BKTKRWCreatePage() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function BKTKRWCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("❌ Session expired. Silakan login ulang.");
+        notifyError("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -61,11 +62,11 @@ export default function BKTKRWCreatePage() {
 
       await api.post("/bkt-krw", payload);
 
-      alert("✅ Data kerawanan berhasil dibuat!");
+      notifySuccess("Data kerawanan berhasil dibuat!");
       navigate("/module/bkt-krw");
     } catch (error) {
       console.error("Error:", error);
-      alert("❌ Error: " + (error.response?.data?.message || error.message));
+      notifyError("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

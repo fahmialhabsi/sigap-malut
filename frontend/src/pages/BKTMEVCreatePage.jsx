@@ -1,6 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function BKTMEVCreatePage() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function BKTMEVCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("Session expired. Silakan login ulang.");
+        notifyWarning("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -60,11 +61,11 @@ export default function BKTMEVCreatePage() {
 
       await api.post("/bkt-mev", payload);
 
-      alert("Data monev berhasil dibuat.");
+      notifyWarning("Data monev berhasil dibuat.");
       navigate("/module/bkt-mev");
     } catch (error) {
       console.error("Error:", error);
-      alert("Error: " + (error.response?.data?.message || error.message));
+      notifyWarning("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

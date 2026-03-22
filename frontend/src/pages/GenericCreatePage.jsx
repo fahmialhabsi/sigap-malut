@@ -1,8 +1,12 @@
-// ...existing code...
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import api from "../utils/api";
 import React from "react";
+import { notifySuccess, notifyError } from "../utils/notify";
+import { sanitizeObject } from "../utils/sanitize";
 
 export default function GenericCreatePage() {
   let { moduleId } = useParams();
@@ -11,11 +15,24 @@ export default function GenericCreatePage() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [moduleInfo, setModuleInfo] = useState(null);
   const [fields, setFields] = useState([]);
-  const [formData, setFormData] = useState({});
+
+  const normalizedModuleId = useMemo(
+    () => String(moduleId || "").toLowerCase(),
+    [moduleId],
+  );
+
+  // Bangun Zod schema secara dinamis dari field hasil API
+  const schema = useMemo(() => buildZodSchema(fields), [fields]);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
 
   const loadFormConfig = useCallback(async () => {
     setLoading(true);
@@ -35,7 +52,16 @@ export default function GenericCreatePage() {
       const editableFields = columns.filter((column) => {
         const name = String(column.name || "").toLowerCase();
         if (column.primaryKey) return false;
-        if (["id", "created_at", "updated_at", "deleted_at"].includes(name)) {
+        if (
+          [
+            "id",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "is_deleted",
+            "deleted_by",
+          ].includes(name)
+        ) {
           return false;
         }
         return true;
@@ -43,12 +69,6 @@ export default function GenericCreatePage() {
 
       setModuleInfo(moduleData);
       setFields(editableFields);
-      setFormData(
-        editableFields.reduce((accumulator, field) => {
-          accumulator[field.name] = "";
-          return accumulator;
-        }, {}),
-      );
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || "Gagal memuat form",
@@ -62,49 +82,43 @@ export default function GenericCreatePage() {
     loadFormConfig();
   }, [loadFormConfig]);
 
-  const normalizedModuleId = useMemo(
-    () => String(moduleId || "").toLowerCase(),
-    [moduleId],
-  );
+  // Reset form dengan nilai default setiap kali fields berubah
+  useEffect(() => {
+    if (fields.length) {
+      reset(
+        fields.reduce((acc, f) => {
+          acc[f.name] = "";
+          return acc;
+        }, {}),
+      );
+    }
+  }, [fields, reset]);
 
-  const handleChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const onSubmit = async (data) => {
     if (!moduleInfo?.tabel_name) return;
 
-    setSaving(true);
+    // Sanitasi semua nilai string sebelum kirim ke API
+    const sanitized = sanitizeObject(data);
+
+    // Normalisasi tipe numerik
+    const payload = fields.reduce((acc, field) => {
+      const val = sanitized[field.name];
+      if (val === "" || val === undefined) {
+        if (!field.allowNull) acc[field.name] = val;
+        return acc;
+      }
+      acc[field.name] = normalizeValueByType(val, field.type);
+      return acc;
+    }, {});
 
     try {
-      const payload = fields.reduce((accumulator, field) => {
-        const currentValue = formData[field.name];
-        if (currentValue === "") {
-          if (field.allowNull) return accumulator;
-          accumulator[field.name] = currentValue;
-          return accumulator;
-        }
-
-        accumulator[field.name] = normalizeValueByType(
-          currentValue,
-          field.type,
-        );
-        return accumulator;
-      }, {});
-
       await api.post(`/${moduleInfo.tabel_name}`, payload);
-      alert("✅ Data berhasil ditambahkan");
+      notifySuccess("Data berhasil ditambahkan");
       navigate(`/module/${normalizedModuleId}`);
     } catch (err) {
-      alert(
-        `❌ ${err.response?.data?.message || err.message || "Gagal menyimpan data"}`,
+      notifyError(
+        err.response?.data?.message || err.message || "Gagal menyimpan data",
       );
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -177,7 +191,7 @@ export default function GenericCreatePage() {
         Tabel: <span className="font-medium">{moduleInfo?.tabel_name}</span>
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {fields.map((field) => (
             <div key={field.name}>
@@ -185,10 +199,11 @@ export default function GenericCreatePage() {
                 {toLabel(field.name)}
                 {!field.allowNull && <span className="text-red-500"> *</span>}
               </label>
-              {renderInputField(
-                field,
-                formData[field.name] ?? "",
-                handleChange,
+              {renderInputField(field, register, errors)}
+              {errors[field.name] && (
+                <p className="mt-1 text-xs text-red-600" role="alert">
+                  {errors[field.name]?.message}
+                </p>
               )}
             </div>
           ))}
@@ -203,10 +218,10 @@ export default function GenericCreatePage() {
           </Link>
           <button
             type="submit"
-            disabled={saving}
+            disabled={isSubmitting}
             className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-60"
           >
-            {saving ? "Menyimpan..." : "Simpan"}
+            {isSubmitting ? "Menyimpan..." : "Simpan"}
           </button>
         </div>
       </form>
@@ -253,30 +268,80 @@ function normalizeValueByType(value, columnType = "") {
   return value;
 }
 
-function renderInputField(field, value, onChange) {
-  // Deklarasi hanya satu kali di awal
-  const commonClassName =
-    "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500";
-  const controlType = inputTypeFromColumnType(field.type);
+/**
+ * Bangun Zod schema secara dinamis dari daftar field yang dimuat dari API.
+ */
+function buildZodSchema(fields) {
+  const shape = {};
+  for (const field of fields) {
+    const isRequired = !field.allowNull;
+    const controlType = inputTypeFromColumnType(field.type);
+    const label = toLabel(field.name);
 
-  // Dropdown enum untuk Unit Kerja
+    if (controlType === "number") {
+      let s = z.coerce
+        .number({ invalid_type_error: `${label} harus berupa angka` })
+        .nonnegative({ message: `${label} tidak boleh negatif` });
+      shape[field.name] = isRequired ? s : s.optional();
+    } else {
+      let s = z.string();
+      if (isRequired) {
+        s = s.min(1, { message: `${label} wajib diisi` }).max(1000, {
+          message: `${label} maksimal 1000 karakter`,
+        });
+      } else {
+        s = s.optional().or(z.literal(""));
+      }
+      shape[field.name] = s;
+    }
+  }
+  return z.object(shape);
+}
+
+const UNIT_KERJA_OPTIONS = [
+  "Sekretariat",
+  "UPTD",
+  "Bidang Ketersediaan",
+  "Bidang Distribusi",
+  "Bidang Konsumsi",
+];
+
+const ROLE_OPTIONS = [
+  "super_admin",
+  "kepala_dinas",
+  "sekretaris",
+  "kepala_bidang",
+  "kepala_uptd",
+  "kasubbag",
+  "kasubbag_umum",
+  "kasubbag_kepegawaian",
+  "kasubbag_perencanaan",
+  "kasi_uptd",
+  "kasubbag_tu_uptd",
+  "kasi_mutu_uptd",
+  "kasi_teknis_uptd",
+  "fungsional",
+  "fungsional_perencana",
+  "fungsional_analis",
+  "pelaksana",
+  "guest",
+];
+
+const INPUT_CLASS =
+  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+/**
+ * Render input field yang terintegrasi dengan react-hook-form register.
+ */
+function renderInputField(field, register, errors) {
+  const hasError = !!errors[field.name];
+  const cls = `${INPUT_CLASS} ${hasError ? "border-red-400 bg-red-50" : ""}`;
+
   if (field.name === "unit_kerja") {
-    const unitKerjaOptions = [
-      "Sekretariat",
-      "UPTD",
-      "Bidang Ketersediaan",
-      "Bidang Distribusi",
-      "Bidang Konsumsi",
-    ];
     return (
-      <select
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-        className={commonClassName}
-        required={!field.allowNull}
-      >
+      <select {...register(field.name)} className={cls}>
         <option value="">-- Pilih Unit Kerja --</option>
-        {unitKerjaOptions.map((opt) => (
+        {UNIT_KERJA_OPTIONS.map((opt) => (
           <option key={opt} value={opt}>
             {opt}
           </option>
@@ -285,37 +350,11 @@ function renderInputField(field, value, onChange) {
     );
   }
 
-  // Dropdown enum untuk Role
   if (field.name === "role") {
-    const roleOptions = [
-      "super_admin",
-      "kepala_dinas",
-      "sekretaris",
-      "kepala_bidang",
-      "kepala_uptd",
-      "kasubbag",
-      "kasubbag_umum",
-      "kasubbag_kepegawaian",
-      "kasubbag_perencanaan",
-      "kasi_uptd",
-      "kasubbag_tu_uptd",
-      "kasi_mutu_uptd",
-      "kasi_teknis_uptd",
-      "fungsional",
-      "fungsional_perencana",
-      "fungsional_analis",
-      "pelaksana",
-      "guest",
-    ];
     return (
-      <select
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-        className={commonClassName}
-        required={!field.allowNull}
-      >
+      <select {...register(field.name)} className={cls}>
         <option value="">-- Pilih Role --</option>
-        {roleOptions.map((opt) => (
+        {ROLE_OPTIONS.map((opt) => (
           <option key={opt} value={opt}>
             {opt.replace(/_/g, " ")}
           </option>
@@ -323,53 +362,12 @@ function renderInputField(field, value, onChange) {
       </select>
     );
   }
-  // Hapus deklarasi ulang, sudah ada di atas
 
-  // Patch: Dropdown enum untuk Unit Kerja
-  if (field.name === "unit_kerja") {
-    const unitKerjaOptions = [
-      "Sekretariat",
-      "UPTD",
-      "Bidang Ketersediaan",
-      "Bidang Distribusi",
-      "Bidang Konsumsi",
-    ];
-    return (
-      <select
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-        className={commonClassName}
-        required={!field.allowNull}
-      >
-        <option value="">-- Pilih Unit Kerja --</option>
-        {unitKerjaOptions.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    );
-  }
+  const controlType = inputTypeFromColumnType(field.type);
 
   if (controlType === "textarea") {
-    return (
-      <textarea
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-        className={commonClassName}
-        rows={4}
-        required={!field.allowNull}
-      />
-    );
+    return <textarea {...register(field.name)} className={cls} rows={4} />;
   }
 
-  return (
-    <input
-      type={controlType}
-      value={value}
-      onChange={(event) => onChange(field.name, event.target.value)}
-      className={commonClassName}
-      required={!field.allowNull}
-    />
-  );
+  return <input type={controlType} {...register(field.name)} className={cls} />;
 }

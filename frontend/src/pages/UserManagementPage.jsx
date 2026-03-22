@@ -2,8 +2,15 @@ import React, { useState, useEffect } from "react";
 import useAuthStore from "../stores/authStore";
 import { roleNameToId } from "../utils/roleMap";
 import unitNameToId from "../utils/unitMap";
-import { FaUserEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
+import {
+  PencilSquareIcon,
+  TrashIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import { Navigate } from "react-router-dom";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
+import { sanitize } from "../utils/sanitize";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -25,6 +32,8 @@ export default function UserManagementPage() {
   const [userList, setUserList] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -92,7 +101,6 @@ export default function UserManagementPage() {
     { Header: "ID", accessor: "id" },
     { Header: "Username", accessor: "username" },
     { Header: "Email", accessor: "email" },
-    { Header: "Password", accessor: "password" },
     { Header: "Nama Lengkap", accessor: "nama_lengkap" },
     { Header: "Role", accessor: "role" },
     { Header: "Unit Kerja", accessor: "unit_kerja" },
@@ -101,34 +109,43 @@ export default function UserManagementPage() {
     { Header: "Aksi", accessor: "aksi" },
   ];
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Yakin ingin menghapus user ini?")) {
-      const token = localStorage.getItem("token");
-      try {
-        const res = await fetch(`/api/auth/users/${id}`, {
-          method: "DELETE",
+  const handleDelete = (id) => {
+    setDeleteTargetId(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const id = deleteTargetId;
+    setDeleteLoading(true);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`/api/auth/users/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        const resUsers = await fetch("/api/auth/users", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        if (data.success) {
-          // Refresh user list dari backend
-          const resUsers = await fetch("/api/auth/users", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const usersData = await resUsers.json();
-          setUserList(usersData.data || []);
-        } else {
-          alert(data.message || "Gagal menghapus user");
-        }
-      } catch {
-        alert("Terjadi error saat menghapus user");
+        const usersData = await resUsers.json();
+        setUserList(usersData.data || []);
+        notifySuccess("User berhasil dihapus");
+      } else {
+        notifyError(data.message || "Gagal menghapus user");
       }
+    } catch {
+      notifyError("Terjadi error saat menghapus user");
+    } finally {
+      setDeleteLoading(false);
+      setDeleteTargetId(null);
     }
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    // Sanitasi input kecuali password
+    const safeValue = name === "password" ? value : sanitize(value);
+    setForm((prev) => ({ ...prev, [name]: safeValue }));
   };
 
   // Handler submit form
@@ -145,11 +162,11 @@ export default function UserManagementPage() {
 
       // Basic client-side validation
       if (!derivedUnit) {
-        alert("Silakan pilih Unit Kerja");
+        notifyWarning("Silakan pilih Unit Kerja");
         return;
       }
       if (!editUser && !form.password) {
-        alert("Password wajib diisi untuk user baru");
+        notifyWarning("Password wajib diisi untuk user baru");
         return;
       }
       let res;
@@ -193,18 +210,20 @@ export default function UserManagementPage() {
       const data = await res.json();
       if (data.success) {
         setShowModal(false);
-        // Refresh user list and inject plaintext password for the newly created user
         const resUsers = await fetch("/api/auth/users", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const usersData = await resUsers.json();
         const users = usersData.data || [];
         setUserList(users);
+        notifySuccess(
+          editUser ? "User berhasil diperbarui" : "User berhasil ditambahkan",
+        );
       } else {
-        alert(data.message || "Gagal menyimpan user");
+        notifyError(data.message || "Gagal menyimpan user");
       }
     } catch {
-      alert("Terjadi error saat menyimpan user");
+      notifyError("Terjadi error saat menyimpan user");
     }
   };
 
@@ -369,8 +388,6 @@ export default function UserManagementPage() {
 
   const dataWithActions = userList.map((u) => ({
     ...u,
-    // password may not be returned from API; keep empty unless we injected it after create
-    password: u.password || "",
     aksi: (
       <React.Fragment>
         <div className="flex gap-2 justify-center">
@@ -379,14 +396,14 @@ export default function UserManagementPage() {
             title="Edit User"
             onClick={() => handleEdit(u)}
           >
-            <FaUserEdit /> Edit
+            <PencilSquareIcon className="w-4 h-4" /> Edit
           </button>
           <button
             className="flex items-center gap-1 px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow transition"
             title="Hapus User"
             onClick={() => handleDelete(u.id)}
           >
-            <FaTrashAlt /> Hapus
+            <TrashIcon className="w-4 h-4" /> Hapus
           </button>
         </div>
       </React.Fragment>
@@ -403,7 +420,7 @@ export default function UserManagementPage() {
           className="absolute right-6 top-6 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold shadow transition text-sm"
           onClick={handleAdd}
         >
-          <FaPlus /> Tambah User
+          <PlusIcon className="w-4 h-4" /> Tambah User
         </button>
         <div className="overflow-x-auto mt-2">
           <table className="min-w-full border rounded-xl text-sm">
@@ -455,6 +472,15 @@ export default function UserManagementPage() {
           </table>
         </div>
         {showModal && renderModal()}
+        <ConfirmModal
+          isOpen={deleteTargetId !== null}
+          title="Hapus User"
+          message="Yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan."
+          confirmLabel="Hapus"
+          loading={deleteLoading}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setDeleteTargetId(null)}
+        />
       </div>
     </div>
   );

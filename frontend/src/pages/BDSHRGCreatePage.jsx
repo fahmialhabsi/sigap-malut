@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function BDSHRGCreatePage() {
   const navigate = useNavigate();
@@ -111,7 +112,7 @@ export default function BDSHRGCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("❌ Session expired. Silakan login ulang.");
+        notifyError("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -181,11 +182,11 @@ export default function BDSHRGCreatePage() {
 
       await api.post("/bds-hrg", payload);
 
-      alert("✅ Data harga berhasil disimpan!");
+      notifySuccess("Data harga berhasil disimpan!");
       navigate("/module/bds-hrg");
     } catch (error) {
       console.error("Error:", error);
-      alert("❌ Error: " + (error.response?.data?.message || error.message));
+      notifyError("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

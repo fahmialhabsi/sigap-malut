@@ -1,9 +1,420 @@
 {
+  "_comment": "SIGAP MALUT — Authoritative RBAC Permission Matrix (dokumenSistem/09-Role-Module-Matrix.md). Format: module:action",
   "roles": {
-    "superadmin": { "permissions": ["*"] },
-    "sekretaris": { "permissions": ["layanan:kgb:create","layanan:kgb:read","layanan:kgb:approve"] },
-    "kepala_bidang": { "permissions": ["layanan:stok:create","layanan:stok:read","layanan:stok:approve"] },
-    "staf": { "permissions": ["layanan:kgb:create","layanan:kgb:read"] },
-    "pelaksana": { "permissions": ["layanan:stok:create","layanan:stok:read"] }
+    "super_admin": {
+      "permissions": ["*"],
+      "sensitiveFields": ["*"]
+    },
+    "kepala_dinas": {
+      "permissions": [
+        "dashboard:read",
+        "dashboard:sekretaris:read",
+        "sek-keu:read",
+        "sek-kep:read",
+        "sek-hum:read",
+        "sek-ast:read",
+        "sek-ren:read",
+        "sek-rmh:read",
+        "bds-hrg:read",
+        "bds-mon:read",
+        "bds-lap:read",
+        "bkt-pgd:read",
+        "bkt-fsl:read",
+        "bks-evl:read",
+        "bks-lap:read",
+        "komoditas:read",
+        "stok:read",
+        "inflasi:read",
+        "inflasi:latest:read",
+        "approval:read",
+        "approval:finalize",
+        "audit-log:read",
+        "kgb:read"
+      ],
+      "sensitiveFields": ["gaji_pokok", "tunjangan", "total_anggaran", "nip"]
+    },
+    "sekretaris": {
+      "permissions": [
+        "dashboard:read",
+        "dashboard:sekretaris:read",
+        "sek-keu:read",
+        "sek-keu:create",
+        "sek-keu:update",
+        "sek-keu:delete",
+        "sek-keu:approve",
+        "sek-kep:read",
+        "sek-kep:create",
+        "sek-kep:update",
+        "sek-kep:delete",
+        "sek-kep:approve",
+        "sek-hum:read",
+        "sek-hum:create",
+        "sek-hum:update",
+        "sek-hum:delete",
+        "sek-ast:read",
+        "sek-ast:create",
+        "sek-ast:update",
+        "sek-ren:read",
+        "sek-ren:create",
+        "sek-ren:update",
+        "sek-rmh:read",
+        "sek-rmh:create",
+        "sek-rmh:update",
+        "bds-hrg:read",
+        "bds-mon:read",
+        "bds-lap:read",
+        "bkt-pgd:read",
+        "bkt-fsl:read",
+        "bks-evl:read",
+        "bks-lap:read",
+        "komoditas:read",
+        "stok:read",
+        "inflasi:read",
+        "inflasi:latest:read",
+        "approval:read",
+        "approval:create",
+        "approval:approve",
+        "audit-log:read",
+        "kgb:read",
+        "kgb:create",
+        "kgb:update",
+        "kgb:delete",
+        "kgb:approve",
+        "kgb:finalize"
+      ],
+      "sensitiveFields": ["gaji_pokok", "tunjangan", "total_anggaran", "nip"]
+    },
+    "kepala_bidang": {
+      "permissions": [
+        "dashboard:read",
+        "bds-hrg:read",
+        "bds-hrg:create",
+        "bds-hrg:update",
+        "bds-hrg:delete",
+        "bds-hrg:approve",
+        "bds-mon:read",
+        "bds-mon:create",
+        "bds-mon:update",
+        "bds-mon:delete",
+        "bds-mon:approve",
+        "bds-lap:read",
+        "bds-lap:create",
+        "bds-lap:approve",
+        "bds-evl:read",
+        "bds-evl:create",
+        "bds-evl:approve",
+        "bks-evl:read",
+        "bks-evl:create",
+        "bks-evl:update",
+        "bks-evl:approve",
+        "bks-lap:read",
+        "bks-lap:create",
+        "bks-lap:approve",
+        "bkt-pgd:read",
+        "bkt-pgd:create",
+        "bkt-pgd:update",
+        "bkt-pgd:approve",
+        "bkt-fsl:read",
+        "bkt-fsl:create",
+        "bkt-fsl:approve",
+        "komoditas:read",
+        "komoditas:create",
+        "komoditas:update",
+        "stok:read",
+        "stok:create",
+        "stok:update",
+        "inflasi:read",
+        "inflasi:latest:read",
+        "approval:read",
+        "approval:create",
+        "approval:approve"
+      ],
+      "sensitiveFields": []
+    },
+    "kepala_bidang_distribusi": {
+      "permissions": [
+        "dashboard:read",
+        "bds-hrg:read",
+        "bds-hrg:create",
+        "bds-hrg:update",
+        "bds-hrg:delete",
+        "bds-hrg:approve",
+        "bds-mon:read",
+        "bds-mon:create",
+        "bds-mon:update",
+        "bds-mon:delete",
+        "bds-mon:approve",
+        "bds-lap:read",
+        "bds-lap:create",
+        "bds-lap:approve",
+        "komoditas:read",
+        "komoditas:create",
+        "komoditas:update",
+        "stok:read",
+        "stok:create",
+        "stok:update",
+        "inflasi:read",
+        "inflasi:latest:read",
+        "approval:read",
+        "approval:create",
+        "approval:approve"
+      ],
+      "sensitiveFields": []
+    },
+    "kepala_uptd": {
+      "permissions": [
+        "dashboard:read",
+        "upt-adm:read",
+        "upt-adm:create",
+        "upt-adm:update",
+        "upt-adm:delete",
+        "upt-adm:approve",
+        "upt-ast:read",
+        "upt-ast:create",
+        "upt-ast:update",
+        "upt-ast:approve",
+        "upt-ins:read",
+        "upt-ins:create",
+        "upt-ins:update",
+        "upt-ins:approve",
+        "upt-kep:read",
+        "upt-kep:create",
+        "upt-kep:update",
+        "upt-kep:approve",
+        "upt-keu:read",
+        "upt-keu:create",
+        "upt-keu:update",
+        "upt-keu:approve",
+        "upt-mtu:read",
+        "upt-mtu:create",
+        "upt-mtu:update",
+        "upt-mtu:approve",
+        "upt-tkn:read",
+        "upt-tkn:create",
+        "upt-tkn:update",
+        "upt-tkn:approve",
+        "komoditas:read",
+        "stok:read",
+        "approval:read",
+        "approval:create",
+        "approval:approve"
+      ],
+      "sensitiveFields": []
+    },
+    "bendahara": {
+      "permissions": [
+        "sek-keu:read",
+        "sek-keu:create",
+        "sek-keu:update",
+        "sek-keu:delete",
+        "upt-keu:read",
+        "upt-keu:create",
+        "upt-keu:update",
+        "approval:read",
+        "approval:create"
+      ],
+      "sensitiveFields": [
+        "gaji_pokok",
+        "tunjangan",
+        "total_anggaran",
+        "nip",
+        "jumlah_spj",
+        "pagu_anggaran"
+      ]
+    },
+    "kasubbag": {
+      "permissions": [
+        "sek-kep:read",
+        "sek-kep:create",
+        "sek-kep:update",
+        "sek-hum:read",
+        "sek-hum:create",
+        "sek-ast:read",
+        "sek-ast:create",
+        "sek-ast:update",
+        "kgb:read",
+        "kgb:create",
+        "kgb:update",
+        "approval:read",
+        "approval:create"
+      ],
+      "sensitiveFields": ["nip"]
+    },
+    "kasubbag_umum": {
+      "permissions": [
+        "sek-hum:read",
+        "sek-hum:create",
+        "sek-hum:update",
+        "sek-rmh:read",
+        "sek-rmh:create",
+        "sek-rmh:update",
+        "sek-ast:read",
+        "sek-ast:create",
+        "sek-ast:update",
+        "approval:read",
+        "approval:create"
+      ],
+      "sensitiveFields": []
+    },
+    "kasubbag_kepegawaian": {
+      "permissions": [
+        "sek-kep:read",
+        "sek-kep:create",
+        "sek-kep:update",
+        "kgb:read",
+        "kgb:create",
+        "kgb:update",
+        "approval:read",
+        "approval:create"
+      ],
+      "sensitiveFields": ["nip"]
+    },
+    "kasubbag_perencanaan": {
+      "permissions": [
+        "sek-ren:read",
+        "sek-ren:create",
+        "sek-ren:update",
+        "bds-lap:read",
+        "bks-lap:read",
+        "bkt-fsl:read",
+        "dashboard:read",
+        "inflasi:read",
+        "komoditas:read",
+        "stok:read"
+      ],
+      "sensitiveFields": []
+    },
+    "fungsional": {
+      "permissions": [
+        "bds-hrg:read",
+        "bds-hrg:create",
+        "bds-hrg:update",
+        "bds-mon:read",
+        "bds-mon:create",
+        "bds-mon:update",
+        "bds-evl:read",
+        "bds-evl:create",
+        "bks-evl:read",
+        "bks-evl:create",
+        "bkt-pgd:read",
+        "bkt-pgd:create",
+        "bkt-fsl:read",
+        "bkt-fsl:create",
+        "komoditas:read",
+        "stok:read",
+        "inflasi:read"
+      ],
+      "sensitiveFields": []
+    },
+    "fungsional_analis": {
+      "permissions": [
+        "bds-hrg:read",
+        "bds-hrg:create",
+        "bds-hrg:update",
+        "bds-mon:read",
+        "bds-mon:create",
+        "bds-evl:read",
+        "bds-evl:create",
+        "komoditas:read",
+        "stok:read",
+        "inflasi:read",
+        "inflasi:latest:read",
+        "dashboard:read"
+      ],
+      "sensitiveFields": []
+    },
+    "staf_pelaksana": {
+      "permissions": [
+        "sek-kep:read",
+        "sek-kep:create",
+        "sek-hum:read",
+        "sek-hum:create",
+        "kgb:read",
+        "kgb:create"
+      ],
+      "sensitiveFields": []
+    },
+    "pelaksana": {
+      "permissions": [
+        "sek-kep:read",
+        "sek-kep:create",
+        "bds-hrg:read",
+        "bds-hrg:create",
+        "bds-mon:read",
+        "bds-mon:create",
+        "bkt-pgd:read",
+        "bkt-pgd:create",
+        "komoditas:read",
+        "stok:read"
+      ],
+      "sensitiveFields": []
+    },
+    "gubernur": {
+      "permissions": [
+        "dashboard:read",
+        "inflasi:read",
+        "inflasi:latest:read",
+        "komoditas:read",
+        "stok:read",
+        "bds-lap:read",
+        "bks-lap:read",
+        "audit-log:read"
+      ],
+      "sensitiveFields": []
+    },
+    "guest": {
+      "permissions": [],
+      "sensitiveFields": []
+    }
+  },
+  "fieldMasks": {
+    "sek-keu": {
+      "sensitiveFields": [
+        "gaji_pokok",
+        "tunjangan_jabatan",
+        "tunjangan_kinerja",
+        "total_anggaran",
+        "pagu_anggaran",
+        "realisasi_anggaran"
+      ],
+      "allowedRoles": ["super_admin", "kepala_dinas", "sekretaris", "bendahara"]
+    },
+    "sek-kep": {
+      "sensitiveFields": [
+        "nip",
+        "gaji_pokok",
+        "pangkat_golongan",
+        "jenis_kelamin",
+        "tanggal_lahir"
+      ],
+      "allowedRoles": [
+        "super_admin",
+        "kepala_dinas",
+        "sekretaris",
+        "kasubbag",
+        "kasubbag_kepegawaian"
+      ]
+    },
+    "kgb": {
+      "sensitiveFields": ["nip", "gaji_pokok", "kenaikan_gaji"],
+      "allowedRoles": [
+        "super_admin",
+        "kepala_dinas",
+        "sekretaris",
+        "kasubbag",
+        "kasubbag_kepegawaian",
+        "bendahara"
+      ]
+    },
+    "upt-keu": {
+      "sensitiveFields": ["gaji_pokok", "tunjangan_jabatan", "pagu_anggaran"],
+      "allowedRoles": [
+        "super_admin",
+        "kepala_dinas",
+        "sekretaris",
+        "bendahara",
+        "kepala_uptd"
+      ]
+    }
   }
 }

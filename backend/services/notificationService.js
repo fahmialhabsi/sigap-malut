@@ -1,7 +1,8 @@
 // notificationService.js
-// Service untuk mengirim notifikasi webhook (Slack/email)
+// Service untuk mengirim notifikasi webhook (Slack/email) dan DB in-app
 
 import axios from "axios";
+import Notification from "../models/Notification.js";
 
 export async function sendSlackNotification(message) {
   const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
@@ -15,6 +16,29 @@ export async function sendSlackNotification(message) {
 
 export async function sendEmailNotification(subject, body) {
   // Implementasi email bisa menggunakan nodemailer atau service lain
-  // Contoh placeholder:
   console.log("Email notification:", subject, body);
+}
+
+/** Buat notifikasi in-app yang disimpan di DB */
+export async function createNotification(
+  targetUserId,
+  taskId,
+  message,
+  link = null,
+) {
+  if (!targetUserId) return null;
+  return Notification.create({
+    target_user_id: targetUserId,
+    task_id: taskId,
+    message,
+    link,
+    channel: "in_app",
+  }).catch(() => null);
+}
+
+/** Hitung notifikasi belum dibaca milik user */
+export async function getUnreadCount(userId) {
+  return Notification.count({
+    where: { target_user_id: userId, seen: false },
+  }).catch(() => 0);
 }

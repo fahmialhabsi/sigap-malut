@@ -1,18 +1,15 @@
 field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
 id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
-nomor_transaksi,Nomor Transaksi,varchar,100,true,true,NULL,none,NULL,Nomor unik transaksi keuangan
-jenis_anggaran,Jenis Anggaran,enum,NULL,true,false,NULL,none,"belanja_pegawai,belanja_barang,belanja_modal,pendapatan_pnbp,dana_operasional",Jenis anggaran/pos keuangan
-uraian,Uraian Kegiatan,varchar,500,true,false,NULL,none,NULL,Uraian kegiatan atau transaksi
-kode_akun,Kode Akun,varchar,20,false,false,NULL,none,NULL,Kode akun anggaran APBD
-nominal,Nominal,decimal,"16,2",true,false,0,none,NULL,Jumlah nominal keuangan (Rupiah)
-sumber_dana,Sumber Dana,enum,NULL,true,false,NULL,none,"APBD,APBN,BLU,PNBP,Hibah",Sumber dana anggaran
-tahun_anggaran,Tahun Anggaran,year,4,true,false,NULL,none,NULL,Tahun anggaran berjalan
-tanggal_transaksi,Tanggal Transaksi,date,NULL,true,false,NULL,none,NULL,Tanggal terjadinya transaksi
-status_realisasi,Status Realisasi,enum,NULL,true,false,pengajuan,none,"pengajuan,disetujui,proses_pencairan,selesai,ditolak",Status realisasi anggaran
-dokumen_pendukung,Dokumen Pendukung,varchar,500,false,false,NULL,none,NULL,Path file dokumen pendukung keuangan
-catatan,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan
-is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,Flag data aktif
-is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Klasifikasi sensitivitas data
-created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID pembuat
-created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
-updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+kode_akun,Kode Akun,varchar,20,true,false,NULL,none,NULL,Kode akun anggaran
+uraian_kegiatan,Uraian Kegiatan,varchar,500,true,false,NULL,none,NULL,Uraian kegiatan atau pos belanja
+jenis_anggaran,Jenis Anggaran,varchar,50,true,false,NULL,none,"Belanja Operasional,Belanja Modal,Belanja Pegawai",Jenis pos anggaran
+pagu_anggaran,Pagu Anggaran,decimal,15,true,false,0,none,NULL,Jumlah pagu anggaran (Rp)
+realisasi,Realisasi,decimal,15,false,false,0,none,NULL,Jumlah realisasi anggaran (Rp)
+sisa_anggaran,Sisa Anggaran,decimal,15,false,false,0,none,NULL,Sisa anggaran (Rp)
+tanggal_transaksi,Tanggal Transaksi,date,NULL,true,false,NULL,none,NULL,Tanggal transaksi keuangan
+nomor_sp2d,Nomor SP2D,varchar,50,false,false,NULL,none,NULL,Nomor SP2D atau nomor bukti
+sumber_dana,Sumber Dana,varchar,100,false,false,NULL,none,"APBD,APBN,DAK,Lainnya",Sumber dana kegiatan
+status_pencairan,Status Pencairan,varchar,50,true,false,Proses,none,"Proses,Cair,Ditolak,Selesai",Status pencairan anggaran
+penanggung_jawab,Penanggung Jawab,varchar,255,false,false,NULL,none,NULL,Nama penanggung jawab anggaran
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Keterangan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

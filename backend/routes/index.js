@@ -61,6 +61,7 @@ import caseRoutes from "./case.js";
 import chatbotRoutes from "./chatbot.js";
 import commentRoutes from "./comment.js";
 import complianceRoutes from "./compliance.js";
+import dataRoutes from "./data.js";
 import dataIntegrationLogRoutes from "./dataIntegrationLog.js";
 import integrationLogRoutes from "./integrationLog.js";
 import integrationLogControllerRoutes from "./integrationLogController.js";
@@ -171,6 +172,7 @@ export default function registerRoutes(app) {
   app.use("/api/chatbot", chatbotRoutes);
   app.use("/api/comment", commentRoutes);
   app.use("/api/compliance", complianceRoutes);
+  app.use("/api/data", dataRoutes);
   app.use("/api/dataintegrationlog", dataIntegrationLogRoutes);
   app.use("/api/integrationlog", integrationLogRoutes);
   app.use("/api/integrationlogcontroller", integrationLogControllerRoutes);

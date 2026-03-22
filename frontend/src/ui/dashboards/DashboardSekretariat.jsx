@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import useAuthStore from "../../stores/authStore";
 import FieldMappingPreview from "../../components/FieldMappingPreview";
 import { Navigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import { roleIdToName } from "../../utils/roleMap";
 import DashboardSekretariatLayout from "../../layouts/DashboardSekretariatLayout";
 import sekretariatModules from "../../data/sekretariatModules";
+import api from "../../utils/api";
 
 function normalizeRoleName(user) {
   return (
@@ -17,19 +18,17 @@ function normalizeRoleName(user) {
   );
 }
 
-// Data dummy (bisa diganti API)
-const kpiData = [
-  {
-    label: "Compliance Koordinasi",
-    value: "98%",
-    info: "Koordinasi lintas bidang",
-  },
-  { label: "Dokumen Masuk", value: 120, info: "Bulan ini" },
-  { label: "Alert Data", value: 3, info: "Perlu validasi" },
-  { label: "Audit Log", value: 250, info: "Aksi tercatat" },
-];
+// Fallback bila API belum tersedia
+const FALLBACK_KPI = {
+  complianceAlurKoordinasi: null,
+  zeroBypassViolations30d: null,
+  totalTransaksi30d: null,
+  avgApprovalTimeHours: null,
+  konsistensiDataKomoditas: null,
+  inflasiPangan: null,
+};
 
-const alertData = [
+const FALLBACK_ALERTS = [
   {
     type: "warning",
     message: "3 data keuangan belum valid",
@@ -331,8 +330,57 @@ function OpenDataPortal() {
 export default function DashboardSekretariat() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
+  const [kpi, setKpi] = useState(FALLBACK_KPI);
+  const [alertData, setAlertData] = useState(FALLBACK_ALERTS);
+  const [kpiLoading, setKpiLoading] = useState(false);
 
-  React.useEffect(() => {
+  const fetchKPIs = useCallback(async () => {
+    setKpiLoading(true);
+    try {
+      const res = await api.get("/dashboard/sekretaris/summary");
+      const d = res.data?.data;
+      if (d) {
+        setKpi(d);
+        // Generate alert items from live KPI data
+        const liveAlerts = [];
+        if (d.zeroBypassViolations30d > 0) {
+          liveAlerts.push({
+            type: "danger",
+            message: `${d.zeroBypassViolations30d} bypass alur terdeteksi dalam 30 hari`,
+            time: "Data real-time",
+          });
+        }
+        if (
+          d.konsistensiDataKomoditas !== null &&
+          d.konsistensiDataKomoditas < 80
+        ) {
+          liveAlerts.push({
+            type: "warning",
+            message: `Konsistensi komoditas ${d.konsistensiDataKomoditas}% — di bawah target 80%`,
+            time: "Bulan ini",
+          });
+        }
+        if (d.inflasiPangan !== null && d.inflasiPangan > 3) {
+          liveAlerts.push({
+            type: "danger",
+            message: `Inflasi pangan ${d.inflasiPangan}% — melampaui batas 3%`,
+            time: "Bulan ini",
+          });
+        }
+        if (liveAlerts.length > 0) setAlertData(liveAlerts);
+      }
+    } catch {
+      // silently fallback — dummy data already in state
+    } finally {
+      setKpiLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchKPIs();
+  }, [fetchKPIs]);
+
+  useEffect(() => {
     if (user) {
       workflowStatusUpdateAPI({
         user,
@@ -393,28 +441,57 @@ export default function DashboardSekretariat() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <HeroCard
-            title={kpiData[0].label}
-            value={kpiData[0].value}
-            info={kpiData[0].info}
+            title="Compliance Koordinasi"
+            value={
+              kpi.complianceAlurKoordinasi !== null
+                ? `${kpi.complianceAlurKoordinasi}%`
+                : kpiLoading
+                  ? "..."
+                  : "—"
+            }
+            info={`${kpi.totalTransaksi30d ?? "—"} transaksi 30 hari`}
             accent="blue"
           />
           <HeroCard
-            title={kpiData[1].label}
-            value={kpiData[1].value}
-            info={kpiData[1].info}
-            accent="emerald"
+            title="Zero Bypass (30h)"
+            value={
+              kpi.zeroBypassViolations30d !== null
+                ? kpi.zeroBypassViolations30d
+                : kpiLoading
+                  ? "..."
+                  : "—"
+            }
+            info="Jumlah bypass alur terdeteksi"
+            accent={kpi.zeroBypassViolations30d > 0 ? "red" : "emerald"}
           />
           <HeroCard
-            title={kpiData[2].label}
-            value={kpiData[2].value}
-            info={kpiData[2].info}
+            title="Avg. Waktu Approval"
+            value={
+              kpi.avgApprovalTimeHours !== null
+                ? `${kpi.avgApprovalTimeHours}j`
+                : kpiLoading
+                  ? "..."
+                  : "—"
+            }
+            info="Rata-rata jam selesai persetujuan"
             accent="amber"
           />
           <HeroCard
-            title={kpiData[3].label}
-            value={kpiData[3].value}
-            info={kpiData[3].info}
-            accent="red"
+            title="Konsistensi Komoditas"
+            value={
+              kpi.konsistensiDataKomoditas !== null
+                ? `${kpi.konsistensiDataKomoditas}%`
+                : kpiLoading
+                  ? "..."
+                  : "—"
+            }
+            info={`${kpi.komoditasVerified ?? "—"}/${kpi.komoditasTotal ?? "—"} komoditas verified`}
+            accent={
+              kpi.konsistensiDataKomoditas !== null &&
+              kpi.konsistensiDataKomoditas < 80
+                ? "red"
+                : "emerald"
+            }
           />
         </div>
 

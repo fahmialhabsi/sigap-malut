@@ -1,21 +1,17 @@
 field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
 id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
-nomor_inspeksi,Nomor Inspeksi,varchar,50,true,true,NULL,none,NULL,Nomor unik kegiatan inspeksi/pengawasan
-nama_pelaku_usaha,Nama Pelaku Usaha,varchar,255,true,false,NULL,none,NULL,Nama pelaku usaha/unit yang diinspeksi
-alamat_pelaku_usaha,Alamat Pelaku Usaha,text,NULL,false,false,NULL,none,NULL,Alamat lengkap pelaku usaha
-jenis_pangan,Jenis Pangan/Komoditas,enum,NULL,true,false,NULL,none,"pangan_segar,pangan_olahan,pangan_siap_saji,bahan_tambahan_pangan,pangan_impor,air_minum",Jenis pangan yang menjadi objek inspeksi
-lokasi_inspeksi,Lokasi Inspeksi,varchar,500,true,false,NULL,none,NULL,Lokasi/tempat dilakukannya inspeksi
-tanggal_inspeksi,Tanggal Inspeksi,date,NULL,true,false,NULL,none,NULL,Tanggal pelaksanaan inspeksi/pengawasan
-jenis_inspeksi,Jenis Inspeksi,enum,NULL,true,false,NULL,none,"inspeksi_rutin,inspeksi_mendadak,audit_sertifikasi,pengambilan_sampel,audit_ulang,tindak_lanjut",Jenis kegiatan inspeksi atau pengawasan
-hasil_inspeksi,Hasil Inspeksi,enum,NULL,false,false,NULL,none,"memenuhi_syarat,tidak_memenuhi_syarat,perlu_tindak_lanjut,dalam_proses",Hasil penilaian inspeksi
-status_compliance,Status Kepatuhan,enum,NULL,false,false,NULL,none,"patuh,tidak_patuh,sebagian_patuh",Status kepatuhan pelaku usaha
-temuan,Temuan,text,NULL,false,false,NULL,none,NULL,Uraian temuan selama inspeksi
-rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi perbaikan yang diberikan
-tindak_lanjut,Tindak Lanjut,text,NULL,false,false,NULL,none,NULL,Tindak lanjut yang sudah atau akan dilakukan
-petugas_inspeksi,Petugas Inspeksi,varchar,255,false,false,NULL,none,NULL,Nama petugas/inspektor yang bertugas
-catatan,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan
-is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,Flag data aktif
-is_sensitive,Tingkat Sensitivitas,enum,NULL,true,false,Sensitif,none,"Biasa,Sensitif",Klasifikasi sensitivitas data
-created_by,Dibuat Oleh,int,11,true,false,NULL,none,NULL,User ID pembuat
-created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
-updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
+nomor_inspeksi,Nomor Inspeksi,varchar,50,true,true,NULL,none,NULL,Nomor unik kegiatan inspeksi
+tanggal_inspeksi,Tanggal Inspeksi,date,NULL,true,false,NULL,none,NULL,Tanggal pelaksanaan inspeksi
+jenis_inspeksi,Jenis Inspeksi,varchar,100,true,false,NULL,none,"Inspeksi Rutin,Inspeksi Mendadak,Inspeksi Khusus,Tindak Lanjut",Jenis kegiatan inspeksi/pengawasan
+objek_inspeksi,Objek Inspeksi,varchar,255,true,false,NULL,none,NULL,Objek atau lokasi yang diinspeksi
+alamat_objek,Alamat Objek,text,NULL,false,false,NULL,none,NULL,Alamat lengkap objek inspeksi
+komoditas,Komoditas,varchar,255,false,false,NULL,none,NULL,Komoditas yang menjadi objek inspeksi
+nama_petugas,Nama Petugas,varchar,255,true,false,NULL,none,NULL,Nama petugas pelaksana inspeksi
+nip_petugas,NIP Petugas,varchar,18,false,false,NULL,none,NULL,NIP petugas pelaksana
+hasil_inspeksi,Hasil Inspeksi,varchar,50,true,false,NULL,none,"Sesuai,Tidak Sesuai,Perlu Perbaikan,Ditangguhkan",Hasil temuan inspeksi
+temuan,Temuan,text,NULL,false,false,NULL,none,NULL,Uraian temuan atau ketidaksesuaian
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi tindak lanjut
+batas_tindaklanjut,Batas Tindak Lanjut,date,NULL,false,false,NULL,none,NULL,Batas waktu tindak lanjut rekomendasi
+status_tindaklanjut,Status Tindak Lanjut,varchar,50,true,false,Belum,none,"Belum,Dalam Proses,Selesai",Status penyelesaian tindak lanjut
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Keterangan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

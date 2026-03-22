@@ -2,6 +2,8 @@
 
 import React, { useEffect, Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import AlertsToast from "./components/realtime/AlertsToast";
 
 import ReportingWorkflowPage from "./pages/ReportingWorkflowPage";
 import CommentWorkflowPage from "./pages/CommentWorkflowPage";
@@ -23,6 +25,11 @@ import DashboardKetersediaan from "./ui/dashboards/DashboardKetersediaan";
 import DashboardDistribusi from "./ui/dashboards/DashboardDistribusi";
 import DashboardKonsumsi from "./ui/dashboards/DashboardKonsumsi";
 import DashboardUPTD from "./ui/dashboards/DashboardUPTD";
+import DashboardGubernur from "./ui/dashboards/DashboardGubernur";
+import DashboardInflasi from "./ui/dashboards/DashboardInflasi";
+import DashboardKepegawaian from "./ui/dashboards/DashboardKepegawaian";
+import DashboardKeuangan from "./ui/dashboards/DashboardKeuangan";
+import DashboardKomoditas from "./ui/dashboards/DashboardKomoditas";
 import LandingPage from "./pages/LandingPage";
 import DashboardSuperAdmin from "./ui/dashboards/DashboardSuperAdmin";
 import MasterDataSyncPanel from "./components/MasterDataSyncPanel.jsx";
@@ -31,6 +38,13 @@ import AuditTrailPage from "./pages/AuditTrailPage";
 import WorkflowStatusPage from "./pages/WorkflowStatusPage";
 import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
 import BksModulePage from "./pages/bidangKonsumsi/BksModulePage";
+import SekretariatTasksPage from "./pages/SekretariatTasksPage";
+import LaporanMendagriPage from "./pages/LaporanMendagriPage";
+import useIdleLogout from "./hooks/useIdleLogout";
+const SelfServiceAnalyticsPage = lazy(
+  () => import("./pages/SelfServiceAnalyticsPage"),
+);
+const ModuleWizardPage = lazy(() => import("./pages/ModuleWizardPage"));
 
 // PUBLIC dashboard imports
 import DashboardPublik from "./ui/dashboards/DashboardPublik";
@@ -66,10 +80,21 @@ function App() {
     initAuth();
   }, [initAuth]);
 
+  // Auto-logout idle >15 menit (13-System-Architecture-Document.md)
+  useIdleLogout();
+
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          style: { fontFamily: "inherit", fontSize: "0.875rem" },
+        }}
+      />
+      <AlertsToast />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<LandingPage />} />
@@ -168,6 +193,59 @@ function App() {
           element={
             <PrivateRoute>
               <DashboardUPTD />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/gubernur"
+          element={
+            <PrivateRoute>
+              <DashboardGubernur />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/inflasi"
+          element={
+            <PrivateRoute>
+              <DashboardInflasi />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/inflasi/mendagri"
+          element={
+            <PrivateRoute>
+              <LaporanMendagriPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          element={
+            <PrivateRoute>
+              <DashboardKepegawaian />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/keuangan"
+          element={
+            <PrivateRoute>
+              <DashboardKeuangan />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/komoditas"
+          element={
+            <PrivateRoute>
+              <DashboardKomoditas />
             </PrivateRoute>
           }
         />
@@ -280,6 +358,39 @@ function App() {
             <PrivateRoute>
               <ApprovalWorkflowPage />
             </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/tasks"
+          element={
+            <PrivateRoute>
+              <SekretariatTasksPage />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Self-service analytics filter (05-Dashboard-Template-Standar.md) */}
+        <Route
+          path="/analytics"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <PrivateRoute>
+                <SelfServiceAnalyticsPage />
+              </PrivateRoute>
+            </Suspense>
+          }
+        />
+
+        {/* Module Wizard — buat modul baru (03-dashboard-uiux.md) */}
+        <Route
+          path="/module-wizard"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <PrivateRoute>
+                <ModuleWizardPage />
+              </PrivateRoute>
+            </Suspense>
           }
         />
 

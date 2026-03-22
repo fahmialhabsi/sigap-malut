@@ -1,6 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function SEKKBJCreatePage() {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ export default function SEKKBJCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("Session expired. Silakan login ulang.");
+        notifyWarning("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -84,10 +85,10 @@ export default function SEKKBJCreatePage() {
 
       await api.post("/sek-kbj", payload);
 
-      alert("Data kebijakan berhasil dibuat.");
+      notifyWarning("Data kebijakan berhasil dibuat.");
       navigate("/module/sek-kbj");
     } catch (error) {
-      alert("Error: " + (error.response?.data?.message || error.message));
+      notifyWarning("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

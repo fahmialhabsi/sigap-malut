@@ -1,48 +1,48 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import api from "../utils/api";
+import { notifySuccess, notifyError } from "../utils/notify";
+import { sanitizeObject } from "../utils/sanitize";
 
 export default function EditPage() {
   const { moduleId, id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({});
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({ defaultValues: {} });
 
   const fetchData = useCallback(async () => {
     try {
       const response = await api.get(`/${moduleId}/${id}`);
-      const data = response.data.data;
-      setFormData(data);
+      reset(response.data.data || {});
     } catch (err) {
       setError(err.response?.data?.message || "Error loading data");
     } finally {
       setLoading(false);
     }
-  }, [moduleId, id]);
+  }, [moduleId, id, reset]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-
+  const onSubmit = async (data) => {
+    const sanitized = sanitizeObject(data);
     try {
-      await api.put(`/${moduleId}/${id}`, formData);
-      alert("✅ Data berhasil diupdate!");
+      await api.put(`/${moduleId}/${id}`, sanitized);
+      notifySuccess("Data berhasil diupdate");
       navigate(`/module/${moduleId}`);
     } catch (err) {
-      alert("❌ Error: " + (err.response?.data?.message || err.message));
-    } finally {
-      setSaving(false);
+      notifyError(
+        err.response?.data?.message || err.message || "Gagal menyimpan data",
+      );
     }
   };
 
@@ -74,7 +74,10 @@ export default function EditPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white rounded-lg shadow p-6"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {fields.map((field) => (
             <div
@@ -86,7 +89,12 @@ export default function EditPage() {
                 {field.required && <span className="text-red-500"> *</span>}
               </label>
 
-              {renderField(field, formData[field.name], handleChange)}
+              {renderField(field, register, errors)}
+              {errors[field.name] && (
+                <p className="mt-1 text-xs text-red-600" role="alert">
+                  {errors[field.name]?.message || `${field.label} wajib diisi`}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -102,10 +110,10 @@ export default function EditPage() {
           </button>
           <button
             type="submit"
-            disabled={saving}
+            disabled={isSubmitting}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50"
           >
-            {saving ? "Menyimpan..." : "💾 Simpan Perubahan"}
+            {isSubmitting ? "Menyimpan..." : "💾 Simpan Perubahan"}
           </button>
         </div>
       </form>
@@ -113,20 +121,20 @@ export default function EditPage() {
   );
 }
 
-// Helper: Render field based on type
-function renderField(field, value, onChange) {
-  const baseClass =
-    "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500";
+// Helper: Render field based on type (react-hook-form register)
+function renderField(field, register, errors) {
+  const hasError = !!errors[field.name];
+  const baseClass = `w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+    hasError ? "border-red-400 bg-red-50" : "border-gray-300"
+  }`;
+
+  const validation = {
+    ...(field.required && { required: `${field.label} wajib diisi` }),
+  };
 
   if (field.type === "select") {
     return (
-      <select
-        name={field.name}
-        value={value || ""}
-        onChange={onChange}
-        className={baseClass}
-        required={field.required}
-      >
+      <select {...register(field.name, validation)} className={baseClass}>
         {field.options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -139,12 +147,9 @@ function renderField(field, value, onChange) {
   if (field.type === "textarea") {
     return (
       <textarea
-        name={field.name}
-        value={value || ""}
-        onChange={onChange}
+        {...register(field.name, validation)}
         rows={3}
         className={baseClass}
-        required={field.required}
       />
     );
   }
@@ -153,12 +158,12 @@ function renderField(field, value, onChange) {
     return (
       <input
         type="number"
-        name={field.name}
-        value={value || ""}
-        onChange={onChange}
         step={field.step || "0.01"}
+        {...register(field.name, {
+          ...validation,
+          valueAsNumber: true,
+        })}
         className={baseClass}
-        required={field.required}
       />
     );
   }
@@ -166,12 +171,9 @@ function renderField(field, value, onChange) {
   return (
     <input
       type={field.type || "text"}
-      name={field.name}
-      value={value || ""}
-      onChange={onChange}
+      readOnly={field.readOnly || false}
+      {...register(field.name, validation)}
       className={baseClass}
-      required={field.required}
-      readOnly={field.readOnly}
     />
   );
 }
