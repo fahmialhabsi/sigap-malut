@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { protect } from "../middleware/auth.js";
+import limiter from "../middleware/rateLimiter.js";
 import {
   uploadSuratMasuk,
   getAllSuratMasuk,
@@ -22,6 +23,9 @@ import {
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/surat/" });
+
+// Apply rate limiting to all surat endpoints
+router.use(limiter);
 
 // Surat Masuk
 router.post("/masuk/upload", protect, upload.single("file_surat"), uploadSuratMasuk);
