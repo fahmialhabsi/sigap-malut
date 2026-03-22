@@ -63,6 +63,13 @@ import UptKeu from "./UPT-KEU.js";
 import UptMtu from "./UPT-MTU.js";
 import UptTkn from "./UPT-TKN.js";
 
+// Import model surat menyurat (e-Office M011-M013)
+import SuratMasuk from "./SuratMasuk.js";
+import SuratKeluar from "./SuratKeluar.js";
+import Disposisi from "./Disposisi.js";
+import AgendaSurat from "./AgendaSurat.js";
+import ArsipSurat from "./ArsipSurat.js";
+
 // Asosiasi Foreign Key Komoditas
 BdsCpd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
 BdsHrg.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
@@ -128,5 +135,10 @@ export {
   UptKeu,
   UptMtu,
   UptTkn,
+  SuratMasuk,
+  SuratKeluar,
+  Disposisi,
+  AgendaSurat,
+  ArsipSurat,
 };
 export default sequelize;

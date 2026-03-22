@@ -10,6 +10,7 @@ import dashboardRoutes from "./routes/dashboard.js";
 import inflasiRoutes from "./routes/inflasi.js";
 import komoditasStockRoutes from "./routes/komoditasStock.js";
 import taskRoutes from "./routes/tasks.js";
+import suratRoutes from "./routes/surat.js";
 import notificationRoutes from "./routes/notification.js";
 import mfaRoutes from "./routes/mfa.js";
 import { initSLAScheduler } from "./services/slaService.js";
@@ -159,6 +160,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/inflasi", inflasiRoutes);
 app.use("/api/komoditas", komoditasStockRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/surat", suratRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/auth/mfa", mfaRoutes);
 

@@ -40,6 +40,12 @@ import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
 import BksModulePage from "./pages/bidangKonsumsi/BksModulePage";
 import SekretariatTasksPage from "./pages/SekretariatTasksPage";
 import LaporanMendagriPage from "./pages/LaporanMendagriPage";
+import UploadSuratMasukPage from "./pages/surat/UploadSuratMasukPage";
+import InboxSuratMasukPage from "./pages/surat/InboxSuratMasukPage";
+import DetailSuratMasukPage from "./pages/surat/DetailSuratMasukPage";
+import FormDisposisiPage from "./pages/surat/FormDisposisiPage";
+import SuratKeluarPage from "./pages/surat/SuratKeluarPage";
+import FormSuratKeluarPage from "./pages/surat/FormSuratKeluarPage";
 import useIdleLogout from "./hooks/useIdleLogout";
 const SelfServiceAnalyticsPage = lazy(
   () => import("./pages/SelfServiceAnalyticsPage"),
@@ -368,6 +374,36 @@ function App() {
               <SekretariatTasksPage />
             </PrivateRoute>
           }
+        />
+
+        {/* Surat Menyurat (e-Office M011-M013) */}
+        <Route
+          path="/surat/masuk"
+          element={<PrivateRoute><InboxSuratMasukPage /></PrivateRoute>}
+        />
+        <Route
+          path="/surat/masuk/upload"
+          element={<PrivateRoute><UploadSuratMasukPage /></PrivateRoute>}
+        />
+        <Route
+          path="/surat/masuk/:id"
+          element={<PrivateRoute><DetailSuratMasukPage /></PrivateRoute>}
+        />
+        <Route
+          path="/surat/masuk/:id/disposisi"
+          element={<PrivateRoute><FormDisposisiPage /></PrivateRoute>}
+        />
+        <Route
+          path="/surat/keluar"
+          element={<PrivateRoute><SuratKeluarPage /></PrivateRoute>}
+        />
+        <Route
+          path="/surat/keluar/baru"
+          element={<PrivateRoute><FormSuratKeluarPage /></PrivateRoute>}
+        />
+        <Route
+          path="/surat/keluar/:id/edit"
+          element={<PrivateRoute><FormSuratKeluarPage /></PrivateRoute>}
         />
 
         {/* Self-service analytics filter (05-Dashboard-Template-Standar.md) */}
