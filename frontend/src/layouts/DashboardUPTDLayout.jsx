@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import uptdModules from "../data/uptdModules";
 import api from "../utils/api";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 function isActiveModule(row) {
   return (
@@ -240,6 +241,13 @@ export default function DashboardUPTDLayout({
           </div>
           <div className="mr-5 hidden md:block text-xs text-blue-100/70">
             {user?.email || ""}
+          </div>
+          <div className="mr-3">
+            <BukaEPelaraButton
+              label="e-Pelara"
+              targetPath="/"
+              className="!py-1.5 !px-3 !text-xs"
+            />
           </div>
           <div className="relative mr-5">
             <NotificationBell />

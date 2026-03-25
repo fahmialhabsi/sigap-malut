@@ -9,7 +9,7 @@ export function getDashboardPath(user) {
   // mapping role langsung ke path (jika backend memberikan role spesifik)
   const dashboardMapping = {
     super_admin: "/dashboard/superadmin",
-    kepala_dinas: "/dashboard/superadmin",
+    kepala_dinas: "/dashboard/kepala-dinas",
     sekretaris: "/dashboard/sekretariat",
     "bidang ketersediaan": "/dashboard/ketersediaan",
     "bidang distribusi": "/dashboard/distribusi",

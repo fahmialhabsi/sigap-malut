@@ -3,7 +3,14 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { notifySuccess, notifyError } from "../../utils/notify";
 
-const MEDIA_TERIMA_OPTIONS = ["WA", "Email", "Pos", "Kurir", "Langsung", "SIPD"];
+const MEDIA_TERIMA_OPTIONS = [
+  "WA",
+  "Email",
+  "Pos",
+  "Kurir",
+  "Langsung",
+  "SIPD",
+];
 
 export default function UploadSuratMasukPage() {
   const navigate = useNavigate();
@@ -51,11 +58,12 @@ export default function UploadSuratMasukPage() {
       const formData = new FormData();
       formData.append("file_surat", file);
       formData.append("media_terima", form.media_terima);
-      if (form.tanggal_surat) formData.append("tanggal_surat", form.tanggal_surat);
+      if (form.tanggal_surat)
+        formData.append("tanggal_surat", form.tanggal_surat);
       if (form.asal_surat) formData.append("asal_surat", form.asal_surat);
       if (form.keterangan) formData.append("keterangan", form.keterangan);
 
-      const res = await api.post("/api/surat/masuk/upload", formData, {
+      const res = await api.post("/surat/masuk/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -72,11 +80,16 @@ export default function UploadSuratMasukPage() {
     return (
       <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-xl shadow text-center">
         <div className="text-5xl mb-4">✅</div>
-        <h2 className="text-xl font-bold text-green-700 mb-2">Surat Berhasil Diunggah</h2>
+        <h2 className="text-xl font-bold text-green-700 mb-2">
+          Surat Berhasil Diunggah
+        </h2>
         <p className="text-gray-600 mb-1">
-          Nomor Agenda: <span className="font-mono font-bold">{success.nomor_agenda}</span>
+          Nomor Agenda:{" "}
+          <span className="font-mono font-bold">{success.nomor_agenda}</span>
         </p>
-        <p className="text-sm text-blue-600 mt-2">🤖 AI sedang memproses dan menganalisis surat...</p>
+        <p className="text-sm text-blue-600 mt-2">
+          🤖 AI sedang memproses dan menganalisis surat...
+        </p>
         <div className="mt-6 flex gap-3 justify-center">
           <button
             onClick={() => navigate("/surat/masuk")}
@@ -85,7 +98,11 @@ export default function UploadSuratMasukPage() {
             Lihat Inbox
           </button>
           <button
-            onClick={() => { setSuccess(null); setFile(null); setPreview(null); }}
+            onClick={() => {
+              setSuccess(null);
+              setFile(null);
+              setPreview(null);
+            }}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
           >
             Upload Lagi
@@ -98,7 +115,10 @@ export default function UploadSuratMasukPage() {
   return (
     <div className="max-w-2xl mx-auto mt-6 p-6 bg-white rounded-xl shadow">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate("/surat/masuk")} className="text-gray-500 hover:text-gray-700">
+        <button
+          onClick={() => navigate("/surat/masuk")}
+          className="text-gray-500 hover:text-gray-700"
+        >
           ← Kembali
         </button>
         <h1 className="text-2xl font-bold text-gray-800">Upload Surat Masuk</h1>
@@ -108,25 +128,38 @@ export default function UploadSuratMasukPage() {
         {/* Drag & Drop Zone */}
         <div
           className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-            dragOver ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-blue-400"
+            dragOver
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-300 hover:border-blue-400"
           }`}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
         >
           {preview ? (
-            <img src={preview} alt="preview" className="max-h-48 mx-auto rounded-lg" />
+            <img
+              src={preview}
+              alt="preview"
+              className="max-h-48 mx-auto rounded-lg"
+            />
           ) : file ? (
             <div className="text-gray-600">
               <div className="text-4xl mb-2">📄</div>
               <p className="font-medium">{file.name}</p>
-              <p className="text-sm text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
+              <p className="text-sm text-gray-400">
+                {(file.size / 1024).toFixed(1)} KB
+              </p>
             </div>
           ) : (
             <div className="text-gray-500">
               <div className="text-4xl mb-2">📂</div>
-              <p className="font-medium">Drag & drop file atau klik untuk memilih</p>
+              <p className="font-medium">
+                Drag & drop file atau klik untuk memilih
+              </p>
               <p className="text-sm mt-1">Mendukung: JPG, PNG, PDF</p>
             </div>
           )}
@@ -141,14 +174,18 @@ export default function UploadSuratMasukPage() {
 
         {/* Media Terima */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Media Terima</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Media Terima
+          </label>
           <select
             value={form.media_terima}
             onChange={(e) => setForm({ ...form, media_terima: e.target.value })}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {MEDIA_TERIMA_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
             ))}
           </select>
         </div>
@@ -156,12 +193,17 @@ export default function UploadSuratMasukPage() {
         {/* Tanggal Surat (opsional) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Tanggal Surat <span className="text-gray-400">(opsional — AI akan mendeteksi)</span>
+            Tanggal Surat{" "}
+            <span className="text-gray-400">
+              (opsional — AI akan mendeteksi)
+            </span>
           </label>
           <input
             type="date"
             value={form.tanggal_surat}
-            onChange={(e) => setForm({ ...form, tanggal_surat: e.target.value })}
+            onChange={(e) =>
+              setForm({ ...form, tanggal_surat: e.target.value })
+            }
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -169,7 +211,10 @@ export default function UploadSuratMasukPage() {
         {/* Asal Surat (opsional) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Asal Surat <span className="text-gray-400">(opsional — AI akan mendeteksi)</span>
+            Asal Surat{" "}
+            <span className="text-gray-400">
+              (opsional — AI akan mendeteksi)
+            </span>
           </label>
           <input
             type="text"
@@ -182,7 +227,9 @@ export default function UploadSuratMasukPage() {
 
         {/* Keterangan */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Keterangan
+          </label>
           <textarea
             value={form.keterangan}
             onChange={(e) => setForm({ ...form, keterangan: e.target.value })}

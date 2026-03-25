@@ -10,6 +10,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  generateSsoToken,
 } from "../controllers/authController.js";
 import { protect } from "../middleware/auth.js";
 
@@ -21,6 +22,7 @@ router.get("/me", protect, getMe);
 router.get("/profile", protect, getMe); // alias for /me
 router.post("/logout", protect, logout);
 router.put("/change-password", protect, changePassword);
+router.post("/sso-token", protect, generateSsoToken); // SSO: generate token untuk e-Pelara
 
 // Route untuk mengambil seluruh data user
 

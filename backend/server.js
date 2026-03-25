@@ -13,6 +13,10 @@ import taskRoutes from "./routes/tasks.js";
 import suratRoutes from "./routes/surat.js";
 import notificationRoutes from "./routes/notification.js";
 import mfaRoutes from "./routes/mfa.js";
+import ePelaraRoutes from "./routes/ePelaraRoutes.js";
+import bypassDetectionRoutes from "./routes/bypassDetection.js";
+import subKegiatanUsulRoutes from "./routes/subKegiatanUsul.js";
+import uptdOpsRoutes from "./routes/uptdOps.js";
 import { initSLAScheduler } from "./services/slaService.js";
 import { initDailyDigestScheduler } from "./services/dailyDigestService.js";
 // ...existing code...
@@ -43,7 +47,10 @@ const httpRequestCounter = new client.Counter({
   labelNames: ["method", "route", "status"],
 });
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Eksplisit path agar dotenv selalu baca dari direktori server.js, bukan process.cwd()
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -68,10 +75,6 @@ app.get("/metrics", async (req, res) => {
 });
 
 app.use("/api/compliance", complianceRoutes);
-
-// ESM __filename shim
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(helmet());
@@ -163,6 +166,10 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/surat", suratRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/auth/mfa", mfaRoutes);
+app.use("/api/epelara", ePelaraRoutes);
+app.use("/api/bypassdetection", bypassDetectionRoutes);
+app.use("/api/sub-kegiatan-usul", subKegiatanUsulRoutes);
+app.use("/api/uptd-ops", uptdOpsRoutes);
 
 // Register all auto-generated routes
 registerRoutes(app);

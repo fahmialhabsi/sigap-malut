@@ -1,5 +1,6 @@
 // Clean ES module auth controller
 import { Op, fn, col, where } from "sequelize";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Role from "../models/Role.js";
 import {
@@ -9,6 +10,69 @@ import {
 } from "../config/auth.js";
 import { generateToken, generateRefreshToken } from "../middleware/auth.js";
 import { logAudit } from "../services/auditLogService.js";
+
+// SSO: Generate short-lived token untuk diverifikasi e-Pelara
+export const generateSsoToken = async (req, res) => {
+  try {
+    const ssoSecret = process.env.SSO_SHARED_SECRET;
+    if (!ssoSecret) {
+      return res.status(500).json({
+        success: false,
+        message: "SSO_SHARED_SECRET tidak dikonfigurasi",
+      });
+    }
+    const user = req.user;
+
+    // Ambil role name dari tabel Roles berdasarkan role_id agar mendapatkan
+    // nama role semantik (SEKRETARIS, KEPALA_DINAS, dst).
+    // user.role (field langsung di tabel users) bisa jadi default "pelaksana".
+    let roleName = user.role; // fallback ke field langsung di users
+    try {
+      const dbUser = await User.findByPk(user.id);
+      if (dbUser?.role_id) {
+        const roleRow = await Role.findByPk(dbUser.role_id);
+        if (roleRow?.name) {
+          roleName = roleRow.name;
+        } else if (roleRow?.code) {
+          roleName = roleRow.code;
+        }
+      }
+      // Jika tidak ada role_id tapi ada role langsung di tabel, pakai itu
+      if (!roleName && dbUser?.role) {
+        roleName = dbUser.role;
+      }
+    } catch (lookupErr) {
+      console.warn(
+        "[generateSsoToken] Role lookup fallback:",
+        lookupErr.message,
+      );
+    }
+
+    console.log(
+      `[generateSsoToken] user=${user.username} role_raw=${user.role} role_resolved=${roleName}`,
+    );
+
+    const ssoToken = jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: roleName,
+        unit_kerja: user.unit_kerja,
+        nama_lengkap: user.nama_lengkap,
+        type: "sso",
+      },
+      ssoSecret,
+      { expiresIn: "15m" },
+    );
+    res.json({ success: true, token: ssoToken, role: roleName });
+  } catch (error) {
+    console.error("generateSsoToken error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Gagal membuat SSO token" });
+  }
+};
 
 async function generateUniqueUsernameFromEmail(email) {
   const base = String(email || "")
@@ -238,6 +302,16 @@ export const login = async (req, res) => {
       if (user.failed_login_attempts >= 5)
         user.locked_until = new Date(Date.now() + 15 * 60 * 1000);
       await user.save();
+      try {
+        await logAudit?.({
+          modul: "AUTH",
+          entitas_id: user.id,
+          aksi: "LOGIN_FAILED",
+          data_lama: null,
+          data_baru: { attempts: user.failed_login_attempts },
+          pegawai_id: user.id,
+        });
+      } catch (_) {}
       return res.status(401).json({
         success: false,
         message: "Email atau password salah",
@@ -261,17 +335,32 @@ export const login = async (req, res) => {
     const roleToDashboard = {
       SUPER_ADMIN: "/dashboard/superadmin",
       SEKRETARIS: "/dashboard/sekretariat",
-
-      // Executive (dokumenSistem)
       KEPALA_DINAS: "/dashboard",
       GUBERNUR: "/dashboard",
-
-      // Public/Viewer
+      KEPALA_BIDANG: "/dashboard",
+      KEPALA_BIDANG_KETERSEDIAAN: "/dashboard/ketersediaan",
+      KEPALA_BIDANG_DISTRIBUSI: "/dashboard/distribusi",
+      KEPALA_BIDANG_KONSUMSI: "/dashboard/konsumsi",
+      KEPALA_UPTD: "/dashboard/uptd",
       VIEWER: "/dashboard-publik",
     };
 
-    const dashboardUrl =
-      (roleName && roleToDashboard[roleName]) || "/dashboard";
+    // Untuk role staf yang tidak ada di mapping eksplisit,
+    // tentukan dashboard berdasarkan unit_kerja
+    let dashboardUrl = roleToDashboard[roleName];
+    if (!dashboardUrl) {
+      const unitKerja = (user.unit_kerja || "").toLowerCase();
+      if (unitKerja.includes("ketersediaan"))
+        dashboardUrl = "/dashboard/ketersediaan";
+      else if (unitKerja.includes("distribusi"))
+        dashboardUrl = "/dashboard/distribusi";
+      else if (unitKerja.includes("konsumsi"))
+        dashboardUrl = "/dashboard/konsumsi";
+      else if (unitKerja.includes("sekretariat"))
+        dashboardUrl = "/dashboard/sekretariat";
+      else if (unitKerja.includes("uptd")) dashboardUrl = "/dashboard/uptd";
+      else dashboardUrl = "/dashboard";
+    }
 
     if (user && user.id) {
       try {
@@ -338,6 +427,16 @@ export const getMe = async (req, res) => {
 // Logout
 export const logout = async (req, res) => {
   // TODO: Invalidate refresh token in database
+  try {
+    await logAudit?.({
+      modul: "AUTH",
+      entitas_id: req.user?.id,
+      aksi: "LOGOUT",
+      data_lama: null,
+      data_baru: null,
+      pegawai_id: req.user?.id,
+    });
+  } catch (_) {}
   res.json({ success: true, message: "Logout berhasil" });
 };
 

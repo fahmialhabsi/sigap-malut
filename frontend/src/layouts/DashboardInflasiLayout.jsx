@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import LiveKPIBadge from "../components/realtime/LiveKPIBadge";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 import AppSidebar, {
   MAIN_MARGIN_EXPANDED,
   MAIN_MARGIN_COLLAPSED,
@@ -89,6 +90,7 @@ export default function DashboardInflasiLayout({ children }) {
             <span>📈</span> Dashboard Inflasi & Stabilisasi Harga
             <LiveKPIBadge type="inflasi" />
           </div>
+          <BukaEPelaraButton label="e-Pelara" targetPath="/" className="!py-1.5 !px-3 !text-xs" />
           <div className="relative">
             <button
               onClick={() => setAvatarOpen((v) => !v)}

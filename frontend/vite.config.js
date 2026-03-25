@@ -20,6 +20,10 @@ export default defineConfig({
     },
   },
   plugins: [react()],
+  define: {
+    // Polyfill process.env untuk library yang masih pakai Node.js idiom
+    "process.env": {},
+  },
   build: {
     // Target modern browsers untuk bundle lebih kecil
     target: "es2020",
@@ -56,8 +60,10 @@ export default defineConfig({
       "axios",
       "zustand",
       "recharts",
+      "leaflet",
+      "react-leaflet",
     ],
     // Exclude besar yang hanya dipakai kadang-kadang
-    exclude: ["pptxgenjs", "leaflet"],
+    exclude: ["pptxgenjs"],
   },
 });

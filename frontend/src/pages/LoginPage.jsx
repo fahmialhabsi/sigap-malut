@@ -54,8 +54,9 @@ export default function LoginPage() {
       const roleName = normalizeRoleName(user);
       const unit = normalizeUnit(user);
 
-      // 1) Backend dashboardUrl
-      if (dashboardUrlFromBackend) {
+      // 1) Backend dashboardUrl — pakai langsung kecuali jika generic /dashboard
+      // (backend mungkin belum tahu role spesifik staf, gunakan roleParam sebagai hint)
+      if (dashboardUrlFromBackend && dashboardUrlFromBackend !== "/dashboard") {
         navigate(dashboardUrlFromBackend, { replace: true });
         setLoading(false);
         return;

@@ -87,27 +87,50 @@ is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,
 created_at,Created At,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL, 3. Master Permissions (1 file): 01_PERMISSIONS.csv
 Define siapa bisa akses modul apa dengan permission apa.
 
+> **CATATAN REVISI (22 Maret 2026):** Daftar role di CSV ini diperbarui untuk mencakup semua 15 role yang telah dikunci dalam dokumen 33. Sebelumnya hanya ada 5 role (`super_admin`, `kepala_dinas`, `kasubbag`, `kepala_bidang`, `pelaksana`) — ini tidak lengkap. Role key baru menggunakan format snake_case sesuai DB.
+
+**Daftar role yang valid di CSV (15 role):**
+
+```
+super_admin, kepala_dinas, gubernur, sekretaris,
+kasubag_umum_kepegawaian, pejabat_fungsional, bendahara, pelaksana,
+kepala_bidang_ketersediaan, kepala_bidang_distribusi, kepala_bidang_konsumsi,
+kepala_uptd, kasubag_uptd, kepala_seksi_uptd, viewer
+```
+
+**Catatan untuk `pejabat_fungsional`:** Saat mendefinisikan permission di modul penilaian kinerja dan task assignment, tambahkan kolom `has_subordinate_context` (true/false) untuk membedakan JF Bidang (dengan bawahan) dari JF Sekretariat/UPTD (tanpa bawahan). Kolom ini hanya konteks dokumentasi — validasi aktual dilakukan via `user_hierarchy` di backend.
+
 CSV
 modul_id,role,can_view,can_create,can_edit,can_delete,can_approve,can_print,can_export
 M001,super_admin,true,true,true,true,true,true,true
 M001,kepala_dinas,true,false,false,false,true,true,true
-M001,kasubbag,true,true,true,false,false,true,true
-M001,pelaksana,true,false,false,false,false,false,false
+M001,sekretaris,true,true,true,true,true,true,true
+M001,kasubag_umum_kepegawaian,true,true,true,false,false,true,true
+M001,pelaksana,true,true,false,false,false,false,false
 M002,super_admin,true,true,true,true,true,true,true
-M002,kasubbag,true,true,true,false,false,true,false
+M002,sekretaris,true,true,true,false,true,true,true
+M002,kasubag_umum_kepegawaian,true,true,true,false,false,true,false
+M002,kasubag_uptd,true,true,false,false,false,true,false
 M003,super_admin,true,true,true,true,false,true,true
-M003,kepala_bidang,true,true,true,true,false,true,true
+M003,kepala_bidang_ketersediaan,true,true,true,true,false,true,true
+M003,kepala_bidang_distribusi,true,true,true,true,false,true,true
+M003,kepala_bidang_konsumsi,true,true,true,true,false,true,true
 M003,pelaksana,true,true,false,false,false,false,false
 ... 4. Master Workflows (1 file): 02_WORKFLOWS.csv
 Define alur approval per modul (jika has_approval=true).
 
+> **CATATAN REVISI (22 Maret 2026):** Kolom `unit_kerja_context` ditambahkan untuk membedakan eksekutor JF berdasarkan konteks unitnya (`sekretariat`/`bidang`/`uptd`). Ini penting agar workflow generator tidak menganggap semua JF memiliki wewenang yang sama. Validasi aktual tetap menggunakan `user_hierarchy` di backend.
+
 CSV
-modul_id,step_order,role,action_label,can_reject,notification_email,notification_sms
-M001,1,kasubbag,Verifikasi Data,true,true,false
-M001,2,super_admin,Approval Final,true,true,false
-M002,1,kasubbag,Proses KGB,true,true,true
-M002,2,super_admin,Approval & Upload SK,false,true,true
-M004,1,kepala_bidang,Verifikasi Harga,true,false,false
+modul_id,step_order,role,unit_kerja_context,action_label,can_reject,notification_email,notification_sms
+M001,1,kasubag_umum_kepegawaian,sekretariat,Verifikasi Data,true,true,false
+M001,2,sekretaris,sekretariat,Review & Forward,true,true,false
+M001,3,super_admin,semua,Approval Final,true,true,false
+M002,1,kasubag_umum_kepegawaian,sekretariat,Proses KGB Sekretariat,true,true,true
+M002,1,kepala_bidang_ketersediaan,bidang,Usul KGB Bidang Ketersediaan,true,true,true
+M002,1,kasubag_uptd,uptd,Usul KGB UPTD,true,true,true
+M002,2,sekretaris,sekretariat,Review & Approve SK KGB,false,true,true
+M004,1,kepala_bidang_ketersediaan,bidang,Verifikasi Harga,true,false,false
 ... 5. Master Relations (1 file): 03_RELATIONS.csv
 Define foreign key relationship antar tabel.
 

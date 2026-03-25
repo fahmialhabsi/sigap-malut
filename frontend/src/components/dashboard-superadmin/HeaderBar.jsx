@@ -1,4 +1,5 @@
 import React from "react";
+import BukaEPelaraButton from "../BukaEPelaraButton";
 
 export default function HeaderBar() {
   return (
@@ -26,6 +27,14 @@ export default function HeaderBar() {
       <button className="bg-blue-600 rounded-full px-6 py-1 h-7 text-white text-base mr-4">
         Impersonate
       </button>
+      {/* e-Pelara button */}
+      <div className="mr-4">
+        <BukaEPelaraButton
+          label="e-Pelara"
+          targetPath="/"
+          className="!py-1 !px-3 !text-xs"
+        />
+      </div>
       {/* User avatar */}
       <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center">
         <span className="text-2xl font-bold text-[#233441]">@</span>

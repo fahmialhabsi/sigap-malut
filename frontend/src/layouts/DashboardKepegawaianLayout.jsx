@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 const NAV_ITEMS = [
   { label: "Ringkasan KGB", path: "/dashboard/kepegawaian", icon: "👤" },
@@ -83,6 +84,7 @@ export default function DashboardKepegawaianLayout({ children }) {
           <div className="font-semibold text-slate-700 flex items-center gap-2">
             <span>🏛️</span> Dashboard Kepegawaian &amp; KGB
           </div>
+          <BukaEPelaraButton label="e-Pelara" targetPath="/" className="!py-1.5 !px-3 !text-xs" />
           <div className="relative">
             <button
               onClick={() => setAvatarOpen((v) => !v)}

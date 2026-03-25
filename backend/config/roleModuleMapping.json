@@ -29,7 +29,9 @@
         "approval:read",
         "approval:finalize",
         "audit-log:read",
-        "kgb:read"
+        "kgb:read",
+        "surat:read",
+        "surat:disposisi:approve"
       ],
       "sensitiveFields": ["gaji_pokok", "tunjangan", "total_anggaran", "nip"]
     },
@@ -80,7 +82,13 @@
         "kgb:update",
         "kgb:delete",
         "kgb:approve",
-        "kgb:finalize"
+        "kgb:finalize",
+        "surat:read",
+        "surat:create",
+        "surat:update",
+        "surat:disposisi:create",
+        "surat:disposisi:read",
+        "surat:keluar:approve"
       ],
       "sensitiveFields": ["gaji_pokok", "tunjangan", "total_anggaran", "nip"]
     },
@@ -252,7 +260,14 @@
         "sek-ast:create",
         "sek-ast:update",
         "approval:read",
-        "approval:create"
+        "approval:create",
+        "surat:read",
+        "surat:create",
+        "surat:update",
+        "surat:disposisi:read",
+        "surat:disposisi:create",
+        "surat:keluar:create",
+        "surat:keluar:submit"
       ],
       "sensitiveFields": []
     },

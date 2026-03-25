@@ -13,6 +13,10 @@ import {
 import { Line } from "react-chartjs-2";
 import api from "../utils/api";
 import { roleIdToName } from "../utils/roleMap";
+import { notifyError } from "../utils/notify";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
+import DpaBidangWidget from "../components/DpaBidangWidget";
+import RenstraBidangWidget from "../components/RenstraBidangWidget";
 
 Chart.register(
   CategoryScale,
@@ -36,7 +40,10 @@ function normalizeRoleName(user) {
 
 const KEBIJAKAN_STORAGE_KEY = "ketersediaan_kebijakan_analisis_records";
 
-export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
+export default function DashboardKetersediaanLayout({
+  fallbackModules = [],
+  children,
+}) {
   // State
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -401,7 +408,7 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
       !kebijakanForm.komoditas ||
       !kebijakanForm.wilayah
     ) {
-      window.alert("Tanggal, Komoditas, dan Wilayah wajib diisi.");
+      notifyError("Tanggal, Komoditas, dan Wilayah wajib diisi.");
       return;
     }
 
@@ -535,6 +542,13 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
           </div>
           <div className="mr-5 hidden md:block text-xs text-green-100/70">
             {user?.email || ""}
+          </div>
+          <div className="mr-3">
+            <BukaEPelaraButton
+              label="e-Pelara"
+              targetPath="/"
+              className="!py-1.5 !px-3 !text-xs"
+            />
           </div>
           <div className="relative mr-5">
             <NotificationBell />
@@ -785,6 +799,21 @@ export default function DashboardKetersediaanLayout({ fallbackModules = [] }) {
               </ul>
             </PanelBox>
           </div>
+          <div className="w-full max-w-7xl mx-auto px-2 pb-8 pt-4">
+            <DpaBidangWidget
+              bidangLabel="Ketersediaan Pangan"
+              programKeyword="ketersediaan"
+            />
+            <RenstraBidangWidget
+              bidangLabel="Ketersediaan Pangan"
+              programKeyword="ketersediaan"
+            />
+          </div>
+          {children && (
+            <div className="w-full max-w-7xl mx-auto px-2 pb-8 pt-2">
+              {children}
+            </div>
+          )}
         </main>
 
         <footer className="flex-none h-10 flex items-center text-xs justify-between px-10 w-full bg-gradient-to-r from-green-900 to-green-800/70 text-green-100/80">

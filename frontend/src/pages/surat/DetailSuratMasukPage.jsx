@@ -21,7 +21,7 @@ export default function DetailSuratMasukPage() {
 
   const fetchDetail = async () => {
     try {
-      const res = await api.get(`/api/surat/masuk/${id}`);
+      const res = await api.get(`/surat/masuk/${id}`);
       const data = res.data.data;
       setSurat(data);
       setDisposisiList(data.disposisi || []);
@@ -44,31 +44,38 @@ export default function DetailSuratMasukPage() {
       const interval = setInterval(fetchDetail, 5000);
       return () => clearInterval(interval);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surat?.ai_status]);
 
   const handleKonfirmasi = async () => {
     setKonfirmLoading(true);
     try {
-      await api.put(`/api/surat/masuk/${id}/konfirmasi`, {});
+      await api.put(`/surat/masuk/${id}/konfirmasi`, {});
       notifySuccess("Surat berhasil dikonfirmasi dan diteruskan ke pimpinan.");
       fetchDetail();
     } catch (error) {
-      notifyError(error.response?.data?.message || "Gagal mengkonfirmasi surat.");
+      notifyError(
+        error.response?.data?.message || "Gagal mengkonfirmasi surat.",
+      );
     } finally {
       setKonfirmLoading(false);
     }
   };
 
   if (loading) {
-    return <div className="text-center py-16 text-gray-500">Memuat data...</div>;
+    return (
+      <div className="text-center py-16 text-gray-500">Memuat data...</div>
+    );
   }
 
   if (!surat) {
     return (
       <div className="text-center py-16 text-gray-400">
         <p>Surat tidak ditemukan.</p>
-        <button onClick={() => navigate("/surat/masuk")} className="mt-4 text-blue-600 hover:underline">
+        <button
+          onClick={() => navigate("/surat/masuk")}
+          className="mt-4 text-blue-600 hover:underline"
+        >
           ← Kembali ke Inbox
         </button>
       </div>
@@ -79,14 +86,23 @@ export default function DetailSuratMasukPage() {
     <div className="max-w-3xl mx-auto mt-6 px-4 pb-10">
       {/* Back + Header */}
       <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => navigate("/surat/masuk")} className="text-gray-500 hover:text-gray-700">
+        <button
+          onClick={() => navigate("/surat/masuk")}
+          className="text-gray-500 hover:text-gray-700"
+        >
           ←
         </button>
         <div>
-          <h1 className="text-xl font-bold text-gray-800">Detail Surat Masuk</h1>
-          <p className="text-sm font-mono text-blue-600">{surat.nomor_agenda}</p>
+          <h1 className="text-xl font-bold text-gray-800">
+            Detail Surat Masuk
+          </h1>
+          <p className="text-sm font-mono text-blue-600">
+            {surat.nomor_agenda}
+          </p>
         </div>
-        <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[surat.status] || "bg-gray-100"}`}>
+        <span
+          className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[surat.status] || "bg-gray-100"}`}
+        >
           {surat.status}
         </span>
       </div>
@@ -96,13 +112,19 @@ export default function DetailSuratMasukPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-5 flex items-center gap-3">
           <div className="animate-spin text-2xl">⏳</div>
           <div>
-            <p className="font-medium text-blue-700">AI sedang menganalisis surat...</p>
-            <p className="text-sm text-blue-500">Halaman akan diperbarui otomatis</p>
+            <p className="font-medium text-blue-700">
+              AI sedang menganalisis surat...
+            </p>
+            <p className="text-sm text-blue-500">
+              Halaman akan diperbarui otomatis
+            </p>
           </div>
         </div>
       ) : surat.ai_status === "done" ? (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-5">
-          <h3 className="font-bold text-green-700 mb-2">🤖 Hasil Analisis AI</h3>
+          <h3 className="font-bold text-green-700 mb-2">
+            🤖 Hasil Analisis AI
+          </h3>
           <div className="grid grid-cols-2 gap-3 text-sm">
             {surat.ai_klasifikasi && (
               <div>
@@ -113,13 +135,17 @@ export default function DetailSuratMasukPage() {
             {surat.ai_routing && (
               <div>
                 <span className="text-gray-500">Routing:</span>
-                <p className="font-medium text-indigo-600">{surat.ai_routing}</p>
+                <p className="font-medium text-indigo-600">
+                  {surat.ai_routing}
+                </p>
               </div>
             )}
             {surat.ai_confidence != null && (
               <div>
                 <span className="text-gray-500">Confidence:</span>
-                <p className="font-medium">{(surat.ai_confidence * 100).toFixed(0)}%</p>
+                <p className="font-medium">
+                  {(surat.ai_confidence * 100).toFixed(0)}%
+                </p>
               </div>
             )}
           </div>
@@ -142,7 +168,10 @@ export default function DetailSuratMasukPage() {
           <InfoRow label="Media Terima" value={surat.media_terima} />
           <InfoRow label="Jenis Surat" value={surat.jenis_surat} />
           <InfoRow label="Sifat Surat" value={surat.sifat_surat} />
-          <InfoRow label="Ditujukan Kepada" value={surat.ditujukan_kepada || "-"} />
+          <InfoRow
+            label="Ditujukan Kepada"
+            value={surat.ditujukan_kepada || "-"}
+          />
           <InfoRow label="Kode Arsip" value={surat.arsip_code || "-"} />
         </div>
         <div className="mt-4">
@@ -175,17 +204,32 @@ export default function DetailSuratMasukPage() {
           <h2 className="font-bold text-gray-700 mb-3">Daftar Disposisi</h2>
           <div className="space-y-3">
             {disposisiList.map((d) => (
-              <div key={d.id} className="border border-gray-100 rounded-lg p-3 text-sm">
+              <div
+                key={d.id}
+                className="border border-gray-100 rounded-lg p-3 text-sm"
+              >
                 <div className="flex justify-between mb-1">
-                  <span className="font-medium text-gray-700">{d.kepada_unit || `User #${d.kepada_user_id}`}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${
-                    d.status === "selesai" ? "bg-green-100 text-green-600" :
-                    d.status === "proses" ? "bg-orange-100 text-orange-600" :
-                    "bg-gray-100 text-gray-500"
-                  }`}>{d.status}</span>
+                  <span className="font-medium text-gray-700">
+                    {d.kepada_unit || `User #${d.kepada_user_id}`}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs ${
+                      d.status === "selesai"
+                        ? "bg-green-100 text-green-600"
+                        : d.status === "proses"
+                          ? "bg-orange-100 text-orange-600"
+                          : "bg-gray-100 text-gray-500"
+                    }`}
+                  >
+                    {d.status}
+                  </span>
                 </div>
                 <p className="text-gray-600">{d.instruksi}</p>
-                {d.batas_waktu && <p className="text-xs text-gray-400 mt-1">Batas: {d.batas_waktu}</p>}
+                {d.batas_waktu && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Batas: {d.batas_waktu}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -200,7 +244,9 @@ export default function DetailSuratMasukPage() {
             disabled={konfirmLoading}
             className="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            {konfirmLoading ? "Memproses..." : "✅ Konfirmasi & Teruskan ke Pimpinan"}
+            {konfirmLoading
+              ? "Memproses..."
+              : "✅ Konfirmasi & Teruskan ke Pimpinan"}
           </button>
         )}
         {surat.status === "disposisi" && (
@@ -220,7 +266,9 @@ function InfoRow({ label, value, mono }) {
   return (
     <div>
       <p className="text-xs text-gray-500">{label}</p>
-      <p className={`font-medium text-gray-800 ${mono ? "font-mono" : ""}`}>{value}</p>
+      <p className={`font-medium text-gray-800 ${mono ? "font-mono" : ""}`}>
+        {value}
+      </p>
     </div>
   );
 }

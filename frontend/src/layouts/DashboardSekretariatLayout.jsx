@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import api from "../utils/api";
 import sekretariatModules from "../data/sekretariatModules";
 import { roleIdToName } from "../utils/roleMap";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 function normalizeRoleName(user) {
   return (
@@ -254,6 +255,16 @@ export default function DashboardSekretariatLayout({
         path: "/dashboard/sekretariat",
       },
       ...modulRows,
+      {
+        id: "surat-masuk",
+        name: "Surat Masuk",
+        path: "/surat/masuk",
+      },
+      {
+        id: "surat-keluar",
+        name: "Surat Keluar",
+        path: "/surat/keluar",
+      },
     ];
   }, [modules]);
 
@@ -268,6 +279,8 @@ export default function DashboardSekretariatLayout({
     M007: "Diklat & Pelatihan",
     M008: "SKP",
     M009: "Database Kepegawaian",
+    "SURAT-MASUK": "Surat Masuk",
+    "SURAT-KELUAR": "Surat Keluar",
   };
 
   const getMenuLabel = (moduleItem) => {
@@ -357,6 +370,13 @@ export default function DashboardSekretariatLayout({
           </div>
           <div className="mr-5 hidden md:block text-xs text-slate-300/80">
             {user?.email || ""}
+          </div>
+          <div className="mr-3">
+            <BukaEPelaraButton
+              label="e-Pelara"
+              targetPath="/"
+              className="!py-1.5 !px-3 !text-xs"
+            />
           </div>
           <div className="relative mr-5">
             <NotificationBell />

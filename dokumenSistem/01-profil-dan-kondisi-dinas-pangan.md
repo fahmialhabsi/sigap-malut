@@ -13,9 +13,22 @@
 # BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
 
 ## Struktur Peran dan Kewenangan Penilaian
-- Sekretaris menilai: Fungsional Perencanaan, Fungsional Keuangan, Kasubag, Bendahara, Staf Sekretariat
-- Kepala Bidang menilai: staf bidang masing-masing
-- Kepala UPTD menilai: staf UPTD masing-masing
+
+> **CATATAN REVISI (22 Maret 2026):** Frasa "Kepala Bidang menilai staf bidang" dalam versi awal dokumen ini telah diklarifikasi dan diperbarui berdasarkan keputusan arsitektur final (lihat dokumen 33). Frasa tersebut ambigu dan berpotensi melanggar PP 30/2019 tentang prinsip "atasan langsung" sebagai penilai. Versi yang diperbarui adalah sebagai berikut:
+
+- Kepala Dinas menilai: Sekretaris, Kepala Bidang (×3), Kepala UPTD
+- Sekretaris menilai: Kasubag Umum & Kepegawaian, Pejabat Fungsional Sekretariat semua, Bendahara, Pelaksana Sekretariat
+- Kasubag Umum & Kepegawaian menilai: Pelaksana di bawah Kasubag saja
+- **Kepala Bidang menilai: JF 1 dan JF 2 di bawahnya SAJA** (bukan Pelaksana langsung)
+- **JF Bidang menilai: Pelaksana di bawah JF tersebut saja** (CONFIDENTIAL — Kepala Bidang tidak bisa melihat nilai ini)
+- Kepala UPTD menilai: Kasubag UPTD, Kepala Seksi 1, Kepala Seksi 2, JF UPTD
+- Kasubag UPTD menilai: Pelaksana di bawah Kasubag UPTD saja
+- Kepala Seksi UPTD menilai: Pelaksana di bawah Kasi masing-masing
+- JF Sekretariat: tidak memiliki bawahan, tidak menilai siapapun
+- JF UPTD: tidak memiliki bawahan, tidak menilai siapapun
+- Bendahara: tidak memiliki bawahan, tidak menilai siapapun
+
+**Dasar hukum:** PP 30/2019 tentang Penilaian Kinerja PNS menetapkan yang berhak menilai adalah **atasan langsung** (pejabat penilai yang ditetapkan secara struktural). Di 3 Bidang, atasan langsung Pelaksana adalah JF Bidang — bukan Kepala Bidang.
 
 ## Indikator Penilaian
 - SKP (Bobot %)

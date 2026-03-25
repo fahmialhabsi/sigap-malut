@@ -15,17 +15,7 @@ function normalizeRoleName(user) {
   );
 }
 
-// Data KPI untuk Super Admin
-const kpiData = [
-  {
-    label: "Indikator Monitoring",
-    value: "50",
-    info: "Monitoring 50 indikator",
-  },
-  { label: "Compliance Alur", value: "100%", info: "Compliance Alur" },
-  { label: "Bypass Terdeteksi", value: 0, info: "Bypass Terdeteksi" },
-  { label: "Data Valid", value: "99%", info: "Data Valid" },
-];
+// Default KPI (akan di-overwrite oleh API)
 
 // Hero Card Component
 function HeroCard({ title, value, info, accent = "blue" }) {
@@ -157,6 +147,12 @@ export default function DashboardSuperAdmin() {
   const [userData, setUserData] = useState(null);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef();
+  const [kpiData, setKpiData] = useState([
+    { label: "Indikator Monitoring", value: "—", info: "Memuat..." },
+    { label: "Compliance Alur", value: "—", info: "Memuat..." },
+    { label: "Bypass Terdeteksi", value: "—", info: "Memuat..." },
+    { label: "Data Valid", value: "—", info: "Memuat..." },
+  ]);
 
   // Auth check
   if (!user || roleName !== "super_admin") return <Navigate to="/" replace />;
@@ -197,6 +193,59 @@ export default function DashboardSuperAdmin() {
         if (!mounted) return;
       });
 
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Fetch KPI dari backend
+  useEffect(() => {
+    let mounted = true;
+    api
+      .get("/api/dashboard/sekretaris/summary")
+      .then((res) => {
+        if (!mounted) return;
+        const d = res.data?.data || {};
+        setKpiData([
+          {
+            label: "Indikator Monitoring",
+            value: String(d.totalTasks ?? d.total_tugas ?? "50"),
+            info: "Total tugas/monitoring aktif",
+          },
+          {
+            label: "Compliance Alur",
+            value: d.completionRate != null ? `${d.completionRate}%` : "—",
+            info: "Persentase tugas selesai tepat waktu",
+          },
+          {
+            label: "Tugas Terlambat",
+            value: String(d.overdueTasks ?? d.overdue ?? 0),
+            info: "Tugas melewati batas waktu",
+          },
+          {
+            label: "Tugas Selesai",
+            value: String(d.completedTasks ?? d.selesai ?? 0),
+            info: "Total tugas telah diselesaikan",
+          },
+        ]);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setKpiData([
+          {
+            label: "Indikator Monitoring",
+            value: "50",
+            info: "Monitoring aktif",
+          },
+          {
+            label: "Compliance Alur",
+            value: "100%",
+            info: "Semua alur terpenuhi",
+          },
+          { label: "Bypass Terdeteksi", value: "0", info: "Tidak ada bypass" },
+          { label: "Data Valid", value: "99%", info: "Validitas data sistem" },
+        ]);
+      });
     return () => {
       mounted = false;
     };

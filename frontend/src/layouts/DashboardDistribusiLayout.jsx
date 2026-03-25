@@ -12,6 +12,7 @@ import {
 import { Line } from "react-chartjs-2";
 import { roleIdToName } from "../utils/roleMap";
 import api from "../utils/api";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 Chart.register(
   CategoryScale,
@@ -35,6 +36,7 @@ function normalizeRoleName(user) {
 
 export default function DashboardDistribusiSuperModern({
   fallbackModules = [],
+  children,
 }) {
   // State
   const sidebarOpen = window.innerWidth > 768;
@@ -223,6 +225,13 @@ export default function DashboardDistribusiSuperModern({
           <div className="mr-5 hidden md:block text-xs text-blue-100/70">
             {user?.email || ""}
           </div>
+          <div className="mr-3">
+            <BukaEPelaraButton
+              label="e-Pelara"
+              targetPath="/"
+              className="!py-1.5 !px-3 !text-xs"
+            />
+          </div>
           <div className="relative mr-5">
             <NotificationBell />
             {notifikasi.length > 0 && (
@@ -323,6 +332,11 @@ export default function DashboardDistribusiSuperModern({
               </ul>
             </PanelBox>
           </div>
+          {children && (
+            <div className="w-full max-w-7xl mx-auto px-2 pb-8 pt-2">
+              {children}
+            </div>
+          )}
         </main>
 
         <footer className="flex-none h-10 flex items-center text-xs justify-between px-10 w-full bg-gradient-to-r from-blue-900 to-blue-800/70 text-blue-100/80">

@@ -23,7 +23,7 @@ export default function FormDisposisiPage() {
   useEffect(() => {
     const fetchSurat = async () => {
       try {
-        const res = await api.get(`/api/surat/masuk/${suratId}`);
+        const res = await api.get(`/surat/masuk/${suratId}`);
         const data = res.data.data;
         setSurat(data);
         // Pre-fill kepada_unit dengan ai_routing jika ada
@@ -52,7 +52,7 @@ export default function FormDisposisiPage() {
 
     setSubmitting(true);
     try {
-      await api.post("/api/surat/masuk/disposisi", {
+      await api.post("/surat/masuk/disposisi", {
         surat_masuk_id: suratId,
         kepada_user_id: parseInt(form.kepada_user_id),
         kepada_unit: form.kepada_unit || undefined,
@@ -72,14 +72,21 @@ export default function FormDisposisiPage() {
   };
 
   if (loading) {
-    return <div className="text-center py-16 text-gray-500">Memuat data surat...</div>;
+    return (
+      <div className="text-center py-16 text-gray-500">
+        Memuat data surat...
+      </div>
+    );
   }
 
   return (
     <div className="max-w-2xl mx-auto mt-6 px-4 pb-10">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => navigate(`/surat/masuk/${suratId}`)} className="text-gray-500 hover:text-gray-700">
+        <button
+          onClick={() => navigate(`/surat/masuk/${suratId}`)}
+          className="text-gray-500 hover:text-gray-700"
+        >
           ←
         </button>
         <h1 className="text-xl font-bold text-gray-800">Buat Disposisi</h1>
@@ -88,16 +95,23 @@ export default function FormDisposisiPage() {
       {/* Info Surat */}
       {surat && (
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5 text-sm">
-          <p className="font-mono font-bold text-blue-700 mb-1">{surat.nomor_agenda}</p>
+          <p className="font-mono font-bold text-blue-700 mb-1">
+            {surat.nomor_agenda}
+          </p>
           <p className="font-medium text-gray-800">{surat.perihal}</p>
           <p className="text-gray-500 mt-1">Dari: {surat.asal_surat}</p>
           {surat.ai_routing && (
-            <p className="text-indigo-600 mt-1">🤖 Rekomendasi AI: <strong>{surat.ai_routing}</strong></p>
+            <p className="text-indigo-600 mt-1">
+              🤖 Rekomendasi AI: <strong>{surat.ai_routing}</strong>
+            </p>
           )}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4"
+      >
         {/* Kepada Unit */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -120,7 +134,9 @@ export default function FormDisposisiPage() {
           <input
             type="number"
             value={form.kepada_user_id}
-            onChange={(e) => setForm({ ...form, kepada_user_id: e.target.value })}
+            onChange={(e) =>
+              setForm({ ...form, kepada_user_id: e.target.value })
+            }
             placeholder="ID User penerima disposisi"
             required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -144,21 +160,27 @@ export default function FormDisposisiPage() {
 
         {/* Prioritas */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Prioritas</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Prioritas
+          </label>
           <select
             value={form.prioritas}
             onChange={(e) => setForm({ ...form, prioritas: e.target.value })}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {PRIORITAS_OPTIONS.map((p) => (
-              <option key={p} value={p}>{p}</option>
+              <option key={p} value={p}>
+                {p}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Batas Waktu */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Batas Waktu</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Batas Waktu
+          </label>
           <input
             type="date"
             value={form.batas_waktu}
@@ -169,7 +191,9 @@ export default function FormDisposisiPage() {
 
         {/* Catatan */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Catatan
+          </label>
           <textarea
             value={form.catatan}
             onChange={(e) => setForm({ ...form, catatan: e.target.value })}

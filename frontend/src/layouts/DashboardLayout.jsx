@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
 import NotificationCenter from "../components/notifications/NotificationCenter";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 function normalizeRoleName(user) {
   return (
@@ -130,6 +131,7 @@ export default function DashboardLayout({ children }) {
             >
               📋 Tugas
             </button>
+            <BukaEPelaraButton label="e-Pelara" className="ml-1" />
             <div style={{ marginLeft: "auto" }}>
               <NotificationCenter />
             </div>
@@ -155,6 +157,7 @@ export default function DashboardLayout({ children }) {
             >
               📋 Tugas
             </button>
+            <BukaEPelaraButton label="e-Pelara" className="ml-1" />
             <div style={{ marginLeft: "auto" }}>
               <NotificationCenter />
             </div>

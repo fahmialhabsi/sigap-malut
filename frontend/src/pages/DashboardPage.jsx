@@ -41,6 +41,26 @@ export default function DashboardPage() {
     "kepala_bidang_konsumsi",
 
     "kepala_uptd",
+
+    // A-10: 6 dashboard baru (Fase 3)
+    "jabatan_fungsional",
+    "pejabat_fungsional",
+    "kasubag",
+    "kasubag_umum_kepegawaian",
+    "kasubbag",
+    "kasubbag_umum",
+    "kasubbag_kepegawaian",
+    "bendahara",
+    "pelaksana",
+    "staf_pelaksana",
+    "subbag_tata_usaha",
+    "kasubag_uptd",
+    "kasubbag_tata_usaha",
+    "seksi_manajemen_mutu",
+    "seksi_manajemen_teknis",
+    "kasi_uptd",
+    "kasi_mutu",
+    "kasi_teknis",
   ];
 
   if (!roleName || !allowedRoles.includes(roleName)) {

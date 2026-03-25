@@ -3,7 +3,19 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { notifyError } from "../../utils/notify";
 
-const JENIS_NASKAH_OPTIONS = ["SK", "SE", "ST", "SU", "ND", "MEMO", "BA", "LAP", "SP", "SKET", "Lainnya"];
+const JENIS_NASKAH_OPTIONS = [
+  "SK",
+  "SE",
+  "ST",
+  "SU",
+  "ND",
+  "MEMO",
+  "BA",
+  "LAP",
+  "SP",
+  "SKET",
+  "Lainnya",
+];
 
 const STATUS_COLORS = {
   draft: "bg-gray-100 text-gray-600",
@@ -28,7 +40,7 @@ export default function SuratKeluarPage() {
       const params = {};
       if (filterStatus) params.status = filterStatus;
       if (filterJenis) params.jenis_naskah = filterJenis;
-      const res = await api.get("/api/surat/keluar", { params });
+      const res = await api.get("/surat/keluar", { params });
       setSuratList(res.data.data || []);
     } catch (error) {
       notifyError("Gagal memuat daftar surat keluar.");
@@ -64,7 +76,9 @@ export default function SuratKeluarPage() {
         >
           <option value="">Semua Jenis</option>
           {JENIS_NASKAH_OPTIONS.map((j) => (
-            <option key={j} value={j}>{j}</option>
+            <option key={j} value={j}>
+              {j}
+            </option>
           ))}
         </select>
         <select
@@ -74,7 +88,9 @@ export default function SuratKeluarPage() {
         >
           <option value="">Semua Status</option>
           {Object.keys(STATUS_COLORS).map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
       </div>
@@ -104,11 +120,15 @@ export default function SuratKeluarPage() {
                     <span className="font-mono text-sm text-blue-700">
                       {surat.nomor_surat || surat.draft_nomor || "Draft"}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[surat.status] || "bg-gray-100"}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[surat.status] || "bg-gray-100"}`}
+                    >
                       {surat.status}
                     </span>
                   </div>
-                  <p className="font-medium text-gray-800 truncate">{surat.perihal}</p>
+                  <p className="font-medium text-gray-800 truncate">
+                    {surat.perihal}
+                  </p>
                   <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                     <span>📬 {surat.kepada}</span>
                     <span>📅 {surat.tanggal_surat}</span>

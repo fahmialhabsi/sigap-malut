@@ -3,7 +3,14 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { notifyError } from "../../utils/notify";
 
-const STATUS_FILTERS = ["Semua", "masuk", "disposisi", "proses", "selesai", "arsip"];
+const STATUS_FILTERS = [
+  "Semua",
+  "masuk",
+  "disposisi",
+  "proses",
+  "selesai",
+  "arsip",
+];
 
 const STATUS_COLORS = {
   masuk: "bg-blue-100 text-blue-700",
@@ -30,7 +37,7 @@ export default function InboxSuratMasukPage() {
     setLoading(true);
     try {
       const params = activeFilter !== "Semua" ? { status: activeFilter } : {};
-      const res = await api.get("/api/surat/masuk", { params });
+      const res = await api.get("/surat/masuk", { params });
       setSuratList(res.data.data || []);
     } catch (error) {
       notifyError("Gagal memuat daftar surat masuk.");
@@ -100,7 +107,8 @@ export default function InboxSuratMasukPage() {
                     </span>
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        STATUS_COLORS[surat.status] || "bg-gray-100 text-gray-600"
+                        STATUS_COLORS[surat.status] ||
+                        "bg-gray-100 text-gray-600"
                       }`}
                     >
                       {surat.status}
@@ -115,7 +123,9 @@ export default function InboxSuratMasukPage() {
                       </span>
                     )}
                   </div>
-                  <p className="font-medium text-gray-800 truncate">{surat.perihal}</p>
+                  <p className="font-medium text-gray-800 truncate">
+                    {surat.perihal}
+                  </p>
                   <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                     <span>📤 {surat.asal_surat}</span>
                     <span>📱 {surat.media_terima}</span>

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 function normalizeRoleName(user) {
   return (
@@ -36,6 +37,11 @@ export default function DashboardKepalaDinasLayout({ children }) {
               Ringkasan Eksekutif dan Monitoring
             </p>
           </div>
+          <BukaEPelaraButton
+            label="e-Pelara"
+            targetPath="/"
+            className="!py-1.5 !px-3 !text-xs"
+          />
         </div>
       </header>
 

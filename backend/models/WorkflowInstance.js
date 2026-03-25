@@ -71,6 +71,14 @@ const WorkflowInstance = sequelize.define(
       allowNull: false,
       defaultValue: 0,
     },
+    current_node_id: {
+      type: DataTypes.STRING(128),
+      allowNull: true,
+    },
+    unit_kerja: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,

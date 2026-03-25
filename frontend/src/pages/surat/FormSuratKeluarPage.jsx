@@ -3,7 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { notifySuccess, notifyError } from "../../utils/notify";
 
-const JENIS_NASKAH_OPTIONS = ["SK", "SE", "ST", "SU", "ND", "MEMO", "BA", "LAP", "SP", "SKET", "Lainnya"];
+const JENIS_NASKAH_OPTIONS = [
+  "SK",
+  "SE",
+  "ST",
+  "SU",
+  "ND",
+  "MEMO",
+  "BA",
+  "LAP",
+  "SP",
+  "SKET",
+  "Lainnya",
+];
 
 const EMPTY_FORM = {
   jenis_naskah: "ST",
@@ -33,13 +45,15 @@ export default function FormSuratKeluarPage() {
       const fetchSurat = async () => {
         setLoading(true);
         try {
-          const res = await api.get(`/api/surat/keluar/${id}`);
+          const res = await api.get(`/surat/keluar/${id}`);
           const d = res.data.data;
           setForm({
             jenis_naskah: d.jenis_naskah || "ST",
             tanggal_surat: d.tanggal_surat || "",
             kepada: d.kepada || "",
-            tembusan: Array.isArray(d.tembusan) ? d.tembusan.join(", ") : d.tembusan || "",
+            tembusan: Array.isArray(d.tembusan)
+              ? d.tembusan.join(", ")
+              : d.tembusan || "",
             perihal: d.perihal || "",
             isi_surat: d.isi_surat || "",
             dasar: d.dasar || "",
@@ -62,8 +76,15 @@ export default function FormSuratKeluarPage() {
   };
 
   const submitForm = async (status) => {
-    if (!form.jenis_naskah || !form.tanggal_surat || !form.kepada || !form.perihal) {
-      notifyError("Jenis naskah, tanggal surat, kepada, dan perihal wajib diisi.");
+    if (
+      !form.jenis_naskah ||
+      !form.tanggal_surat ||
+      !form.kepada ||
+      !form.perihal
+    ) {
+      notifyError(
+        "Jenis naskah, tanggal surat, kepada, dan perihal wajib diisi.",
+      );
       return;
     }
 
@@ -79,12 +100,15 @@ export default function FormSuratKeluarPage() {
       if (isEdit) {
         const updateData = { ...form, status };
         if (form.tembusan) {
-          updateData.tembusan = form.tembusan.split(",").map((s) => s.trim()).filter(Boolean);
+          updateData.tembusan = form.tembusan
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
         }
-        await api.put(`/api/surat/keluar/${id}`, updateData);
+        await api.put(`/surat/keluar/${id}`, updateData);
         notifySuccess("Surat keluar berhasil diperbarui.");
       } else {
-        const res = await api.post("/api/surat/keluar", formData, {
+        const res = await api.post("/surat/keluar", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         notifySuccess(
@@ -98,21 +122,28 @@ export default function FormSuratKeluarPage() {
 
       navigate("/surat/keluar");
     } catch (error) {
-      notifyError(error.response?.data?.message || "Gagal menyimpan surat keluar.");
+      notifyError(
+        error.response?.data?.message || "Gagal menyimpan surat keluar.",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <div className="text-center py-16 text-gray-500">Memuat data...</div>;
+    return (
+      <div className="text-center py-16 text-gray-500">Memuat data...</div>
+    );
   }
 
   return (
     <div className="max-w-2xl mx-auto mt-6 px-4 pb-10">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => navigate("/surat/keluar")} className="text-gray-500 hover:text-gray-700">
+        <button
+          onClick={() => navigate("/surat/keluar")}
+          className="text-gray-500 hover:text-gray-700"
+        >
           ←
         </button>
         <h1 className="text-xl font-bold text-gray-800">
@@ -132,7 +163,9 @@ export default function FormSuratKeluarPage() {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {JENIS_NASKAH_OPTIONS.map((j) => (
-              <option key={j} value={j}>{j}</option>
+              <option key={j} value={j}>
+                {j}
+              </option>
             ))}
           </select>
         </div>
@@ -183,7 +216,9 @@ export default function FormSuratKeluarPage() {
 
         {/* Isi Surat */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Isi Surat</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Isi Surat
+          </label>
           <textarea
             value={form.isi_surat}
             onChange={(e) => handleChange("isi_surat", e.target.value)}
@@ -195,7 +230,9 @@ export default function FormSuratKeluarPage() {
 
         {/* Dasar */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Dasar Hukum</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Dasar Hukum
+          </label>
           <textarea
             value={form.dasar}
             onChange={(e) => handleChange("dasar", e.target.value)}
@@ -208,7 +245,8 @@ export default function FormSuratKeluarPage() {
         {/* Tembusan */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Tembusan <span className="text-xs text-gray-400">(pisah dengan koma)</span>
+            Tembusan{" "}
+            <span className="text-xs text-gray-400">(pisah dengan koma)</span>
           </label>
           <textarea
             value={form.tembusan}
@@ -222,7 +260,9 @@ export default function FormSuratKeluarPage() {
         {/* Penandatangan */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Penandatangan</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Penandatangan
+            </label>
             <input
               type="text"
               value={form.penandatangan}
@@ -232,7 +272,9 @@ export default function FormSuratKeluarPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Jabatan TTD</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Jabatan TTD
+            </label>
             <input
               type="text"
               value={form.jabatan_ttd}
@@ -246,7 +288,9 @@ export default function FormSuratKeluarPage() {
         {/* Upload File Draft */}
         {!isEdit && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">File Draft (opsional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              File Draft (opsional)
+            </label>
             <div
               onClick={() => fileInputRef.current?.click()}
               className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 text-sm text-gray-500"
@@ -265,7 +309,9 @@ export default function FormSuratKeluarPage() {
 
         {/* Keterangan */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Keterangan
+          </label>
           <textarea
             value={form.keterangan}
             onChange={(e) => handleChange("keterangan", e.target.value)}

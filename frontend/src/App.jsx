@@ -32,6 +32,13 @@ import DashboardKeuangan from "./ui/dashboards/DashboardKeuangan";
 import DashboardKomoditas from "./ui/dashboards/DashboardKomoditas";
 import LandingPage from "./pages/LandingPage";
 import DashboardSuperAdmin from "./ui/dashboards/DashboardSuperAdmin";
+import DashboardKepalaDinas from "./ui/dashboards/DashboardKepalaDinas";
+import DashboardFungsional from "./ui/dashboards/DashboardFungsional";
+import DashboardKasubag from "./ui/dashboards/DashboardKasubag";
+import DashboardBendahara from "./ui/dashboards/DashboardBendahara";
+import DashboardPelaksana from "./ui/dashboards/DashboardPelaksana";
+import DashboardKasubagUPTD from "./ui/dashboards/DashboardKasubagUPTD";
+import DashboardKasiUPTD from "./ui/dashboards/DashboardKasiUPTD";
 import MasterDataSyncPanel from "./components/MasterDataSyncPanel.jsx";
 import IntegrationLogPanel from "./components/IntegrationLogPanel.jsx";
 import AuditTrailPage from "./pages/AuditTrailPage";
@@ -213,6 +220,64 @@ function App() {
         />
 
         <Route
+          path="/dashboard/kepala-dinas"
+          element={
+            <PrivateRoute>
+              <DashboardKepalaDinas />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/fungsional"
+          element={
+            <PrivateRoute>
+              <DashboardFungsional />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/kasubag"
+          element={
+            <PrivateRoute>
+              <DashboardKasubag />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/bendahara"
+          element={
+            <PrivateRoute>
+              <DashboardBendahara />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/pelaksana"
+          element={
+            <PrivateRoute>
+              <DashboardPelaksana />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/kasubag-uptd"
+          element={
+            <PrivateRoute>
+              <DashboardKasubagUPTD />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/kasi-uptd"
+          element={
+            <PrivateRoute>
+              <DashboardKasiUPTD />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
           path="/dashboard/inflasi"
           element={
             <PrivateRoute>
@@ -231,6 +296,7 @@ function App() {
         />
 
         <Route
+          path="/dashboard/kepegawaian"
           element={
             <PrivateRoute>
               <DashboardKepegawaian />
@@ -379,31 +445,59 @@ function App() {
         {/* Surat Menyurat (e-Office M011-M013) */}
         <Route
           path="/surat/masuk"
-          element={<PrivateRoute><InboxSuratMasukPage /></PrivateRoute>}
+          element={
+            <PrivateRoute>
+              <InboxSuratMasukPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/surat/masuk/upload"
-          element={<PrivateRoute><UploadSuratMasukPage /></PrivateRoute>}
+          element={
+            <PrivateRoute>
+              <UploadSuratMasukPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/surat/masuk/:id"
-          element={<PrivateRoute><DetailSuratMasukPage /></PrivateRoute>}
+          element={
+            <PrivateRoute>
+              <DetailSuratMasukPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/surat/masuk/:id/disposisi"
-          element={<PrivateRoute><FormDisposisiPage /></PrivateRoute>}
+          element={
+            <PrivateRoute>
+              <FormDisposisiPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/surat/keluar"
-          element={<PrivateRoute><SuratKeluarPage /></PrivateRoute>}
+          element={
+            <PrivateRoute>
+              <SuratKeluarPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/surat/keluar/baru"
-          element={<PrivateRoute><FormSuratKeluarPage /></PrivateRoute>}
+          element={
+            <PrivateRoute>
+              <FormSuratKeluarPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/surat/keluar/:id/edit"
-          element={<PrivateRoute><FormSuratKeluarPage /></PrivateRoute>}
+          element={
+            <PrivateRoute>
+              <FormSuratKeluarPage />
+            </PrivateRoute>
+          }
         />
 
         {/* Self-service analytics filter (05-Dashboard-Template-Standar.md) */}
