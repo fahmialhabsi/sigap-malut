@@ -1,4 +1,6 @@
 import { sequelize, testConnection } from "./config/database.js";
+// Import models/index.js agar semua model (termasuk Spj) ter-define sebelum sequelize.sync()
+import "./models/index.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
 import sekAdmRoutes from "./routes/SEK-ADM.js";
@@ -6,9 +8,25 @@ import bdsHrgRoutes from "./routes/BDS-HRG.js";
 import bktPgdRoutes from "./routes/BKT-PGD.js";
 import modulesRoutes from "./routes/modules.js";
 import bksEvlRoutes from "./routes/BKS-EVL.js";
+import dashboardRoutes from "./routes/dashboard.js";
+import inflasiRoutes from "./routes/inflasi.js";
+import komoditasStockRoutes from "./routes/komoditasStock.js";
+import taskRoutes from "./routes/tasks.js";
+import suratRoutes from "./routes/surat.js";
+import notificationRoutes from "./routes/notification.js";
+import mfaRoutes from "./routes/mfa.js";
+import ePelaraRoutes from "./routes/ePelaraRoutes.js";
+import bypassDetectionRoutes from "./routes/bypassDetection.js";
+import subKegiatanUsulRoutes from "./routes/subKegiatanUsul.js";
+import uptdOpsRoutes from "./routes/uptdOps.js";
+import spjRoutes from "./routes/spj.js";
+import skpRoutes from "./routes/skp.js";
+import { initSLAScheduler } from "./services/slaService.js";
+import { initDailyDigestScheduler } from "./services/dailyDigestService.js";
 // ...existing code...
 // backend/server.js
 
+import http from "http";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
@@ -18,6 +36,12 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
 import client from "prom-client";
+import { initSocketIOAsync } from "./services/socketService.js";
+import {
+  startKPIPolling,
+  stopKPIPolling,
+} from "./services/kpiPollingService.js";
+import { getCacheStats } from "./services/cacheService.js";
 const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics();
 
@@ -27,9 +51,13 @@ const httpRequestCounter = new client.Counter({
   labelNames: ["method", "route", "status"],
 });
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Eksplisit path agar dotenv selalu baca dari direktori server.js, bukan process.cwd()
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
+const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 import complianceRoutes from "./routes/compliance.js";
 
@@ -51,10 +79,6 @@ app.get("/metrics", async (req, res) => {
 });
 
 app.use("/api/compliance", complianceRoutes);
-
-// ESM __filename shim
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(helmet());
@@ -97,11 +121,13 @@ app.use(
 
 // Health check
 app.get("/health", (req, res) => {
+  const cacheStats = getCacheStats();
   res.json({
     success: true,
     message: "SIGAP Malut API is running",
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || "development",
+    cache: cacheStats,
   });
 });
 
@@ -137,8 +163,19 @@ app.use("/api/bds-hrg", bdsHrgRoutes);
 app.use("/api/bkt-pgd", bktPgdRoutes);
 app.use("/api/modules", modulesRoutes);
 app.use("/api/bks-evl", bksEvlRoutes);
-
-// Register all auto-generated routes
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/inflasi", inflasiRoutes);
+app.use("/api/komoditas", komoditasStockRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/surat", suratRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/auth/mfa", mfaRoutes);
+app.use("/api/epelara", ePelaraRoutes);
+app.use("/api/bypassdetection", bypassDetectionRoutes);
+app.use("/api/sub-kegiatan-usul", subKegiatanUsulRoutes);
+app.use("/api/uptd-ops", uptdOpsRoutes);
+app.use("/api/spj", spjRoutes);
+app.use("/api/skp", skpRoutes);  \nimport pelaksanaRoutes from "./routes/pelaksana/index.js";  \napp.use("/api/pelaksana", pelaksanaRoutes);  \n  \n// Register all auto-generated routes
 registerRoutes(app);
 
 // Error handler
@@ -161,14 +198,38 @@ async function startServer() {
     // Sync database models (only create tables if not exist)
     await sequelize.sync();
 
-    app.listen(PORT, () => {
+    // Inisialisasi Socket.IO
+    await initSocketIOAsync(httpServer);
+
+    // Mulai KPI polling (5 menit)
+    startKPIPolling();
+
+    // SLA escalation + daily digest schedulers
+    await initSLAScheduler();
+    await initDailyDigestScheduler();
+
+    httpServer.listen(PORT, () => {
       console.log(`\n${"=".repeat(60)}`);
       console.log(`SIGAP Malut Backend Server`);
       console.log(`${"=".repeat(60)}`);
       console.log(`Server running on: http://localhost:${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
       console.log(`Database: ${sequelize.getDialect()}`);
+      console.log(`WebSocket: Socket.IO aktif di ws://localhost:${PORT}`);
+      console.log(`KPI Polling: setiap 5 menit`);
+      console.log(`SLA Scheduler: aktif`);
+      console.log(`Daily Digest: aktif`);
       console.log(`${"=".repeat(60)}\n`);
+    });
+
+    // Graceful shutdown
+    process.on("SIGTERM", () => {
+      stopKPIPolling();
+      httpServer.close();
+    });
+    process.on("SIGINT", () => {
+      stopKPIPolling();
+      httpServer.close(() => process.exit(0));
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);

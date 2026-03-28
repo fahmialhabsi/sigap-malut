@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import api from "../utils/api";
 import sekretariatModules from "../data/sekretariatModules";
 import { roleIdToName } from "../utils/roleMap";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 function normalizeRoleName(user) {
   return (
@@ -16,13 +17,13 @@ function normalizeRoleName(user) {
   );
 }
 
-function isActiveModule(row) {
+function isActiveModule(module) {
   return (
-    row?.is_active === undefined ||
-    row?.is_active === null ||
-    row?.is_active === true ||
-    String(row?.is_active).toLowerCase() === "true" ||
-    String(row?.is_active) === "1"
+    module?.is_active === undefined ||
+    module?.is_active === null ||
+    module?.is_active === true ||
+    String(module?.is_active).toLowerCase() === "true" ||
+    String(module?.is_active) === "1"
   );
 }
 
@@ -36,20 +37,15 @@ function SidebarItem({ to, label, sidebarOpen, onNavigate }) {
       {({ isActive }) => (
         <>
           {isActive && (
-            <div className="absolute left-2 h-[52px] w-2 bg-gradient-to-b from-yellow-400 to-yellow-200 rounded-r-lg scale-105 shadow-lg transition" />
+            <div className="absolute left-2 h-[52px] w-2 bg-gradient-to-b from-yellow-400 to-yellow-200 rounded-r-lg shadow-lg transition" />
           )}
           <div
-            className={`
-              h-[52px] w-full pl-10 pr-5 text-lg flex items-center rounded-2xl font-semibold
+            className={`h-[52px] w-full pl-10 pr-5 text-lg flex items-center rounded-2xl font-semibold
               ${
                 isActive
                   ? "bg-slate-800/95 text-yellow-300"
                   : "bg-slate-900/90 text-slate-100 hover:bg-slate-800/90"
-              }
-              shadow group-hover:scale-105
-              transition-all
-              relative
-            `}
+              } shadow group-hover:scale-105 transition-all relative`}
           >
             <span className="flex-1 text-left">
               {sidebarOpen ? label : label[0]}
@@ -65,43 +61,40 @@ export default function DashboardSekretariatLayout({
   children,
   fallbackModules = sekretariatModules,
 }) {
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.innerWidth < 768;
-  });
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return window.innerWidth >= 768;
-  });
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false,
+  );
+  const [sidebarOpen, setSidebarOpen] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true,
+  );
   const [waktu, setWaktu] = useState(new Date());
   const [user, setUser] = useState(null);
-  const [notifikasi, setNotifikasi] = useState([]);
-  const [avatarOpen, setAvatarOpen] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
   const [modules, setModules] = useState(
     Array.isArray(fallbackModules) ? fallbackModules : [],
   );
+  const [authChecked, setAuthChecked] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef();
 
+  // --- Handle window resize ---
   useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       if (!mobile) setSidebarOpen(true);
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // --- Update clock every second ---
   useEffect(() => {
     const timer = setInterval(() => setWaktu(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // --- Auth & role check ---
   useEffect(() => {
     let mounted = true;
 
@@ -123,10 +116,7 @@ export default function DashboardSekretariatLayout({
           roleName === "kepala_dinas" ||
           roleName === "gubernur" ||
           unit.includes("sekretariat");
-
-        if (!data || !allowed) {
-          window.location.href = "/";
-        }
+        if (!data || !allowed) window.location.href = "/";
       })
       .catch(() => {
         if (!mounted) return;
@@ -139,19 +129,14 @@ export default function DashboardSekretariatLayout({
     };
   }, []);
 
+  // --- Fetch & filter modules ---
   useEffect(() => {
     if (!authChecked) return;
     let mounted = true;
 
     const applyModules = (arr) => {
       if (!mounted) return;
-
       const rows = Array.isArray(arr) ? arr : [];
-      if (!rows.length) {
-        setModules(Array.isArray(fallbackModules) ? fallbackModules : []);
-        return;
-      }
-
       const sekretariatRows = rows.filter((row) => {
         const moduleId = String(row?.modul_id || row?.id || "")
           .trim()
@@ -165,47 +150,36 @@ export default function DashboardSekretariatLayout({
         )
           .trim()
           .toLowerCase();
-
-        const byBidang = bidang.includes("sekretariat");
-        const byId =
-          moduleId.startsWith("SA") ||
-          /^M0(0[1-9]|[1-2][0-9]|3[0-1])$/.test(moduleId);
-
-        return isActiveModule(row) && (byBidang || byId);
+        return (
+          isActiveModule(row) &&
+          (bidang.includes("sekretariat") ||
+            moduleId.startsWith("SA") ||
+            /^M0(0[1-9]|[1-2][0-9]|3[0-1])$/.test(moduleId))
+        );
       });
-
-      const selected = sekretariatRows.length ? sekretariatRows : rows;
-      const sorted = [...selected].sort((a, b) => {
-        const orderA = Number(a?.menu_order ?? a?.menuOrder ?? 9999);
-        const orderB = Number(b?.menu_order ?? b?.menuOrder ?? 9999);
-        return orderA - orderB;
-      });
+      const sorted = sekretariatRows.length ? sekretariatRows : rows;
+      sorted.sort(
+        (a, b) =>
+          Number(a?.menu_order ?? a?.menuOrder ?? 9999) -
+          Number(b?.menu_order ?? b?.menuOrder ?? 9999),
+      );
       setModules(sorted);
     };
 
     api
       .get("/modules")
       .then((res) => {
-        if (!mounted) return;
-
-        const payload = res.data;
-        const arr = Array.isArray(payload)
-          ? payload
-          : Array.isArray(payload?.data)
-            ? payload.data
-            : Array.isArray(payload?.result)
-              ? payload.result
-              : [];
-
-        if (arr.length) {
-          applyModules(arr);
-          return;
-        }
-
-        fetch("/master-data/modules-sekretariat.json")
-          .then((r) => r.json())
-          .then((json) => applyModules(json))
-          .catch(() => applyModules(fallbackModules));
+        const arr = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
+        if (arr.length) applyModules(arr);
+        else
+          fetch("/master-data/modules-sekretariat.json")
+            .then((r) => r.json())
+            .then((json) => applyModules(json))
+            .catch(() => applyModules(fallbackModules));
       })
       .catch(() => {
         fetch("/master-data/modules-sekretariat.json")
@@ -219,25 +193,25 @@ export default function DashboardSekretariatLayout({
     };
   }, [authChecked, fallbackModules]);
 
+  // --- Avatar dropdown click outside ---
   useEffect(() => {
     const handleClick = (e) => {
-      if (avatarRef.current && !avatarRef.current.contains(e.target)) {
+      if (avatarRef.current && !avatarRef.current.contains(e.target))
         setAvatarOpen(false);
-      }
     };
-
     if (avatarOpen) window.addEventListener("mousedown", handleClick);
     return () => window.removeEventListener("mousedown", handleClick);
   }, [avatarOpen]);
 
+  // --- Sidebar menu ---
   const sekretariatMenu = useMemo(() => {
-    const modulRows = (Array.isArray(modules) ? modules : [])
+    const modulRows = (modules || [])
       .filter(isActiveModule)
-      .sort((a, b) => {
-        const orderA = Number(a?.menu_order ?? a?.menuOrder ?? 9999);
-        const orderB = Number(b?.menu_order ?? b?.menuOrder ?? 9999);
-        return orderA - orderB;
-      })
+      .sort(
+        (a, b) =>
+          Number(a?.menu_order ?? a?.menuOrder ?? 9999) -
+          Number(b?.menu_order ?? b?.menuOrder ?? 9999),
+      )
       .map((row) => {
         const id = row.modul_id || row.id;
         return {
@@ -246,31 +220,29 @@ export default function DashboardSekretariatLayout({
           path: `/module/${String(id).toLowerCase()}`,
         };
       });
-
     return [
-      {
-        id: "dashboard",
-        name: "Dashboard",
-        path: "/dashboard/sekretariat",
-      },
+      { id: "dashboard", name: "Dashboard", path: "/dashboard/sekretariat" },
       ...modulRows,
+      { id: "surat-masuk", name: "Surat Masuk", path: "/surat/masuk" },
+      { id: "surat-keluar", name: "Surat Keluar", path: "/surat/keluar" },
     ];
   }, [modules]);
 
-  const menuLabelMap = {
-    DASHBOARD: "Dashboard Sekretariat",
-    M001: "Data ASN",
-    M002: "Tracking KGB",
-    M003: "Tracking Pangkat",
-    M004: "Tracking Penghargaan",
-    M005: "Data Cuti",
-    M006: "Perjalanan Dinas",
-    M007: "Diklat & Pelatihan",
-    M008: "SKP",
-    M009: "Database Kepegawaian",
-  };
-
   const getMenuLabel = (moduleItem) => {
+    const menuLabelMap = {
+      DASHBOARD: "Dashboard Sekretariat",
+      M001: "Data ASN",
+      M002: "Tracking KGB",
+      M003: "Tracking Pangkat",
+      M004: "Tracking Penghargaan",
+      M005: "Data Cuti",
+      M006: "Perjalanan Dinas",
+      M007: "Diklat & Pelatihan",
+      M008: "SKP",
+      M009: "Database Kepegawaian",
+      "SURAT-MASUK": "Surat Masuk",
+      "SURAT-KELUAR": "Surat Keluar",
+    };
     const key = String(moduleItem?.id || "").toUpperCase();
     return menuLabelMap[key] || moduleItem?.name || "Modul";
   };
@@ -287,13 +259,7 @@ export default function DashboardSekretariatLayout({
       )}
 
       <aside
-        className={`h-full bg-black/95 z-30 flex flex-col items-center flex-shrink-0 transition-all duration-300 ${
-          isMobile
-            ? `${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed left-0 top-0 w-[275px] min-w-[275px]`
-            : sidebarOpen
-              ? "w-[275px] min-w-[275px]"
-              : "w-[72px] min-w-[72px]"
-        } border-r border-slate-800/80 shadow-xl`}
+        className={`h-full bg-black/95 z-30 flex flex-col items-center flex-shrink-0 transition-all duration-300 ${isMobile ? `${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed left-0 top-0 w-[275px] min-w-[275px]` : sidebarOpen ? "w-[275px] min-w-[275px]" : "w-[72px] min-w-[72px]"} border-r border-slate-800/80 shadow-xl`}
       >
         <div className="flex items-center justify-center w-full py-8">
           <img
@@ -302,7 +268,6 @@ export default function DashboardSekretariatLayout({
             className={`object-contain ${sidebarOpen ? "w-24 h-24" : "w-10 h-10"}`}
           />
         </div>
-
         <nav className="w-full flex flex-col gap-4 flex-1 justify-center px-3">
           {sekretariatMenu.length ? (
             sekretariatMenu.map((m) => (
@@ -311,9 +276,7 @@ export default function DashboardSekretariatLayout({
                 to={m.path}
                 label={getMenuLabel(m)}
                 sidebarOpen={sidebarOpen}
-                onNavigate={() => {
-                  if (isMobile) setSidebarOpen(false);
-                }}
+                onNavigate={() => isMobile && setSidebarOpen(false)}
               />
             ))
           ) : (
@@ -322,7 +285,6 @@ export default function DashboardSekretariatLayout({
             </div>
           )}
         </nav>
-
         <div className="py-6 w-full text-xs text-slate-300/70 text-center tracking-wide">
           {sidebarOpen ? "SIGAP Malut" : "SIGAP"}
         </div>
@@ -333,14 +295,13 @@ export default function DashboardSekretariatLayout({
           <button
             type="button"
             className="mr-3 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-700/80 bg-black/70 text-slate-100 hover:bg-slate-900/80"
-            onClick={() => setSidebarOpen((open) => !open)}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
             aria-label={sidebarOpen ? "Tutup sidebar" : "Buka sidebar"}
           >
             <span className="text-base font-bold">
               {sidebarOpen ? "<" : "="}
             </span>
           </button>
-
           <div className="text-lg md:text-2xl text-white font-bold tracking-wide flex-1">
             SIGAP <span className="font-light">·</span> Sekretariat
           </div>
@@ -358,13 +319,15 @@ export default function DashboardSekretariatLayout({
           <div className="mr-5 hidden md:block text-xs text-slate-300/80">
             {user?.email || ""}
           </div>
+          <div className="mr-3">
+            <BukaEPelaraButton
+              label="e-Pelara"
+              targetPath="/"
+              className="!py-1.5 !px-3 !text-xs"
+            />
+          </div>
           <div className="relative mr-5">
             <NotificationBell />
-            {notifikasi.length > 0 && (
-              <span className="absolute -top-1 -right-1 rounded-full w-4 h-4 bg-red-500 flex items-center justify-center text-xs text-white animate-bounce">
-                !
-              </span>
-            )}
           </div>
           <div className="relative" ref={avatarRef}>
             <button onClick={() => setAvatarOpen(!avatarOpen)}>
@@ -431,23 +394,13 @@ function ProfileAvatar({ userName = "User" }) {
 }
 
 /* ==== Animasi CSS ==== */
-const style = document.createElement("style");
-style.textContent = `
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(30px);}
-  to { opacity: 1; transform: translateY(0);}
-}
-.animate-fade-in-up {
-  animation: fade-in-up 0.3s cubic-bezier(0.4,0,0.2,1) both;
-}
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}
-`;
 if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent = `
+  @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: translateY(0);} }
+  .animate-fade-in-up { animation: fade-in-up 0.3s cubic-bezier(0.4,0,0.2,1) both; }
+  @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .animate-spin-slow { animation: spin-slow 3s linear infinite; }
+  `;
   document.head.appendChild(style);
 }

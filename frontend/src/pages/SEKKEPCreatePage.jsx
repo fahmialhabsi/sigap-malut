@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function SEKKEPCreatePage() {
   const navigate = useNavigate();
@@ -128,13 +129,13 @@ export default function SEKKEPCreatePage() {
     try {
       // Validate required fields
       if (!formData.asn_id || !formData.nip || !formData.nama_asn) {
-        alert("❌ ASN, NIP, dan Nama ASN wajib diisi!");
+        notifyError("ASN, NIP, dan Nama ASN wajib diisi!");
         setLoading(false);
         return;
       }
 
       if (!formData.jenis_layanan_kepegawaian) {
-        alert("❌ Jenis Layanan wajib dipilih!");
+        notifyError("Jenis Layanan wajib dipilih!");
         setLoading(false);
         return;
       }
@@ -144,7 +145,7 @@ export default function SEKKEPCreatePage() {
         formData.jenis_layanan_kepegawaian === "Kenaikan Pangkat" &&
         (!formData.pangkat_baru || !formData.golongan_baru)
       ) {
-        alert(
+        notifyWarning(
           "❌ Untuk Kenaikan Pangkat, Pangkat Baru dan Golongan Baru wajib diisi!",
         );
         setLoading(false);
@@ -155,7 +156,7 @@ export default function SEKKEPCreatePage() {
         formData.jenis_layanan_kepegawaian === "Mutasi" &&
         (!formData.jabatan_baru || !formData.tmt_kenaikan)
       ) {
-        alert("❌ Untuk Mutasi, Jabatan Baru dan TMT wajib diisi!");
+        notifyError("Untuk Mutasi, Jabatan Baru dan TMT wajib diisi!");
         setLoading(false);
         return;
       }
@@ -164,7 +165,7 @@ export default function SEKKEPCreatePage() {
         formData.jenis_layanan_kepegawaian === "Cuti" &&
         (!formData.jenis_cuti || !formData.tanggal_mulai_cuti)
       ) {
-        alert("❌ Untuk Cuti, Jenis Cuti dan Tanggal Mulai wajib diisi!");
+        notifyError("Untuk Cuti, Jenis Cuti dan Tanggal Mulai wajib diisi!");
         setLoading(false);
         return;
       }
@@ -173,7 +174,7 @@ export default function SEKKEPCreatePage() {
         formData.jenis_layanan_kepegawaian === "Penilaian Kinerja" &&
         (!formData.nilai_skp || !formData.predikat_kinerja)
       ) {
-        alert(
+        notifyWarning(
           "❌ Untuk Penilaian Kinerja, Nilai SKP dan Predikat wajib diisi!",
         );
         setLoading(false);
@@ -195,17 +196,17 @@ export default function SEKKEPCreatePage() {
       const response = await api.post("/sek-kep", payload);
 
       if (response.data.success) {
-        alert(
+        notifyWarning(
           `✅ Data kepegawaian berhasil dibuat!\n\nID: ${response.data.data.id}`,
         );
         navigate("/module/sek-kep");
       } else {
-        alert("❌ Error: " + (response.data.message || "Unknown error"));
+        notifyError("Error: " + (response.data.message || "Unknown error"));
       }
     } catch (err) {
       const errMsg =
         err.response?.data?.message || err.response?.data?.error || err.message;
-      alert("❌ Error:\n\n" + errMsg);
+      notifyError("Error:\n\n" + errMsg);
       console.error("Error details:", err);
     } finally {
       setLoading(false);

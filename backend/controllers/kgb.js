@@ -141,7 +141,7 @@ export const deleteKgb = async (req, res) => {
       });
     }
     
-    await record.destroy();
+    await record.update({ is_deleted: true, deleted_at: new Date(), deleted_by: req.user?.id || null });
     
     res.json({
       success: true,

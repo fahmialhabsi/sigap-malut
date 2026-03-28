@@ -1,0 +1,16 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+kode_sop,Kode SOP,varchar,50,true,true,NULL,none,NULL,Kode unik dokumen SOP
+nama_sop,Nama SOP,varchar,500,true,false,NULL,none,NULL,Nama atau judul SOP
+jenis_dokumen,Jenis Dokumen,varchar,100,true,false,NULL,none,"SOP,Instruksi Kerja,Prosedur,Kebijakan,Pedoman",Jenis dokumen manajemen mutu
+area_proses,Area/Proses,varchar,255,true,false,NULL,none,NULL,Area atau proses yang dicakup SOP
+versi,Versi,varchar,20,true,false,1.0,none,NULL,Versi dokumen SOP
+tanggal_terbit,Tanggal Terbit,date,NULL,true,false,NULL,none,NULL,Tanggal penerbitan SOP
+tanggal_revisi,Tanggal Revisi Terakhir,date,NULL,false,false,NULL,none,NULL,Tanggal revisi terakhir
+dibuat_oleh,Dibuat Oleh,varchar,255,false,false,NULL,none,NULL,Nama penyusun SOP
+disetujui_oleh,Disetujui Oleh,varchar,255,false,false,NULL,none,NULL,Nama yang menyetujui SOP
+status_dokumen,Status Dokumen,varchar,50,true,false,Aktif,none,"Aktif,Revisi,Kadaluarsa,Ditarik",Status keaktifan dokumen
+tujuan_sop,Tujuan SOP,text,NULL,false,false,NULL,none,NULL,Tujuan dan ruang lingkup SOP
+referensi,Referensi,varchar,500,false,false,NULL,none,NULL,Referensi atau dasar hukum SOP
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Keterangan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

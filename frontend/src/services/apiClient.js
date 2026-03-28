@@ -1,8 +1,8 @@
 // services/apiClient.js
 import axios from "axios";
 
+// Sama seperti utils/api.js: gunakan process.env untuk kompatibilitas Jest.
 const resolvedBaseURL =
-  import.meta?.env?.VITE_API_URL ||
   (typeof process !== "undefined" && process.env && process.env.VITE_API_URL) ||
   "/api";
 

@@ -1,0 +1,69 @@
+{
+  "name": "kgb_workflow",
+  "description": "Workflow specialized for KGB (Kenaikan Gaji Berkala) processing – kepegawaian approvals.",
+  "based_on": "default_workflow",
+  "states": [
+    "draft",
+    "submitted_hr",
+    "verified_hr",
+    "submitted_kepegawaian",
+    "approved_kepegawaian",
+    "forwarded_to_sekretaris",
+    "approved_by_secretary",
+    "closed",
+    "rejected"
+  ],
+  "transitions": [
+    {
+      "name": "submit_hr",
+      "from": ["draft"],
+      "to": "submitted_hr",
+      "allowed_roles": ["staf_pelaksana", "kasubag_umum_kepegawaian"]
+    },
+    {
+      "name": "verify_hr",
+      "from": ["submitted_hr"],
+      "to": "verified_hr",
+      "allowed_roles": ["kasubag_umum_kepegawaian", "pejabat_fungsional"]
+    },
+    {
+      "name": "submit_kepegawaian",
+      "from": ["verified_hr"],
+      "to": "submitted_kepegawaian",
+      "allowed_roles": ["kasubag_umum_kepegawaian"]
+    },
+    {
+      "name": "approve_kepegawaian",
+      "from": ["submitted_kepegawaian"],
+      "to": "approved_kepegawaian",
+      "allowed_roles": ["kepala_bidang", "sekretaris"]
+    },
+    {
+      "name": "forward_to_sekretaris",
+      "from": ["approved_kepegawaian"],
+      "to": "forwarded_to_sekretaris",
+      "allowed_roles": ["kepala_bidang"]
+    },
+    {
+      "name": "approve_by_secretary",
+      "from": ["forwarded_to_sekretaris"],
+      "to": "approved_by_secretary",
+      "allowed_roles": ["sekretaris"]
+    },
+    {
+      "name": "close",
+      "from": ["approved_by_secretary", "approved_kepegawaian"],
+      "to": "closed",
+      "allowed_roles": ["sekretaris", "kepala_dinas"]
+    },
+    {
+      "name": "reject",
+      "from": ["submitted_hr", "verified_hr", "submitted_kepegawaian"],
+      "to": "rejected",
+      "allowed_roles": ["kasubag_umum_kepegawaian", "pejabat_fungsional", "kepala_bidang"]
+    }
+  ],
+  "notes": {
+    "enforcement": "Every transition MUST write an audit snapshot to audit_log (modul='tasks'). Evidence documents stored in task_files with integrity hash."
+  }
+}

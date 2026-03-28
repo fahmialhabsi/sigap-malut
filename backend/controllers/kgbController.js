@@ -12,7 +12,7 @@ module.exports = function (models) {
     },
     list: async (req, res, next) => {
       try {
-        const r = await svc.findAll();
+        const r = await svc.findAll({ where: { is_deleted: false } });
         return res.json(r);
       } catch (e) {
         next(e);

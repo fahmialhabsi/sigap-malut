@@ -1,0 +1,17 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+nomor_inspeksi,Nomor Inspeksi,varchar,50,true,true,NULL,none,NULL,Nomor unik kegiatan inspeksi
+tanggal_inspeksi,Tanggal Inspeksi,date,NULL,true,false,NULL,none,NULL,Tanggal pelaksanaan inspeksi
+jenis_inspeksi,Jenis Inspeksi,varchar,100,true,false,NULL,none,"Inspeksi Rutin,Inspeksi Mendadak,Inspeksi Khusus,Tindak Lanjut",Jenis kegiatan inspeksi/pengawasan
+objek_inspeksi,Objek Inspeksi,varchar,255,true,false,NULL,none,NULL,Objek atau lokasi yang diinspeksi
+alamat_objek,Alamat Objek,text,NULL,false,false,NULL,none,NULL,Alamat lengkap objek inspeksi
+komoditas,Komoditas,varchar,255,false,false,NULL,none,NULL,Komoditas yang menjadi objek inspeksi
+nama_petugas,Nama Petugas,varchar,255,true,false,NULL,none,NULL,Nama petugas pelaksana inspeksi
+nip_petugas,NIP Petugas,varchar,18,false,false,NULL,none,NULL,NIP petugas pelaksana
+hasil_inspeksi,Hasil Inspeksi,varchar,50,true,false,NULL,none,"Sesuai,Tidak Sesuai,Perlu Perbaikan,Ditangguhkan",Hasil temuan inspeksi
+temuan,Temuan,text,NULL,false,false,NULL,none,NULL,Uraian temuan atau ketidaksesuaian
+rekomendasi,Rekomendasi,text,NULL,false,false,NULL,none,NULL,Rekomendasi tindak lanjut
+batas_tindaklanjut,Batas Tindak Lanjut,date,NULL,false,false,NULL,none,NULL,Batas waktu tindak lanjut rekomendasi
+status_tindaklanjut,Status Tindak Lanjut,varchar,50,true,false,Belum,none,"Belum,Dalam Proses,Selesai",Status penyelesaian tindak lanjut
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Keterangan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

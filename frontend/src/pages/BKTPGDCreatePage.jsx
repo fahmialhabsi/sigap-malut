@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function BKTPGDCreatePage() {
   const navigate = useNavigate();
@@ -88,21 +89,12 @@ export default function BKTPGDCreatePage() {
     setLoading(true);
 
     try {
-      // DEBUG: Check localStorage
-      console.log("=== DEBUG START ===");
-      console.log("localStorage token:", localStorage.getItem("token"));
-      console.log("localStorage user:", localStorage.getItem("user"));
-
       // Get user from localStorage
       const userStr = localStorage.getItem("user");
       const user = userStr ? JSON.parse(userStr) : null;
 
-      console.log("Parsed user:", user);
-      console.log("User ID:", user?.id);
-      console.log("=== DEBUG END ===");
-
       if (!user || !user.id) {
-        alert(
+        notifyWarning(
           "❌ Error: User tidak terautentikasi.\n\nSilakan logout dan login ulang.",
         );
         setLoading(false);
@@ -131,8 +123,6 @@ export default function BKTPGDCreatePage() {
         keterangan: formData.keterangan || "",
         created_by: user.id,
       };
-
-      console.log("Sending BKT-PGD data:", bktPgdData);
 
       // 1. Submit ke BKT-PGD
       await api.post("/bkt-pgd", bktPgdData);
@@ -173,7 +163,7 @@ export default function BKTPGDCreatePage() {
         created_by: user.id,
       });
 
-      alert(
+      notifyWarning(
         "✅ Data produksi berhasil disimpan!\n\n" +
           "📊 Auto-sync ke Bidang Distribusi (draft - menunggu input harga)\n" +
           "📨 Auto-report ke Sekretariat (status: proses)",
@@ -193,7 +183,7 @@ export default function BKTPGDCreatePage() {
         errorMsg = error.message;
       }
 
-      alert("❌ Error: " + errorMsg);
+      notifyError("Error: " + errorMsg);
     } finally {
       setLoading(false);
     }

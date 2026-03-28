@@ -4,28 +4,30 @@
 // Generated: 2026-03-19T23:39:36.937Z
 // =====================================================
 
-import express from 'express';
+import express from "express";
 import {
   getAllStok,
   getStokById,
   createStok,
   updateStok,
-  deleteStok
-} from '../controllers/stok.js';
-// import { protect } from '../middleware/auth.js'; // Uncomment when auth is ready
+  deleteStok,
+} from "../controllers/stok.js";
+import { protect } from "../middleware/auth.js";
+import { requirePermission } from "../middleware/permissionCheck.js";
 
 const router = express.Router();
 
-// All routes are protected (uncomment when auth is ready)
-// router.use(protect);
+router.use(protect);
 
-router.route('/')
-  .get(getAllStok)
-  .post(createStok);
+router
+  .route("/")
+  .get(requirePermission("stok", "read"), getAllStok)
+  .post(requirePermission("stok", "create"), createStok);
 
-router.route('/:id')
-  .get(getStokById)
-  .put(updateStok)
-  .delete(deleteStok);
+router
+  .route("/:id")
+  .get(requirePermission("stok", "read"), getStokById)
+  .put(requirePermission("stok", "update"), updateStok)
+  .delete(requirePermission("stok", "delete"), deleteStok);
 
 export default router;

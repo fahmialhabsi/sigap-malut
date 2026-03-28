@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function BDSCPDCreatePage() {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export default function BDSCPDCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("Session expired. Silakan login ulang.");
+        notifyWarning("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -61,7 +62,7 @@ export default function BDSCPDCreatePage() {
           rec.jenis_layanan_cppd === formData.jenis_layanan_cppd,
       );
       if (isDuplicate) {
-        alert(
+        notifyWarning(
           "Data untuk periode dan jenis layanan ini sudah ada di modul lain. Tidak boleh duplikasi!",
         );
         setLoading(false);
@@ -84,11 +85,11 @@ export default function BDSCPDCreatePage() {
 
       await api.post("/bds-cpd", payload);
 
-      alert("Data CPPD berhasil dibuat.");
+      notifyWarning("Data CPPD berhasil dibuat.");
       navigate("/module/bds-cpd");
     } catch (error) {
       console.error("Error:", error);
-      alert("Error: " + (error.response?.data?.message || error.message));
+      notifyWarning("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

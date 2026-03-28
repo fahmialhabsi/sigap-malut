@@ -1,7 +1,5 @@
 ---
 
-# 03 - Dashboard UI/UX SIGAP-MALUT
-
 # BAB KHUSUS: UI/UX SISTEM PENILAIAN KINERJA ASN
 
 ## Wireframe Halaman

@@ -1,0 +1,15 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+nomor_surat,Nomor Surat,varchar,100,false,false,NULL,none,NULL,Nomor surat atau dokumen administrasi
+perihal,Perihal,varchar,500,true,false,NULL,none,NULL,Perihal atau pokok surat
+tanggal_surat,Tanggal Surat,date,NULL,true,false,NULL,none,NULL,Tanggal surat dibuat
+pengirim,Pengirim,varchar,255,false,false,NULL,none,NULL,Nama pengirim surat
+penerima,Penerima,varchar,255,true,false,NULL,none,NULL,Nama penerima surat
+jenis_dokumen,Jenis Dokumen,varchar,100,true,false,NULL,none,"Surat Masuk,Surat Keluar,Memorandum,SK,Nota Dinas",Jenis dokumen administrasi
+nomor_agenda,Nomor Agenda,varchar,50,false,true,NULL,none,NULL,Nomor agenda surat masuk/keluar
+sifat_surat,Sifat Surat,varchar,50,false,false,Biasa,none,"Biasa,Segera,Sangat Segera,Rahasia",Sifat atau klasifikasi surat
+lampiran,Lampiran,varchar,255,false,false,NULL,none,NULL,Deskripsi lampiran surat
+status_disposisi,Status Disposisi,varchar,50,true,false,Baru,none,"Baru,Didisposisi,Selesai",Status disposisi surat
+ditujukan_kepada,Ditujukan Kepada,varchar,255,false,false,NULL,none,NULL,PIC atau unit yang dituju
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Keterangan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

@@ -49,13 +49,6 @@ router.use(protect);
 
 router.get("/", async (req, res) => {
   try {
-    if (req.user?.role !== "super_admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Hanya super admin yang bisa mengakses daftar modul",
-      });
-    }
-
     const modules = await loadModules();
     const activeModules = modules
       .filter((row) => row.is_active)

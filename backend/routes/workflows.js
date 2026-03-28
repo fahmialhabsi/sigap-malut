@@ -3,6 +3,7 @@ import * as controller from "../controllers/workflowController.js";
 
 import { protect } from "../middleware/auth.js";
 import { requireWorkflowPermission } from "../middleware/workflowRbac.js";
+import { chainOfCommandGuard, workflowValidation } from "../middleware/chainOfCommand.js";
 
 const router = express.Router();
 
@@ -41,6 +42,8 @@ router.delete(
 router.post(
   "/workflows/:id/transition",
   protect,
+  chainOfCommandGuard,
+  workflowValidation,
   requireWorkflowPermission("transition"),
   controller.transition,
 );

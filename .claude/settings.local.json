@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \":*)",
+      "Read(//e/e/sigap-malut/backend/**)",
+      "Read(//e/sigap-malut/frontend/src/ui/dashboards/**)",
+      "Read(//e/sigap-malut/frontend/src/ui/dashboards//**)",
+      "Read(//e/sigap-malut/frontend/src/pages/dashboard/**)",
+      "Read(//e/e/sigap-malut/**)",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(echo \"=== $f ===\")",
+      "Bash(done)",
+      "Bash(do echo:*)",
+      "Bash(head -15 grep -n \"ALLOWED\\\\|useAuthStore\\\\|Navigate\\\\|fetch.*api\\\\|/api/\\\\|localStorage.*token\\\\|authorization\" e:/sigap-malut/frontend/src/pages/dashboard/fungsional-keuangan.jsx)",
+      "Bash(head -20 grep -n \"export default\\\\|useState.*kpi\\\\|useState.*api\\\\|kpiSummary\\\\|liveKpi\" e:/sigap-malut/frontend/src/pages/dashboard/fungsional-keuangan.jsx)",
+      "Bash(npx vite:*)",
+      "Bash(wc -l \"e:/sigap-malut/master-data/FIELDS_SEKRETARIAT/\"*.csv)",
+      "Read(//e/sigap-malut/backend/routes/**)"
+    ]
+  }
+}

@@ -1,6 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function SEKLDSCreatePage() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function SEKLDSCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("Session expired. Silakan login ulang.");
+        notifyWarning("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -61,10 +62,10 @@ export default function SEKLDSCreatePage() {
 
       await api.post("/sek-lds", payload);
 
-      alert("Laporan distribusi berhasil dibuat.");
+      notifyWarning("Laporan distribusi berhasil dibuat.");
       navigate("/module/sek-lds");
     } catch (error) {
-      alert("Error: " + (error.response?.data?.message || error.message));
+      notifyWarning("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

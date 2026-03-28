@@ -29,6 +29,15 @@ export default function DashboardMain() {
   const roleName = normalizeRoleName(user);
   const unit = normalizeUnit(user);
 
+  if (roleName === "fungsional_ketersediaan")
+    return <Navigate to="/dashboard/fungsional-ketersediaan" replace />;
+  if (roleName === "fungsional_perencana")
+    return <Navigate to="/dashboard/fungsional-perencanaan" replace />;
+  if (roleName === "fungsional_keuangan")
+    return <Navigate to="/dashboard/fungsional-keuangan" replace />;
+  if (roleName === "fungsional_analis")
+    return <Navigate to="/dashboard/fungsional-keuangan" replace />;
+
   if (roleName === "super_admin")
     return <Navigate to="/dashboard/superadmin" replace />;
 
@@ -72,6 +81,46 @@ export default function DashboardMain() {
     return <Navigate to="/dashboard/konsumsi" replace />;
   if (roleName === "kepala_uptd")
     return <Navigate to="/dashboard/uptd" replace />;
+
+  // Jabatan Fungsional
+  if (roleName === "jabatan_fungsional" || roleName === "pejabat_fungsional")
+    return <Navigate to="/dashboard/fungsional" replace />;
+
+  // Kasubag Umum & Kepegawaian
+  if (
+    roleName === "kasubag" ||
+    roleName === "kasubag_umum_kepegawaian" ||
+    roleName === "kasubbag" ||
+    roleName === "kasubbag_umum" ||
+    roleName === "kasubbag_kepegawaian"
+  )
+    return <Navigate to="/dashboard/kasubag" replace />;
+
+  // Bendahara
+  if (roleName === "bendahara")
+    return <Navigate to="/dashboard/bendahara" replace />;
+
+  // Staf Pelaksana
+  if (roleName === "pelaksana" || roleName === "staf_pelaksana")
+    return <Navigate to="/dashboard/pelaksana" replace />;
+
+  // Kasubag Tata Usaha UPTD
+  if (
+    roleName === "subbag_tata_usaha" ||
+    roleName === "kasubag_uptd" ||
+    roleName === "kasubbag_tata_usaha"
+  )
+    return <Navigate to="/dashboard/kasubag-uptd" replace />;
+
+  // Kepala Seksi UPTD
+  if (
+    roleName === "seksi_manajemen_mutu" ||
+    roleName === "seksi_manajemen_teknis" ||
+    roleName === "kasi_uptd" ||
+    roleName === "kasi_mutu" ||
+    roleName === "kasi_teknis"
+  )
+    return <Navigate to="/dashboard/kasi-uptd" replace />;
 
   return <Navigate to="/" replace />;
 }

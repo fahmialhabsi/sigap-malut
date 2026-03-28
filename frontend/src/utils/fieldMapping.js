@@ -2,7 +2,10 @@
 // Auto-sync field mapping dari master-data/*.csv ke modul UI
 
 const BACKEND_BASE_URL =
-  import.meta?.env?.VITE_BACKEND_URL || "http://localhost:5000";
+  (typeof process !== "undefined" &&
+    process.env &&
+    process.env.VITE_BACKEND_URL) ||
+  "http://localhost:5000";
 
 export async function fetchFieldMapping(modulId) {
   // File convention: FIELDS_<MODULID>.csv

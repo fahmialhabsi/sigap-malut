@@ -61,6 +61,7 @@ import caseRoutes from "./case.js";
 import chatbotRoutes from "./chatbot.js";
 import commentRoutes from "./comment.js";
 import complianceRoutes from "./compliance.js";
+import dataRoutes from "./data.js";
 import dataIntegrationLogRoutes from "./dataIntegrationLog.js";
 import integrationLogRoutes from "./integrationLog.js";
 import integrationLogControllerRoutes from "./integrationLogController.js";
@@ -78,6 +79,7 @@ import notificationRoutes from "./notification.js";
 import pegawaiRoutes from "./pegawai.js";
 import pegawaiControllerRoutes from "./pegawaiController.js";
 import perintahRoutes from "./perintah.js";
+import programKegiatanRoutes from "./programKegiatan.js";
 import reminderRoutes from "./reminder.js";
 import reportRoutes from "./report.js";
 import stokRoutes from "./stok.js";
@@ -88,6 +90,10 @@ import workflowRoutes from "./workflow.js";
 import workflowControllerRoutes from "./workflowController.js";
 import workflowTransitionLogRoutes from "./workflowTransitionLog.js";
 import workflowsRoutes from "./workflows.js";
+import analyticsRoutes from "./analyticsRoutes.js";
+import rekeningAnggaranRoutes from "./rekeningAnggaran.js";
+import gajiPegawaiRoutes from "./gajiPegawai.js";
+import barangBarangRoutes from "./barangBarang.js";
 import { protect } from "../middleware/auth.js";
 import { createReplicationPilotGuard } from "../middleware/uptdPilotGuard.js";
 
@@ -171,6 +177,7 @@ export default function registerRoutes(app) {
   app.use("/api/chatbot", chatbotRoutes);
   app.use("/api/comment", commentRoutes);
   app.use("/api/compliance", complianceRoutes);
+  app.use("/api/data", dataRoutes);
   app.use("/api/dataintegrationlog", dataIntegrationLogRoutes);
   app.use("/api/integrationlog", integrationLogRoutes);
   app.use("/api/integrationlogcontroller", integrationLogControllerRoutes);
@@ -188,6 +195,7 @@ export default function registerRoutes(app) {
   app.use("/api/pegawai", pegawaiRoutes);
   app.use("/api/pegawaicontroller", pegawaiControllerRoutes);
   app.use("/api/perintah", perintahRoutes);
+  app.use("/api", programKegiatanRoutes);
   app.use("/api/reminder", reminderRoutes);
   app.use("/api/report", reportRoutes);
   app.use("/api/stok", stokRoutes);
@@ -198,6 +206,10 @@ export default function registerRoutes(app) {
   app.use("/api/workflowcontroller", workflowControllerRoutes);
   app.use("/api/workflowtransitionlog", workflowTransitionLogRoutes);
   app.use("/api/workflows", workflowsRoutes);
+  app.use("/api/analytics", analyticsRoutes);
+  app.use("/api", rekeningAnggaranRoutes);
+  app.use("/api", gajiPegawaiRoutes);
+  app.use("/api", barangBarangRoutes);
 
-  console.log("✅ 84 API routes registered\n");
+  console.log("✅ 85 API routes registered\n");
 }

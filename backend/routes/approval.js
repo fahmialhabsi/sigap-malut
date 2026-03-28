@@ -1,5 +1,6 @@
 import express from "express";
 import { authorize } from "../middleware/rbac.js";
+import { chainOfCommandGuard } from "../middleware/chainOfCommand.js";
 const router = express.Router();
 
 // In-memory store (replace with DB in production)
@@ -25,8 +26,8 @@ router.post("/", authorize("approval:create"), (req, res) => {
   res.status(201).json(entry);
 });
 
-// RBAC: update approval status
-router.put("/:modulId/:dataId", authorize("approval:update"), (req, res) => {
+// RBAC: update approval status — dilindungi chain-of-command
+router.put("/:modulId/:dataId", authorize("approval:update"), chainOfCommandGuard, (req, res) => {
   const { user, status, detail } = req.body;
   const { modulId, dataId } = req.params;
   const entry = {

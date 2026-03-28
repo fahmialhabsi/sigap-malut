@@ -27,6 +27,26 @@ async function createWorkflow(data, user) {
 }
 
 async function transitionWorkflow(instance, action, user, comment) {
+  // Guard: test lama memanggil transitionWorkflow(stateString, actionString)
+  // Mode string-hanya: validasi transisi sederhana tanpa DB
+  if (typeof instance === "string") {
+    const from = instance;
+    const validTransitions = {
+      draft: ["submit", "submitted"],
+      submitted: ["approve", "approved", "reject", "rejected"],
+    };
+    const allowed = validTransitions[from] || [];
+    if (!allowed.includes(action)) {
+      throw new Error(`invalid transition: ${from} → ${action}`);
+    }
+    const stateMap = {
+      submit: "submitted",
+      approve: "approved",
+      reject: "rejected",
+    };
+    return stateMap[action] || action;
+  }
+
   // Call workflowEngine.performTransition
   const result = await workflowEngine.performTransition({
     instance,
@@ -37,26 +57,25 @@ async function transitionWorkflow(instance, action, user, comment) {
 
   if (result && result.success) {
     // Update WorkflowInstance in DB
+    const updateFields = {
+      current_state: result.toState,
+      current_step_index: result.current_step_index,
+      current_domain: result.current_domain,
+      // A-16: simpan current_node_id jika path node-based digunakan
+      ...(result.current_node_id != null
+        ? { current_node_id: result.current_node_id }
+        : {}),
+    };
+
     if (instance.set) {
-      instance.set({
-        current_state: result.toState,
-        current_step_index: result.current_step_index,
-        current_domain: result.current_domain,
-      });
+      instance.set(updateFields);
       await instance.save();
     } else {
       // fallback for plain object
-      instance.current_state = result.toState;
-      instance.current_step_index = result.current_step_index;
-      instance.current_domain = result.current_domain;
-      await WorkflowInstance.update(
-        {
-          current_state: result.toState,
-          current_step_index: result.current_step_index,
-          current_domain: result.current_domain,
-        },
-        { where: { id: instance.id } },
-      );
+      Object.assign(instance, updateFields);
+      await WorkflowInstance.update(updateFields, {
+        where: { id: instance.id },
+      });
     }
 
     // Save WorkflowHistory

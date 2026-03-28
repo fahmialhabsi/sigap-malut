@@ -1,0 +1,16 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+kode_aset,Kode Aset,varchar,50,true,true,NULL,none,NULL,Kode identifikasi aset
+nama_aset,Nama Aset,varchar,255,true,false,NULL,none,NULL,Nama atau deskripsi aset
+jenis_aset,Jenis Aset,varchar,100,true,false,NULL,none,"Tanah,Gedung,Kendaraan,Peralatan,Perlengkapan,Lainnya",Jenis/kategori aset
+merk_model,Merk/Model,varchar,100,false,false,NULL,none,NULL,Merk atau model aset
+nomor_seri,Nomor Seri,varchar,100,false,false,NULL,none,NULL,Nomor seri atau nomor rangka aset
+tahun_perolehan,Tahun Perolehan,integer,4,false,false,NULL,none,NULL,Tahun aset diperoleh
+harga_perolehan,Harga Perolehan,decimal,15,false,false,0,none,NULL,Nilai perolehan aset (Rp)
+kondisi_aset,Kondisi Aset,varchar,50,true,false,Baik,none,"Baik,Rusak Ringan,Rusak Berat,Tidak Layak Pakai",Kondisi fisik aset saat ini
+lokasi_penyimpanan,Lokasi Penyimpanan,varchar,255,false,false,NULL,none,NULL,Lokasi fisik aset dsimpan
+penanggungjawab,Penanggung Jawab,varchar,255,false,false,NULL,none,NULL,Pegawai penanggung jawab aset
+status_aset,Status Aset,varchar,50,true,false,Aktif,none,"Aktif,Dipinjam,Dalam Perbaikan,Dihapuskan",Status penggunaan aset
+tanggal_pemeriksaan,Tanggal Pemeriksaan,date,NULL,false,false,NULL,none,NULL,Tanggal pemeriksaan fisik terakhir
+keterangan,Keterangan,text,NULL,false,false,NULL,none,NULL,Keterangan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

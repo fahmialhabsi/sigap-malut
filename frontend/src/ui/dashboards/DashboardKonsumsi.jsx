@@ -7,6 +7,13 @@ import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import { fetchBksEvlSummary } from "../../services/bksEvlService";
 import { roleIdToName } from "../../utils/roleMap";
 import DashboardKonsumsiLayout from "../../layouts/DashboardKonsumsiLayout";
+import BukaEPelaraButton from "../../components/BukaEPelaraButton";
+import DpaBidangWidget from "../../components/DpaBidangWidget";
+import RenstraBidangWidget from "../../components/RenstraBidangWidget";
+import api from "../../utils/api";
+import BroadcastBidangPanel from "../../components/dashboard/BroadcastBidangPanel";
+import SkipToContent from "../../components/ui/SkipToContent";
+import useKPIPolling from "../../hooks/useKPIPolling";
 
 function normalizeRoleName(user) {
   return (
@@ -155,6 +162,7 @@ export default function DashboardKonsumsi() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
   const unit = normalizeUnit(user);
+  const { kpi: liveKpi } = useKPIPolling("fungsional-konsumsi");
 
   const isAllowed =
     !!user &&
@@ -166,6 +174,17 @@ export default function DashboardKonsumsi() {
 
   const [summary, setSummary] = React.useState(null);
   const [loadingSummary, setLoadingSummary] = React.useState(true);
+  const [subKegForm, setSubKegForm] = React.useState({
+    nama: "",
+    sasaran: "",
+    indikator: "",
+    pagu: "",
+    keterangan: "",
+  });
+  const [subKegSubmitting, setSubKegSubmitting] = React.useState(false);
+  const [subKegResult, setSubKegResult] = React.useState(null);
+  const [subKegList, setSubKegList] = React.useState([]);
+  const [subKegListLoading, setSubKegListLoading] = React.useState(false);
 
   React.useEffect(() => {
     if (!user) return;
@@ -181,9 +200,19 @@ export default function DashboardKonsumsi() {
     fetchBksEvlSummary()
       .then((data) => setSummary(data || null))
       .finally(() => setLoadingSummary(false));
+
+    // Fetch daftar usulan sub-kegiatan (konsumsi)
+    setSubKegListLoading(true);
+    api
+      .get("/api/sub-kegiatan-usul", { params: { bidang: "konsumsi" } })
+      .then((res) =>
+        setSubKegList(Array.isArray(res.data?.data) ? res.data.data : []),
+      )
+      .catch(() => setSubKegList([]))
+      .finally(() => setSubKegListLoading(false));
   }, [user]);
 
-  if (!isAllowed) return <Navigate to="/" replace />;
+  if (!isAllowed) return <Navigate to="/unauthorized" replace />;
 
   const energi = summary?.konsumsi_pangan?.energi_kkal_per_kapita ?? null;
   const protein = summary?.konsumsi_pangan?.protein_g_per_kapita ?? null;
@@ -245,6 +274,25 @@ export default function DashboardKonsumsi() {
 
   return (
     <DashboardKonsumsiLayout>
+      <SkipToContent />
+      {liveKpi && (
+        <section aria-label="Status Konsumsi Live" aria-live="polite"
+          className="mx-4 mt-4 p-3 rounded-xl bg-emerald-900/30 border border-emerald-700/40 flex flex-wrap gap-6 text-sm">
+          <span className="text-emerald-200">Laporan Menunggu: <strong className="text-white">{liveKpi.laporanMenungguVerifikasi ?? "—"}</strong></span>
+        </section>
+      )}
+      <main id="main-content" aria-label="Konten Utama Dashboard Konsumsi">
+      {/* Panel Perintah/Broadcast untuk Kepala Bidang Konsumsi */}
+      <div className="mt-8 px-2 md:px-4 pb-4">
+        <BroadcastBidangPanel
+          label="Perintah/Broadcast ke Fungsional & Pelaksana Konsumsi"
+          tujuanOptions={[
+            { value: "fungsional_konsumsi", label: "Fungsional Konsumsi" },
+            { value: "pelaksana_konsumsi", label: "Pelaksana Konsumsi" },
+          ]}
+          endpoint="/notifications/broadcast-bidang-konsumsi"
+        />
+      </div>
       <div className="mx-auto w-full max-w-7xl px-2 md:px-4 py-8">
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
           {heroCards.map((card) => (
@@ -368,6 +416,195 @@ export default function DashboardKonsumsi() {
         </div>
 
         <div className="mt-8">
+          <BukaEPelaraButton
+            label="Buka e-Pelara — Konsumsi"
+            targetPath="/"
+            className="mb-6 w-full md:w-auto"
+          />
+          <div className="mt-4">
+            <DpaBidangWidget
+              bidangLabel="Konsumsi Pangan"
+              programKeyword="konsumsi"
+            />
+            <RenstraBidangWidget
+              bidangLabel="Konsumsi Pangan"
+              programKeyword="konsumsi"
+            />
+          </div>
+        </div>
+
+        {/* ─── Form Usulan Sub-Kegiatan — Priority 3 ─── */}
+        <div className="mt-8">
+          <PanelBox
+            title="📝 Usulan Sub-Kegiatan — Bidang Konsumsi"
+            accent="emerald"
+          >
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!subKegForm.nama.trim()) return;
+                setSubKegSubmitting(true);
+                setSubKegResult(null);
+                try {
+                  const res = await api.post("/api/sub-kegiatan-usul", {
+                    nama_sub_kegiatan: subKegForm.nama,
+                    sasaran: subKegForm.sasaran,
+                    indikator: subKegForm.indikator,
+                    pagu_usulan: subKegForm.pagu || undefined,
+                    keterangan: subKegForm.keterangan,
+                    bidang: "konsumsi",
+                  });
+                  setSubKegResult({ ok: true });
+                  setSubKegForm({
+                    nama: "",
+                    sasaran: "",
+                    indikator: "",
+                    pagu: "",
+                    keterangan: "",
+                  });
+                  if (res.data?.data) {
+                    setSubKegList((prev) => [res.data.data, ...prev]);
+                  }
+                } catch {
+                  setSubKegResult({ ok: false });
+                } finally {
+                  setSubKegSubmitting(false);
+                }
+              }}
+              className="space-y-3"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="md:col-span-2">
+                  <label className="text-xs text-green-200 block mb-1">
+                    Nama Sub-Kegiatan <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    required
+                    maxLength={300}
+                    value={subKegForm.nama}
+                    onChange={(e) =>
+                      setSubKegForm((s) => ({ ...s, nama: e.target.value }))
+                    }
+                    placeholder="Contoh: Analisis Pola Konsumsi Pangan 2025"
+                    className="w-full bg-slate-900/70 border border-slate-600/60 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-green-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-green-200 block mb-1">
+                    Sasaran
+                  </label>
+                  <input
+                    maxLength={300}
+                    value={subKegForm.sasaran}
+                    onChange={(e) =>
+                      setSubKegForm((s) => ({ ...s, sasaran: e.target.value }))
+                    }
+                    placeholder="Sasaran kegiatan"
+                    className="w-full bg-slate-900/70 border border-slate-600/60 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-green-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-green-200 block mb-1">
+                    Indikator
+                  </label>
+                  <input
+                    maxLength={300}
+                    value={subKegForm.indikator}
+                    onChange={(e) =>
+                      setSubKegForm((s) => ({
+                        ...s,
+                        indikator: e.target.value,
+                      }))
+                    }
+                    placeholder="Indikator capaian"
+                    className="w-full bg-slate-900/70 border border-slate-600/60 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-green-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-green-200 block mb-1">
+                    Pagu Usulan (Rp)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={subKegForm.pagu}
+                    onChange={(e) =>
+                      setSubKegForm((s) => ({ ...s, pagu: e.target.value }))
+                    }
+                    placeholder="0"
+                    className="w-full bg-slate-900/70 border border-slate-600/60 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-green-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-green-200 block mb-1">
+                    Keterangan
+                  </label>
+                  <input
+                    maxLength={500}
+                    value={subKegForm.keterangan}
+                    onChange={(e) =>
+                      setSubKegForm((s) => ({
+                        ...s,
+                        keterangan: e.target.value,
+                      }))
+                    }
+                    placeholder="Keterangan tambahan (opsional)"
+                    className="w-full bg-slate-900/70 border border-slate-600/60 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-green-400"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="submit"
+                  disabled={subKegSubmitting || !subKegForm.nama.trim()}
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition"
+                >
+                  {subKegSubmitting ? "Menyimpan…" : "📤 Ajukan Usulan"}
+                </button>
+                {subKegResult && (
+                  <span
+                    className={`text-xs ${subKegResult.ok ? "text-emerald-300" : "text-red-300"}`}
+                  >
+                    {subKegResult.ok
+                      ? "✅ Usulan berhasil diajukan."
+                      : "❌ Gagal menyimpan. Coba lagi."}
+                  </span>
+                )}
+              </div>
+            </form>
+            {/* Daftar usulan */}
+            {(subKegListLoading || subKegList.length > 0) && (
+              <div className="mt-5 pt-4 border-t border-slate-700/40">
+                <p className="text-xs font-semibold text-slate-400 mb-2">
+                  Usulan yang telah diajukan ({subKegList.length})
+                </p>
+                {subKegListLoading ? (
+                  <p className="text-xs text-slate-500 animate-pulse">
+                    Memuat daftar…
+                  </p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {subKegList.slice(0, 5).map((item, i) => (
+                      <div
+                        key={item.id ?? i}
+                        className="flex items-center justify-between bg-slate-900/60 rounded-lg px-3 py-2 text-xs"
+                      >
+                        <span className="text-slate-200 truncate max-w-[70%]">
+                          {item.nama_sub_kegiatan}
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-900/40 text-emerald-300 font-medium flex-shrink-0">
+                          {item.status || "diajukan"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </PanelBox>
+        </div>
+
+        <div className="mt-2">
           <PanelBox
             title="Notifikasi Kritis"
             accent="amber"
@@ -387,6 +624,7 @@ export default function DashboardKonsumsi() {
           </PanelBox>
         </div>
       </div>
+      </main>
     </DashboardKonsumsiLayout>
   );
 }

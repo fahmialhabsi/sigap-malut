@@ -36,3 +36,6 @@ coverage/
 ~$*.xls*
 ~$*.ppt*backup_fields_*/
 prometheus/
+
+# Folder e-Pelara (repo terpisah, jangan digabung)
+e-pelara/

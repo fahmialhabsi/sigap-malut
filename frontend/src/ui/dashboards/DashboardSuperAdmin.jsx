@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink, Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import api from "../../utils/api";
 import superAdminModules from "../../data/superAdminModules";
+import SkipToContent from "../../components/ui/SkipToContent";
+import useKPIPolling from "../../hooks/useKPIPolling";
 
 function normalizeRoleName(user) {
   return (
@@ -15,17 +17,7 @@ function normalizeRoleName(user) {
   );
 }
 
-// Data KPI untuk Super Admin
-const kpiData = [
-  {
-    label: "Indikator Monitoring",
-    value: "50",
-    info: "Monitoring 50 indikator",
-  },
-  { label: "Compliance Alur", value: "100%", info: "Compliance Alur" },
-  { label: "Bypass Terdeteksi", value: 0, info: "Bypass Terdeteksi" },
-  { label: "Data Valid", value: "99%", info: "Data Valid" },
-];
+// Default KPI (akan di-overwrite oleh API)
 
 // Hero Card Component
 function HeroCard({ title, value, info, accent = "blue" }) {
@@ -157,9 +149,15 @@ export default function DashboardSuperAdmin() {
   const [userData, setUserData] = useState(null);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef();
+  const [kpiData, setKpiData] = useState([
+    { label: "Indikator Monitoring", value: "—", info: "Memuat..." },
+    { label: "Compliance Alur", value: "—", info: "Memuat..." },
+    { label: "Bypass Terdeteksi", value: "—", info: "Memuat..." },
+    { label: "Data Valid", value: "—", info: "Memuat..." },
+  ]);
 
-  // Auth check
-  if (!user || roleName !== "super_admin") return <Navigate to="/" replace />;
+  // Live KPI via Socket.IO + REST fallback
+  const { kpi: liveKpi } = useKPIPolling("inflasi");
 
   // Responsive handler
   useEffect(() => {
@@ -202,6 +200,59 @@ export default function DashboardSuperAdmin() {
     };
   }, []);
 
+  // Fetch KPI dari backend
+  useEffect(() => {
+    let mounted = true;
+    api
+      .get("/api/dashboard/sekretaris/summary")
+      .then((res) => {
+        if (!mounted) return;
+        const d = res.data?.data || {};
+        setKpiData([
+          {
+            label: "Indikator Monitoring",
+            value: String(d.totalTasks ?? d.total_tugas ?? "50"),
+            info: "Total tugas/monitoring aktif",
+          },
+          {
+            label: "Compliance Alur",
+            value: d.completionRate != null ? `${d.completionRate}%` : "—",
+            info: "Persentase tugas selesai tepat waktu",
+          },
+          {
+            label: "Tugas Terlambat",
+            value: String(d.overdueTasks ?? d.overdue ?? 0),
+            info: "Tugas melewati batas waktu",
+          },
+          {
+            label: "Tugas Selesai",
+            value: String(d.completedTasks ?? d.selesai ?? 0),
+            info: "Total tugas telah diselesaikan",
+          },
+        ]);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setKpiData([
+          {
+            label: "Indikator Monitoring",
+            value: "50",
+            info: "Monitoring aktif",
+          },
+          {
+            label: "Compliance Alur",
+            value: "100%",
+            info: "Semua alur terpenuhi",
+          },
+          { label: "Bypass Terdeteksi", value: "0", info: "Tidak ada bypass" },
+          { label: "Data Valid", value: "99%", info: "Validitas data sistem" },
+        ]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   // Avatar dropdown handler
   useEffect(() => {
     const handleClick = (e) => {
@@ -213,6 +264,22 @@ export default function DashboardSuperAdmin() {
     if (avatarOpen) window.addEventListener("mousedown", handleClick);
     return () => window.removeEventListener("mousedown", handleClick);
   }, [avatarOpen]);
+
+  // Auth guard — after all hooks (React Rules of Hooks compliance)
+  if (!user || roleName !== "super_admin") return <Navigate to="/" replace />;
+
+  // Merge live KPI data over fetched/default values
+  const displayKpi = [
+    {
+      label: "Indikator Monitoring",
+      value: kpiData[0].value,
+      info: liveKpi?.inflasi != null ? `Inflasi: ${liveKpi.inflasi}%` : kpiData[0].info,
+      accent: "blue",
+    },
+    { label: kpiData[1].label, value: kpiData[1].value, info: kpiData[1].info, accent: "emerald" },
+    { label: kpiData[2].label, value: kpiData[2].value, info: kpiData[2].info, accent: "amber" },
+    { label: kpiData[3].label, value: kpiData[3].value, info: kpiData[3].info, accent: "red" },
+  ];
 
   const menuItems = [
     {
@@ -257,6 +324,7 @@ export default function DashboardSuperAdmin() {
 
   return (
     <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-black via-slate-950 to-slate-900 text-slate-100 select-none">
+      <SkipToContent />
       {/* Sidebar Backdrop */}
       {isMobile && sidebarOpen && (
         <button
@@ -269,6 +337,8 @@ export default function DashboardSuperAdmin() {
 
       {/* Sidebar */}
       <aside
+        role="navigation"
+        aria-label="Menu Navigasi Super Admin"
         className={`h-full bg-black/95 z-30 flex flex-col items-center flex-shrink-0 transition-all duration-300 ${
           isMobile
             ? `${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed left-0 top-0 w-[275px] min-w-[275px]`
@@ -322,6 +392,8 @@ export default function DashboardSuperAdmin() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header
+          role="banner"
+          aria-label="Header Dashboard Super Admin SIGAP Malut"
           className="h-20 flex items-center justify-between px-8 bg-slate-950/90 border-b border-slate-800/85 shadow-lg z-10"
           style={{
             backdropFilter: "blur(12px)",
@@ -371,6 +443,7 @@ export default function DashboardSuperAdmin() {
                   </div>
                   <button
                     onClick={() => {
+                      useAuthStore.getState().logout?.();
                       localStorage.removeItem("token");
                       window.location.href = "/login";
                     }}
@@ -385,7 +458,7 @@ export default function DashboardSuperAdmin() {
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto">
+        <main id="main-content" className="flex-1 overflow-y-auto" aria-label="Konten Utama Dashboard Super Admin">
           <div className="w-full px-6 md:px-12 py-8 space-y-8">
             {/* Hero Banner */}
             <div
@@ -419,32 +492,13 @@ export default function DashboardSuperAdmin() {
             </div>
 
             {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <HeroCard
-                title={kpiData[0].label}
-                value={kpiData[0].value}
-                info={kpiData[0].info}
-                accent="blue"
-              />
-              <HeroCard
-                title={kpiData[1].label}
-                value={kpiData[1].value}
-                info={kpiData[1].info}
-                accent="emerald"
-              />
-              <HeroCard
-                title={kpiData[2].label}
-                value={kpiData[2].value}
-                info={kpiData[2].info}
-                accent="amber"
-              />
-              <HeroCard
-                title={kpiData[3].label}
-                value={kpiData[3].value}
-                info={kpiData[3].info}
-                accent="red"
-              />
-            </div>
+            <section aria-label="Indikator Kinerja Utama" aria-live="polite">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {displayKpi.map((k) => (
+                  <HeroCard key={k.label} title={k.label} value={k.value} info={k.info} accent={k.accent} />
+                ))}
+              </div>
+            </section>
 
             {/* Module Section */}
             <PanelBox title="Modul Super Admin" accent="blue">

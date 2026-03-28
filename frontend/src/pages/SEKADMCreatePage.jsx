@@ -1,6 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function SEKADMCreatePage() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function SEKADMCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("❌ Session expired. Silakan login ulang.");
+        notifyError("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -56,11 +57,11 @@ export default function SEKADMCreatePage() {
 
       await api.post("/sek-adm", payload);
 
-      alert("✅ Surat administrasi berhasil dibuat!");
+      notifySuccess("Surat administrasi berhasil dibuat!");
       navigate("/module/sek-adm");
     } catch (error) {
       console.error("Error:", error);
-      alert("❌ Error: " + (error.response?.data?.message || error.message));
+      notifyError("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

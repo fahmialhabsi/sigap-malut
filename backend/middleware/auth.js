@@ -38,7 +38,7 @@ export const protect = async (req, res, next) => {
         id: decoded.id,
         username: decoded.username,
         email: decoded.email,
-        role: decoded.role,
+        role: String(decoded.role || "").toLowerCase(),
         unit_kerja: decoded.unit_kerja,
         nama_lengkap: decoded.nama_lengkap,
       };
@@ -86,7 +86,7 @@ export const optionalAuth = async (req, res, next) => {
         id: decoded.id,
         username: decoded.username,
         email: decoded.email,
-        role: decoded.role,
+        role: String(decoded.role || "").toLowerCase(),
         unit_kerja: decoded.unit_kerja,
         nama_lengkap: decoded.nama_lengkap,
       };
@@ -107,7 +107,7 @@ export const generateToken = (user) => {
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role,
+      role: String(user.role || "").toLowerCase(),
       unit_kerja: user.unit_kerja,
       nama_lengkap: user.nama_lengkap,
     },

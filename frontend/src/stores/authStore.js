@@ -24,7 +24,38 @@ function normalizeUser(raw) {
   // jika hanya ada role_id (UUID) mapping ke nama role via roleIdToName
   if (!user.role) {
     const fromRoleId = user.role_id && roleIdToName?.[String(user.role_id)];
-    user.role = fromRoleId || user.role || null;
+    user.role = fromRoleId || null;
+    // DEBUG: log mapping roleIdToName
+    if (!fromRoleId) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "[normalizeUser] Tidak dapat mapping role_id ke role:",
+        user.role_id,
+        roleIdToName,
+      );
+    }
+  }
+
+  // Jika user.role === "fungsional" dan unit_kerja mengandung bidang tertentu, set role lebih spesifik
+  if ((user.role === "fungsional" || user.role === "fungsional_analis") && user.unit_kerja) {
+    const unit = String(user.unit_kerja).toLowerCase();
+    if (unit.includes("ketersediaan")) user.role = "fungsional_ketersediaan";
+    else if (unit.includes("distribusi")) user.role = "fungsional_distribusi";
+    else if (unit.includes("konsumsi")) user.role = "fungsional_konsumsi";
+    else if (unit.includes("perencana") || unit.includes("perencanaan"))
+      user.role = "fungsional_perencana";
+    else if (unit.includes("keuangan")) user.role = "fungsional_keuangan";
+    else if (unit.includes("uptd mutu")) user.role = "fungsional_uptd_mutu";
+    else if (unit.includes("uptd teknis")) user.role = "fungsional_uptd_teknis";
+    else if (unit.includes("uptd")) user.role = "fungsional_uptd";
+  }
+  // Fallback: jika email superadmin@dinpangan.go.id atau username superadmin, set role dan roleName ke super_admin
+  if (
+    (user.email && user.email.toLowerCase() === "superadmin@dinpangan.go.id") ||
+    (user.username && user.username.toLowerCase() === "superadmin")
+  ) {
+    user.role = "super_admin";
+    user.roleName = "super_admin";
   }
 
   // roleName: variasi lain kalau ada
@@ -172,3 +203,4 @@ const useAuthStore = create((set) => ({
 }));
 
 export default useAuthStore;
+export { normalizeUser };

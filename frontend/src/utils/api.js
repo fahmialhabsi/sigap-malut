@@ -1,30 +1,11 @@
 // src/utils/api.js
 import axios from "axios";
 
-const resolvedBaseURL = (() => {
-  try {
-    // Vite exposes env via import.meta.env at build time
-    if (
-      typeof import.meta !== "undefined" &&
-      import.meta.env &&
-      import.meta.env.VITE_API_URL
-    )
-      return import.meta.env.VITE_API_URL;
-  } catch (e) {
-    // ignore
-  }
-  try {
-    if (
-      typeof process !== "undefined" &&
-      process.env &&
-      process.env.VITE_API_URL
-    )
-      return process.env.VITE_API_URL;
-  } catch (e) {
-    // ignore
-  }
-  return "/api";
-})();
+// NOTE: Hindari penggunaan import.meta agar Jest (CJS) tidak error.
+// Vite akan mengisi process.env.VITE_API_URL melalui define() di vite.config.js.
+const resolvedBaseURL =
+  (typeof process !== "undefined" && process.env && process.env.VITE_API_URL) ||
+  "/api";
 
 const api = axios.create({
   baseURL: resolvedBaseURL,
@@ -37,10 +18,6 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-
-    console.log("API Request:", config.method.toUpperCase(), config.url); // DEBUG
-    console.log("Token:", token ? "EXISTS" : "NOT FOUND"); // DEBUG
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -52,42 +29,38 @@ api.interceptors.request.use(
 );
 
 // Response interceptor
+let _redirectingToLogin = false;
+
 api.interceptors.response.use(
-  (response) => {
-    try {
-      console.log(
-        "API Response:",
-        response.status,
-        response.config.url,
-        response.data,
-      );
-    } catch (e) {
-      console.log("API Response (debug) failed to stringify", e);
-    }
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error("API Error: full error:", error);
-    console.error("API Error: response:", error.response);
-    if (error.response) {
-      console.error(
-        "API Error: status/data:",
-        error.response.status,
-        error.response.data,
-      );
-    } else if (error.request) {
-      console.error("API Error: no response received, request:", error.request);
+    const status = error.response?.status;
+    const url = error.config?.url || "";
+
+    // Auto-redirect ke login saat token expired (kecuali saat request login itu sendiri)
+    if (status === 401 && !url.includes("/auth/login") && !_redirectingToLogin) {
+      _redirectingToLogin = true;
+      try {
+        // Bersihkan token yang tidak valid
+        localStorage.removeItem("token");
+        // Import lazy untuk hindari circular dependency
+        import("../stores/authStore").then(({ default: useAuthStore }) => {
+          useAuthStore.getState().logout?.();
+        });
+      } catch {
+        // Ignore store errors
+      }
+      // Redirect dengan pesan
+      setTimeout(() => {
+        window.location.href = "/login?reason=session_expired";
+        _redirectingToLogin = false;
+      }, 100);
     }
 
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      try {
-        window.location = { href: "/login" };
-      } catch (e) {
-        window.location.href = "/login";
-      }
+    if (status === 403) {
+      console.warn("[API] Akses ditolak (403) — role tidak punya izin:", url);
     }
+
     return Promise.reject(error);
   },
 );

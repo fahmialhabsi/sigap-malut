@@ -9,6 +9,23 @@ import { v4 as uuidv4 } from "uuid";
 const canonicalRoles = [
   {
     id: uuidv4(),
+    code: "gubernur",
+    name: "Gubernur",
+    level: 0,
+    description:
+      "Gubernur Maluku Utara — akses monitoring lintas bidang, tidak dapat mengubah data operasional.",
+    default_permissions: [
+      "dashboard:read",
+      "read:all",
+      "inflasi:read",
+      "komoditas:read",
+      "stok:read",
+      "audit-log:read",
+    ],
+    is_active: true,
+  },
+  {
+    id: uuidv4(),
     code: "kepala_dinas",
     name: "Kepala Dinas",
     level: 1,
@@ -67,6 +84,33 @@ const canonicalRoles = [
       "finalize:konsumsi",
       "approve:field_requests",
     ],
+    is_active: true,
+  },
+  {
+    id: uuidv4(),
+    code: "kepala_bidang_ketersediaan",
+    name: "Kepala Bidang Ketersediaan",
+    level: 31,
+    description: "Kepala Bidang Ketersediaan Pangan.",
+    default_permissions: ["read:ketersediaan", "approve:field_requests", "finalize:ketersediaan"],
+    is_active: true,
+  },
+  {
+    id: uuidv4(),
+    code: "kepala_bidang_distribusi",
+    name: "Kepala Bidang Distribusi",
+    level: 32,
+    description: "Kepala Bidang Distribusi Pangan.",
+    default_permissions: ["read:distribusi", "approve:field_requests", "finalize:distribusi"],
+    is_active: true,
+  },
+  {
+    id: uuidv4(),
+    code: "kepala_bidang_konsumsi",
+    name: "Kepala Bidang Konsumsi",
+    level: 33,
+    description: "Kepala Bidang Konsumsi Pangan.",
+    default_permissions: ["read:konsumsi", "approve:field_requests", "finalize:konsumsi"],
     is_active: true,
   },
   {

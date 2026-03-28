@@ -1,5 +1,6 @@
 // Clean ES module auth controller
 import { Op, fn, col, where } from "sequelize";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Role from "../models/Role.js";
 import {
@@ -9,6 +10,69 @@ import {
 } from "../config/auth.js";
 import { generateToken, generateRefreshToken } from "../middleware/auth.js";
 import { logAudit } from "../services/auditLogService.js";
+
+// SSO: Generate short-lived token untuk diverifikasi e-Pelara
+export const generateSsoToken = async (req, res) => {
+  try {
+    const ssoSecret = process.env.SSO_SHARED_SECRET;
+    if (!ssoSecret) {
+      return res.status(500).json({
+        success: false,
+        message: "SSO_SHARED_SECRET tidak dikonfigurasi",
+      });
+    }
+    const user = req.user;
+
+    // Ambil role name dari tabel Roles berdasarkan role_id agar mendapatkan
+    // nama role semantik (SEKRETARIS, KEPALA_DINAS, dst).
+    // user.role (field langsung di tabel users) bisa jadi default "pelaksana".
+    let roleName = user.role; // fallback ke field langsung di users
+    try {
+      const dbUser = await User.findByPk(user.id);
+      if (dbUser?.role_id) {
+        const roleRow = await Role.findByPk(dbUser.role_id);
+        if (roleRow?.code) {
+          roleName = roleRow.code;
+        } else if (roleRow?.name) {
+          roleName = roleRow.name;
+        }
+      }
+      // Jika tidak ada role_id tapi ada role langsung di tabel, pakai itu
+      if (!roleName && dbUser?.role) {
+        roleName = dbUser.role;
+      }
+    } catch (lookupErr) {
+      console.warn(
+        "[generateSsoToken] Role lookup fallback:",
+        lookupErr.message,
+      );
+    }
+
+    console.log(
+      `[generateSsoToken] user=${user.username} role_raw=${user.role} role_resolved=${roleName}`,
+    );
+
+    const ssoToken = jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: roleName,
+        unit_kerja: user.unit_kerja,
+        nama_lengkap: user.nama_lengkap,
+        type: "sso",
+      },
+      ssoSecret,
+      { expiresIn: "15m" },
+    );
+    res.json({ success: true, token: ssoToken, role: roleName });
+  } catch (error) {
+    console.error("generateSsoToken error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Gagal membuat SSO token" });
+  }
+};
 
 async function generateUniqueUsernameFromEmail(email) {
   const base = String(email || "")
@@ -59,13 +123,24 @@ function buildRoleCandidates(role) {
 }
 
 async function resolveRoleRow({ role, role_id }) {
+  // PATCH: Auto-create role jika tidak ditemukan, baik via role_id maupun code/nama
+  const getNextRoleLevel = async () => {
+    const maxRole = await Role.findOne({ order: [["level", "DESC"]] });
+    return maxRole && maxRole.level ? maxRole.level + 1 : 9999;
+  };
+
   if (role_id) {
-    const roleById = await Role.findByPk(String(role_id).trim());
+    let roleById = await Role.findByPk(String(role_id).trim());
     if (!roleById) {
-      return {
-        roleRow: null,
-        error: `Role_id '${role_id}' tidak ditemukan di tabel roles`,
-      };
+      const level = await getNextRoleLevel();
+      const code = role || role_id;
+      roleById = await Role.create({
+        id: role_id,
+        code,
+        name: code,
+        level,
+        is_active: true,
+      });
     }
     return { roleRow: roleById, error: null };
   }
@@ -75,7 +150,7 @@ async function resolveRoleRow({ role, role_id }) {
     return { roleRow: null, error: null };
   }
 
-  const roleRow = await Role.findOne({
+  let roleRow = await Role.findOne({
     where: {
       [Op.or]: [
         { code: { [Op.in]: codeCandidates } },
@@ -85,10 +160,18 @@ async function resolveRoleRow({ role, role_id }) {
   });
 
   if (!roleRow) {
-    return {
-      roleRow: null,
-      error: `Role '${role}' tidak ditemukan di tabel roles`,
-    };
+    // PATCH: Auto-create role jika tidak ditemukan via code/nama
+    const { v4: uuidv4 } = await import("uuid");
+    const level = await getNextRoleLevel();
+    const code = codeCandidates[0];
+    const name = nameCandidates[0];
+    roleRow = await Role.create({
+      id: uuidv4(),
+      code,
+      name,
+      level,
+      is_active: true,
+    });
   }
 
   return { roleRow, error: null };
@@ -137,9 +220,25 @@ export const register = async (req, res) => {
       });
     }
 
-    // Optional: validate role exists and active
-    const roleRow = await Role.findByPk(role_id);
-    if (!roleRow || roleRow.is_active === false) {
+    // Otomatisasi: jika role_id tidak ditemukan, insert role baru
+    let roleRow = await Role.findByPk(role_id);
+    if (!roleRow) {
+      // Helper untuk generate level unik jika perlu
+      const getNextRoleLevel = async () => {
+        const maxRole = await Role.findOne({ order: [["level", "DESC"]] });
+        return maxRole && maxRole.level ? maxRole.level + 1 : 9999;
+      };
+      const level = await getNextRoleLevel();
+      // Gunakan code dari req.body.role jika ada, jika tidak pakai role_id sebagai code
+      const code = req.body.role || role_id;
+      roleRow = await Role.create({
+        id: role_id,
+        code,
+        name: code,
+        level,
+        is_active: true,
+      });
+    } else if (roleRow.is_active === false) {
       return res.status(400).json({
         success: false,
         message: "Role tidak valid atau tidak aktif",
@@ -238,6 +337,16 @@ export const login = async (req, res) => {
       if (user.failed_login_attempts >= 5)
         user.locked_until = new Date(Date.now() + 15 * 60 * 1000);
       await user.save();
+      try {
+        await logAudit?.({
+          modul: "AUTH",
+          entitas_id: user.id,
+          aksi: "LOGIN_FAILED",
+          data_lama: null,
+          data_baru: { attempts: user.failed_login_attempts },
+          pegawai_id: user.id,
+        });
+      } catch (_) {}
       return res.status(401).json({
         success: false,
         message: "Email atau password salah",
@@ -255,23 +364,112 @@ export const login = async (req, res) => {
 
     // Lookup role from Roles table (source of truth)
     const roleRow = user.role_id ? await Role.findByPk(user.role_id) : null;
-    const roleName = roleRow?.name || null; // e.g. "GUBERNUR", "KEPALA_DINAS"
+    // Prefer code (machine-readable, e.g. "kepala_dinas") over name (display, e.g. "Kepala Dinas")
+    const roleName = roleRow?.code || roleRow?.name || null;
 
-    // Dashboard mapping (sesuai dokumenSistem: eksekutif -> /dashboard)
+    // Dashboard mapping (sesuai dokumenSistem role → dashboard URL)
+    // WAJIB lengkap: semua varian role harus ada di sini
     const roleToDashboard = {
+      // Super admin
+      super_admin: "/dashboard/superadmin",
       SUPER_ADMIN: "/dashboard/superadmin",
+      // Kepala Dinas
+      kepala_dinas: "/dashboard/kepala-dinas",
+      KEPALA_DINAS: "/dashboard/kepala-dinas",
+      // Gubernur
+      gubernur: "/dashboard/gubernur",
+      GUBERNUR: "/dashboard/gubernur",
+      // Sekretaris
+      sekretaris: "/dashboard/sekretariat",
       SEKRETARIS: "/dashboard/sekretariat",
-
-      // Executive (dokumenSistem)
-      KEPALA_DINAS: "/dashboard",
-      GUBERNUR: "/dashboard",
-
-      // Public/Viewer
+      // Kepala Bidang — generic kepala_bidang TIDAK di-map di sini,
+      // biarkan fallback unit_kerja yang menentukan bidang yang tepat
+      kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
+      kepala_bidang_distribusi: "/dashboard/distribusi",
+      kepala_bidang_konsumsi: "/dashboard/konsumsi",
+      KEPALA_BIDANG_KETERSEDIAAN: "/dashboard/ketersediaan",
+      KEPALA_BIDANG_DISTRIBUSI: "/dashboard/distribusi",
+      KEPALA_BIDANG_KONSUMSI: "/dashboard/konsumsi",
+      // Kepala UPTD
+      kepala_uptd: "/dashboard/uptd",
+      KEPALA_UPTD: "/dashboard/uptd",
+      uptd: "/dashboard/uptd",
+      // Kasubag
+      kasubag: "/dashboard/kasubag",
+      kasubag_umum: "/dashboard/kasubag",
+      kasubag_kepegawaian: "/dashboard/kasubag",
+      kasubag_umum_kepegawaian: "/dashboard/kasubag",
+      kasubbag_umum_kepegawaian: "/dashboard/kasubag",
+      KASUBAG_UMUM_KEPEGAWAIAN: "/dashboard/kasubag",
+      KASUBAG_UMUM: "/dashboard/kasubag",
+      KASUBAG_KEPEGAWAIAN: "/dashboard/kasubag",
+      // Kasubag UPTD
+      kasubag_uptd: "/dashboard/kasubag-uptd",
+      kasubbag_tu_uptd: "/dashboard/kasubag-uptd",
+      KASUBAG_UPTD: "/dashboard/kasubag-uptd",
+      // Kasi UPTD
+      kepala_seksi_uptd: "/dashboard/kasi-uptd",
+      kasi_uptd: "/dashboard/kasi-uptd",
+      kasi_mutu_uptd: "/dashboard/kasi-mutu",
+      kasi_teknis_uptd: "/dashboard/kasi-teknis",
+      KEPALA_SEKSI_UPTD: "/dashboard/kasi-uptd",
+      // Fungsional
+      fungsional: "/dashboard/fungsional",
+      pejabat_fungsional: "/dashboard/fungsional",
+      jabatan_fungsional: "/dashboard/fungsional",
+      fungsional_perencana: "/dashboard/fungsional-perencanaan",
+      fungsional_analis: "/dashboard/fungsional-keuangan",
+      fungsional_analis_keuangan: "/dashboard/fungsional-keuangan",
+      fungsional_keuangan: "/dashboard/fungsional-keuangan",
+      fungsional_ketersediaan: "/dashboard/fungsional-ketersediaan",
+      fungsional_distribusi: "/dashboard/fungsional-distribusi",
+      fungsional_konsumsi: "/dashboard/fungsional-konsumsi",
+      fungsional_uptd: "/dashboard/fungsional-uptd",
+      fungsional_uptd_mutu: "/dashboard/fungsional-uptd-mutu",
+      fungsional_uptd_teknis: "/dashboard/fungsional-uptd-teknis",
+      PEJABAT_FUNGSIONAL: "/dashboard/fungsional",
+      FUNGSIONAL_PERENCANA: "/dashboard/fungsional-perencanaan",
+      FUNGSIONAL_ANALIS_KEUANGAN: "/dashboard/fungsional-keuangan",
+      // Bendahara — SEMUA VARIAN
+      bendahara: "/dashboard/bendahara",
+      BENDAHARA: "/dashboard/bendahara",
+      bendahara_pengeluaran: "/dashboard/bendahara-pengeluaran",
+      BENDAHARA_PENGELUARAN: "/dashboard/bendahara-pengeluaran",
+      bendahara_gaji: "/dashboard/bendahara-gaji",
+      BENDAHARA_GAJI: "/dashboard/bendahara-gaji",
+      bendahara_barang: "/dashboard/bendahara-barang",
+      BENDAHARA_BARANG: "/dashboard/bendahara-barang",
+      // Pelaksana
+      pelaksana: "/dashboard/pelaksana",
+      PELAKSANA: "/dashboard/pelaksana",
+      staf_pelaksana: "/dashboard/pelaksana",
+      STAF_PELAKSANA: "/dashboard/pelaksana",
+      // Viewer / Publik
+      viewer: "/dashboard-publik",
       VIEWER: "/dashboard-publik",
+      guest: "/dashboard-publik",
     };
 
-    const dashboardUrl =
-      (roleName && roleToDashboard[roleName]) || "/dashboard";
+    // Prioritas: role_id FK (source of truth) > kolom role langsung di users (bisa stale)
+    const effectiveRole = roleName || user.role || "";
+
+    // Tentukan dashboard URL dari role
+    let dashboardUrl =
+      roleToDashboard[effectiveRole] ||
+      roleToDashboard[effectiveRole.toUpperCase()];
+    if (!dashboardUrl) {
+      const unitKerja = (user.unit_kerja || "").toLowerCase();
+      if (unitKerja.includes("ketersediaan"))
+        dashboardUrl = "/dashboard/ketersediaan";
+      else if (unitKerja.includes("distribusi"))
+        dashboardUrl = "/dashboard/distribusi";
+      else if (unitKerja.includes("konsumsi"))
+        dashboardUrl = "/dashboard/konsumsi";
+      else if (unitKerja.includes("sekretariat"))
+        dashboardUrl = "/dashboard/sekretariat";
+      else if (unitKerja.includes("uptd")) dashboardUrl = "/dashboard/uptd";
+      else dashboardUrl = "/dashboard";
+    }
 
     if (user && user.id) {
       try {
@@ -298,12 +496,19 @@ export const login = async (req, res) => {
         user: {
           id: user.id,
           username: user.username,
-          name: user.name,
+          name: user.name || user.nama_lengkap,
+          nama_lengkap: user.nama_lengkap,
           email: user.email,
+          // role: kolom teks LANGSUNG dari tabel users (source of truth untuk routing)
+          role: effectiveRole,
           role_id: user.role_id,
           unit_id: user.unit_id,
+          unit_kerja: user.unit_kerja,
+          nip: user.nip,
+          jabatan: user.jabatan,
+          is_active: user.is_active,
         },
-        roleName,
+        roleName: effectiveRole,
         token,
         refreshToken,
         dashboardUrl,
@@ -338,6 +543,16 @@ export const getMe = async (req, res) => {
 // Logout
 export const logout = async (req, res) => {
   // TODO: Invalidate refresh token in database
+  try {
+    await logAudit?.({
+      modul: "AUTH",
+      entitas_id: req.user?.id,
+      aksi: "LOGOUT",
+      data_lama: null,
+      data_baru: null,
+      pegawai_id: req.user?.id,
+    });
+  } catch (_) {}
   res.json({ success: true, message: "Logout berhasil" });
 };
 

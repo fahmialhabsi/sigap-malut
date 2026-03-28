@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
+import NotificationCenter from "../components/notifications/NotificationCenter";
+import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 function normalizeRoleName(user) {
   return (
@@ -123,6 +125,16 @@ export default function DashboardLayout({ children }) {
                 <span>{modul.name}</span>
               </button>
             ))}
+            <button
+              className="px-4 py-2 rounded font-semibold flex items-center gap-2 transition bg-ink text-accent hover:bg-accentDark"
+              onClick={() => navigate("/tasks")}
+            >
+              📋 Tugas
+            </button>
+            <BukaEPelaraButton label="e-Pelara" className="ml-1" />
+            <div style={{ marginLeft: "auto" }}>
+              <NotificationCenter />
+            </div>
           </div>
         </nav>
       ) : (
@@ -139,6 +151,16 @@ export default function DashboardLayout({ children }) {
                   <span>{cat.label}</span>
                 </button>
               ))}
+            <button
+              className="px-4 py-2 rounded font-semibold flex items-center gap-2 transition bg-ink text-accent hover:bg-accentDark"
+              onClick={() => navigate("/tasks")}
+            >
+              📋 Tugas
+            </button>
+            <BukaEPelaraButton label="e-Pelara" className="ml-1" />
+            <div style={{ marginLeft: "auto" }}>
+              <NotificationCenter />
+            </div>
           </div>
         </nav>
       )}

@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
 import { getDashboardPath } from "../utils/getDashboardPath";
+import { normalizeUser } from "../stores/authStore";
 
 function normalizeRoleName(user) {
   return (
@@ -42,104 +43,47 @@ export default function LoginPage() {
     const result = await login(email, password);
 
     if (result?.success) {
-      // Prefer backend dashboardUrl if available
-      const dashboardUrlFromBackend = result?.data?.dashboardUrl;
-
       // Pull stored user (authStore should persist it)
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem("user"));
       } catch {}
 
-      const roleName = normalizeRoleName(user);
-      const unit = normalizeUnit(user);
+      // Re-normalisasi user agar roleIdToName sudah terisi (fix super_admin)
+      user = normalizeUser(user);
 
-      // 1) Backend dashboardUrl
-      if (dashboardUrlFromBackend) {
-        navigate(dashboardUrlFromBackend, { replace: true });
-        setLoading(false);
-        return;
-      }
+      // DEBUG LOG: cek hasil login dan role
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG] Login result user (normalized):", user);
+      // Tambahan log untuk roleIdToName dan role_id
+      // eslint-disable-next-line no-console
+      console.log(
+        "[DEBUG] user.role:",
+        user.role,
+        "user.role_id:",
+        user.role_id,
+        "roleIdToName:",
+        roleIdToName,
+      );
 
-      // 2) Role param from landing page (intent)
-      if (roleParam) {
-        // Executive
-        if (roleParam === "gubernur") {
-          navigate("/dashboard", { replace: true });
-          setLoading(false);
-          return;
-        }
-
-        // Bidang
-        if (roleParam === "kepala_bidang_ketersediaan") {
-          navigate("/dashboard/ketersediaan", { replace: true });
-          setLoading(false);
-          return;
-        }
-        if (roleParam === "kepala_bidang_distribusi") {
-          navigate("/dashboard/distribusi", { replace: true });
-          setLoading(false);
-          return;
-        }
-        if (roleParam === "kepala_bidang_konsumsi") {
-          navigate("/dashboard/konsumsi", { replace: true });
-          setLoading(false);
-          return;
-        }
-        if (roleParam === "kepala_uptd") {
-          navigate("/dashboard/uptd", { replace: true });
-          setLoading(false);
-          return;
-        }
-        if (roleParam === "sekretaris") {
-          navigate("/dashboard/sekretariat", { replace: true });
-          setLoading(false);
-          return;
-        }
-        if (roleParam === "super_admin") {
-          navigate("/dashboard/superadmin", { replace: true });
-          setLoading(false);
-          return;
-        }
-      }
-
-      // === tambahan: inference via getDashboardPath util ===
+      // Selalu gunakan getDashboardPath untuk redirect
       try {
         const inferredPath = getDashboardPath(user);
-        if (inferredPath && inferredPath !== "/dashboard") {
-          navigate(inferredPath, { replace: true });
+        // eslint-disable-next-line no-console
+        console.log("[DEBUG] inferredPath:", inferredPath);
+        if (inferredPath) {
           setLoading(false);
-          return;
+          navigate(inferredPath, { replace: true });
+          return; // pastikan langsung return, tidak lanjut ke bawah
         }
       } catch (err) {
         // ignore error here but you can uncomment to debug
         // console.error("getDashboardPath error:", err);
       }
-      // ======================================================
-
-      // 3) Fallback based on actual user role/unit
-      if (roleName === "super_admin")
-        return navigate("/dashboard/superadmin", { replace: true });
-      if (roleName === "sekretaris")
-        return navigate("/dashboard/sekretariat", { replace: true });
-      if (roleName === "gubernur" || roleName === "kepala_dinas")
-        return navigate("/dashboard", { replace: true });
-
-      // Generic kepala_bidang -> infer by unit
-      if (roleName === "kepala_bidang") {
-        if (unit.includes("ketersediaan"))
-          return navigate("/dashboard/ketersediaan", { replace: true });
-        if (unit.includes("distribusi"))
-          return navigate("/dashboard/distribusi", { replace: true });
-        if (unit.includes("konsumsi"))
-          return navigate("/dashboard/konsumsi", { replace: true });
-        return navigate("/dashboard", { replace: true });
-      }
-
-      if (roleName === "kepala_uptd")
-        return navigate("/dashboard/uptd", { replace: true });
-
-      return navigate("/dashboard", { replace: true });
+      setLoading(false);
+      // Jika mapping gagal, fallback ke /dashboard
+      navigate("/dashboard", { replace: true });
+      return;
     }
 
     setError(result?.message || "Login gagal");

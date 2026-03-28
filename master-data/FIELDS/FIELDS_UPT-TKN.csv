@@ -1,0 +1,15 @@
+field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
+id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
+nomor_layanan,Nomor Layanan,varchar,50,true,true,NULL,none,NULL,Nomor unik layanan teknis
+tanggal_layanan,Tanggal Layanan,date,NULL,true,false,NULL,none,NULL,Tanggal pelaksanaan layanan
+jenis_layanan,Jenis Layanan,varchar,255,true,false,NULL,none,NULL,Jenis layanan teknis UPTD
+nama_pemohon,Nama Pemohon,varchar,255,true,false,NULL,none,NULL,Nama pemohon layanan
+instansi_pemohon,Instansi Pemohon,varchar,255,false,false,NULL,none,NULL,Instansi asal pemohon
+komoditas,Komoditas,varchar,255,true,false,NULL,none,NULL,Komoditas yang diuji/dilayani
+jumlah_sampel,Jumlah Sampel,integer,NULL,false,false,NULL,none,NULL,Jumlah sampel yang diproses
+metode_pengujian,Metode Pengujian,varchar,255,false,false,NULL,none,NULL,Metode pengujian yang digunakan
+hasil_pengujian,Hasil Pengujian,text,NULL,false,false,NULL,none,NULL,Hasil pengujian laboratorium
+status_layanan,Status Layanan,varchar,50,true,false,Proses,none,"Proses,Selesai,Ditolak",Status pelaksanaan layanan
+petugas_pelaksana,Petugas Pelaksana,varchar,255,true,false,NULL,none,NULL,Nama petugas pelaksana layanan
+catatan,Catatan,text,NULL,false,false,NULL,none,NULL,Catatan tambahan
+created_at,Dibuat Pada,datetime,NULL,false,false,NULL,none,NULL,Waktu pencatatan data

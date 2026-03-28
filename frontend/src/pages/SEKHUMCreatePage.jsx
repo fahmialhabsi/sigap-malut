@@ -1,6 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function SEKHUMCreatePage() {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ export default function SEKHUMCreatePage() {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user || !user.id) {
-        alert("Session expired. Silakan login ulang.");
+        notifyWarning("Session expired. Silakan login ulang.");
         navigate("/login");
         return;
       }
@@ -84,10 +85,10 @@ export default function SEKHUMCreatePage() {
 
       await api.post("/sek-hum", payload);
 
-      alert("Data humas berhasil dibuat.");
+      notifyWarning("Data humas berhasil dibuat.");
       navigate("/module/sek-hum");
     } catch (error) {
-      alert("Error: " + (error.response?.data?.message || error.message));
+      notifyWarning("Error: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

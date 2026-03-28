@@ -63,6 +63,27 @@ import UptKeu from "./UPT-KEU.js";
 import UptMtu from "./UPT-MTU.js";
 import UptTkn from "./UPT-TKN.js";
 
+// Import model perintah (chain of command)
+import Perintah from "./Perintah.js";
+import PerintahLog from "./PerintahLog.js";
+
+// Import model surat menyurat (e-Office M011-M013)
+import SuratMasuk from "./SuratMasuk.js";
+import SuratKeluar from "./SuratKeluar.js";
+import Disposisi from "./Disposisi.js";
+import AgendaSurat from "./AgendaSurat.js";
+import ArsipSurat from "./ArsipSurat.js";
+
+// Import model perencanaan
+import ProgramKegiatan from "./ProgramKegiatan.js";
+import DokumenPerencanaan from "./DokumenPerencanaan.js";
+
+// Import model keuangan
+import SpjFactory from "./Spj.js";
+const Spj = SpjFactory(sequelize);
+import RekeningAnggaran from "./RekeningAnggaran.js";
+import GajiPegawai from "./GajiPegawai.js";
+
 // Asosiasi Foreign Key Komoditas
 BdsCpd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
 BdsHrg.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
@@ -73,9 +94,17 @@ if (typeof BdsCpd.associate === "function") BdsCpd.associate(sequelize.models);
 if (typeof BdsHrg.associate === "function") BdsHrg.associate(sequelize.models);
 if (typeof BdsMon.associate === "function") BdsMon.associate(sequelize.models);
 
+// Asosiasi Perintah ↔ PerintahLog
+Perintah.hasMany(PerintahLog, { foreignKey: "perintah_id", as: "logs" });
+PerintahLog.belongsTo(Perintah, { foreignKey: "perintah_id", as: "perintah" });
+
 // Export semua model
 export {
   sequelize,
+  Perintah,
+  PerintahLog,
+  ProgramKegiatan,
+  DokumenPerencanaan,
   Komoditas,
   Kgb,
   Stok,
@@ -128,5 +157,13 @@ export {
   UptKeu,
   UptMtu,
   UptTkn,
+  SuratMasuk,
+  SuratKeluar,
+  Disposisi,
+  AgendaSurat,
+  ArsipSurat,
+  Spj,
+  RekeningAnggaran,
+  GajiPegawai,
 };
 export default sequelize;
