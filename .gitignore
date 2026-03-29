@@ -39,3 +39,6 @@ prometheus/
 
 # Folder e-Pelara (repo terpisah, jangan digabung)
 e-pelara/
+backend/.claude/
+backend/.vscode/
+backend/uploads/
