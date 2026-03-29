@@ -88,7 +88,7 @@ function KpiCard({ label, value, sub, color }) {
   return (
     <div style={{
       background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-      padding: "16px 20px", minWidth: 155,
+      padding: "16px 20px", minWidth: 0, width: "100%", flex: "1 1 0",
     }}>
       <div style={{ fontSize: 12, color: T.textSec, marginBottom: 4 }}>{label}</div>
       <div style={{ fontSize: 22, fontWeight: 700, color: color || T.primary }}>{value}</div>
@@ -145,6 +145,9 @@ export default function DashboardBendaharaGaji() {
   const [searchQ, setSearchQ]   = useState("");
   const [loading, setLoading]   = useState(false);
   const [notif, setNotif]       = useState(null);
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === "undefined" ? 1440 : window.innerWidth
+  );
 
   const user  = getUser();
   const role  = (user?.role || user?.roleName || "").toLowerCase();
@@ -153,6 +156,13 @@ export default function DashboardBendaharaGaji() {
   const showNotif = useCallback((msg, type = "success") => {
     setNotif({ msg, type });
     setTimeout(() => setNotif(null), 3500);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const loadGaji = useCallback(async () => {
@@ -203,6 +213,12 @@ export default function DashboardBendaharaGaji() {
 
   // ── Guard ─────────────────────────────────────────────────────────────────
   if (!allowed) return <Navigate to="/unauthorized" replace />;
+
+  const isPhone = viewportWidth < 640;
+  const isTablet = viewportWidth >= 640 && viewportWidth < 1024;
+  const pagePaddingX = isPhone ? 12 : isTablet ? 16 : 24;
+  const contentMaxWidth =
+    viewportWidth >= 1600 ? 1680 : viewportWidth >= 1280 ? 1440 : "100%";
 
   // ── Computed ──────────────────────────────────────────────────────────────
   const filtered = gajiList.filter((g) =>
@@ -311,8 +327,8 @@ export default function DashboardBendaharaGaji() {
       {/* Header */}
       <header role="banner" style={{
         background: `linear-gradient(135deg, ${T.primary} 0%, ${T.secondary} 100%)`,
-        color: "#fff", padding: "16px 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        color: "#fff", padding: isPhone ? "14px 12px" : "16px 24px",
+        display: "flex", flexDirection: isPhone ? "column" : "row", alignItems: isPhone ? "flex-start" : "center", justifyContent: "space-between",
       }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 700 }}>Dashboard Bendahara Gaji</div>
@@ -320,7 +336,7 @@ export default function DashboardBendaharaGaji() {
             Penggajian & Tunjangan ASN — {user?.name || user?.username || "—"}
           </div>
         </div>
-        <div style={{ textAlign: "right", fontSize: 12, opacity: 0.75 }}>
+        <div style={{ textAlign: isPhone ? "left" : "right", fontSize: 12, opacity: 0.75 }}>
           <div>Periode: {BULAN_NAMA[bulan - 1]} {tahun}</div>
           <div>{new Date().toLocaleDateString("id-ID", { dateStyle: "long" })}</div>
         </div>
@@ -329,17 +345,17 @@ export default function DashboardBendaharaGaji() {
       {/* Notifikasi */}
       {notif && (
         <div aria-live="polite" style={{
-          position: "fixed", top: 16, right: 16, zIndex: 9999,
+          position: "fixed", top: isPhone ? 12 : 16, right: isPhone ? 12 : 16, left: isPhone ? 12 : "auto", zIndex: 9999,
           background: notif.type === "error" ? T.danger : notif.type === "warning" ? T.warning : T.accent,
           color: "#fff", padding: "10px 20px", borderRadius: 8,
-          boxShadow: "0 4px 12px rgba(0,0,0,.2)", fontSize: 13, maxWidth: 360,
+          boxShadow: "0 4px 12px rgba(0,0,0,.2)", fontSize: 13, maxWidth: isPhone ? "calc(100vw - 24px)" : 360,
         }}>
           {notif.msg}
         </div>
       )}
 
       {/* Tab Bar */}
-      <nav style={{ background: T.card, borderBottom: `2px solid ${T.border}`, padding: "0 24px", display: "flex", gap: 4 }}>
+      <nav style={{ background: T.card, borderBottom: `2px solid ${T.border}`, padding: isPhone ? "0 12px" : "0 24px", display: "flex", gap: 4, overflowX: "auto" }}>
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -365,19 +381,19 @@ export default function DashboardBendaharaGaji() {
         ))}
       </nav>
 
-      <main id="main-content" style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
+      <main id="main-content" style={{ width: "100%", padding: `${isPhone ? 16 : 24}px ${pagePaddingX}px 32px`, maxWidth: contentMaxWidth, margin: "0 auto" }}>
 
         {/* ── TAB: RINGKASAN ───────────────────────────────────────── */}
         {tab === "ringkasan" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: isPhone ? "flex-start" : "center", flexDirection: isPhone ? "column" : "row", gap: 10, marginBottom: 16 }}>
               <h2 style={{ color: T.primary, fontSize: 16, margin: 0 }}>
                 Ringkasan Gaji — {BULAN_NAMA[bulan - 1]} {tahun}
               </h2>
               <PeriodSelector />
             </div>
 
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: viewportWidth < 640 ? "1fr" : viewportWidth < 1100 ? "repeat(2, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))", gap: 16, marginBottom: 24 }}>
               <KpiCard label="Total Pegawai"    value={jmlPegawai} />
               <KpiCard label="Sudah Dibayar"    value={jmlDibayar}    color={T.success} />
               <KpiCard label="Belum Dibayar"    value={jmlPending}    color={T.warning} />
@@ -446,7 +462,7 @@ export default function DashboardBendaharaGaji() {
               <h2 style={{ color: T.primary, fontSize: 16, margin: 0 }}>
                 Daftar Gaji — {BULAN_NAMA[bulan - 1]} {tahun}
               </h2>
-              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                 <PeriodSelector />
                 <input
                   type="search"
@@ -455,7 +471,7 @@ export default function DashboardBendaharaGaji() {
                   onChange={(e) => setSearchQ(e.target.value)}
                   style={{
                     padding: "6px 12px", borderRadius: 6, border: `1px solid ${T.border}`,
-                    fontSize: 12, width: 180,
+                    fontSize: 12, width: isPhone ? "100%" : 180,
                   }}
                 />
                 {jmlPending > 0 && (
@@ -713,7 +729,7 @@ export default function DashboardBendaharaGaji() {
             {selectedPegawai ? (
               <div style={{
                 background: T.card, border: `2px solid ${T.border}`, borderRadius: 12,
-                padding: 28, maxWidth: 560,
+                padding: isPhone ? 20 : 28, width: "100%", maxWidth: isPhone ? "100%" : 560,
               }}>
                 {/* Slip header */}
                 <div style={{ textAlign: "center", marginBottom: 20, borderBottom: `2px solid ${T.primary}`, paddingBottom: 16 }}>
@@ -811,12 +827,12 @@ export default function DashboardBendaharaGaji() {
         {/* ── TAB: LAPORAN ─────────────────────────────────────────── */}
         {tab === "laporan" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: isPhone ? "flex-start" : "center", flexDirection: isPhone ? "column" : "row", gap: 10, marginBottom: 16 }}>
               <h2 style={{ color: T.primary, fontSize: 16, margin: 0 }}>Laporan Penggajian</h2>
               <PeriodSelector />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isPhone ? 220 : 280}px, 1fr))`, gap: 16 }}>
               {[
                 { label: "Daftar Gaji Induk",           frekuensi: "Bulanan",   deadline: "Tgl 1 bulan gajian" },
                 { label: "Rekapitulasi Gaji",            frekuensi: "Bulanan",   deadline: "Bersamaan daftar gaji" },

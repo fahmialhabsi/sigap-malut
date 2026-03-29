@@ -7,6 +7,19 @@ import { roleIdToName } from "../utils/roleMap";
 import { getDashboardPath } from "../utils/getDashboardPath";
 import { normalizeUser } from "../stores/authStore";
 
+const ROLE_PARAM_LABELS = {
+  sekretariat: "Sekretariat Dinas Pangan",
+  sekretaris: "Sekretariat Dinas Pangan",
+  kepala_dinas: "Kepala Dinas",
+  gubernur: "Gubernur",
+  super_admin: "Super Admin",
+  kepala_bidang_ketersediaan: "Bidang Ketersediaan dan Kerawanan Pangan",
+  kepala_bidang_distribusi: "Bidang Distribusi dan Cadangan Pangan",
+  kepala_bidang_konsumsi: "Bidang Konsumsi dan Keamanan Pangan",
+  kepala_uptd: "Balai Pengawasan Mutu dan Keamanan Pangan",
+  publik: "Masyarakat / Peneliti / Lainnya",
+};
+
 function normalizeRoleName(user) {
   return (
     (user?.roleName && String(user.roleName).toLowerCase()) ||
@@ -25,7 +38,8 @@ function normalizeUnit(user) {
 export default function LoginPage() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const roleParam = params.get("role"); // UI only: gubernur / kepala_bidang_konsumsi / dll
+  const roleParam = params.get("role"); // UI only: domain/entrypoint, bukan otorisasi
+  const roleParamLabel = ROLE_PARAM_LABELS[roleParam] || roleParam;
 
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
@@ -112,7 +126,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-800">SIGAP Malut</h1>
           {roleParam && (
             <p className="text-xs text-gray-500 mt-2">
-              Login untuk: <span className="font-semibold">{roleParam}</span>
+              Login untuk: <span className="font-semibold">{roleParamLabel}</span>
             </p>
           )}
         </div>

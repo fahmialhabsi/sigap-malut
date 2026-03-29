@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
+import { getDashboardPath } from "../../utils/getDashboardPath";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import api from "../../utils/api";
@@ -55,6 +56,7 @@ function formatRupiah(val) {
 export default function DashboardPelaksana() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
+  const preferredPath = user ? getDashboardPath(user) : null;
 
   // tasks
   const [tasks, setTasks] = useState([]);
@@ -79,8 +81,13 @@ export default function DashboardPelaksana() {
   const [skpError, setSkpError] = useState("");
 
   const isAllowed = !!user && ALLOWED.includes(roleName);
+  const shouldRedirectToSpecificPelaksana =
+    preferredPath &&
+    preferredPath !== "/dashboard/pelaksana" &&
+    preferredPath.startsWith("/dashboard/pelaksana-");
 
   useEffect(() => {
+    if (shouldRedirectToSpecificPelaksana) return;
     if (user) {
       workflowStatusUpdateAPI({
         user,
@@ -89,17 +96,18 @@ export default function DashboardPelaksana() {
         detail: "Akses dashboard Pelaksana",
       });
     }
-  }, [user]);
+  }, [shouldRedirectToSpecificPelaksana, user]);
 
   useEffect(() => {
+    if (shouldRedirectToSpecificPelaksana) return;
     api.get("/dashboard/pelaksana/summary")
       .then((res) => setKpi(res.data?.data ?? null))
       .catch(() => setKpi(null))
       .finally(() => setKpiLoading(false));
-  }, []);
+  }, [shouldRedirectToSpecificPelaksana]);
 
   useEffect(() => {
-    if (!user) return;
+    if (shouldRedirectToSpecificPelaksana || !user) return;
     api.get("/tasks/assigned", { params: { limit: 15 } })
       .then((res) =>
         setTasks(
@@ -109,9 +117,10 @@ export default function DashboardPelaksana() {
       )
       .catch(() => setTasks([]))
       .finally(() => setTasksLoading(false));
-  }, [user]);
+  }, [shouldRedirectToSpecificPelaksana, user]);
 
   useEffect(() => {
+    if (shouldRedirectToSpecificPelaksana) return;
     let cancelled = false;
     api.get("/notifications?limit=10")
       .then((res) => {
@@ -120,7 +129,7 @@ export default function DashboardPelaksana() {
       .catch(() => setNotifList([]))
       .finally(() => setNotifLoading(false));
     return () => { cancelled = true; };
-  }, []);
+  }, [shouldRedirectToSpecificPelaksana]);
 
   function loadSpj() {
     setSpjLoading(true);
@@ -131,12 +140,12 @@ export default function DashboardPelaksana() {
   }
 
   useEffect(() => {
-    if (!user) return;
+    if (shouldRedirectToSpecificPelaksana || !user) return;
     loadSpj();
-  }, [user]);
+  }, [shouldRedirectToSpecificPelaksana, user]);
 
   useEffect(() => {
-    if (!user) return;
+    if (shouldRedirectToSpecificPelaksana || !user) return;
     setSkpLoading(true);
     api.get("/skp/my", { params: { limit: 5 } })
       .then((res) => setSkpList(Array.isArray(res.data?.data) ? res.data.data : []))
@@ -145,9 +154,10 @@ export default function DashboardPelaksana() {
         setSkpList([]);
       })
       .finally(() => setSkpLoading(false));
-  }, [user]);
+  }, [shouldRedirectToSpecificPelaksana, user]);
 
   if (!isAllowed) return <Navigate to="/" replace />;
+  if (shouldRedirectToSpecificPelaksana) return <Navigate to={preferredPath} replace />;
 
   const done = tasks.filter((t) => t.status === "done").length;
   const inProgress = tasks.filter((t) => t.status === "in_progress").length;

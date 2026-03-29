@@ -203,4 +203,4 @@ const useAuthStore = create((set) => ({
 }));
 
 export default useAuthStore;
-export { normalizeUser };
+export { normalizeUser, useAuthStore };

@@ -230,7 +230,7 @@ export default function DashboardGubernur() {
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{
               padding: "10px 18px", fontSize: 13, fontWeight: tab === t.id ? 700 : 500, borderBottom: tab === t.id ? `3px solid ${T.primary}` : "3px solid transparent",
-              color: tab === t.id ? T.primary : T.textSec, background: "none", border: "none", borderBottom: tab === t.id ? `3px solid ${T.primary}` : "3px solid transparent",
+              color: tab === t.id ? T.primary : T.textSec, background: "none", border: "none",
               cursor: "pointer", whiteSpace: "nowrap",
             }}
             aria-selected={tab === t.id} role="tab">

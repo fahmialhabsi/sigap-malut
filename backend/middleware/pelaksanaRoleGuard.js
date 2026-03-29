@@ -1,12 +1,14 @@
 // backend/middleware/pelaksanaRoleGuard.js
 // Guard untuk endpoint Pelaksana SEKRETARIAT — hanya role 'pelaksana'
 
+import UserHierarchy from "../models/UserHierarchy.js";
+
 export const pelaksanaRoleGuard = (req, res, next) => {
   const role = req.user?.role;
   if (role !== 'pelaksana') {
-    return res.status(403).json({ 
-      success: false, 
-      message: `Akses ditolak — hanya role 'pelaksana' yang diizinkan (current: ${role})` 
+    return res.status(403).json({
+      success: false,
+      message: `Akses ditolak — hanya role 'pelaksana' yang diizinkan (current: ${role})`
     });
   }
   next();
@@ -14,82 +16,76 @@ export const pelaksanaRoleGuard = (req, res, next) => {
 
 // Guard KRITIS: SPJ hanya bisa dibuat untuk diri sendiri (BAGIAN I)
 export const spjSelfGuard = (req, res, next) => {
-  const userId = req.user.id;
-  const { penerima_uang_id, atas_nama_id } = req.body;
-  
-  const claimedId = penerima_uang_id || atas_nama_id;
-  if (claimedId && String(claimedId) !== String(userId)) {
+  const uid = req.user.id;
+  const { penerima_uang_id, atas_nama_id, pelaksana_id } = req.body;
+
+  const claimedId = penerima_uang_id || atas_nama_id || pelaksana_id;
+  if (claimedId && String(claimedId) !== String(uid)) {
     return res.status(403).json({
       success: false,
       error: 'SPJ_ATAS_NAMA_ORANG_LAIN',
-      message: 'Anda hanya boleh membuat SPJ untuk diri sendiri. Bendahara/Pelaksana lain buat SPJ mereka sendiri.'
+      message: 'Anda hanya boleh membuat SPJ untuk diri sendiri. Penerima uang harus membuat SPJ-nya sendiri.'
     });
   }
-  
+
   // Paksa field identitas diri sendiri
-  req.body.dibuat_oleh = userId;
-  req.body.penerima_uang_id = userId;
+  req.body.pelaksana_id = uid;
+  req.body.dibuat_oleh = uid;
+  req.body.penerima_uang_id = uid;
   next();
 };
 
 // Guard: Submit tugas WAJIB ke atasan langsung via user_hierarchy
 export const submitTugasGuard = async (req, res, next) => {
   try {
-    const { submit_ke } = req.body; // opsional, jika ada
-    const userId = req.user.id;
-    
-    // Query atasan primer dari user_hierarchy
-    const UserHierarchy = require('../models/UserHierarchy'); // lazy import
-    const atasan = await UserHierarchy.findOne({
-      where: { 
-        bawahan_id: userId, 
-        adalah_primer: true,
-        deleted_at: null 
-      }
+    const { submit_ke } = req.body; // opsional
+    const uid = req.user.id;
+
+    // Gunakan field yang ada di model UserHierarchy (user_id + supervisor_id)
+    const hierarki = await UserHierarchy.findOne({
+      where: { user_id: uid }
     });
-    
-    if (submit_ke && atasan && String(submit_ke) !== String(atasan.atasan_id)) {
+
+    if (submit_ke && hierarki && String(submit_ke) !== String(hierarki.supervisor_id)) {
       return res.status(403).json({
         success: false,
         error: 'BYPASS_HIERARCHY',
-        message: `Tugas harus disubmit ke atasan langsung (ID: ${atasan.atasan_id}, Role: ${atasan.role_atasan}). Bukan bypass ke ${submit_ke}.`
+        message: `Tugas harus disubmit ke atasan langsung (supervisor_id: ${hierarki.supervisor_id}). Tidak boleh bypass ke ${submit_ke}.`
       });
     }
-    
-    // Attach atasan info ke req untuk controller
-    req.atasanLangsung = atasan;
+
+    // Attach info atasan ke req untuk controller
+    req.atasanLangsung = hierarki ? { atasan_id: hierarki.supervisor_id } : null;
     next();
   } catch (error) {
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Gagal validasi hierarchy: ' + error.message 
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal validasi hierarchy: ' + error.message
     });
   }
 };
 
-// Privacy Guards: Read-only milik sendiri
+// Privacy Guards: read-only hanya milik sendiri
 export const skpPrivacyGuard = (req, res, next) => {
-  req.query.dinilai_id = req.user.id; // Paksa filter milik sendiri
+  req.query.dinilai_id = req.user.id;
   next();
 };
 
 export const slipGajiPrivacyGuard = (req, res, next) => {
-  req.query.asn_id = req.user.id; // Filter NIP sendiri
+  req.query.asn_id = req.user.id;
   next();
 };
 
 export const tugasSayaGuard = (req, res, next) => {
-  // Hanya tugas yang assigned ke saya atau dibuat oleh saya
   req.query.my_tasks = true;
   next();
 };
 
 export default {
   pelaksanaRoleGuard,
-  spjSelfGuard, 
+  spjSelfGuard,
   submitTugasGuard,
   skpPrivacyGuard,
   slipGajiPrivacyGuard,
   tugasSayaGuard
 };
-

@@ -2,22 +2,24 @@
 // Role: PELAKSANA / STAF — Unit Sekretariat
 // Tabs: ringkasan | tugas | surat | modul | notifikasi
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Navigate, Link } from "react-router-dom";
 import api from "../../services/api.js";
+import { useAuthStore } from "../../stores/authStore.js";
 
-// ── Design Tokens ─────────────────────────────────────────────────────────────
+// ── Design Tokens (sesuai 05-template-standar-dashboard.md — konsisten semua role) ──
 const T = {
-  primary:  "#4A148C",
-  secondary:"#311B92",
-  accent:   "#00695C",
+  primary:  "#1B4F8A",   // navy — konsisten dengan semua dashboard lain
+  secondary:"#2E7D32",   // hijau — konsisten
+  accent:   "#F57C00",   // oranye — konsisten
   danger:   "#C62828",
   warning:  "#E65100",
   success:  "#2E7D32",
-  bg:       "#F3E5F5",
+  info:     "#0277BD",
+  bg:       "#F4F6F9",   // abu terang — konsisten
   card:     "#FFFFFF",
-  border:   "#CE93D8",
-  textPri:  "#1A0035",
+  border:   "#DDE3ED",   // konsisten
+  textPri:  "#1A2B3C",
   textSec:  "#546E7A",
 };
 
@@ -30,6 +32,7 @@ const ALLOWED = [
 const TABS = [
   { id: "ringkasan",   label: "Ringkasan" },
   { id: "tugas",       label: "Tugas Saya" },
+  { id: "spj",         label: "SPJ Saya" },
   { id: "surat",       label: "Surat" },
   { id: "modul",       label: "Modul Kerja" },
   { id: "notifikasi",  label: "Notifikasi" },
@@ -52,34 +55,34 @@ const MODUL_SEK = [
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function getUser() {
-  try {
-    const raw = sessionStorage.getItem("auth-store") || localStorage.getItem("auth-store");
-    if (raw) {
-      const p = JSON.parse(raw);
-      if (p?.state?.user) return p.state.user;
-    }
-  } catch { /* silent */ }
-  try {
-    const raw = localStorage.getItem("user");
-    if (raw) return JSON.parse(raw);
-  } catch { /* silent */ }
-  return null;
-}
 
 function Badge({ text }) {
   const map = {
-    open:       { bg:"#E3F2FD", fg:"#1565C0" },
-    todo:       { bg:"#E3F2FD", fg:"#1565C0" },
-    in_progress:{ bg:"#FFF9C4", fg:"#F57F17" },
-    proses:     { bg:"#FFF9C4", fg:"#F57F17" },
-    done:       { bg:"#E8F5E9", fg:"#2E7D32" },
-    selesai:    { bg:"#E8F5E9", fg:"#2E7D32" },
-    overdue:    { bg:"#FFEBEE", fg:"#C62828" },
-    terlambat:  { bg:"#FFEBEE", fg:"#C62828" },
-    belum_baca: { bg:"#FFF3E0", fg:"#E65100" },
-    dibaca:     { bg:"#ECEFF1", fg:"#546E7A" },
-    disposisi:  { bg:"#F3E5F5", fg:"#6A1B9A" },
+    // Tugas
+    open:                    { bg:"#E3F2FD", fg:"#1565C0" },
+    todo:                    { bg:"#E3F2FD", fg:"#1565C0" },
+    assigned:                { bg:"#E3F2FD", fg:"#1565C0" },
+    accepted:                { bg:"#E8EAF6", fg:"#3949AB" },
+    in_progress:             { bg:"#FFF9C4", fg:"#F57F17" },
+    proses:                  { bg:"#FFF9C4", fg:"#F57F17" },
+    submitted:               { bg:"#E8F5E9", fg:"#1B5E20" },
+    done:                    { bg:"#E8F5E9", fg:"#2E7D32" },
+    selesai:                 { bg:"#E8F5E9", fg:"#2E7D32" },
+    returned:                { bg:"#FFEBEE", fg:"#C62828" },
+    dikembalikan:            { bg:"#FFEBEE", fg:"#C62828" },
+    overdue:                 { bg:"#FFEBEE", fg:"#C62828" },
+    terlambat:               { bg:"#FFEBEE", fg:"#C62828" },
+    // SPJ
+    draft:                   { bg:"#ECEFF1", fg:"#546E7A" },
+    diajukan_ke_bendahara:   { bg:"#E3F2FD", fg:"#1565C0" },
+    menunggu_verifikasi:     { bg:"#FFF9C4", fg:"#F57F17" },
+    verified:                { bg:"#E8F5E9", fg:"#2E7D32" },
+    rejected:                { bg:"#FFEBEE", fg:"#C62828" },
+    dibayarkan:              { bg:"#E8F5E9", fg:"#1B5E20" },
+    // Surat
+    belum_baca:              { bg:"#FFF3E0", fg:"#E65100" },
+    dibaca:                  { bg:"#ECEFF1", fg:"#546E7A" },
+    disposisi:               { bg:"#EDE7F6", fg:"#6A1B9A" },
   };
   const s = map[(text || "").toLowerCase()] || { bg:"#ECEFF1", fg:"#546E7A" };
   return (
@@ -92,15 +95,39 @@ function Badge({ text }) {
   );
 }
 
-function KpiCard({ label, value, sub, color }) {
+// KpiCard sesuai pola sistem (trend indicator ▲▼, konsisten dengan fungsional-ketersediaan)
+function KpiCard({ label, value, sub, color, trend, unit, good }) {
+  const trendColor = good == null ? T.textSec : (trend > 0) === good ? T.success : T.danger;
   return (
     <div style={{
       background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-      padding: "14px 18px", minWidth: 140, flex: "1 1 140px",
+      padding: "14px 18px", minWidth: 0, width: "100%", flex: "1 1 0",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
     }}>
       <div style={{ fontSize: 11, color: T.textSec, marginBottom: 3 }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 700, color: color || T.primary }}>{value ?? "–"}</div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+        <span style={{ fontSize: 22, fontWeight: 700, color: color || T.primary }}>{value ?? "–"}</span>
+        {unit && <span style={{ fontSize: 12, color: T.textSec }}>{unit}</span>}
+      </div>
+      {trend != null && (
+        <div style={{ fontSize: 10, color: trendColor, marginTop: 2 }}>
+          {trend > 0 ? "▲" : "▼"} {Math.abs(trend)}%
+        </div>
+      )}
       {sub && <div style={{ fontSize: 10, color: T.textSec, marginTop: 1 }}>{sub}</div>}
+    </div>
+  );
+}
+
+// ── Section title helper (konsisten dengan fungsional-ketersediaan) ───────────
+function SectionTitle({ title, sub }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+      <div style={{ width: 4, height: 18, background: T.primary, borderRadius: 2, flexShrink: 0 }} />
+      <div>
+        <div style={{ fontWeight: 700, color: T.textPri, fontSize: 14 }}>{title}</div>
+        {sub && <div style={{ fontSize: 11, color: T.textSec }}>{sub}</div>}
+      </div>
     </div>
   );
 }
@@ -131,6 +158,95 @@ const STATIC_NOTIF = [
   { id:"n4", pesan:"Tugas 'Input data kepegawaian' selesai disetujui",waktu:"1 hari lalu", tipe:"success" },
 ];
 
+const STATIC_SPJ = [
+  {
+    id:"spj1", judul:"SPPD ke Ternate — Workshop Pangan",
+    jenis_spj:"SPPD", total_anggaran:2100000, status:"verified",
+    submitted_at:"2026-03-24", catatan_terakhir:"Sudah disetujui Sekretaris",
+    updated_at:"2026-03-28",
+  },
+  {
+    id:"spj2", judul:"Honor Narasumber Workshop",
+    jenis_spj:"HONOR", total_anggaran:750000, status:"menunggu_verifikasi",
+    submitted_at:"2026-03-27", catatan_terakhir:"Menunggu verifikasi PPK",
+    updated_at:"2026-03-27",
+  },
+  {
+    id:"spj3", judul:"Pembelian ATK Maret 2026",
+    jenis_spj:"ATK", total_anggaran:320000, status:"rejected",
+    submitted_at:"2026-03-15", catatan_terakhir:"Kwitansi tidak ada nama toko dan tanggal",
+    updated_at:"2026-03-20",
+  },
+];
+
+const STATIC_KEP = {
+  nip: "19950101 202203 1 001",
+  jabatan: "Pelaksana — Sekretariat",
+  pangkat: "Penata Muda (III/a)",
+  golongan: "III/a",
+  masa_kerja_tahun: 4,
+  masa_kerja_bulan: 2,
+  kgb_berikutnya: "2026-10-01",
+  kgb_hari_lagi: 185,
+  skp_terakhir: { periode: "Semester 1 2025", nilai: 87.5, predikat: "BAIK", status: "disetujui" },
+  kenaikan_pangkat_estimasi: "Oktober 2028",
+};
+
+// ── TugasCard — reusable card dipakai di list view ────────────────────────────
+function TugasCard({ t, detailTugas, setDetailTugas, handleMulai, handleSelesaikan, loading, isOverdue, prioritasColor }) {
+  return (
+    <div style={{
+      background: T.card, border: `1px solid ${isOverdue(t.deadline, t.status) ? T.danger : T.border}`,
+      borderRadius: 10, padding: 14, marginBottom: 10,
+      borderLeft: `3px solid ${["returned","dikembalikan"].includes(t.status) ? T.danger : ["in_progress","proses"].includes(t.status) ? T.accent : T.primary}`,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, color: T.textPri, fontSize: 13 }}>{t.judul || t.title || "–"}</div>
+          <div style={{ display: "flex", gap: 8, marginTop: 5, flexWrap: "wrap", alignItems: "center" }}>
+            <Badge text={t.status} />
+            {t.prioritas && <span style={{ fontSize: 11, color: prioritasColor(t.prioritas), fontWeight: 600 }}>● {t.prioritas}</span>}
+            {t.deadline && (
+              <span style={{ fontSize: 11, color: isOverdue(t.deadline, t.status) ? T.danger : T.textSec }}>
+                {isOverdue(t.deadline, t.status) ? "⚠ " : ""}Deadline: {new Date(t.deadline).toLocaleDateString("id-ID")}
+              </span>
+            )}
+          </div>
+          {(t.catatan_kembalikan || t.returned_note) && (
+            <div style={{ marginTop: 6, fontSize: 11, background: "#FFEBEE", color: T.danger, borderRadius: 4, padding: "4px 8px" }}>
+              <strong>Catatan:</strong> {t.catatan_kembalikan || t.returned_note}
+            </div>
+          )}
+        </div>
+        <Badge text={t.status} />
+      </div>
+      <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {["todo","open","assigned","accepted"].includes(t.status) && (
+          <button onClick={() => handleMulai(t.id)} disabled={loading} style={{
+            background: T.info, color: "#fff", border: "none",
+            borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontSize: 11, fontWeight: 600,
+          }}>Mulai</button>
+        )}
+        {["in_progress","proses"].includes(t.status) && (
+          <button onClick={() => handleSelesaikan(t.id)} disabled={loading} style={{
+            background: T.success, color: "#fff", border: "none",
+            borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontSize: 11, fontWeight: 600,
+          }}>Submit Hasil</button>
+        )}
+        <button onClick={() => setDetailTugas(detailTugas === t.id ? null : t.id)} style={{
+          background: "transparent", color: T.primary, border: `1px solid ${T.primary}`,
+          borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontSize: 11,
+        }}>{detailTugas === t.id ? "Tutup" : "Detail"}</button>
+      </div>
+      {detailTugas === t.id && (
+        <div style={{ marginTop: 10, fontSize: 12, color: T.textSec, borderTop: `1px solid ${T.border}`, paddingTop: 10 }}>
+          {t.deskripsi || t.description || "Tidak ada deskripsi tambahan."}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function PelaksanaSekretariat() {
   const [tab, setTab]               = useState("ringkasan");
@@ -138,12 +254,21 @@ export default function PelaksanaSekretariat() {
   const [suratMasuk, setSuratMasuk] = useState([]);
   const [suratKeluar, setSuratKeluar] = useState([]);
   const [notifList, setNotifList]   = useState([]);
+  const [kpi, setKpi]               = useState(null);
+  const [absensiHariIni, setAbsensiHariIni] = useState(null);
+  const [spjList, setSpjList]       = useState([]);
+  const [kepegawaian, setKepegawaian] = useState(null);
   const [detailTugas, setDetailTugas] = useState(null);
   const [filterTugas, setFilterTugas] = useState("semua");
+  const [filterSpj, setFilterSpj]   = useState("semua");
   const [loading, setLoading]       = useState(false);
   const [notif, setNotif]           = useState(null);
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === "undefined" ? 1440 : window.innerWidth
+  );
 
-  const user    = getUser();
+  // ── Auth: Zustand store (konsisten dengan semua dashboard lain) ───────────
+  const user    = useAuthStore((state) => state.user);
   const role    = (user?.role || user?.roleName || "").toLowerCase();
   const allowed = ALLOWED.includes(role);
 
@@ -152,10 +277,29 @@ export default function PelaksanaSekretariat() {
     setTimeout(() => setNotif(null), 3000);
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // ── Data fetchers — pakai endpoint khusus Pelaksana (routes/pelaksana/) ────
+  const loadKpiSummary = useCallback(async () => {
+    try {
+      const r = await api.get("/pelaksana/dashboard/summary");
+      const d = r.data?.data;
+      if (d) {
+        setKpi(d);
+        setAbsensiHariIni(d.absensiHariIni || null);
+      }
+    } catch { /* fallback ke computed dari tugas */ }
+  }, []);
+
   const loadTugas = useCallback(async () => {
     try {
-      const r = await api.get("/tasks?unit=sekretariat&limit=30");
-      const d = r.data?.data || r.data?.tasks || [];
+      const r = await api.get("/pelaksana/tugas?periode=semua&limit=30");
+      const d = r.data?.data || [];
       setTugas(d.length ? d : STATIC_TUGAS);
     } catch { setTugas(STATIC_TUGAS); }
   }, []);
@@ -163,8 +307,8 @@ export default function PelaksanaSekretariat() {
   const loadSurat = useCallback(async () => {
     try {
       const [rm, rk] = await Promise.all([
-        api.get("/surat/masuk?limit=20"),
-        api.get("/surat/keluar?limit=20"),
+        api.get("/pelaksana/surat/masuk?limit=20"),
+        api.get("/pelaksana/surat/keluar?limit=20"),
       ]);
       setSuratMasuk(rm.data?.data?.length ? rm.data.data : STATIC_SURAT_MASUK);
       setSuratKeluar(rk.data?.data?.length ? rk.data.data : STATIC_SURAT_KELUAR);
@@ -176,17 +320,35 @@ export default function PelaksanaSekretariat() {
 
   const loadNotif = useCallback(async () => {
     try {
-      const r = await api.get("/notification?limit=20");
+      const r = await api.get("/pelaksana/notifikasi?limit=20");
       const d = r.data?.data || [];
       setNotifList(d.length ? d : STATIC_NOTIF);
     } catch { setNotifList(STATIC_NOTIF); }
   }, []);
 
+  const loadSpj = useCallback(async () => {
+    try {
+      const r = await api.get("/pelaksana/spj?limit=20");
+      const d = r.data?.data || [];
+      setSpjList(d.length ? d : STATIC_SPJ);
+    } catch { setSpjList(STATIC_SPJ); }
+  }, []);
+
+  const loadKepegawaian = useCallback(async () => {
+    try {
+      const r = await api.get("/pelaksana/kepegawaian/profil");
+      setKepegawaian(r.data?.data || STATIC_KEP);
+    } catch { setKepegawaian(STATIC_KEP); }
+  }, []);
+
   useEffect(() => {
     if (!allowed) return;
+    loadKpiSummary();
     loadTugas();
+    loadSpj();
+    loadKepegawaian();
     loadNotif();
-  }, [allowed, loadTugas, loadNotif]);
+  }, [allowed, loadKpiSummary, loadTugas, loadSpj, loadKepegawaian, loadNotif]);
 
   useEffect(() => {
     if (!allowed) return;
@@ -195,6 +357,27 @@ export default function PelaksanaSekretariat() {
 
   // ── Guard ─────────────────────────────────────────────────────────────────
   if (!allowed) return <Navigate to="/unauthorized" replace />;
+
+  const isPhone = viewportWidth < 640;
+  const isTablet = viewportWidth >= 640 && viewportWidth < 1024;
+  const isCompact = viewportWidth < 960;
+  const pagePaddingX = isPhone ? 12 : isTablet ? 16 : 24;
+  const pagePaddingY = isPhone ? 16 : 20;
+  const contentMaxWidth =
+    viewportWidth >= 1600 ? 1680 : viewportWidth >= 1280 ? 1440 : "100%";
+  const summaryGridColumns = isCompact ? "1fr" : "1fr 1fr";
+  const taskBoardColumns =
+    viewportWidth < 768
+      ? "1fr"
+      : viewportWidth < 1280
+        ? "repeat(2, minmax(0, 1fr))"
+        : "repeat(3, minmax(0, 1fr))";
+  const kpiGridColumns =
+    viewportWidth < 640
+      ? "1fr"
+      : viewportWidth < 1100
+        ? "repeat(2, minmax(0, 1fr))"
+        : "repeat(4, minmax(0, 1fr))";
 
   // ── Computed ──────────────────────────────────────────────────────────────
   const tugasTodo     = tugas.filter((t) => ["todo","open"].includes(t.status));
@@ -213,12 +396,31 @@ export default function PelaksanaSekretariat() {
       ? tugasOverdue
       : tugas.filter((t) => t.status === filterTugas);
 
+  // SPJ computed
+  const spjDikembalikan = spjList.filter((s) => s.status === "rejected");
+  const spjPending      = spjList.filter((s) => ["diajukan_ke_bendahara","menunggu_verifikasi"].includes(s.status));
+  const filteredSpj = filterSpj === "semua" ? spjList
+    : spjList.filter((s) => s.status === filterSpj);
+
+  // Tugas kanban buckets
+  const kanbanBelumMulai  = tugas.filter((t) => ["assigned","accepted","todo","open"].includes(t.status));
+  const kanbanSedangJalan = tugas.filter((t) => ["in_progress","proses"].includes(t.status));
+  const kanbanDikembalikan = tugas.filter((t) => ["returned","dikembalikan"].includes(t.status));
+
+  // Item dikembalikan gabungan (tugas + SPJ) untuk panel Ringkasan
+  const semuaDikembalikan = [
+    ...kanbanDikembalikan.map((t) => ({ ...t, _jenis: "tugas" })),
+    ...spjDikembalikan.map((s) => ({ ...s, _jenis: "spj" })),
+  ];
+
   // ── Actions ───────────────────────────────────────────────────────────────
   const handleSelesaikan = async (id) => {
     setLoading(true);
     try {
-      await api.put(`/tasks/${id}`, { status: "done" });
-      showNotif("Tugas ditandai selesai.");
+      // Coba endpoint baru terlebih dahulu, fallback ke lama
+      await api.post(`/pelaksana/tugas/${id}/submit`, { note: "Selesai" })
+        .catch(() => api.put(`/tasks/${id}`, { status: "done" }));
+      showNotif("Tugas disubmit.");
       await loadTugas();
       setDetailTugas(null);
     } catch (e) {
@@ -229,7 +431,8 @@ export default function PelaksanaSekretariat() {
   const handleMulai = async (id) => {
     setLoading(true);
     try {
-      await api.put(`/tasks/${id}`, { status: "in_progress" });
+      await api.post(`/pelaksana/tugas/${id}/mulai`)
+        .catch(() => api.put(`/tasks/${id}`, { status: "in_progress" }));
       showNotif("Tugas dimulai.");
       await loadTugas();
     } catch (e) {
@@ -271,8 +474,8 @@ export default function PelaksanaSekretariat() {
       {/* Header */}
       <header role="banner" style={{
         background: `linear-gradient(135deg, ${T.primary} 0%, ${T.secondary} 100%)`,
-        color: "#fff", padding: "14px 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        color: "#fff", padding: isPhone ? "14px 12px" : "14px 24px",
+        display: "flex", flexDirection: isPhone ? "column" : "row", alignItems: isPhone ? "flex-start" : "center", justifyContent: "space-between",
       }}>
         <div>
           <div style={{ fontSize: 17, fontWeight: 700 }}>Dashboard Pelaksana — Sekretariat</div>
@@ -280,7 +483,7 @@ export default function PelaksanaSekretariat() {
             {user?.name || user?.username || "—"} &nbsp;·&nbsp; Unit Sekretariat
           </div>
         </div>
-        <div style={{ fontSize: 12, opacity: 0.75 }}>
+        <div style={{ fontSize: 12, opacity: 0.75, textAlign: isPhone ? "left" : "right" }}>
           {new Date().toLocaleDateString("id-ID", { dateStyle: "long" })}
         </div>
       </header>
@@ -288,20 +491,21 @@ export default function PelaksanaSekretariat() {
       {/* Notifikasi toast */}
       {notif && (
         <div aria-live="polite" style={{
-          position: "fixed", top: 16, right: 16, zIndex: 9999,
+          position: "fixed", top: isPhone ? 12 : 16, right: isPhone ? 12 : 16, left: isPhone ? 12 : "auto", zIndex: 9999,
           background: notif.type === "error" ? T.danger : notif.type === "warning" ? T.warning : T.accent,
           color: "#fff", padding: "10px 20px", borderRadius: 8,
-          boxShadow: "0 4px 12px rgba(0,0,0,.2)", fontSize: 13, maxWidth: 340,
+          boxShadow: "0 4px 12px rgba(0,0,0,.2)", fontSize: 13, maxWidth: isPhone ? "calc(100vw - 24px)" : 340,
         }}>
           {notif.msg}
         </div>
       )}
 
       {/* Tab Bar */}
-      <nav style={{ background: T.card, borderBottom: `2px solid ${T.border}`, padding: "0 24px", display: "flex", gap: 2, overflowX: "auto" }}>
+      <nav style={{ background: T.card, borderBottom: `2px solid ${T.border}`, padding: isPhone ? "0 12px" : "0 24px", display: "flex", gap: 2, overflowX: "auto" }}>
         {TABS.map((t) => {
           const badge =
-            t.id === "tugas"      ? (tugasTodo.length + tugasProses.length) || null :
+            t.id === "tugas"      ? (kanbanBelumMulai.length + kanbanSedangJalan.length) || null :
+            t.id === "spj"        ? spjDikembalikan.length || null :
             t.id === "surat"      ? suratBelumBaca || null :
             t.id === "notifikasi" ? notifBelumBaca || null : null;
           return (
@@ -330,22 +534,75 @@ export default function PelaksanaSekretariat() {
         })}
       </nav>
 
-      <main id="main-content" style={{ padding: "20px 24px", maxWidth: 1100, margin: "0 auto" }}>
+      <main id="main-content" style={{ width: "100%", padding: `${pagePaddingY}px ${pagePaddingX}px 32px`, maxWidth: contentMaxWidth, margin: "0 auto" }}>
 
         {/* ── TAB: RINGKASAN ───────────────────────────────────────── */}
         {tab === "ringkasan" && (
           <div>
             <h2 style={{ color: T.primary, fontSize: 15, marginBottom: 14 }}>
-              Selamat datang, {user?.name?.split(" ")[0] || "Rekan"}!
+              Selamat datang, {user?.nama_lengkap?.split(" ")[0] || user?.name?.split(" ")[0] || "Rekan"}!
             </h2>
 
-            {/* KPI row */}
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
-              <KpiCard label="Tugas Aktif"      value={tugasTodo.length + tugasProses.length} color={T.warning} />
-              <KpiCard label="Tugas Selesai"    value={tugasSelesai.length} color={T.success} />
-              <KpiCard label="Overdue"          value={tugasOverdue.length} color={T.danger} />
-              <KpiCard label="Surat Belum Baca" value={suratBelumBaca} sub="surat masuk" />
-              <KpiCard label="Notifikasi Baru"  value={notifBelumBaca} />
+            {/* Strip Absensi Hari Ini (BAGIAN D.3 — selalu terlihat di atas) */}
+            <div style={{
+              background: absensiHariIni?.status ? "#E8F5E9" : "#FFF3E0",
+              border: `1px solid ${absensiHariIni?.status ? T.success : T.accent}`,
+              borderRadius: 10, padding: "12px 18px", marginBottom: 16,
+              display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10,
+            }}>
+              <div>
+                <span style={{ fontWeight: 700, fontSize: 13, color: absensiHariIni?.status ? T.success : T.accent }}>
+                  {absensiHariIni?.status
+                    ? `✅ Sudah absen hari ini: ${absensiHariIni.status.toUpperCase()} (${absensiHariIni.jam || "—"})`
+                    : "⚠ Absensi Hari Ini Belum Diisi"}
+                </span>
+                <div style={{ fontSize: 11, color: T.textSec, marginTop: 2 }}>
+                  {new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                </div>
+              </div>
+              {!absensiHariIni?.status && (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {["Hadir", "Sakit", "Ijin", "Dinas Luar"].map((s) => (
+                    <button key={s} style={{
+                      background: T.primary, color: "#fff", border: "none",
+                      borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontSize: 11, fontWeight: 600,
+                    }}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* KPI tiles — 4 tiles (BAGIAN D.2) dengan trend indicator */}
+            <div style={{ display: "grid", gridTemplateColumns: kpiGridColumns, gap: 12, marginBottom: 20 }}>
+              <KpiCard
+                label="Tugas Aktif"
+                value={kpi?.tugasAktif ?? (tugasTodo.length + tugasProses.length)}
+                unit="tugas"
+                color={T.warning}
+                sub="assigned + in progress"
+              />
+              <KpiCard
+                label="Tugas Overdue"
+                value={kpi?.tugasOverdue ?? tugasOverdue.length}
+                unit="tugas"
+                color={kpi?.tugasOverdue > 0 ? T.danger : T.success}
+                sub="melewati deadline"
+              />
+              <KpiCard
+                label="SPJ Pending"
+                value={kpi?.spjPending ?? 0}
+                unit="SPJ"
+                color={T.accent}
+                sub="menunggu verifikasi"
+              />
+              <KpiCard
+                label="Slip Gaji"
+                value={kpi?.slipGajiBulanIni ?? "—"}
+                color={T.info}
+                sub={new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+              />
             </div>
 
             {/* Tugas prioritas tinggi */}
@@ -397,15 +654,205 @@ export default function PelaksanaSekretariat() {
               </div>
             )}
 
+            {/* ── ROW B: SPJ Saya + Dikembalikan (2 panel sejajar) ──────── */}
+            <div style={{ display: "grid", gridTemplateColumns: summaryGridColumns, gap: 14, marginBottom: 16 }}>
+
+              {/* Panel SPJ Saya */}
+              <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
+                <SectionTitle title="SPJ Saya" sub="Status terkini" />
+                {spjList.length === 0 && <div style={{ fontSize: 12, color: T.textSec, fontStyle: "italic" }}>Belum ada SPJ.</div>}
+                {spjList.slice(0, 3).map((s) => (
+                  <div key={s.id} style={{
+                    borderBottom: `1px solid ${T.border}`, paddingBottom: 10, marginBottom: 10,
+                    borderLeft: `3px solid ${s.status === "verified" || s.status === "dibayarkan" ? T.success : s.status === "rejected" ? T.danger : T.accent}`,
+                    paddingLeft: 8,
+                  }}>
+                    <div style={{ fontWeight: 600, fontSize: 12, color: T.textPri }}>{s.judul || "–"}</div>
+                    <div style={{ fontSize: 11, color: T.textSec, marginTop: 2 }}>
+                      {s.jenis_spj && <span style={{ marginRight: 6 }}>[{s.jenis_spj}]</span>}
+                      {s.total_anggaran != null && `Rp ${Number(s.total_anggaran).toLocaleString("id-ID")}`}
+                    </div>
+                    <div style={{ marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <Badge text={s.status} />
+                      {s.status === "rejected" && (
+                        <button onClick={() => setTab("spj")} style={{
+                          fontSize: 10, background: T.danger, color: "#fff", border: "none",
+                          borderRadius: 4, padding: "2px 8px", cursor: "pointer", fontWeight: 600,
+                        }}>Perbaiki</button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <button onClick={() => setTab("spj")} style={{
+                  marginTop: 4, background: "transparent", color: T.primary,
+                  border: `1px solid ${T.primary}`, borderRadius: 6,
+                  padding: "4px 12px", cursor: "pointer", fontSize: 11, width: "100%",
+                }}>+ Buat SPJ Baru</button>
+              </div>
+
+              {/* Panel Dikembalikan — badge merah mencolok */}
+              <div style={{
+                background: semuaDikembalikan.length > 0 ? "#FFF8F8" : T.card,
+                border: `1px solid ${semuaDikembalikan.length > 0 ? "#FFCDD2" : T.border}`,
+                borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <div style={{ width: 4, height: 18, background: semuaDikembalikan.length > 0 ? T.danger : T.border, borderRadius: 2 }} />
+                  <div>
+                    <span style={{ fontWeight: 700, color: T.textPri, fontSize: 14 }}>Perlu Tindakan</span>
+                    {semuaDikembalikan.length > 0 && (
+                      <span style={{ marginLeft: 8, background: T.danger, color: "#fff", borderRadius: 10, padding: "1px 7px", fontSize: 10, fontWeight: 700 }}>
+                        {semuaDikembalikan.length}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {semuaDikembalikan.length === 0 && (
+                  <div style={{ fontSize: 12, color: T.success, fontStyle: "italic" }}>✓ Tidak ada item yang perlu diperbaiki</div>
+                )}
+                {semuaDikembalikan.map((item) => (
+                  <div key={`${item._jenis}-${item.id}`} style={{
+                    background: "#FFEBEE", border: `1px solid #FFCDD2`, borderRadius: 8,
+                    padding: "10px 12px", marginBottom: 8,
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, background: T.danger, color: "#fff", borderRadius: 3, padding: "1px 6px", fontWeight: 700 }}>
+                        {item._jenis === "spj" ? "SPJ" : "TUGAS"}
+                      </span>
+                      <span style={{ fontWeight: 600, fontSize: 12, color: T.textPri }}>
+                        {item.judul || item.title || "–"}
+                      </span>
+                    </div>
+                    {(item.catatan_terakhir || item.catatan_kembalikan || item.returned_note) && (
+                      <div style={{ fontSize: 11, color: T.danger, marginBottom: 6 }}>
+                        "{item.catatan_terakhir || item.catatan_kembalikan || item.returned_note}"
+                      </div>
+                    )}
+                    <button onClick={() => setTab(item._jenis === "spj" ? "spj" : "tugas")} style={{
+                      width: "100%", background: T.danger, color: "#fff", border: "none",
+                      borderRadius: 5, padding: "5px 0", cursor: "pointer", fontSize: 10, fontWeight: 600,
+                    }}>Perbaiki Sekarang</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── ROW C: Status Kepegawaian + Jadwal & Pengingat ──────── */}
+            <div style={{ display: "grid", gridTemplateColumns: summaryGridColumns, gap: 14, marginBottom: 16 }}>
+
+              {/* Panel Status Kepegawaian (read-only) */}
+              <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
+                <SectionTitle title="Status Kepegawaian Saya" sub="Data pribadi — hanya Anda yang bisa melihat" />
+                {kepegawaian ? (
+                  <div style={{ fontSize: 12 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "minmax(92px, auto) 1fr", gap: "4px 12px", color: T.textPri, marginBottom: 10 }}>
+                      <span style={{ color: T.textSec }}>NIP</span>       <span style={{ fontFamily: "monospace" }}>{kepegawaian.nip || "–"}</span>
+                      <span style={{ color: T.textSec }}>Jabatan</span>   <span style={{ fontWeight: 600 }}>{kepegawaian.jabatan || "–"}</span>
+                      <span style={{ color: T.textSec }}>Pangkat</span>   <span>{kepegawaian.pangkat || "–"}</span>
+                      <span style={{ color: T.textSec }}>Masa kerja</span><span>{kepegawaian.masa_kerja_tahun} th {kepegawaian.masa_kerja_bulan} bln</span>
+                    </div>
+
+                    {/* KGB berikutnya */}
+                    <div style={{ background: "#E8F5E9", border: "1px solid #A5D6A7", borderRadius: 8, padding: "8px 12px", marginBottom: 8 }}>
+                      <div style={{ fontWeight: 700, fontSize: 11, color: T.success, marginBottom: 2 }}>KGB Berikutnya</div>
+                      <div style={{ fontSize: 12, color: T.textPri }}>
+                        {kepegawaian.kgb_berikutnya ? new Date(kepegawaian.kgb_berikutnya).toLocaleDateString("id-ID", { dateStyle: "long" }) : "–"}
+                      </div>
+                      {kepegawaian.kgb_hari_lagi != null && (
+                        <div style={{ fontSize: 10, color: T.textSec }}>{kepegawaian.kgb_hari_lagi} hari lagi</div>
+                      )}
+                    </div>
+
+                    {/* SKP terakhir */}
+                    {kepegawaian.skp_terakhir && (
+                      <div style={{ background: "#E3F2FD", border: "1px solid #90CAF9", borderRadius: 8, padding: "8px 12px" }}>
+                        <div style={{ fontWeight: 700, fontSize: 11, color: T.info, marginBottom: 2 }}>
+                          Nilai SKP — {kepegawaian.skp_terakhir.periode}
+                        </div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: T.primary }}>
+                          {kepegawaian.skp_terakhir.nilai}
+                          <span style={{ fontSize: 11, fontWeight: 400, color: T.textSec, marginLeft: 6 }}>
+                            ({kepegawaian.skp_terakhir.predikat})
+                          </span>
+                        </div>
+                        <Badge text={kepegawaian.skp_terakhir.status} />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 12, color: T.textSec, fontStyle: "italic" }}>Memuat data kepegawaian…</div>
+                )}
+              </div>
+
+              {/* Panel Jadwal & Pengingat */}
+              <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
+                <SectionTitle title="Jadwal & Pengingat" sub="Hari ini dan mendatang" />
+
+                {/* Tugas overdue — pengingat mencolok */}
+                {tugasOverdue.length > 0 && (
+                  <div style={{ background: "#FFEBEE", border: `1px solid #FFCDD2`, borderRadius: 8, padding: "8px 12px", marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.danger, marginBottom: 4 }}>
+                      ⚠ {tugasOverdue.length} tugas melewati deadline!
+                    </div>
+                    {tugasOverdue.slice(0, 2).map((t) => (
+                      <div key={t.id} style={{ fontSize: 11, color: T.danger }}>• {t.judul || t.title}</div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Deadline hari ini */}
+                {tugas.filter((t) => {
+                  if (!t.deadline || ["done","selesai"].includes(t.status)) return false;
+                  const d = new Date(t.deadline); const now = new Date();
+                  return d.toDateString() === now.toDateString();
+                }).length > 0 && (
+                  <div style={{ background: "#FFF3E0", border: `1px solid #FFE0B2`, borderRadius: 8, padding: "8px 12px", marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.accent, marginBottom: 4 }}>Deadline Hari Ini</div>
+                    {tugas.filter((t) => {
+                      if (!t.deadline || ["done","selesai"].includes(t.status)) return false;
+                      return new Date(t.deadline).toDateString() === new Date().toDateString();
+                    }).map((t) => (
+                      <div key={t.id} style={{ fontSize: 11, color: T.textPri }}>
+                        • {t.judul || t.title} — {new Date(t.deadline).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Item dikembalikan */}
+                {semuaDikembalikan.length > 0 && (
+                  <div style={{ background: "#FFEBEE", border: `1px solid #FFCDD2`, borderRadius: 8, padding: "8px 12px", marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.danger }}>
+                      ❌ {semuaDikembalikan.length} item perlu diperbaiki segera
+                    </div>
+                  </div>
+                )}
+
+                {/* KGB mendekati */}
+                {kepegawaian?.kgb_hari_lagi != null && kepegawaian.kgb_hari_lagi <= 30 && (
+                  <div style={{ background: "#E8F5E9", border: `1px solid #A5D6A7`, borderRadius: 8, padding: "8px 12px", marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, color: T.success }}>
+                      📅 KGB jatuh tempo dalam {kepegawaian.kgb_hari_lagi} hari
+                    </div>
+                  </div>
+                )}
+
+                {tugasOverdue.length === 0 && semuaDikembalikan.length === 0 && (
+                  <div style={{ fontSize: 12, color: T.success, fontStyle: "italic" }}>✓ Semua jadwal lancar</div>
+                )}
+              </div>
+            </div>
+
             {/* Modul shortcut */}
-            <div style={{ fontWeight: 600, color: T.primary, marginBottom: 10, fontSize: 13 }}>Akses Cepat Modul</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 10 }}>
+            <SectionTitle title="Akses Cepat Modul" />
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isPhone ? 120 : 140}px, 1fr))`, gap: 10 }}>
               {MODUL_SEK.slice(0, 6).map((m) => (
                 <Link key={m.kode} to={m.path} style={{
                   background: T.card, border: `1px solid ${T.border}`, borderRadius: 8,
                   padding: "12px 14px", textDecoration: "none", color: T.primary,
                   fontWeight: 600, fontSize: 12, textAlign: "center",
                   display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
                 }}>
                   <span style={{ fontSize: 20 }}>{m.icon}</span>
                   <span>{m.label}</span>
@@ -415,122 +862,304 @@ export default function PelaksanaSekretariat() {
           </div>
         )}
 
-        {/* ── TAB: TUGAS ───────────────────────────────────────────── */}
+        {/* ── TAB: TUGAS — Kanban Mini 3 Kolom (BAGIAN D.3) ────────── */}
         {tab === "tugas" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-              <h2 style={{ color: T.primary, fontSize: 15, margin: 0 }}>Tugas Saya</h2>
-              <div style={{ display: "flex", gap: 6 }}>
-                {["semua","todo","in_progress","done","overdue"].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setFilterTugas(s)}
-                    style={{
-                      padding: "4px 10px", fontSize: 11, borderRadius: 6,
-                      border: `1px solid ${filterTugas === s ? T.primary : T.border}`,
-                      background: filterTugas === s ? T.primary : T.card,
-                      color: filterTugas === s ? "#fff" : T.textSec,
-                      cursor: "pointer", fontWeight: filterTugas === s ? 600 : 400,
-                    }}
-                  >
-                    {s === "semua" ? "Semua" : s === "in_progress" ? "Proses" : s === "overdue" ? "Terlambat" : s === "done" ? "Selesai" : "Todo"}
-                  </button>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+              <SectionTitle title="Tugas Saya" sub={`${tugas.length} total · ${kanbanDikembalikan.length} dikembalikan · ${tugasOverdue.length} overdue`} />
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {[["semua","Semua"],["done","Selesai"],["overdue","Overdue"]].map(([val, label]) => (
+                  <button key={val} onClick={() => setFilterTugas(val)} style={{
+                    padding: "4px 10px", fontSize: 11, borderRadius: 6,
+                    border: `1px solid ${filterTugas === val ? T.primary : T.border}`,
+                    background: filterTugas === val ? T.primary : T.card,
+                    color: filterTugas === val ? "#fff" : T.textSec,
+                    cursor: "pointer", fontWeight: filterTugas === val ? 600 : 400,
+                  }}>{label}</button>
                 ))}
               </div>
             </div>
 
-            {filteredTugas.length === 0 && (
-              <div style={{ color: T.textSec, fontStyle: "italic", padding: 20, textAlign: "center" }}>
-                Tidak ada tugas.
+            {filterTugas !== "semua" ? (
+              /* ── View filter: list biasa ── */
+              filteredTugas.length === 0
+                ? <div style={{ color: T.textSec, fontStyle: "italic", padding: 20, textAlign: "center" }}>Tidak ada tugas.</div>
+                : filteredTugas.map((t) => <TugasCard key={t.id} t={t} detailTugas={detailTugas} setDetailTugas={setDetailTugas} handleMulai={handleMulai} handleSelesaikan={handleSelesaikan} loading={loading} isOverdue={isOverdue} prioritasColor={prioritasColor} />)
+            ) : (
+              /* ── Kanban 3 kolom ── */
+              <div style={{ display: "grid", gridTemplateColumns: taskBoardColumns, gap: 12, alignItems: "start" }}>
+                {/* KOLOM 1: Belum Mulai */}
+                <div style={{ background: "#F8FAFC", border: `1px solid ${T.border}`, borderRadius: 10, padding: 12 }}>
+                  <div style={{ fontWeight: 700, color: T.info, fontSize: 12, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".5px" }}>
+                    ⏳ Belum Mulai ({kanbanBelumMulai.length})
+                  </div>
+                  {kanbanBelumMulai.length === 0 && <div style={{ fontSize: 12, color: T.textSec, fontStyle: "italic" }}>Tidak ada</div>}
+                  {kanbanBelumMulai.map((t) => (
+                    <div key={t.id} style={{
+                      background: T.card, border: `1px solid ${isOverdue(t.deadline, t.status) ? T.danger : T.border}`,
+                      borderRadius: 8, padding: "10px 12px", marginBottom: 8,
+                      borderLeft: `3px solid ${isOverdue(t.deadline, t.status) ? T.danger : T.info}`,
+                    }}>
+                      <div style={{ fontWeight: 600, fontSize: 12, color: T.textPri, marginBottom: 4 }}>
+                        {t.judul || t.title || "–"}
+                        {t.jenis_tugas === "rutin_harian" && (
+                          <span style={{ marginLeft: 5, fontSize: 10, background: "#E8F5E9", color: T.success, padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>RUTIN</span>
+                        )}
+                        {t._substitusi && (
+                          <span style={{ marginLeft: 5, fontSize: 10, background: "#FFF3E0", color: T.accent, padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>SUBSTITUSI</span>
+                        )}
+                      </div>
+                      {t.deadline && (
+                        <div style={{ fontSize: 10, color: isOverdue(t.deadline, t.status) ? T.danger : T.textSec, marginBottom: 6 }}>
+                          {isOverdue(t.deadline, t.status) ? "⚠ " : ""}Deadline: {new Date(t.deadline).toLocaleDateString("id-ID")}
+                        </div>
+                      )}
+                      {t.prioritas && <div style={{ fontSize: 10, color: prioritasColor(t.prioritas), fontWeight: 600, marginBottom: 6 }}>● {t.prioritas}</div>}
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => handleMulai(t.id)} disabled={loading} style={{
+                          flex: 1, background: T.info, color: "#fff", border: "none",
+                          borderRadius: 5, padding: "5px 0", cursor: "pointer", fontSize: 10, fontWeight: 600,
+                        }}>Mulai</button>
+                        <button onClick={() => setDetailTugas(detailTugas === t.id ? null : t.id)} style={{
+                          background: "transparent", color: T.textSec, border: `1px solid ${T.border}`,
+                          borderRadius: 5, padding: "5px 8px", cursor: "pointer", fontSize: 10,
+                        }}>Detail</button>
+                      </div>
+                      {detailTugas === t.id && (
+                        <div style={{ marginTop: 8, fontSize: 11, color: T.textSec, borderTop: `1px solid ${T.border}`, paddingTop: 8 }}>
+                          {t.deskripsi || t.description || "Tidak ada deskripsi."}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* KOLOM 2: Sedang Berjalan */}
+                <div style={{ background: "#FFFDE7", border: `1px solid #FFE082`, borderRadius: 10, padding: 12 }}>
+                  <div style={{ fontWeight: 700, color: "#F57F17", fontSize: 12, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".5px" }}>
+                    🔄 Sedang Berjalan ({kanbanSedangJalan.length})
+                  </div>
+                  {kanbanSedangJalan.length === 0 && <div style={{ fontSize: 12, color: T.textSec, fontStyle: "italic" }}>Tidak ada</div>}
+                  {kanbanSedangJalan.map((t) => (
+                    <div key={t.id} style={{
+                      background: T.card, border: `1px solid ${isOverdue(t.deadline, t.status) ? T.danger : "#FFE082"}`,
+                      borderRadius: 8, padding: "10px 12px", marginBottom: 8,
+                      borderLeft: `3px solid ${T.accent}`,
+                    }}>
+                      <div style={{ fontWeight: 600, fontSize: 12, color: T.textPri, marginBottom: 4 }}>
+                        {t.judul || t.title || "–"}
+                      </div>
+                      {t.started_at && (
+                        <div style={{ fontSize: 10, color: T.textSec, marginBottom: 4 }}>
+                          Mulai: {new Date(t.started_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                        </div>
+                      )}
+                      {t.deadline && (
+                        <div style={{ fontSize: 10, color: isOverdue(t.deadline, t.status) ? T.danger : T.textSec, marginBottom: 6 }}>
+                          {isOverdue(t.deadline, t.status) ? "⚠ " : ""}Deadline: {new Date(t.deadline).toLocaleDateString("id-ID")}
+                        </div>
+                      )}
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => handleSelesaikan(t.id)} disabled={loading} style={{
+                          flex: 1, background: T.success, color: "#fff", border: "none",
+                          borderRadius: 5, padding: "5px 0", cursor: "pointer", fontSize: 10, fontWeight: 600,
+                        }}>Submit Hasil</button>
+                        <button onClick={() => setDetailTugas(detailTugas === t.id ? null : t.id)} style={{
+                          background: "transparent", color: T.textSec, border: `1px solid ${T.border}`,
+                          borderRadius: 5, padding: "5px 8px", cursor: "pointer", fontSize: 10,
+                        }}>Detail</button>
+                      </div>
+                      {detailTugas === t.id && (
+                        <div style={{ marginTop: 8, fontSize: 11, color: T.textSec, borderTop: `1px solid ${T.border}`, paddingTop: 8 }}>
+                          {t.deskripsi || t.description || "Tidak ada deskripsi."}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* KOLOM 3: Dikembalikan */}
+                <div style={{ background: "#FFF8F8", border: `1px solid #FFCDD2`, borderRadius: 10, padding: 12 }}>
+                  <div style={{ fontWeight: 700, color: T.danger, fontSize: 12, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".5px" }}>
+                    ↩ Dikembalikan ({kanbanDikembalikan.length})
+                  </div>
+                  {kanbanDikembalikan.length === 0 && <div style={{ fontSize: 12, color: T.textSec, fontStyle: "italic" }}>Tidak ada</div>}
+                  {kanbanDikembalikan.map((t) => (
+                    <div key={t.id} style={{
+                      background: T.card, border: `1px solid #FFCDD2`,
+                      borderRadius: 8, padding: "10px 12px", marginBottom: 8,
+                      borderLeft: `3px solid ${T.danger}`,
+                    }}>
+                      <div style={{ fontWeight: 600, fontSize: 12, color: T.textPri, marginBottom: 4 }}>
+                        {t.judul || t.title || "–"}
+                      </div>
+                      {t.catatan_kembalikan && (
+                        <div style={{ fontSize: 10, background: "#FFEBEE", color: T.danger, borderRadius: 4, padding: "4px 8px", marginBottom: 6 }}>
+                          <strong>Catatan:</strong> {t.catatan_kembalikan}
+                        </div>
+                      )}
+                      <button onClick={() => setDetailTugas(detailTugas === t.id ? null : t.id)} style={{
+                        width: "100%", background: T.danger, color: "#fff", border: "none",
+                        borderRadius: 5, padding: "5px 0", cursor: "pointer", fontSize: 10, fontWeight: 600,
+                      }}>Perbaiki & Submit Ulang</button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {filteredTugas.map((t) => (
-              <div key={t.id} style={{
-                background: T.card, border: `1px solid ${isOverdue(t.deadline, t.status) ? T.danger : T.border}`,
-                borderRadius: 10, padding: 16, marginBottom: 12,
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, color: T.textPri, fontSize: 14 }}>{t.judul || t.title || "–"}</div>
-                    {(t.deskripsi || t.description) && (
-                      <div style={{ fontSize: 12, color: T.textSec, marginTop: 3 }}>
-                        {t.deskripsi || t.description}
+            {/* Footer stats */}
+            <div style={{ marginTop: 14, padding: "8px 14px", background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 11, color: T.textSec, display: "flex", gap: 20, flexWrap: "wrap" }}>
+              <span>{kanbanBelumMulai.length} belum mulai</span>
+              <span>{kanbanSedangJalan.length} sedang berjalan</span>
+              <span>{kanbanDikembalikan.length} dikembalikan</span>
+              <span>{tugasSelesai.length} selesai hari ini</span>
+              <span style={{ color: tugasOverdue.length > 0 ? T.danger : T.success, fontWeight: 600 }}>{tugasOverdue.length} overdue</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB: SPJ SAYA ────────────────────────────────────────── */}
+        {tab === "spj" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+              <SectionTitle title="SPJ Saya" sub={`${spjList.length} total · ${spjDikembalikan.length} perlu diperbaiki`} />
+              <button style={{
+                background: T.primary, color: "#fff", border: "none",
+                borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontSize: 12, fontWeight: 600,
+              }}>+ Buat SPJ Baru</button>
+            </div>
+
+            {/* Filter bar */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+              {[
+                ["semua","Semua"],
+                ["draft","Draft"],
+                ["diajukan_ke_bendahara","Diajukan"],
+                ["menunggu_verifikasi","Verifikasi"],
+                ["verified","Disetujui"],
+                ["rejected","Dikembalikan"],
+              ].map(([val, label]) => (
+                <button key={val} onClick={() => setFilterSpj(val)} style={{
+                  padding: "4px 10px", fontSize: 11, borderRadius: 6,
+                  border: `1px solid ${filterSpj === val ? T.primary : T.border}`,
+                  background: filterSpj === val ? T.primary : T.card,
+                  color: filterSpj === val ? "#fff" : T.textSec,
+                  cursor: "pointer", fontWeight: filterSpj === val ? 600 : 400,
+                }}>{label}</button>
+              ))}
+            </div>
+
+            {filteredSpj.length === 0 && (
+              <div style={{ color: T.textSec, fontStyle: "italic", padding: 20, textAlign: "center" }}>Tidak ada SPJ.</div>
+            )}
+
+            {filteredSpj.map((s) => {
+              const isRejected = s.status === "rejected";
+              const isApproved = ["verified","dibayarkan"].includes(s.status);
+              const borderColor = isRejected ? T.danger : isApproved ? T.success : T.accent;
+              return (
+                <div key={s.id} style={{
+                  border: `1px solid ${isRejected ? "#FFCDD2" : T.border}`,
+                  borderRadius: 10, padding: 16, marginBottom: 12,
+                  borderLeft: `4px solid ${borderColor}`,
+                  background: isRejected ? "#FFF8F8" : T.card,
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, color: T.textPri, fontSize: 14 }}>{s.judul || s.kegiatan || "–"}</div>
+                      <div style={{ display: "flex", gap: 10, marginTop: 5, flexWrap: "wrap", alignItems: "center" }}>
+                        <Badge text={s.status} />
+                        {s.jenis_spj && (
+                          <span style={{ fontSize: 11, color: T.textSec, background: "#F5F5F5", padding: "1px 7px", borderRadius: 4 }}>
+                            {s.jenis_spj}
+                          </span>
+                        )}
+                        {s.total_anggaran != null && (
+                          <span style={{ fontSize: 12, fontWeight: 700, color: T.primary }}>
+                            Rp {Number(s.total_anggaran).toLocaleString("id-ID")}
+                          </span>
+                        )}
                       </div>
-                    )}
-                    <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap", alignItems: "center" }}>
-                      <Badge text={t.status} />
-                      {t.prioritas && (
-                        <span style={{ fontSize: 11, color: prioritasColor(t.prioritas), fontWeight: 600 }}>
-                          ● {t.prioritas}
-                        </span>
-                      )}
-                      {t.deadline && (
-                        <span style={{ fontSize: 11, color: isOverdue(t.deadline, t.status) ? T.danger : T.textSec }}>
-                          Deadline: {new Date(t.deadline).toLocaleDateString("id-ID")}
-                          {isOverdue(t.deadline, t.status) && " ⚠"}
-                        </span>
-                      )}
                     </div>
+                    <div style={{ fontSize: 11, color: T.textSec, textAlign: "right", flexShrink: 0 }}>
+                      {s.updated_at ? new Date(s.updated_at).toLocaleDateString("id-ID") : "–"}
+                    </div>
+                  </div>
+
+                  {/* Timeline status — SPJ tracking (BAGIAN C.5) */}
+                  <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 0, flexWrap: "wrap" }}>
+                    {[
+                      ["draft","Draft"],
+                      ["diajukan_ke_bendahara","Bendahara"],
+                      ["menunggu_verifikasi","PPK"],
+                      ["verified","Sekretaris"],
+                      ["dibayarkan","Dibayar"],
+                    ].map(([st, label], idx, arr) => {
+                      const statuses = ["draft","diajukan_ke_bendahara","menunggu_verifikasi","verified","dibayarkan","rejected"];
+                      const currentIdx = statuses.indexOf(s.status);
+                      const stepIdx = statuses.indexOf(st);
+                      const isDone = s.status === "rejected" ? false : stepIdx <= currentIdx;
+                      const isCurrent = s.status === st;
+                      return (
+                        <div key={st} style={{ display: "flex", alignItems: "center" }}>
+                          <div style={{
+                            width: 22, height: 22, borderRadius: "50%", fontSize: 10, fontWeight: 700,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            background: isDone ? T.success : isCurrent ? T.accent : "#E0E0E0",
+                            color: isDone || isCurrent ? "#fff" : T.textSec,
+                            flexShrink: 0,
+                          }}>
+                            {isDone ? "✓" : idx + 1}
+                          </div>
+                          <div style={{ fontSize: 9, color: isDone ? T.success : T.textSec, marginLeft: 3, marginRight: 3, whiteSpace: "nowrap" }}>
+                            {label}
+                          </div>
+                          {idx < arr.length - 1 && (
+                            <div style={{ width: 16, height: 2, background: isDone ? T.success : "#E0E0E0", marginRight: 3 }} />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Catatan jika dikembalikan */}
+                  {isRejected && s.catatan_terakhir && (
+                    <div style={{ marginTop: 10, background: "#FFEBEE", border: `1px solid #FFCDD2`, borderRadius: 6, padding: "8px 12px", fontSize: 11, color: T.danger }}>
+                      <strong>Catatan: </strong>{s.catatan_terakhir}
+                    </div>
+                  )}
+
+                  {/* Tombol aksi */}
+                  <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                    {s.status === "draft" && (
+                      <>
+                        <button style={{
+                          background: T.primary, color: "#fff", border: "none",
+                          borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontSize: 11, fontWeight: 600,
+                        }}>Submit ke Bendahara</button>
+                        <button style={{
+                          background: "transparent", color: T.textSec, border: `1px solid ${T.border}`,
+                          borderRadius: 6, padding: "6px 12px", cursor: "pointer", fontSize: 11,
+                        }}>Edit Draft</button>
+                      </>
+                    )}
+                    {isRejected && (
+                      <button style={{
+                        background: T.danger, color: "#fff", border: "none",
+                        borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontSize: 11, fontWeight: 600,
+                      }}>Perbaiki & Submit Ulang</button>
+                    )}
+                    {isApproved && (
+                      <button style={{
+                        background: T.success, color: "#fff", border: "none",
+                        borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontSize: 11, fontWeight: 600,
+                      }}>Download PDF</button>
+                    )}
                   </div>
                 </div>
-
-                {/* Expand detail */}
-                {detailTugas === t.id ? (
-                  <div style={{ marginTop: 12, borderTop: `1px solid ${T.border}`, paddingTop: 12 }}>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      {["todo","open"].includes(t.status) && (
-                        <button
-                          onClick={() => handleMulai(t.id)}
-                          disabled={loading}
-                          style={{
-                            background: T.warning, color: "#fff", border: "none",
-                            borderRadius: 6, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600,
-                          }}
-                        >
-                          Mulai Kerjakan
-                        </button>
-                      )}
-                      {["in_progress","proses"].includes(t.status) && (
-                        <button
-                          onClick={() => handleSelesaikan(t.id)}
-                          disabled={loading}
-                          style={{
-                            background: T.accent, color: "#fff", border: "none",
-                            borderRadius: 6, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600,
-                          }}
-                        >
-                          Tandai Selesai
-                        </button>
-                      )}
-                      <button
-                        onClick={() => setDetailTugas(null)}
-                        style={{
-                          background: "transparent", color: T.textSec,
-                          border: `1px solid ${T.border}`, borderRadius: 6,
-                          padding: "7px 12px", cursor: "pointer", fontSize: 12,
-                        }}
-                      >
-                        Tutup
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  !["done","selesai"].includes(t.status) && (
-                    <button
-                      onClick={() => setDetailTugas(t.id)}
-                      style={{
-                        marginTop: 10, background: "transparent", color: T.primary,
-                        border: `1px solid ${T.primary}`, borderRadius: 6,
-                        padding: "5px 12px", cursor: "pointer", fontSize: 11,
-                      }}
-                    >
-                      Kelola Tugas
-                    </button>
-                  )
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -569,7 +1198,7 @@ export default function PelaksanaSekretariat() {
                     )}
                     {suratMasuk.map((s, i) => (
                       <tr key={s.id || i} style={{
-                        background: s.status === "belum_baca" ? "#FAF0FF" : i % 2 === 0 ? "#F5F0EE" : "#fff",
+                        background: s.status === "belum_baca" ? "#EBF5FB" : i % 2 === 0 ? "#F8FAFC" : "#fff",
                         borderBottom: `1px solid ${T.border}`,
                         fontWeight: s.status === "belum_baca" ? 600 : 400,
                       }}>
@@ -619,7 +1248,7 @@ export default function PelaksanaSekretariat() {
                       <tr><td colSpan={5} style={{ padding: 16, textAlign: "center", color: T.textSec, fontStyle: "italic" }}>Tidak ada surat keluar.</td></tr>
                     )}
                     {suratKeluar.map((s, i) => (
-                      <tr key={s.id || i} style={{ background: i % 2 === 0 ? "#F5F0EE" : "#fff", borderBottom: `1px solid ${T.border}` }}>
+                      <tr key={s.id || i} style={{ background: i % 2 === 0 ? "#F8FAFC" : "#fff", borderBottom: `1px solid ${T.border}` }}>
                         <td style={{ padding: "8px 12px", fontSize: 11 }}>{s.nomor || "–"}</td>
                         <td style={{ padding: "8px 12px" }}>{s.perihal || "–"}</td>
                         <td style={{ padding: "8px 12px", fontSize: 12 }}>{s.tujuan || "–"}</td>
@@ -640,7 +1269,7 @@ export default function PelaksanaSekretariat() {
         {tab === "modul" && (
           <div>
             <h2 style={{ color: T.primary, fontSize: 15, marginBottom: 14 }}>Modul Kerja Sekretariat</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${isPhone ? 130 : 160}px, 1fr))`, gap: 12 }}>
               {MODUL_SEK.map((m) => (
                 <Link
                   key={m.kode}

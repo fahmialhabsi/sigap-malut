@@ -91,6 +91,14 @@ export default function DashboardLayout({ children }) {
   // Dashboard bidang modern membawa layout full-screen sendiri (dengan sidebar internal).
   const childComponentName =
     children?.type?.displayName || children?.type?.name || "";
+  const nestedChildComponentName =
+    children?.props?.children?.type?.displayName ||
+    children?.props?.children?.type?.name ||
+    "";
+  const resolvedChildName =
+    childComponentName === "RoleProtectedRoute"
+      ? nestedChildComponentName
+      : childComponentName;
   const standaloneDashboardNames = [
     "DashboardDistribusi",
     "DashboardDistribusiLayout",
@@ -105,9 +113,25 @@ export default function DashboardLayout({ children }) {
     "DashboardUPTDLayout",
   ];
   const isStandaloneDashboard =
-    standaloneDashboardNames.includes(childComponentName);
+    standaloneDashboardNames.includes(resolvedChildName);
+  const isFluidDashboard =
+    resolvedChildName.startsWith("Pelaksana") ||
+    [
+      "DashboardBendaharaPengeluaran",
+      "DashboardBendaharaGaji",
+      "DashboardBendaharaBarang",
+      "FungsionalUPTDDashboard",
+      "FungsionalUPTDMutuDashboard",
+      "FungsionalUPTDTeknisDashboard",
+    ].includes(resolvedChildName);
+  const navInnerClass = isFluidDashboard
+    ? "w-full flex flex-wrap items-center gap-4 px-4 md:px-6 xl:px-8 py-2"
+    : "mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2";
+  const mainClass = isFluidDashboard
+    ? "flex-1 w-full px-0 py-0"
+    : "flex-1 px-8 py-8 mx-auto max-w-6xl";
 
-  if (isStandaloneDashboard) {
+  if (isStandaloneDashboard || roleName === "sekretaris") {
     return <>{children}</>;
   }
 
@@ -115,7 +139,7 @@ export default function DashboardLayout({ children }) {
     <div className="flex flex-col min-h-screen bg-ink text-surface font-inter">
       {user && roleName === "sekretaris" ? (
         <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
-          <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
+          <div className={navInnerClass}>
             {modulesByCategory["Sekretariat"].map((modul) => (
               <button
                 key={modul.id}
@@ -139,7 +163,7 @@ export default function DashboardLayout({ children }) {
         </nav>
       ) : (
         <nav className="w-full border-b border-muted bg-ink text-surface shadow-sm">
-          <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-4 px-8 py-2">
+          <div className={navInnerClass}>
             {categories
               .filter((cat) => roleName && cat.roles.includes(roleName))
               .map((cat) => (
@@ -165,7 +189,7 @@ export default function DashboardLayout({ children }) {
         </nav>
       )}
 
-      <main className="flex-1 px-8 py-8 mx-auto max-w-6xl">{children}</main>
+      <main className={mainClass}>{children}</main>
     </div>
   );
 }

@@ -21,6 +21,8 @@ import subKegiatanUsulRoutes from "./routes/subKegiatanUsul.js";
 import uptdOpsRoutes from "./routes/uptdOps.js";
 import spjRoutes from "./routes/spj.js";
 import skpRoutes from "./routes/skp.js";
+import pelaksanaRoutes from "./routes/pelaksana/index.js";
+import sekretarisRoutes from "./routes/sekretaris/index.js";
 import { initSLAScheduler } from "./services/slaService.js";
 import { initDailyDigestScheduler } from "./services/dailyDigestService.js";
 // ...existing code...
@@ -175,10 +177,12 @@ app.use("/api/bypassdetection", bypassDetectionRoutes);
 app.use("/api/sub-kegiatan-usul", subKegiatanUsulRoutes);
 app.use("/api/uptd-ops", uptdOpsRoutes);
 app.use("/api/spj", spjRoutes);
-app.use("/api/skp", skpRoutes);  \nimport pelaksanaRoutes from "./routes/pelaksana/index.js";  \napp.use("/api/pelaksana", pelaksanaRoutes);  \n  \n// Register all auto-generated routes
-registerRoutes(app);
+app.use("/api/skp", skpRoutes);
+app.use("/api/pelaksana", pelaksanaRoutes);
+app.use("/api/sekretaris", sekretarisRoutes);
 
-// Error handler
+// Register all auto-generated routes
+registerRoutes(app);
 
 // Error handler
 app.use((err, req, res, next) => {

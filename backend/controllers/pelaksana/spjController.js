@@ -1,11 +1,14 @@
-// backend/controllers/pelaksana/spjController.js  
+// backend/controllers/pelaksana/spjController.js
 // SPJ Pelaksana — BAGIAN C.5 + H (KRITIS: Pelaksana SATU-SATUNYA boleh buat SPJ)
 // spjSelfGuard wajib di routes!
 
-import Spj from '../../../models/Spj.js';
-import sequelize from '../../../config/database.js';
-import Notification from '../../../models/Notification.js';
-import { pelaksanaRoleGuard, spjSelfGuard } from '../../../middleware/pelaksanaRoleGuard.js';
+import { Op } from "sequelize";
+import sequelize from "../../config/database.js";
+import Notification from "../../models/Notification.js";
+import User from "../../models/User.js";
+
+// Spj didaftarkan lewat factory di models/index.js → ambil via sequelize.models
+const getSpj = () => sequelize.models.Spj;
 
 const userId = (req) => req.user.id;
 
@@ -13,70 +16,81 @@ const userId = (req) => req.user.id;
 export const getSpjSaya = async (req, res) => {
   try {
     const uid = userId(req);
-    const { status, periode, limit = 10 } = req.query;
+    const { status, limit = 10 } = req.query;
+    const Spj = getSpj();
 
-    const where = {
-      dibuat_oleh: uid,
-      deleted_at: null
-    };
-
-    if (status) where.status = { [Op.in]: status.split(',') };
+    const where = { pelaksana_id: uid };
+    if (status) where.status = { [Op.in]: status.split(",") };
 
     const spjs = await Spj.findAll({
       where,
-      order: [['updated_at', 'DESC']],
-      limit: Number(limit)
+      order: [["updated_at", "DESC"]],
+      limit: Number(limit),
     });
 
-    // Enrich dengan timeline/status changes (dari spj_logs jika ada)
     res.json({ success: true, data: spjs });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// ── POST /api/pelaksana/spj — Buat SPJ baru (multi-jenis: SPPD/Honor/ATK) ──
+// ── GET /api/pelaksana/spj/:id — Detail SPJ + timeline ──
+export const getSpjDetail = async (req, res) => {
+  try {
+    const Spj = getSpj();
+    const spj = await Spj.findOne({
+      where: { id: req.params.id, pelaksana_id: userId(req) },
+    });
+
+    if (!spj) {
+      return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
+    }
+
+    res.json({ success: true, data: spj });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// ── POST /api/pelaksana/spj — Buat SPJ baru (multi-jenis: SPPD/Honor/ATK/Lain) ──
 export const buatSpj = async (req, res) => {
   const t = await sequelize.transaction();
   try {
     const uid = userId(req);
-    const { 
-      jenis_spj, // 'SPPD' | 'HONOR' | 'ATK' | 'LAIN'
-      nomor_sppd, 
-      tujuan, 
-      tanggal_berangkat, 
-      tanggal_kembali, 
-      moda_transportasi,
-      total_nominal,
-      deskripsi_hasil,
-      lampiran_required // array checklist lampiran berdasarkan jenis
+    const Spj = getSpj();
+    const {
+      judul,
+      kegiatan,
+      jenis_spj,       // 'SPPD' | 'HONOR' | 'ATK' | 'LAIN'
+      tanggal_kegiatan,
+      total_anggaran,
+      keterangan,
     } = req.body;
 
-    // Validasi berdasarkan jenis
-    const validJenis = ['SPPD', 'HONOR', 'ATK', 'LAIN'];
-    if (!validJenis.includes(jenis_spj)) {
-      return res.status(400).json({ success: false, message: 'Jenis SPJ tidak valid' });
+    // Validasi jenis SPJ
+    const validJenis = ["SPPD", "HONOR", "ATK", "LAIN"];
+    if (jenis_spj && !validJenis.includes(jenis_spj)) {
+      await t.rollback();
+      return res.status(400).json({ success: false, message: "Jenis SPJ tidak valid" });
     }
 
-    // spjSelfGuard sudah paksa dibuat_oleh/penerima_uang_id = uid
-
-    const spj = await Spj.create({
-      dibuat_oleh: uid,
-      jenis_spj,
-      nomor_sppd: jenis_spj === 'SPPD' ? nomor_sppd : null,
-      tujuan,
-      tanggal_berangkat: jenis_spj === 'SPPD' ? tanggal_berangkat : null,
-      tanggal_kembali: jenis_spj === 'SPPD' ? tanggal_kembali : null, 
-      moda_transportasi: jenis_spj === 'SPPD' ? moda_transportasi : null,
-      total_nominal: parseFloat(total_nominal),
-      deskripsi_hasil,
-      status: 'DRAFT',
-      lampiran_required: JSON.stringify(lampiran_required || []),
-      metadata: { jenis_spj } // untuk template form
-    }, { transaction: t });
+    // spjSelfGuard sudah paksa pelaksana_id = uid
+    const spj = await Spj.create(
+      {
+        pelaksana_id: uid,
+        judul: judul || kegiatan,
+        kegiatan: kegiatan || judul,
+        tanggal_kegiatan: tanggal_kegiatan || new Date(),
+        total_anggaran: parseFloat(total_anggaran) || 0,
+        keterangan,
+        status: "draft",
+        // Lampiran via multer disimpan terpisah oleh route
+        file_bukti: req.files?.lampiran_sppd?.[0]?.filename || null,
+      },
+      { transaction: t },
+    );
 
     await t.commit();
-
     res.status(201).json({ success: true, data: spj });
   } catch (error) {
     await t.rollback();
@@ -87,19 +101,31 @@ export const buatSpj = async (req, res) => {
 // ── PUT /api/pelaksana/spj/:id — Update DRAFT SPJ ──
 export const updateSpjDraft = async (req, res) => {
   try {
+    const Spj = getSpj();
     const spj = await Spj.findOne({
       where: {
         id: req.params.id,
-        dibuat_oleh: userId(req),
-        status: 'DRAFT'
-      }
+        pelaksana_id: userId(req),
+        status: "draft",
+      },
     });
 
     if (!spj) {
-      return res.status(404).json({ success: false, message: 'SPJ draft tidak ditemukan' });
+      return res
+        .status(404)
+        .json({ success: false, message: "SPJ draft tidak ditemukan" });
     }
 
-    await spj.update(req.body);
+    const allowedFields = ["judul", "kegiatan", "tanggal_kegiatan", "total_anggaran", "keterangan"];
+    const updates = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) updates[field] = req.body[field];
+    }
+    if (req.files?.lampiran_sppd?.[0]) {
+      updates.file_bukti = req.files.lampiran_sppd[0].filename;
+    }
+
+    await spj.update(updates);
     res.json({ success: true, data: spj });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -110,42 +136,50 @@ export const updateSpjDraft = async (req, res) => {
 export const submitSpj = async (req, res) => {
   const t = await sequelize.transaction();
   try {
+    const Spj = getSpj();
     const spj = await Spj.findOne({
       where: {
         id: req.params.id,
-        dibuat_oleh: userId(req),
-        status: 'DRAFT'
-      }
+        pelaksana_id: userId(req),
+        status: "draft",
+      },
     });
 
     if (!spj) {
-      return res.status(404).json({ success: false, message: 'SPJ draft tidak ditemukan' });
+      return res
+        .status(404)
+        .json({ success: false, message: "SPJ draft tidak ditemukan" });
     }
 
-    // Validasi checklist lampiran wajib lengkap (per jenis_spj)
-    const lampiranStatus = checkLampiranLengkap(spj.jenis_spj, spj.lampiran_required);
-    if (!lampiranStatus.lengkap) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Lampiran wajib belum lengkap',
-        missing: lampiranStatus.missing 
+    // Validasi field wajib
+    if (!spj.judul || !spj.tanggal_kegiatan || !spj.total_anggaran) {
+      await t.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Judul, tanggal kegiatan, dan total anggaran wajib diisi sebelum submit",
       });
     }
 
-    spj.status = 'DIAJUKAN_KE_BENDAHARA';
-    spj.submitted_at = new Date();
+    spj.status = "submitted";
     await spj.save({ transaction: t });
 
     // Notif ke Bendahara Pengeluaran
-    const bendaharaIds = await getBendaharaIds(); // implement service
-    for (const bid of bendaharaIds) {
-      await Notification.create({
-        target_user_id: bid,
-        spj_id: spj.id,
-        message: `SPJ baru dari ${req.user.nama_lengkap}: ${spj.judul}`,
-        link: `/spj/${spj.id}`
-      });
-    }
+    const bendaharaList = await User.findAll({
+      where: { role: "bendahara_pengeluaran" },
+      attributes: ["id"],
+    });
+    await Promise.all(
+      bendaharaList.map((b) =>
+        Notification.create(
+          {
+            target_user_id: b.id,
+            message: `SPJ baru dari ${req.user.nama_lengkap || "Pelaksana"}: ${spj.judul}`,
+            link: `/spj/${spj.id}`,
+          },
+          { transaction: t },
+        ),
+      ),
+    );
 
     await t.commit();
     res.json({ success: true, data: spj });
@@ -157,54 +191,113 @@ export const submitSpj = async (req, res) => {
 
 // ── POST /api/pelaksana/spj/:id/perbaiki — Submit ulang setelah dikembalikan ──
 export const perbaikiSpj = async (req, res) => {
-  // Sama seperti submit, tapi update status REVISI → DIAJUKAN lagi + log revisi counter
-  res.json({ success: true, message: 'Perbaiki SPJ (reuse submit + revisi counter)' });
-};
-
-// ── GET /api/pelaksana/spj/:id/export — Download PDF SPJ disetujui ──
-export const exportSpj = async (req, res) => {
+  const t = await sequelize.transaction();
   try {
+    const Spj = getSpj();
     const spj = await Spj.findOne({
       where: {
         id: req.params.id,
-        dibuat_oleh: userId(req),
-        status: { [Op.in]: ['DISETUJUI', 'DIBAYARKAN'] }
-      }
+        pelaksana_id: userId(req),
+        status: "rejected",
+      },
     });
 
     if (!spj) {
-      return res.status(404).json({ success: false, message: 'SPJ tidak ditemukan atau belum disetujui' });
+      return res.status(404).json({
+        success: false,
+        message: "SPJ yang dikembalikan tidak ditemukan",
+      });
     }
 
-    // Generate PDF (html-pdf or puppeteer)
-    const pdfBuffer = await generateSpjPdf(spj);
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="SPJ-${spj.nomor_spj || spj.id}.pdf"`
+    // Update field yang diperbaiki
+    const allowedFields = ["judul", "kegiatan", "tanggal_kegiatan", "total_anggaran", "keterangan"];
+    const updates = { status: "submitted" };
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) updates[field] = req.body[field];
+    }
+    if (req.files?.lampiran_perbaikan?.[0]) {
+      updates.file_bukti = req.files.lampiran_perbaikan[0].filename;
+    }
+
+    await spj.update(updates, { transaction: t });
+
+    // Notif ke Bendahara
+    const bendaharaList = await User.findAll({
+      where: { role: "bendahara_pengeluaran" },
+      attributes: ["id"],
     });
-    res.send(pdfBuffer);
+    await Promise.all(
+      bendaharaList.map((b) =>
+        Notification.create(
+          {
+            target_user_id: b.id,
+            message: `SPJ diperbaiki oleh ${req.user.nama_lengkap || "Pelaksana"}: ${spj.judul}`,
+            link: `/spj/${spj.id}`,
+          },
+          { transaction: t },
+        ),
+      ),
+    );
+
+    await t.commit();
+    res.json({ success: true, data: spj });
+  } catch (error) {
+    await t.rollback();
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// ── DELETE /api/pelaksana/spj/:id — Hapus DRAFT saja ──
+export const hapusSpjDraft = async (req, res) => {
+  try {
+    const Spj = getSpj();
+    const deleted = await Spj.destroy({
+      where: {
+        id: req.params.id,
+        pelaksana_id: userId(req),
+        status: "draft",
+      },
+    });
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "SPJ draft tidak ditemukan atau sudah disubmit",
+      });
+    }
+
+    res.json({ success: true, message: "SPJ draft dihapus" });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// ── Helper functions ──
-function checkLampiranLengkap(jenis, required) {
-  // Logic per jenis_spj: cek field lampiran_* tidak null
-  const missing = [];
-  // Implementasi berdasarkan Spj model fields
-  return { lengkap: missing.length === 0, missing };
-}
+// ── GET /api/pelaksana/spj/:id/export — Download PDF SPJ disetujui ──
+export const exportSpj = async (req, res) => {
+  try {
+    const Spj = getSpj();
+    const spj = await Spj.findOne({
+      where: {
+        id: req.params.id,
+        pelaksana_id: userId(req),
+        status: { [Op.in]: ["verified"] },
+      },
+    });
 
-async function getBendaharaIds() {
-  // Query users role='bendahara_pengeluaran' aktif
-  return []; // placeholder
-}
+    if (!spj) {
+      return res.status(404).json({
+        success: false,
+        message: "SPJ tidak ditemukan atau belum disetujui",
+      });
+    }
 
-async function generateSpjPdf(spj) {
-  // Puppeteer/PDFKit generate PDF dari template
-  return Buffer.from(''); // placeholder
-}
-
-export { checkLampiranLengkap };
-
+    // Placeholder: kirim data JSON sampai PDF generator tersedia
+    res.json({
+      success: true,
+      message: "PDF export akan tersedia setelah integrasi PDF generator",
+      data: spj,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

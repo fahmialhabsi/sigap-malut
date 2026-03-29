@@ -5,7 +5,7 @@ const roles = [
   { label: "Super Admin", value: "super_admin" },
   { label: "Kepala Dinas", value: "kepala_dinas" },
   { label: "Gubernur", value: "gubernur" },
-  { label: "Sekretariat Dinas Pangan", value: "sekretaris" },
+  { label: "Sekretariat Dinas Pangan", value: "sekretariat" },
   {
     label: "Bidang Ketersediaan dan Kerawanan Pangan",
     value: "kepala_bidang_ketersediaan",

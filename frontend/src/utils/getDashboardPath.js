@@ -63,13 +63,15 @@ export function getDashboardPath(user) {
   // 1) role (string) langsung, normalize
   if (user.role) {
     const roleKey = String(user.role).toLowerCase();
-    if (dashboardMapping[roleKey]) return dashboardMapping[roleKey];
+    const isGenericPelaksanaRole = ["pelaksana", "staf", "staf_pelaksana"].includes(roleKey);
+    if (dashboardMapping[roleKey] && !isGenericPelaksanaRole) return dashboardMapping[roleKey];
   }
 
   // 1b) jika ada roleName field gunakan itu
   if (user.roleName) {
     const roleNameKey = String(user.roleName).toLowerCase();
-    if (dashboardMapping[roleNameKey]) return dashboardMapping[roleNameKey];
+    const isGenericPelaksanaRole = ["pelaksana", "staf", "staf_pelaksana"].includes(roleNameKey);
+    if (dashboardMapping[roleNameKey] && !isGenericPelaksanaRole) return dashboardMapping[roleNameKey];
   }
 
   // 2) cek role_id -> map via roleIdToName jika ada
@@ -79,7 +81,8 @@ export function getDashboardPath(user) {
       roleIdToName?.[String(user.role_id).toLowerCase()];
     if (mapped) {
       const mappedKey = String(mapped).toLowerCase();
-      if (dashboardMapping[mappedKey]) return dashboardMapping[mappedKey];
+      const isGenericPelaksanaRole = ["pelaksana", "staf", "staf_pelaksana"].includes(mappedKey);
+      if (dashboardMapping[mappedKey] && !isGenericPelaksanaRole) return dashboardMapping[mappedKey];
       // kalau mapped === 'kepala_bidang', lanjutkan ke inferensi unit di bawah
     }
     // Fallback: jika email superadmin@dinpangan.go.id atau username superadmin, arahkan ke dashboard superadmin
@@ -119,7 +122,7 @@ export function getDashboardPath(user) {
   const unitVal = (resolvedFromId || rawUnitStr).toString().toLowerCase();
 
   // Pelaksana: route to per-bidang dashboard based on unit_kerja
-  const isPelaksana = ["pelaksana", "staf"].includes(
+  const isPelaksana = ["pelaksana", "staf", "staf_pelaksana"].includes(
     (user.role || user.roleName || "").toString().toLowerCase()
   );
   if (isPelaksana) {
@@ -128,6 +131,7 @@ export function getDashboardPath(user) {
     if (unitVal.includes("konsumsi")) return "/dashboard/pelaksana-konsumsi";
     if (unitVal.includes("uptd")) return "/dashboard/pelaksana-uptd";
     if (unitVal.includes("sekretariat") || unitVal.includes("sekretaris")) return "/dashboard/pelaksana-sekretariat";
+    return "/dashboard/pelaksana";
   }
 
   if (unitVal.includes("ketersediaan")) return "/dashboard/ketersediaan";

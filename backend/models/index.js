@@ -84,6 +84,29 @@ const Spj = SpjFactory(sequelize);
 import RekeningAnggaran from "./RekeningAnggaran.js";
 import GajiPegawai from "./GajiPegawai.js";
 
+// Import model Pelaksana (Dashboard Pelaksana — Prompt 10)
+import SubChecklistTugas from "./SubChecklistTugas.js";
+import UserHierarchy from "./UserHierarchy.js";
+import Task from "./Task.js";
+import TaskAssignment from "./TaskAssignment.js";
+import TaskLog from "./TaskLog.js";
+import TaskFile from "./TaskFile.js";
+import Notification from "./Notification.js";
+
+// Import model Bidang Ketersediaan (Prompt 11–13)
+import ProduksiPangan from "./ProduksiPangan.js";
+import StokPangan from "./StokPangan.js";
+import NeracaPangan from "./NeracaPangan.js";
+import KerawananPangan from "./KerawananPangan.js";
+import EwsKetersediaan from "./EwsKetersediaan.js";
+import AnalisaJfKetersediaan from "./AnalisaJfKetersediaan.js";
+
+// Import model Sekretaris (Dashboard Sekretaris)
+import ApprovalSekretariat from "./ApprovalSekretariat.js";
+import SkpPenilaianSekretaris from "./SkpPenilaianSekretaris.js";
+import LaporanKonsolidasiSekretaris from "./LaporanKonsolidasiSekretaris.js";
+import NotifikasiSekretaris from "./NotifikasiSekretaris.js";
+
 // Asosiasi Foreign Key Komoditas
 BdsCpd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
 BdsHrg.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
@@ -165,5 +188,22 @@ export {
   Spj,
   RekeningAnggaran,
   GajiPegawai,
+  SubChecklistTugas,
+  UserHierarchy,
+  Task,
+  TaskAssignment,
+  TaskLog,
+  TaskFile,
+  Notification,
+  ProduksiPangan,
+  StokPangan,
+  NeracaPangan,
+  KerawananPangan,
+  EwsKetersediaan,
+  AnalisaJfKetersediaan,
+  ApprovalSekretariat,
+  SkpPenilaianSekretaris,
+  LaporanKonsolidasiSekretaris,
+  NotifikasiSekretaris,
 };
 export default sequelize;

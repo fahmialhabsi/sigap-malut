@@ -40,7 +40,8 @@ const SubChecklistTugas = sequelize.define(
       allowNull: true,
     },
     urutan: {
-      type: DataTypes.TINYINT,
+      // Postgres tidak mengenal TINYINT, gunakan SMALLINT agar kompatibel
+      type: DataTypes.SMALLINT,
       defaultValue: 0,
     },
   },

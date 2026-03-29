@@ -66,6 +66,10 @@ import {
   rejectSpj,
   bayarSpj,
 } from "../controllers/dashboardBendaharaController.js";
+import {
+  getPelaksanaSummary,
+  getTugasHariIni,
+} from "../controllers/pelaksana/dashboardPelaksanaController.js";
 
 const router = Router();
 
@@ -99,6 +103,53 @@ router.get("/sekretaris/keuangan", sekPerm, getSekretarisKeuangan);
 router.get("/sekretaris/kepegawaian", sekPerm, getSekretarisKepegawaian);
 router.get("/sekretaris/approval-queue", sekPerm, getApprovalQueueSekretaris);
 router.post("/approval/:id/:aksi", sekPerm, approveAction);
+
+// Sekretaris v2 aggregated dashboard KPI (for hero tiles)
+router.get("/sekretaris/hero-kpi", sekPerm, async (req, res) => {
+  try {
+    const { Op } = await import("sequelize");
+    const db = (await import("../config/database.js")).default;
+    const { QueryTypes } = await import("sequelize");
+    const Perintah = (await import("../models/Perintah.js")).default;
+    const ApprovalSekretariat = (await import("../models/ApprovalSekretariat.js")).default;
+    const BypassDetection = (await import("../models/bypassDetection.js")).default;
+
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thirtyDaysLater = new Date(now); thirtyDaysLater.setDate(now.getDate() + 30);
+
+    const [
+      inboxBelumDibaca,
+      approvalPending,
+      bypassBulanIni,
+      kgbAlertCount,
+    ] = await Promise.all([
+      Perintah.count({ where: { ke_role: "sekretaris", status: "diterbitkan" } }).catch(() => 0),
+      ApprovalSekretariat.count({
+        where: { status: "menunggu_persetujuan_sekretaris", deleted_at: null },
+      }).catch(() => 0),
+      BypassDetection.count({ where: { detected_at: { [Op.gte]: firstDay } } }).catch(() => 0),
+      db.query(
+        `SELECT COUNT(*) as cnt FROM "SEK-KBJ" WHERE tanggal_kgb <= :cutoff AND status IN ('draft','diajukan') AND deleted_at IS NULL`,
+        { type: QueryTypes.SELECT, replacements: { cutoff: thirtyDaysLater } }
+      ).then((r) => Number(r[0]?.cnt || 0)).catch(() => 0),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        inbox_kadin: inboxBelumDibaca,
+        approval_pending: approvalPending,
+        bypass_bulan_ini: bypassBulanIni,
+        kgb_alert: kgbAlertCount,
+        sla_compliance: null, // computed separately
+        generatedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // KPI summary for Sekretaris dashboard — accessible by sekretaris, kepala_dinas, super_admin
 router.get(
@@ -153,12 +204,19 @@ router.put("/spj/:id/verify",  bendPerm, verifySpj);
 router.put("/spj/:id/reject",  bendPerm, rejectSpj);
 router.put("/spj/:id/bayar",   bendPerm, bayarSpj);
 
-// KPI summary untuk Pelaksana
+// KPI summary untuk Pelaksana (Sekretariat & semua unit)
 router.get(
   "/pelaksana/summary",
   requireAnyPermission(["dashboard:read", "pelaksana:read"]),
   withCache("dashboard:pelaksana", TTL.DASHBOARD),
-  getSekretarisSummary, // TODO: ganti handler jika KPI berbeda
+  getPelaksanaSummary,
+);
+
+// Tugas hari ini untuk kanban mini panel Pelaksana
+router.get(
+  "/pelaksana/tugas-hari-ini",
+  requireAnyPermission(["dashboard:read", "pelaksana:read"]),
+  getTugasHariIni,
 );
 
 // Kasubag extended endpoints

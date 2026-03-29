@@ -78,7 +78,7 @@ function KpiCard({ label, value, sub, color, onClick }) {
       onClick={onClick}
       style={{
         background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-        padding: "16px 20px", minWidth: 150, cursor: onClick ? "pointer" : "default",
+        padding: "16px 20px", minWidth: 0, width: "100%", flex: "1 1 0", cursor: onClick ? "pointer" : "default",
         transition: "box-shadow .15s",
       }}
       onMouseEnter={(e) => { if (onClick) e.currentTarget.style.boxShadow = "0 2px 10px rgba(74,20,140,.15)"; }}
@@ -145,6 +145,9 @@ export default function DashboardBendaharaPengeluaran() {
   const [loading, setLoading] = useState(false);
   const [notif, setNotif]     = useState(null);
   const [filterStatus, setFilterStatus] = useState("semua");
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === "undefined" ? 1440 : window.innerWidth
+  );
 
   const user = getUser();
   const role = (user?.role || user?.roleName || "").toLowerCase();
@@ -153,6 +156,13 @@ export default function DashboardBendaharaPengeluaran() {
   const showNotif = useCallback((msg, type = "success") => {
     setNotif({ msg, type });
     setTimeout(() => setNotif(null), 3500);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const loadKpi = useCallback(async () => {
@@ -220,6 +230,12 @@ export default function DashboardBendaharaPengeluaran() {
 
   // ── Guard ─────────────────────────────────────────────────────────────────
   if (!allowed) return <Navigate to="/unauthorized" replace />;
+
+  const isPhone = viewportWidth < 640;
+  const isTablet = viewportWidth >= 640 && viewportWidth < 1024;
+  const pagePaddingX = isPhone ? 12 : isTablet ? 16 : 24;
+  const contentMaxWidth =
+    viewportWidth >= 1600 ? 1680 : viewportWidth >= 1280 ? 1440 : "100%";
 
   // ── Actions ───────────────────────────────────────────────────────────────
   const handleVerifikasi = async (id) => {
@@ -289,8 +305,8 @@ export default function DashboardBendaharaPengeluaran() {
       {/* Header */}
       <header role="banner" style={{
         background: `linear-gradient(135deg, ${T.primary} 0%, ${T.secondary} 100%)`,
-        color: "#fff", padding: "16px 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        color: "#fff", padding: isPhone ? "14px 12px" : "16px 24px",
+        display: "flex", flexDirection: isPhone ? "column" : "row", alignItems: isPhone ? "flex-start" : "center", justifyContent: "space-between",
       }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 700 }}>Dashboard Bendahara Pengeluaran</div>
@@ -298,7 +314,7 @@ export default function DashboardBendaharaPengeluaran() {
             Kas, SPJ, & Penatausahaan Keuangan — {user?.name || user?.username || "—"}
           </div>
         </div>
-        <div style={{ fontSize: 12, opacity: 0.75 }}>
+        <div style={{ fontSize: 12, opacity: 0.75, textAlign: isPhone ? "left" : "right" }}>
           {new Date().toLocaleDateString("id-ID", { dateStyle: "long" })}
         </div>
       </header>
@@ -306,17 +322,17 @@ export default function DashboardBendaharaPengeluaran() {
       {/* Notifikasi */}
       {notif && (
         <div aria-live="polite" style={{
-          position: "fixed", top: 16, right: 16, zIndex: 9999,
+          position: "fixed", top: isPhone ? 12 : 16, right: isPhone ? 12 : 16, left: isPhone ? 12 : "auto", zIndex: 9999,
           background: notif.type === "error" ? T.danger : notif.type === "warning" ? T.warning : T.accent,
           color: "#fff", padding: "10px 20px", borderRadius: 8,
-          boxShadow: "0 4px 12px rgba(0,0,0,.2)", fontSize: 13, maxWidth: 360,
+          boxShadow: "0 4px 12px rgba(0,0,0,.2)", fontSize: 13, maxWidth: isPhone ? "calc(100vw - 24px)" : 360,
         }}>
           {notif.msg}
         </div>
       )}
 
       {/* Tab Bar */}
-      <nav style={{ background: T.card, borderBottom: `2px solid ${T.border}`, padding: "0 24px", display: "flex", gap: 4 }}>
+      <nav style={{ background: T.card, borderBottom: `2px solid ${T.border}`, padding: isPhone ? "0 12px" : "0 24px", display: "flex", gap: 4, overflowX: "auto" }}>
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -342,7 +358,7 @@ export default function DashboardBendaharaPengeluaran() {
         ))}
       </nav>
 
-      <main id="main-content" style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
+      <main id="main-content" style={{ width: "100%", padding: `${isPhone ? 16 : 24}px ${pagePaddingX}px 32px`, maxWidth: contentMaxWidth, margin: "0 auto" }}>
 
         {/* ── TAB: RINGKASAN ───────────────────────────────────────── */}
         {tab === "ringkasan" && (
@@ -350,7 +366,7 @@ export default function DashboardBendaharaPengeluaran() {
             <h2 style={{ color: T.primary, marginBottom: 16, fontSize: 16 }}>Ringkasan Kas & SPJ</h2>
 
             {/* KPI row */}
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: viewportWidth < 640 ? "1fr" : viewportWidth < 1100 ? "repeat(2, minmax(0, 1fr))" : "repeat(5, minmax(0, 1fr))", gap: 16, marginBottom: 24 }}>
               <KpiCard
                 label="SPJ Pending Verifikasi"
                 value={kpi?.spj_pending ?? spjPending}
@@ -417,10 +433,10 @@ export default function DashboardBendaharaPengeluaran() {
         {/* ── TAB: SPJ MASUK ───────────────────────────────────────── */}
         {tab === "spj" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: isPhone ? "flex-start" : "center", flexDirection: isPhone ? "column" : "row", gap: 10, marginBottom: 16 }}>
               <h2 style={{ color: T.primary, fontSize: 16, margin: 0 }}>SPJ Masuk</h2>
               {/* Filter */}
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {["semua", "submitted", "diajukan", "diverifikasi", "dikembalikan"].map((s) => (
                   <button
                     key={s}
@@ -439,7 +455,7 @@ export default function DashboardBendaharaPengeluaran() {
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: viewportWidth < 640 ? "1fr" : "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 16 }}>
               <KpiCard label="Pending"     value={spjPending}  color={T.warning} />
               <KpiCard label="Diverifikasi" value={spjVerified} color={T.accent} />
               <KpiCard label="Ditolak"     value={spjTolak}    color={T.danger} />

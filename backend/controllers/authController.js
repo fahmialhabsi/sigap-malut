@@ -98,6 +98,38 @@ function normalizeRoleInput(value) {
     .toLowerCase();
 }
 
+function normalizeRoleKey(value) {
+  return normalizeRoleInput(value).replace(/[\s-]+/g, "_");
+}
+
+function isUuidLike(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(value || "").trim(),
+  );
+}
+
+async function resolveEffectiveUserRole(user) {
+  const storedRole = normalizeRoleKey(user?.role);
+  let roleRow = null;
+
+  if (user?.role_id) {
+    try {
+      roleRow = await Role.findByPk(user.role_id);
+    } catch (_) {
+      roleRow = null;
+    }
+  }
+
+  const roleFromRoleId = normalizeRoleKey(roleRow?.code || roleRow?.name);
+
+  return {
+    roleRow,
+    storedRole: storedRole || null,
+    roleFromRoleId: roleFromRoleId || null,
+    effectiveRole: roleFromRoleId || storedRole || "",
+  };
+}
+
 function buildRoleCandidates(role) {
   const normalizedRole = normalizeRoleInput(role);
   if (!normalizedRole) {
@@ -268,7 +300,12 @@ export const register = async (req, res) => {
       pegawai_id: user.id,
     });
 
-    const token = generateToken(user);
+    const registeredRole =
+      normalizeRoleKey(roleRow?.code || roleRow?.name || user.role) || null;
+    const token = generateToken({
+      ...(user.toJSON ? user.toJSON() : user),
+      role: registeredRole,
+    });
     const refreshToken = generateRefreshToken(user);
 
     res.status(201).json({
@@ -285,7 +322,7 @@ export const register = async (req, res) => {
           position_id: user.position_id,
           is_active: user.is_active,
         },
-        roleName: roleRow?.name || null,
+        roleName: registeredRole,
         token,
         refreshToken,
       },
@@ -359,13 +396,12 @@ export const login = async (req, res) => {
     user.last_login = new Date();
     await user.save();
 
-    const token = generateToken(user);
+    const { effectiveRole } = await resolveEffectiveUserRole(user);
+    const token = generateToken({
+      ...(user.toJSON ? user.toJSON() : user),
+      role: effectiveRole,
+    });
     const refreshToken = generateRefreshToken(user);
-
-    // Lookup role from Roles table (source of truth)
-    const roleRow = user.role_id ? await Role.findByPk(user.role_id) : null;
-    // Prefer code (machine-readable, e.g. "kepala_dinas") over name (display, e.g. "Kepala Dinas")
-    const roleName = roleRow?.code || roleRow?.name || null;
 
     // Dashboard mapping (sesuai dokumenSistem role → dashboard URL)
     // WAJIB lengkap: semua varian role harus ada di sini
@@ -451,24 +487,44 @@ export const login = async (req, res) => {
     };
 
     // Prioritas: role_id FK (source of truth) > kolom role langsung di users (bisa stale)
-    const effectiveRole = roleName || user.role || "";
-
     // Tentukan dashboard URL dari role
-    let dashboardUrl =
-      roleToDashboard[effectiveRole] ||
-      roleToDashboard[effectiveRole.toUpperCase()];
+    const isGenericPelaksanaRole = ["pelaksana", "staf", "staf_pelaksana"].includes(
+      effectiveRole,
+    );
+    let dashboardUrl = null;
+
+    if (!isGenericPelaksanaRole) {
+      dashboardUrl =
+        roleToDashboard[effectiveRole] ||
+        roleToDashboard[effectiveRole.toUpperCase()];
+    }
+
     if (!dashboardUrl) {
       const unitKerja = (user.unit_kerja || "").toLowerCase();
-      if (unitKerja.includes("ketersediaan"))
-        dashboardUrl = "/dashboard/ketersediaan";
-      else if (unitKerja.includes("distribusi"))
-        dashboardUrl = "/dashboard/distribusi";
-      else if (unitKerja.includes("konsumsi"))
-        dashboardUrl = "/dashboard/konsumsi";
-      else if (unitKerja.includes("sekretariat"))
-        dashboardUrl = "/dashboard/sekretariat";
-      else if (unitKerja.includes("uptd")) dashboardUrl = "/dashboard/uptd";
-      else dashboardUrl = "/dashboard";
+      if (isGenericPelaksanaRole) {
+        if (unitKerja.includes("ketersediaan"))
+          dashboardUrl = "/dashboard/pelaksana-ketersediaan";
+        else if (unitKerja.includes("distribusi"))
+          dashboardUrl = "/dashboard/pelaksana-distribusi";
+        else if (unitKerja.includes("konsumsi"))
+          dashboardUrl = "/dashboard/pelaksana-konsumsi";
+        else if (unitKerja.includes("sekretariat"))
+          dashboardUrl = "/dashboard/pelaksana-sekretariat";
+        else if (unitKerja.includes("uptd"))
+          dashboardUrl = "/dashboard/pelaksana-uptd";
+        else dashboardUrl = "/dashboard/pelaksana";
+      } else {
+        if (unitKerja.includes("ketersediaan"))
+          dashboardUrl = "/dashboard/ketersediaan";
+        else if (unitKerja.includes("distribusi"))
+          dashboardUrl = "/dashboard/distribusi";
+        else if (unitKerja.includes("konsumsi"))
+          dashboardUrl = "/dashboard/konsumsi";
+        else if (unitKerja.includes("sekretariat"))
+          dashboardUrl = "/dashboard/sekretariat";
+        else if (unitKerja.includes("uptd")) dashboardUrl = "/dashboard/uptd";
+        else dashboardUrl = "/dashboard";
+      }
     }
 
     if (user && user.id) {
@@ -613,10 +669,38 @@ export const getAllUsers = async (req, res) => {
       attributes: { exclude: ["password"] },
       order: [["created_at", "ASC"]],
     });
+
+    const roleIds = Array.from(
+      new Set(users.map((u) => u?.role_id).filter(isUuidLike)),
+    );
+    const roles = roleIds.length
+      ? await Role.findAll({ where: { id: { [Op.in]: roleIds } } })
+      : [];
+    const roleById = new Map(
+      roles.map((role) => [String(role.id), role.toJSON ? role.toJSON() : role]),
+    );
+
     // attach `password` field for admin UI (maps to persisted plain_password)
     const mapped = users.map((u) => {
       const obj = u.toJSON ? u.toJSON() : u;
-      return { ...obj, password: obj.plain_password || "" };
+      const roleRow = obj.role_id ? roleById.get(String(obj.role_id)) : null;
+      const storedRole = normalizeRoleKey(obj.role);
+      const roleFromRoleId = normalizeRoleKey(
+        roleRow?.code || roleRow?.name || null,
+      );
+      const effectiveRole = roleFromRoleId || storedRole || null;
+
+      return {
+        ...obj,
+        stored_role: obj.role || null,
+        role_from_role_id: roleRow?.code || roleRow?.name || null,
+        role_conflict:
+          Boolean(storedRole) &&
+          Boolean(roleFromRoleId) &&
+          storedRole !== roleFromRoleId,
+        role: effectiveRole || obj.role || null,
+        password: obj.plain_password || "",
+      };
     });
     res.json({ success: true, data: mapped });
   } catch (error) {
