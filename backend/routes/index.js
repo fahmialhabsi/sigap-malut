@@ -89,6 +89,11 @@ import workflowRoutes from "./workflow.js";
 import workflowControllerRoutes from "./workflowController.js";
 import workflowTransitionLogRoutes from "./workflowTransitionLog.js";
 import workflowsRoutes from "./workflows.js";
+import kabidKetersediaanRoutes from "./kabid-ketersediaan.js";
+import kabidDistribusiRoutes from "./kabid-distribusi.js";
+import jfKetersediaanRoutes from "./jf-ketersediaan.js";
+import jfDistribusiRoutes from "./jf-distribusi.js";
+import pelaksanaBidangRoutes from "./pelaksana-bidang.js";
 import { protect } from "../middleware/auth.js";
 import { createReplicationPilotGuard } from "../middleware/uptdPilotGuard.js";
 
@@ -201,5 +206,12 @@ export default function registerRoutes(app) {
   app.use("/api/workflowtransitionlog", workflowTransitionLogRoutes);
   app.use("/api/workflows", workflowsRoutes);
 
-  console.log("✅ 84 API routes registered\n");
+  // Prompts 11-16: Bidang Ketersediaan & Distribusi
+  app.use("/api/kabid-ketersediaan", kabidKetersediaanRoutes);
+  app.use("/api/kabid-distribusi", kabidDistribusiRoutes);
+  app.use("/api/jf-ketersediaan", jfKetersediaanRoutes);
+  app.use("/api/jf-distribusi", jfDistribusiRoutes);
+  app.use("/api/pelaksana", pelaksanaBidangRoutes);
+
+  console.log("✅ API routes registered (incl. kabid/jf distribusi, pelaksana bidang)\n");
 }

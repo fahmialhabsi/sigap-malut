@@ -3,7 +3,10 @@
 // e-Pelara role mapping (D-10):
 //   JF di Bidang            → ADMINISTRATOR (approve + verifikasi teknis)
 //   JF di Sekretariat/UPTD  → PENGAWAS (view-only)
-import React, { useEffect, useState } from "react";
+// P12 + P15: JF Ketersediaan & Distribusi — satu dashboard, konten adaptif per unit_kerja
+import React, { useEffect, useMemo, useState } from "react";
+import JfVerifikasiDataMasukPanel from "../../components/jfBidang/JfVerifikasiDataMasukPanel";
+import WorkspaceAnalisaDistribusi from "../../components/jfBidang/workspace/WorkspaceAnalisaDistribusi";
 import { Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
@@ -49,6 +52,22 @@ export default function DashboardFungsional() {
     unit.includes("distribusi") ||
     unit.includes("konsumsi");
   const epelараRole = isBidang ? "ADMINISTRATOR" : "PENGAWAS";
+
+  const [cov, setCov] = useState(null);
+  useEffect(() => {
+    if (!unit.includes("distribusi")) return;
+    api
+      .get("/api/jf-distribusi/harga/coverage-hari-ini")
+      .then((r) => setCov(r.data?.data ?? null))
+      .catch(() => setCov(null));
+  }, [unit]);
+
+  const workspaceAnalisa = useMemo(() => {
+    if (unit.includes("distribusi")) {
+      return <WorkspaceAnalisaDistribusi />;
+    }
+    return null;
+  }, [unit]);
 
   useEffect(() => {
     if (user) {
@@ -243,6 +262,38 @@ export default function DashboardFungsional() {
             />
           </div>
         </div>
+      )}
+
+      {/* Workspace analisa — berbeda per bidang (P15: Distribusi) */}
+      {isBidang && workspaceAnalisa}
+
+      {/* Coverage harian harga — JF Distribusi */}
+      {isBidang && unit.includes("distribusi") && cov && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900">
+          <span className="font-semibold">📊 Coverage input harga hari ini:</span>{" "}
+          {cov.sudah}/{cov.total} pasar · Batas {cov.deadline_wit} WIT
+          {cov.belum_nama?.length ? (
+            <span className="block text-xs mt-1 text-amber-800">
+              Belum: {cov.belum_nama.join(" · ")}
+            </span>
+          ) : null}
+        </div>
+      )}
+
+      {/* Verifikasi data dari Pelaksana — Ketersediaan vs Distribusi */}
+      {isBidang && unit.includes("ketersediaan") && (
+        <JfVerifikasiDataMasukPanel
+          baseUrl="/api/jf-ketersediaan"
+          title="Verifikasi Data Produksi / Lapangan"
+          unitBadge="JF Bidang Ketersediaan"
+        />
+      )}
+      {isBidang && unit.includes("distribusi") && (
+        <JfVerifikasiDataMasukPanel
+          baseUrl="/api/jf-distribusi"
+          title="Verifikasi Harga Pasar Harian"
+          unitBadge="JF Bidang Distribusi"
+        />
       )}
 
       {/* ─── PANEL STATUS REVIEW ATASAN — Priority 2 ─── */}

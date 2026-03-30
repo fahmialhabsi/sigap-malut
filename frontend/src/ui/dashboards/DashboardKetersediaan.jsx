@@ -4,10 +4,22 @@ import React, { useState, useEffect } from "react";
 import DashboardKetersediaanLayout from "../../layouts/DashboardKetersediaanLayout";
 import ketersediaanModules from "../../data/ketersediaanModules";
 import api from "../../utils/api";
+import useAuthStore from "../../stores/authStore";
+import { roleIdToName } from "../../utils/roleMap";
+import DashboardKabidKetersediaan from "./DashboardKabidKetersediaan";
 
-// Wrapper: re-export layout yang baru sehingga route yang sudah ada tetap bekerja.
-// Jika Anda ingin menyimpan implementasi lama (dashboard ringkas), lihat DashboardKetersediaanLegacy.jsx
-export default function DashboardKetersediaan(props) {
+function _normalizeRoleName(user) {
+  return (
+    (user?.roleName && String(user.roleName).toLowerCase()) ||
+    user?.role ||
+    roleIdToName?.[user?.role_id] ||
+    roleIdToName?.[String(user?.role_id)] ||
+    null
+  );
+}
+
+// Inner component that owns all hooks — avoids hooks-after-return violation
+function DashboardKetersediaanInner(props) {
   const [subKegForm, setSubKegForm] = useState({
     nama: "",
     sasaran: "",
@@ -202,4 +214,23 @@ export default function DashboardKetersediaan(props) {
       </div>
     </DashboardKetersediaanLayout>
   );
+}
+
+// Wrapper: re-export layout yang baru sehingga route yang sudah ada tetap bekerja.
+// Role-based: kepala_bidang → DashboardKabidKetersediaan; lainnya → layout default
+// Jika Anda ingin menyimpan implementasi lama (dashboard ringkas), lihat DashboardKetersediaanLegacy.jsx
+export default function DashboardKetersediaan(props) {
+  const user = useAuthStore((state) => state.user);
+  const roleName = _normalizeRoleName(user);
+  const unit = user?.unit_kerja ? String(user.unit_kerja).toLowerCase() : "";
+
+  // Role-based routing: Kepala Bidang gets full Kabid dashboard
+  const isKabid =
+    roleName?.includes("kepala_bidang") ||
+    roleName?.includes("kabid") ||
+    (unit.includes("ketersediaan") && roleName?.includes("kepala"));
+  if (isKabid && !roleName?.includes("super_admin")) {
+    return <DashboardKabidKetersediaan />;
+  }
+  return <DashboardKetersediaanInner {...props} />;
 }

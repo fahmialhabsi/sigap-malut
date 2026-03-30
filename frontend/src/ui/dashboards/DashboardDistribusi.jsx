@@ -10,6 +10,12 @@ import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import DpaBidangWidget from "../../components/DpaBidangWidget";
 import RenstraBidangWidget from "../../components/RenstraBidangWidget";
 import api from "../../utils/api";
+import HeroInflasiPanel from "../../components/distribusi/HeroInflasiPanel";
+import CppdStatusPanel from "../../components/distribusi/CppdStatusPanel";
+import ApprovalQueueJF from "../../components/kabidKetersediaan/ApprovalQueueJF";
+import TimSayaPanel from "../../components/kabidKetersediaan/TimSayaPanel";
+import DikembalikanSekretarisPanel from "../../components/kabidKetersediaan/DikembalikanSekretarisPanel";
+import DashboardKabidDistribusi from "./DashboardKabidDistribusi";
 
 function normalizeRoleName(user) {
   return (
@@ -21,7 +27,7 @@ function normalizeRoleName(user) {
   );
 }
 
-export default function DashboardDistribusi() {
+function DashboardDistribusiInner() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
 
@@ -78,6 +84,24 @@ export default function DashboardDistribusi() {
 
   return (
     <DashboardDistribusiLayout fallbackModules={_distribusiModules}>
+      {/* ─── P16: Panel Kepala Bidang Distribusi — Inflasi Hero + CPPD + Approval + Tim ─── */}
+      <div className="px-6 md:px-12 pt-6 space-y-6">
+        {/* Inflasi Real-time Hero */}
+        <HeroInflasiPanel />
+
+        {/* CPPD + Approval Queue */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <CppdStatusPanel />
+          <ApprovalQueueJF unitKerja="Bidang Distribusi" />
+        </div>
+
+        {/* Tim Saya + Dikembalikan Sekretaris */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TimSayaPanel unitKerja="Bidang Distribusi" />
+          <DikembalikanSekretarisPanel unitKerja="Bidang Distribusi" />
+        </div>
+      </div>
+
       {/* Konten dashboard distribusi dirender oleh layout */}
       {/* Jika ingin panel tambahan, tambahkan di sini */}
       <div className="mt-8 px-6 md:px-12 pb-4">
@@ -314,4 +338,22 @@ export default function DashboardDistribusi() {
       </div>
     </DashboardDistribusiLayout>
   );
+}
+
+// P14: Kepala Bidang → dashboard kabid penuh (sama pola dengan DashboardKetersediaan)
+export default function DashboardDistribusi(props) {
+  const user = useAuthStore((state) => state.user);
+  const roleName = normalizeRoleName(user);
+  const unit = user?.unit_kerja ? String(user.unit_kerja).toLowerCase() : "";
+
+  const isKabid =
+    roleName === "kepala_bidang_distribusi" ||
+    roleName === "kabid_distribusi" ||
+    (unit.includes("distribusi") &&
+      (roleName?.includes("kepala_bidang") || roleName?.includes("kabid")));
+
+  if (isKabid && !String(roleName || "").includes("super_admin")) {
+    return <DashboardKabidDistribusi />;
+  }
+  return <DashboardDistribusiInner {...props} />;
 }

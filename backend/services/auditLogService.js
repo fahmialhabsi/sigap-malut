@@ -1,4 +1,5 @@
 import AuditLog from "../models/auditLog.js";
+import HargaPanganLog from "../models/HargaPanganLog.js";
 
 function toStringSafe(v) {
   if (v === null || v === undefined) return undefined;
@@ -22,7 +23,6 @@ export async function logAudit({
       created_at: new Date(),
     };
 
-    // Coerce IDs to strings where possible to avoid accidental type mismatch
     const ent = toStringSafe(entitas_id);
     const peg = toStringSafe(pegawai_id);
     if (ent !== undefined) payload.entitas_id = ent;
@@ -30,9 +30,39 @@ export async function logAudit({
 
     await AuditLog.create(payload);
   } catch (err) {
-    // Swallow audit errors to avoid breaking primary flows (login/register/etc.)
-    // Log a concise warning so operators can investigate DB schema/type mismatches.
     console.warn("Audit create failed:", err?.message || err);
+    return null;
+  }
+}
+
+/**
+ * Audit khusus modul harga_pangan (tabel harga_pangan_logs) — jejak CREATE/VERIFY/RETURN/UPDATE.
+ */
+export async function logHargaPanganEntry({
+  harga_pangan_id = null,
+  batch_id = null,
+  aksi,
+  old_value = null,
+  new_value = null,
+  actor_id,
+  actor_role = null,
+}) {
+  if (!aksi || actor_id == null) {
+    console.warn("[auditLogService] logHargaPanganEntry: aksi atau actor_id hilang, dilewati.");
+    return null;
+  }
+  try {
+    return await HargaPanganLog.create({
+      harga_pangan_id,
+      batch_id,
+      aksi,
+      old_value,
+      new_value,
+      actor_id,
+      actor_role: actor_role != null ? String(actor_role) : null,
+    });
+  } catch (e) {
+    console.error("[auditLogService] gagal menulis harga_pangan_logs:", e.message);
     return null;
   }
 }

@@ -1,4 +1,8 @@
 import { sequelize, testConnection } from "./config/database.js";
+import "./models/HargaPangan.js";
+import "./models/HargaPanganLog.js";
+import "./models/InflasiHarian.js";
+import { initInflasiHarianCron } from "./jobs/inflasiHarianCron.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
 import sekAdmRoutes from "./routes/SEK-ADM.js";
@@ -204,6 +208,8 @@ async function startServer() {
     await initSLAScheduler();
     await initDailyDigestScheduler();
 
+    initInflasiHarianCron(console);
+
     httpServer.listen(PORT, () => {
       console.log(`\n${"=".repeat(60)}`);
       console.log(`SIGAP Malut Backend Server`);
@@ -215,6 +221,7 @@ async function startServer() {
       console.log(`KPI Polling: setiap 5 menit`);
       console.log(`SLA Scheduler: aktif`);
       console.log(`Daily Digest: aktif`);
+      console.log(`Inflasi harian (cron Laspeyres-tipe): ${process.env.INFLASI_CRON_DISABLED === "1" ? "nonaktif" : "aktif"}`);
       console.log(`${"=".repeat(60)}\n`);
     });
 

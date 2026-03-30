@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//e/sigap-malut/**)",
+      "Bash(ls \"e:\\\\sigap-malut\\\\backend\\\\models\"\" 2>/dev/null || echo \"no models dir found \")",
+      "Bash(node --check controllers/pelaksana/spjController.js)",
+      "Bash(node --check controllers/pelaksana/tugasSayaController.js)",
+      "Bash(node --check middleware/pelaksanaRoleGuard.js)",
+      "Bash(find /e/sigap-malut -type f -name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js)",
+      "Bash(node --check /e/sigap-malut/backend/routes/dashboard.js)",
+      "Bash(find e:/sigap-malut/frontend/src/ui/dashboards -type f -name *.jsx -o -name *.js)",
+      "Bash(grep -r sekretaris e:/sigap-malut/backend/models/ --include=*.js)",
+      "Bash(grep -l \"sekretaris\\\\|approval\" e:/sigap-malut/backend/routes/*.js)",
+      "Bash(ls -lh e:/sigap-malut/frontend/src/ui/dashboards/*.jsx)",
+      "Read(//e/sigap-malut/backend/**)",
+      "Bash(xargs basename:*)",
+      "Bash(grep -E \"\\\\.jsx$\")"
+    ],
+    "additionalDirectories": [
+      "e:\\sigap-malut\\frontend\\src\\pages\\dashboard"
+    ]
+  }
+}
