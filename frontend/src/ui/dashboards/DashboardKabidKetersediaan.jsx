@@ -7,6 +7,7 @@ import { roleIdToName } from "../../utils/roleMap";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import api from "../../utils/api";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
+import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
 import HeroKpiTilesKabid from "../../components/kabidKetersediaan/HeroKpiTilesKabid";
 import EWSPanel from "../../components/kabidKetersediaan/EWSPanel";
 import ApprovalQueueJF from "../../components/kabidKetersediaan/ApprovalQueueJF";
@@ -221,7 +222,8 @@ export default function DashboardKabidKetersediaan() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <UploadSuratMasukQuickAction showBendaharaHint />
             <span className="px-2 py-1 bg-amber-500/20 border border-amber-500/40 rounded-full text-amber-200 text-xs font-medium">
               🔔 {(summary?.laporan_pending_review ?? 0) + 1} notif
             </span>

@@ -8,6 +8,7 @@ import {
   generateArsipCode,
   KODE_KLASIFIKASI_ARSIP,
 } from "../utils/suratUtils.js";
+import { emitSuratMasukBaru } from "../services/socketService.js";
 
 // POST /api/surat/masuk/upload
 export const uploadSuratMasuk = async (req, res) => {
@@ -58,6 +59,15 @@ export const uploadSuratMasuk = async (req, res) => {
         console.error("[uploadSuratMasuk] AI trigger error:", err.message),
       );
     }
+
+    emitSuratMasukBaru({
+      surat_id: surat.id,
+      nomor_agenda: surat.nomor_agenda,
+      ai_status: surat.ai_status,
+      media_terima: surat.media_terima,
+      diterima_oleh: userId,
+      message: "Surat masuk baru masuk agenda e-Office (unggahan staf).",
+    });
 
     return res.status(201).json({
       success: true,

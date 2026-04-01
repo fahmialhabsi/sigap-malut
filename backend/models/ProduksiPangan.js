@@ -4,7 +4,8 @@ import sequelize from '../config/database.js';
 
 const ProduksiPangan = sequelize.define('ProduksiPangan', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  periode_bulan: { type: DataTypes.TINYINT, allowNull: false },
+  // Postgres tidak punya tipe TINYINT → gunakan SMALLINT (cukup untuk 1–12)
+  periode_bulan: { type: DataTypes.SMALLINT, allowNull: false },
   periode_tahun: { type: DataTypes.INTEGER, allowNull: false },
   kabupaten_kota: { type: DataTypes.STRING(100), allowNull: false },
   komoditas_id: { type: DataTypes.INTEGER, allowNull: false },
@@ -15,6 +16,7 @@ const ProduksiPangan = sequelize.define('ProduksiPangan', {
     allowNull: false
   },
   catatan: { type: DataTypes.TEXT },
+  catatan_revisi: { type: DataTypes.TEXT },
   diinput_oleh: { type: DataTypes.INTEGER, allowNull: false },
   diverifikasi_oleh: { type: DataTypes.INTEGER },
   status: {

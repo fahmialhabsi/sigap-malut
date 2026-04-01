@@ -20,6 +20,11 @@ function normalizeUser(raw) {
   if (!raw) return null;
   const user = { ...raw };
 
+  const normalizeRole = (v) => {
+    if (!v) return null;
+    return String(v).trim().toLowerCase().replace(/[\s-]+/g, "_");
+  };
+
   // role: jika backend mengirim role (string) gunakan itu;
   // jika hanya ada role_id (UUID) mapping ke nama role via roleIdToName
   if (!user.role) {
@@ -31,6 +36,10 @@ function normalizeUser(raw) {
   if (!user.roleName) {
     user.roleName = user.roleName || user.role || null;
   }
+
+  // normalisasi casing/format untuk role & roleName (SUPER_ADMIN, super admin, super-admin -> super_admin)
+  user.role = normalizeRole(user.role);
+  user.roleName = normalizeRole(user.roleName);
 
   // unit_kerja: konsistenkan dari unit_id / unit / unitName / unit_kerja
   let unitVal =

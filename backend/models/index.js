@@ -70,10 +70,64 @@ import Disposisi from "./Disposisi.js";
 import AgendaSurat from "./AgendaSurat.js";
 import ArsipSurat from "./ArsipSurat.js";
 
+// New Sekretaris models
+import Task from "./Task.js";
+import ApprovalSekretariat from "./ApprovalSekretariat.js";
+import SkpPenilaianSekretaris from "./SkpPenilaianSekretaris.js";
+import LaporanKonsolidasiSekretaris from "./LaporanKonsolidasiSekretaris.js";
+import NotifikasiSekretaris from "./NotifikasiSekretaris.js";
+
+// Kasubag Umum & Kepegawaian (Prompt 4) models
+import KgbTracking from "./KgbTracking.js";
+import PangkatTracking from "./PangkatTracking.js";
+import AbsensiHarian from "./AbsensiHarian.js";
+import Cuti from "./Cuti.js";
+import PerjalananDinas from "./PerjalananDinas.js";
+import Diklat from "./Diklat.js";
+import DiklatPeserta from "./DiklatPeserta.js";
+import SkpPenilaianKasubag from "./SkpPenilaianKasubag.js";
+import NotifikasiKasubag from "./NotifikasiKasubag.js";
+import UserHierarchy from "./UserHierarchy.js";
+
+// JF Sekretariat (Prompt 5/6) models
+import AnalisaPerencanaan from "./AnalisaPerencanaan.js";
+import Renstra from "./Renstra.js";
+import Renja from "./Renja.js";
+import Monev from "./Monev.js";
+import Lakip from "./Lakip.js";
+
+// JF Keuangan / PPK (Prompt 6) models
+import Spj from "./Spj.js";
+import Dpa from "./Dpa.js";
+import Rka from "./Rka.js";
+import RealisasiAnggaran from "./RealisasiAnggaran.js";
+import AnalisaKeuangan from "./AnalisaKeuangan.js";
+import UangPersediaan from "./UangPersediaan.js";
+import BukuKasUmum from "./BukuKasUmum.js";
+import DaftarGaji from "./DaftarGaji.js";
+import AsetBarang from "./AsetBarang.js";
+import PenerimaanBarang from "./PenerimaanBarang.js";
+import PemeliharaanAset from "./PemeliharaanAset.js";
+import LaporanKerusakanAset from "./LaporanKerusakanAset.js";
+import SubChecklistTugas from "./SubChecklistTugas.js";
+
+// Prompt 1 — Gubernur models
+import InstruksiGubernur from "./InstruksiGubernur.js";
+import PengajuanKeGubernur from "./PengajuanKeGubernur.js";
+import KpiKepalaDinas from "./KpiKepalaDinas.js";
+import NotifikasiGubernur from "./NotifikasiGubernur.js";
+import PengajuanKeKepalaDinas from "./PengajuanKeKepalaDinas.js";
+
 // Asosiasi Foreign Key Komoditas
 BdsCpd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
 BdsHrg.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
 BdsMon.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
+
+// Associate new models
+ApprovalSekretariat.associate?.(sequelize.models);
+SkpPenilaianSekretaris.associate?.(sequelize.models);
+LaporanKonsolidasiSekretaris.associate?.(sequelize.models);
+NotifikasiSekretaris.associate?.(sequelize.models);
 
 // Daftarkan asosiasi foreign key jika diperlukan
 if (typeof BdsCpd.associate === "function") BdsCpd.associate(sequelize.models);
@@ -140,5 +194,44 @@ export {
   Disposisi,
   AgendaSurat,
   ArsipSurat,
+  Task,
+  ApprovalSekretariat,
+  SkpPenilaianSekretaris,
+  LaporanKonsolidasiSekretaris,
+  NotifikasiSekretaris,
+  KgbTracking,
+  PangkatTracking,
+  AbsensiHarian,
+  Cuti,
+  PerjalananDinas,
+  Diklat,
+  DiklatPeserta,
+  SkpPenilaianKasubag,
+  NotifikasiKasubag,
+  UserHierarchy,
+  AnalisaPerencanaan,
+  Renstra,
+  Renja,
+  Monev,
+  Lakip,
+  Spj,
+  Dpa,
+  Rka,
+  RealisasiAnggaran,
+  AnalisaKeuangan,
+  UangPersediaan,
+  BukuKasUmum,
+  DaftarGaji,
+  AsetBarang,
+  PenerimaanBarang,
+  PemeliharaanAset,
+  LaporanKerusakanAset,
+  SubChecklistTugas,
+  InstruksiGubernur,
+  PengajuanKeGubernur,
+  KpiKepalaDinas,
+  NotifikasiGubernur,
+  PengajuanKeKepalaDinas,
 };
 export default sequelize;
+

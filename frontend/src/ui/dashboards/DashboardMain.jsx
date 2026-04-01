@@ -32,21 +32,8 @@ export default function DashboardMain() {
   if (roleName === "super_admin")
     return <Navigate to="/dashboard/superadmin" replace />;
 
-  if (roleName === "gubernur" || roleName === "kepala_dinas") {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-slate-800 rounded-xl shadow p-6 flex flex-col gap-2 mb-8 border border-slate-700">
-          <div className="font-bold text-lg mb-2 text-slate-100">
-            Dashboard Eksekutif
-          </div>
-          <div className="text-slate-300 text-sm">
-            Ringkasan lintas bidang untuk monitoring (Gubernur / Kepala Dinas).
-          </div>
-        </div>
-        <ProfessionalCharts />
-      </div>
-    );
-  }
+  if (roleName === "gubernur") return <Navigate to="/dashboard/gubernur" replace />;
+  if (roleName === "kepala_dinas") return <Navigate to="/dashboard/kepala-dinas" replace />;
 
   // Kabid generik -> arahkan berdasarkan unit
   if (roleName === "kepala_bidang") {
@@ -88,7 +75,12 @@ export default function DashboardMain() {
     return <Navigate to="/dashboard/kasubag" replace />;
 
   // Bendahara
-  if (roleName === "bendahara")
+  if (
+    roleName === "bendahara" ||
+    roleName === "bendahara_pengeluaran" ||
+    roleName === "bendahara_gaji" ||
+    roleName === "bendahara_barang"
+  )
     return <Navigate to="/dashboard/bendahara" replace />;
 
   // Staf Pelaksana

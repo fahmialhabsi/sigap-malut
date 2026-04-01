@@ -339,6 +339,62 @@ router.get("/dashboard/summary", async (req, res) => {
   }
 });
 
+// GET /api/tasks/unit
+// Dipakai oleh DashboardKasubag/DashboardKasubagUPTD/DashboardKasiUPTD (legacy UI).
+// Definisi "unit tasks" dibuat longgar agar tetap kompatibel lintas modul:
+// - tugas yang di-assign ke user
+// - atau tugas yang dibuat oleh user
+// - atau tugas yang source_unit match unit_kerja user
+router.get("/unit", async (req, res) => {
+  try {
+    const actorId = uid(req);
+    if (!actorId) return res.status(401).json({ success: false, error: "unauthenticated" });
+
+    const unitVal = String(req.user?.unit_kerja || "").trim();
+    const limitRaw = Number(req.query?.limit || 15);
+    const limit = Number.isFinite(limitRaw)
+      ? Math.min(Math.max(limitRaw, 1), 50)
+      : 15;
+
+    const assignedTaskIds = await TaskAssignment.findAll({
+      where: { assignee_user_id: actorId },
+      attributes: ["task_id"],
+      order: [["created_at", "DESC"]],
+      limit: 500,
+    })
+      .then((rows) => rows.map((r) => r.task_id))
+      .catch(() => []);
+
+    const whereOr = [
+      { created_by: actorId },
+      assignedTaskIds.length ? { id: { [Op.in]: assignedTaskIds } } : null,
+      unitVal ? { source_unit: unitVal } : null,
+    ].filter(Boolean);
+
+    const rows = await Task.findAll({
+      where: whereOr.length ? { [Op.or]: whereOr } : {},
+      order: [["created_at", "DESC"]],
+      limit,
+    }).catch(() => []);
+
+    return res.json({
+      success: true,
+      data: rows.map((t) => ({
+        id: t.id,
+        title: t.title,
+        judul: t.title,
+        status: t.status,
+        due_date: t.due_date,
+        created_at: t.created_at,
+        source_unit: t.source_unit,
+      })),
+      total: rows.length,
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // POST /api/tasks
 router.post("/", async (req, res) => {
   const t = await sequelize.transaction();
@@ -479,6 +535,69 @@ router.post("/:id/assign", async (req, res) => {
     if (!ok) {
       await t.rollback();
       return res.status(403).json({ success: false, message: reason });
+    }
+
+    // ─── UPTD Dual-Track Enforcement ────────────────────────────────────────
+    // Jalur A (Kasubag TU) tidak boleh assign ke Mutu/Teknis/JF/Kepala UPTD.
+    // Jalur B (Kasi Mutu/Teknis) hanya boleh assign ke pelaksana seksi masing-masing.
+    const actorUnit = String(req.user?.unit_kerja || "").toLowerCase();
+    const actorRole = String(req.user?.role || req.user?.roleName || "").toLowerCase();
+    if (actorUnit.includes("uptd")) {
+      const assigneeUser = await User.findByPk(assignee_user_id, {
+        transaction: t,
+      }).catch(() => null);
+      if (!assigneeUser) {
+        await t.rollback();
+        return res
+          .status(400)
+          .json({ success: false, message: "Assignee tidak ditemukan" });
+      }
+      const assUnit = String(assigneeUser.unit_kerja || "").toLowerCase();
+      const assRole = String(assigneeUser.role || "").toLowerCase();
+
+      const isKasubagTu =
+        actorRole.includes("kasubag_uptd") ||
+        actorRole.includes("subbag_tata_usaha") ||
+        actorRole.includes("kasubbag_tata_usaha") ||
+        actorRole.includes("tata_usaha");
+      const isKasiMutu = actorRole.includes("mutu") || actorRole.includes("seksi_manajemen_mutu");
+      const isKasiTeknis = actorRole.includes("teknis") || actorRole.includes("seksi_manajemen_teknis");
+
+      if (isKasubagTu) {
+        const okTarget = assUnit.includes("uptd_tu") && (assRole === "pelaksana" || assRole === "staf_pelaksana");
+        if (!okTarget) {
+          await t.rollback();
+          return res.status(403).json({
+            success: false,
+            message: "Kasubag TU UPTD hanya dapat assign ke Pelaksana TU (jalur administratif).",
+            code: "UPTD_DUAL_TRACK_VIOLATION",
+          });
+        }
+      }
+
+      if (isKasiMutu) {
+        const okTarget = assUnit.includes("uptd_mutu") && (assRole === "pelaksana" || assRole === "staf_pelaksana");
+        if (!okTarget) {
+          await t.rollback();
+          return res.status(403).json({
+            success: false,
+            message: "Kasi Mutu hanya dapat assign ke Pelaksana Mutu.",
+            code: "UPTD_SEKSI_SCOPE_VIOLATION",
+          });
+        }
+      }
+
+      if (isKasiTeknis) {
+        const okTarget = assUnit.includes("uptd_teknis") && (assRole === "pelaksana" || assRole === "staf_pelaksana");
+        if (!okTarget) {
+          await t.rollback();
+          return res.status(403).json({
+            success: false,
+            message: "Kasi Teknis hanya dapat assign ke Pelaksana Teknis.",
+            code: "UPTD_SEKSI_SCOPE_VIOLATION",
+          });
+        }
+      }
     }
 
     const old = task.toJSON();

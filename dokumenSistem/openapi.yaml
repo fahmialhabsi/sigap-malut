@@ -19,6 +19,215 @@ security:
   - bearerAuth: []
 
 paths:
+  /api/public/summary:
+    get:
+      summary: Ringkasan dashboard publik
+      description: >
+        Mengembalikan KPI ringkas publik (agregat). Tidak memerlukan token.
+      security: []
+      tags: [Public]
+      responses:
+        "200":
+          description: Ringkasan publik
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      last_updated_at: { type: string, format: date-time }
+                      inflasi:
+                        type: object
+                        nullable: true
+                        properties:
+                          tanggal: { type: string, format: date }
+                          inflasi_dod_persen: { type: number, nullable: true }
+                          inflasi_mtd_persen: { type: number, nullable: true }
+                          inflasi_yoy_proksi_persen: { type: number, nullable: true }
+                          coverage_komoditas_persen: { type: number, nullable: true }
+                      harga_pangan:
+                        type: object
+                        properties:
+                          tanggal_terbaru: { type: string, format: date, nullable: true }
+                      umkm:
+                        type: object
+                        properties:
+                          umkm_tersertifikasi_count: { type: integer }
+                      cppd:
+                        type: object
+                        description: CPPD Provinsi Maluku Utara (agregat dari stok gudang bertanda CPPD)
+                        properties:
+                          status_keseluruhan:
+                            type: string
+                            nullable: true
+                            enum: [aman, waspada, kritis]
+                          tanggal_data:
+                            type: string
+                            format: date
+                            nullable: true
+                          stok_cadangan:
+                            type: array
+                            items:
+                              type: object
+                          catatan: { type: string }
+                          meta: { type: object, additionalProperties: true }
+                      catatan:
+                        type: object
+                        properties:
+                          inflasi: { type: string }
+                          harga: { type: string }
+                          cppd: { type: string }
+
+  /api/public/cppd/summary:
+    get:
+      summary: Ringkasan CPPD publik (Provinsi Maluku Utara)
+      description: >
+        Agregat cadangan pangan pemerintah daerah dari stok_pangan dengan
+        filter lokasi_gudang (CPPD / Cadangan Pemerintah / Badan Pangan).
+      security: []
+      tags: [Public]
+      responses:
+        "200":
+          description: Ringkasan CPPD
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      status_keseluruhan:
+                        type: string
+                        nullable: true
+                      tanggal_data:
+                        type: string
+                        format: date
+                        nullable: true
+                      stok_cadangan:
+                        type: array
+                        items:
+                          type: object
+                      catatan: { type: string }
+                      meta: { type: object }
+
+  /api/public/datasets:
+    get:
+      summary: Daftar dataset publik
+      description: >
+        Daftar dataset publik yang dapat digunakan masyarakat/peneliti.
+      security: []
+      tags: [Public]
+      responses:
+        "200":
+          description: Daftar dataset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        description: { type: string }
+                        last_updated: { type: string, format: date, nullable: true }
+                        endpoints:
+                          type: object
+                          additionalProperties: true
+
+  /api/public/inflasi/trend:
+    get:
+      summary: Tren inflasi harian (proksi internal)
+      description: Data tren untuk kebutuhan visualisasi publik.
+      security: []
+      tags: [Public]
+      parameters:
+        - in: query
+          name: days
+          schema: { type: integer, default: 30, maximum: 366 }
+      responses:
+        "200":
+          description: Tren inflasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tanggal: { type: string, format: date }
+                        inflasi_dod_persen: { type: number, nullable: true }
+                        inflasi_mtd_persen: { type: number, nullable: true }
+                        inflasi_yoy_proksi_persen: { type: number, nullable: true }
+                        indeks_laspeyres: { type: number }
+
+  /api/public/harga/trend:
+    get:
+      summary: Tren harga pangan harian (rerata terverifikasi)
+      description: Mengembalikan rerata harian per komoditas_key.
+      security: []
+      tags: [Public]
+      parameters:
+        - in: query
+          name: komoditas_key
+          required: true
+          schema: { type: string, example: beras_medium }
+        - in: query
+          name: days
+          schema: { type: integer, default: 30, maximum: 366 }
+      responses:
+        "200":
+          description: Tren harga
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tanggal: { type: string, format: date }
+                        harga_avg: { type: number }
+                        n: { type: integer }
+
+  /api/public/datasets/harga-pangan.csv:
+    get:
+      summary: Download CSV tren harga pangan
+      description: File CSV agregat harian per komoditas_key.
+      security: []
+      tags: [Public]
+      parameters:
+        - in: query
+          name: komoditas_key
+          required: true
+          schema: { type: string }
+        - in: query
+          name: days
+          schema: { type: integer, default: 30, maximum: 366 }
+      responses:
+        "200":
+          description: CSV file
+          content:
+            text/csv:
+              schema:
+                type: string
+
   /api/auth/login:
     post:
       summary: Login pengguna

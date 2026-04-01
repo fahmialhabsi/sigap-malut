@@ -103,6 +103,8 @@ export default function DashboardLayout({ children }) {
     "DashboardKonsumsiLayout",
     "DashboardUPTD",
     "DashboardUPTDLayout",
+    "DashboardGubernur",
+    "DashboardKepalaDinas",
   ];
   const isStandaloneDashboard =
     standaloneDashboardNames.includes(childComponentName);

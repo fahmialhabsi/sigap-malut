@@ -18,7 +18,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import api from "../../api/axiosInstance";
+import api from "../../utils/api";
 
 function buildMockData(_label) {
   const months = ["Okt", "Nov", "Des", "Jan", "Feb", "Mar"];

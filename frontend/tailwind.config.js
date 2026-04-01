@@ -20,6 +20,18 @@ export default {
         success: "#06A657",
         bg: "#F6F7FB",
         card: "#FFFFFF",
+        /** Dashboard eksekutif & publik — canvas terang, aksen teal + rose lembut */
+        exec: {
+          canvas: "#fff8f6",
+          canvas2: "#f0fdfa",
+          wash: "#fdf4f7",
+          ink: "#0f172a",
+          muted: "#64748b",
+          border: "#e2e8f0",
+          card: "#ffffff",
+          accent: "#0d9488",
+          accent2: "#db2777",
+        },
       },
       spacing: {
         1: "4px",
@@ -55,6 +67,8 @@ export default {
       boxShadow: {
         soft: "0 18px 36px -24px rgba(15, 23, 42, 0.45)",
         "soft-sm": "0 10px 20px -18px rgba(15, 23, 42, 0.35)",
+        exec:
+          "0 20px 50px -24px rgba(219, 39, 119, 0.08), 0 12px 40px -20px rgba(13, 148, 136, 0.12)",
       },
       borderRadius: {
         xl: "1rem",

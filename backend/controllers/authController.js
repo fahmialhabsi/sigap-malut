@@ -334,7 +334,7 @@ export const login = async (req, res) => {
     // Dashboard mapping (sesuai dokumenSistem: eksekutif -> /dashboard)
     const roleToDashboard = {
       SUPER_ADMIN: "/dashboard/superadmin",
-      SEKRETARIS: "/dashboard/sekretariat",
+SEKRETARIS: "/dashboard/sekretaris",
       KEPALA_DINAS: "/dashboard",
       GUBERNUR: "/dashboard",
       KEPALA_BIDANG: "/dashboard",

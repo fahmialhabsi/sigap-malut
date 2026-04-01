@@ -22,7 +22,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import api from "../../api/axiosInstance";
+import api from "../../utils/api";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
 

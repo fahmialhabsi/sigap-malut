@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//e/sigap-malut/frontend/src/ui/dashboards//**)",
+      "Read(//e/sigap-malut/backend/routes//**)",
+      "Read(//e/sigap-malut/backend/migrations//**)",
+      "Read(//e/sigap-malut/backend/models//**)",
+      "Read(//e/sigap-malut/backend/**)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

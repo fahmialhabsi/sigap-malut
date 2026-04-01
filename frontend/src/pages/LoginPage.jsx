@@ -7,13 +7,13 @@ import { roleIdToName } from "../utils/roleMap";
 import { getDashboardPath } from "../utils/getDashboardPath";
 
 function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
+  const v =
+    (user?.roleName && String(user.roleName)) ||
+    (user?.role && String(user.role)) ||
     roleIdToName?.[user?.role_id] ||
     roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
+    null;
+  return v ? String(v).trim().toLowerCase().replace(/[\s-]+/g, "_") : null;
 }
 
 function normalizeUnit(user) {
@@ -93,7 +93,7 @@ export default function LoginPage() {
           return;
         }
         if (roleParam === "sekretaris") {
-          navigate("/dashboard/sekretariat", { replace: true });
+          navigate("/dashboard/sekretaris", { replace: true });
           setLoading(false);
           return;
         }
@@ -122,7 +122,7 @@ export default function LoginPage() {
       if (roleName === "super_admin")
         return navigate("/dashboard/superadmin", { replace: true });
       if (roleName === "sekretaris")
-        return navigate("/dashboard/sekretariat", { replace: true });
+        navigate("/dashboard/sekretaris", { replace: true });
       if (roleName === "gubernur" || roleName === "kepala_dinas")
         return navigate("/dashboard", { replace: true });
 
@@ -201,6 +201,7 @@ export default function LoginPage() {
             </label>
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg"

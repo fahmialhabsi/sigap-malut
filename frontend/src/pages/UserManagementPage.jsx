@@ -323,6 +323,9 @@ export default function UserManagementPage() {
                 </option>
                 <option value="fungsional_analis">Fungsional Analis</option>
                 <option value="pelaksana">Pelaksana</option>
+                <option value="pelaksana_ketersediaan">
+                  Pelaksana Ketersediaan
+                </option>
                 <option value="guest">Guest</option>
               </select>
             </div>

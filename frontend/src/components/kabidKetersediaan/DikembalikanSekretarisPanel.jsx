@@ -6,9 +6,12 @@ export default function DikembalikanSekretarisPanel({ unitKerja = "Bidang Keters
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const endpoint = unitKerja.toLowerCase().includes("distribusi")
+  const uk = unitKerja.toLowerCase();
+  const endpoint = uk.includes("distribusi")
     ? "/api/kabid-distribusi/laporan-ke-sekretaris/status"
-    : "/api/kabid-ketersediaan/laporan-ke-sekretaris/status";
+    : uk.includes("konsumsi")
+      ? "/api/kabid-konsumsi/laporan-ke-sekretaris/status"
+      : "/api/kabid-ketersediaan/laporan-ke-sekretaris/status";
 
   useEffect(() => {
     setLoading(true);

@@ -39,6 +39,13 @@ const Task =
         type: DataTypes.STRING(100),
         allowNull: true,
       },
+      sumber_perintah_kadin: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'Task',
+          key: 'id'
+        }
+      },
       status: {
         type: DataTypes.ENUM(
           "draft",
@@ -47,6 +54,15 @@ const Task =
           "in_progress",
           "submitted",
           "verified",
+          // Extra workflow statuses (Prompt 11–13 + Sekretariat hub)
+          // SQLite: not enforced at DB-level; Sequelize validation needs these values.
+          "review_kabid",
+          "submitted_to_kabid",
+          "approved_kabid",
+          "returned_to_jf",
+          "submitted_to_jf",
+          "verified_by_jf",
+          "returned_to_pelaksana",
           "approved_by_secretary",
           "forwarded_to_kadin",
           "closed",
@@ -73,6 +89,11 @@ const Task =
         type: DataTypes.JSON,
         allowNull: true,
       },
+      // Return workflow (Kasubag/JF mengembalikan ke Pelaksana)
+      returned_by: { type: DataTypes.INTEGER, allowNull: true },
+      returned_at: { type: DataTypes.DATE, allowNull: true },
+      catatan_verifikasi: { type: DataTypes.TEXT, allowNull: true },
+      revisi_ke: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       is_sensitive: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -99,3 +120,4 @@ const Task =
   );
 
 export default Task;
+

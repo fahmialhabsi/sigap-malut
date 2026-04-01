@@ -10,14 +10,35 @@ export function getDashboardPath(user) {
   const dashboardMapping = {
     super_admin: "/dashboard/superadmin",
     kepala_dinas: "/dashboard/kepala-dinas",
-    sekretaris: "/dashboard/sekretariat",
+    sekretaris: "/dashboard/sekretaris",
     "bidang ketersediaan": "/dashboard/ketersediaan",
     "bidang distribusi": "/dashboard/distribusi",
     "bidang konsumsi": "/dashboard/konsumsi",
     kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
     kepala_bidang_distribusi: "/dashboard/distribusi",
     kepala_bidang_konsumsi: "/dashboard/konsumsi",
+    // Kasubag Umum & Kepegawaian
+    kasubag_umum_kepegawaian: "/dashboard/kasubag",
+    kasubag: "/dashboard/kasubag",
+    kasubbag: "/dashboard/kasubag",
+    kasubbag_umum: "/dashboard/kasubag",
+    kasubbag_kepegawaian: "/dashboard/kasubag",
+    // UPTD
     uptd: "/dashboard/uptd",
+    kepala_uptd: "/dashboard/uptd",
+    subbag_tata_usaha: "/dashboard/kasubag-uptd",
+    kasubag_uptd: "/dashboard/kasubag-uptd",
+    kasubbag_tata_usaha: "/dashboard/kasubag-uptd",
+    seksi_manajemen_mutu: "/dashboard/kasi-uptd",
+    seksi_manajemen_teknis: "/dashboard/kasi-uptd",
+    kasi_uptd: "/dashboard/kasi-uptd",
+    kasi_mutu: "/dashboard/kasi-uptd",
+    kasi_teknis: "/dashboard/kasi-uptd",
+
+    // Bendahara (sub-role)
+    bendahara_pengeluaran: "/dashboard/bendahara",
+    bendahara_gaji: "/dashboard/bendahara",
+    bendahara_barang: "/dashboard/bendahara",
   };
 
   // 0) jika backend sudah memberi dashboardUrl
@@ -76,6 +97,15 @@ export function getDashboardPath(user) {
   if (unitVal.includes("ketersediaan")) return "/dashboard/ketersediaan";
   if (unitVal.includes("distribusi")) return "/dashboard/distribusi";
   if (unitVal.includes("konsumsi")) return "/dashboard/konsumsi";
+  if (unitVal.includes("uptd")) {
+    const r = (user.role || user.roleName || "").toString().toLowerCase();
+    if (r.includes("kasi") || r.includes("seksi")) return "/dashboard/kasi-uptd";
+    if (r.includes("kasubag") || r.includes("tata_usaha") || r.includes("tu"))
+      return "/dashboard/kasubag-uptd";
+    if (r.includes("fungsional")) return "/dashboard/fungsional";
+    if (r.includes("pelaksana")) return "/dashboard/pelaksana";
+    return "/dashboard/uptd";
+  }
 
   // 4) cek jabatan (contoh: "Kepala Bidang Ketersediaan")
   const jabatan = (user.jabatan || user.position || user.role_title || "")

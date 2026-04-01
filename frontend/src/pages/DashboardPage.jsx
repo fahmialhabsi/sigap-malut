@@ -3,16 +3,19 @@ import useAuthStore from "../stores/authStore";
 import { roleIdToName } from "../utils/roleMap";
 
 function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
+  const v =
+    (user?.roleName && String(user.roleName)) ||
+    (user?.role && String(user.role)) ||
     roleIdToName?.[user?.role_id] ||
     roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
+    null;
+  return v ? String(v).trim().toLowerCase().replace(/[\s-]+/g, "_") : null;
 }
 
+import { useNavigate } from "react-router-dom";
+
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
 
   if (!user) {
@@ -25,6 +28,11 @@ export default function DashboardPage() {
   }
 
   const roleName = normalizeRoleName(user);
+
+  if (roleName === "sekretaris") {
+    navigate("/dashboard/sekretaris", { replace: true });
+    return null;
+  }
 
   const allowedRoles = [
     "super_admin",
@@ -51,6 +59,9 @@ export default function DashboardPage() {
     "kasubbag_umum",
     "kasubbag_kepegawaian",
     "bendahara",
+    "bendahara_pengeluaran",
+    "bendahara_gaji",
+    "bendahara_barang",
     "pelaksana",
     "staf_pelaksana",
     "subbag_tata_usaha",

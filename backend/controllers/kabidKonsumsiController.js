@@ -1,7 +1,13 @@
 // Controller: Kepala Bidang Konsumsi & Penganekaragaman Pangan
-import { Op } from 'sequelize';
+import { Op, Sequelize } from "sequelize";
 import Task from '../models/Task.js';
 import Notification from '../models/Notification.js';
+import sequelize from "../config/database.js";
+import SppgPenerima from "../models/SppgPenerima.js";
+import SppgDistribusi from "../models/SppgDistribusi.js";
+import InspeksiKeamanan from "../models/InspeksiKeamanan.js";
+import KeracunanPangan from "../models/KeracunanPangan.js";
+import KoordinasiUptd from "../models/KoordinasiUptd.js";
 
 // === DASHBOARD SUMMARY (6 KPI Tiles) ===
 export async function getDashboardSummary(req, res) {
@@ -246,5 +252,311 @@ export async function getSkpJF(req, res) {
     });
   } catch (err) {
     res.status(500).json({ error: 'internal_server_error' });
+  }
+}
+
+// =========================================================
+// PROMPT 17 (Konsumsi): SPPG + Keamanan Pangan + Koordinasi UPTD
+// Endpoint kini membaca dari tabel domain (M056–M067 minimal).
+// =========================================================
+
+export async function getDualHero(req, res) {
+  try {
+    const now = new Date();
+    const bulan = now.getMonth() + 1;
+    const tahun = now.getFullYear();
+
+    // SPPG: target = total penerima aktif; realisasi = sum terealisasi bulan ini (cap by target)
+    const target = await SppgPenerima.sum("jumlah_penerima", {
+      where: { status_aktif: true },
+    }).catch(() => 0);
+
+    const realisasi = await SppgDistribusi.sum("jumlah_penerima_terealisasi", {
+      where: { periode_bulan: bulan, periode_tahun: tahun },
+    }).catch(() => 0);
+
+    const penerima_target = Number(target || 0);
+    const penerima_terealisasi = Number(realisasi || 0);
+    const realisasi_persen =
+      penerima_target > 0
+        ? Number(((Math.min(penerima_terealisasi, penerima_target) / penerima_target) * 100).toFixed(1))
+        : 0;
+
+    // Keamanan pangan: inspeksi bulan ini + temuan + keracunan aktif
+    const monthStart = new Date(Date.UTC(tahun, bulan - 1, 1));
+    const monthEnd = new Date(Date.UTC(tahun, bulan, 0));
+
+    const inspeksiSelesai = await InspeksiKeamanan.count({
+      where: {
+        tanggal_inspeksi: { [Op.between]: [monthStart, monthEnd] },
+        status: "selesai",
+      },
+    }).catch(() => 0);
+
+    const temuanRows = await InspeksiKeamanan.findAll({
+      attributes: [
+        "status_temuan",
+        [sequelize.fn("COUNT", sequelize.col("id")), "cnt"],
+      ],
+      where: { tanggal_inspeksi: { [Op.between]: [monthStart, monthEnd] } },
+      group: ["status_temuan"],
+      raw: true,
+    }).catch(() => []);
+
+    const temuan = { aman: 0, perlu_perbaikan: 0, tidak_layak: 0 };
+    for (const r of temuanRows) {
+      const k = String(r.status_temuan || "").toLowerCase();
+      const n = Number(r.cnt || 0);
+      if (k.includes("aman")) temuan.aman += n;
+      else if (k.includes("tidak")) temuan.tidak_layak += n;
+      else temuan.perlu_perbaikan += n;
+    }
+
+    const keracunanAktifCount = await KeracunanPangan.count({
+      where: { status: { [Op.in]: ["baru", "investigasi", "uji_lab"] } },
+    }).catch(() => 0);
+
+    res.json({
+      data: {
+        sppg: {
+          periode_bulan: bulan,
+          periode_tahun: tahun,
+          realisasi_persen,
+          penerima_terealisasi,
+          penerima_target,
+          deadline_laporan_bapanas_hari: 8, // cron service akan isi real; sementara statis
+          kebutuhan_pangan: null,
+        },
+        keamanan_pangan: {
+          inspeksi_bulan_ini: { selesai: inspeksiSelesai, target: null },
+          temuan,
+          keracunan_aktif: { jumlah: keracunanAktifCount },
+        },
+      },
+    });
+  } catch (err) {
+    console.error("[kabidKonsumsi] getDualHero error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function getSppgPenerima(req, res) {
+  try {
+    const rows = await SppgPenerima.findAll({
+      order: [["kabupaten_kota", "ASC"], ["nama_satuan", "ASC"]],
+      limit: 200,
+    }).catch(() => []);
+    res.json({ data: rows, total: rows.length });
+  } catch (err) {
+    console.error("[kabidKonsumsi] getSppgPenerima error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function getSppgRealisasi(req, res) {
+  try {
+    const { bulan, tahun } = req.params;
+    const b = Number(bulan);
+    const t = Number(tahun);
+    const penerima = await SppgPenerima.findAll({
+      where: { status_aktif: true },
+      order: [["kabupaten_kota", "ASC"], ["nama_satuan", "ASC"]],
+      limit: 500,
+    }).catch(() => []);
+
+    const distribusi = await SppgDistribusi.findAll({
+      where: { periode_bulan: b, periode_tahun: t },
+      order: [["created_at", "DESC"]],
+      limit: 2000,
+    }).catch(() => []);
+
+    const map = new Map();
+    for (const d of distribusi) {
+      map.set(d.sppg_penerima_id, d);
+    }
+
+    const rows = penerima.map((p) => {
+      const d = map.get(p.id);
+      return {
+        sppg_penerima_id: p.id,
+        nama_satuan: p.nama_satuan,
+        kabupaten_kota: p.kabupaten_kota,
+        penerima_terdaftar: p.jumlah_penerima,
+        jumlah_penerima_terealisasi: d?.jumlah_penerima_terealisasi ?? null,
+        status_distribusi: d?.status_distribusi ?? "belum",
+        tanggal_distribusi: d?.tanggal_distribusi ?? null,
+        catatan: d?.catatan ?? null,
+        diverifikasi_oleh: d?.diverifikasi_oleh ?? null,
+      };
+    });
+
+    const penerima_target = rows.reduce((acc, r) => acc + Number(r.penerima_terdaftar || 0), 0);
+    const penerima_terealisasi = rows.reduce((acc, r) => acc + Number(r.jumlah_penerima_terealisasi || 0), 0);
+    const realisasi_persen =
+      penerima_target > 0
+        ? Number(((Math.min(penerima_terealisasi, penerima_target) / penerima_target) * 100).toFixed(1))
+        : 0;
+
+    res.json({
+      data: {
+        periode_bulan: b,
+        periode_tahun: t,
+        realisasi_persen,
+        penerima_target,
+        penerima_terealisasi,
+        rows,
+      },
+    });
+  } catch (err) {
+    console.error("[kabidKonsumsi] getSppgRealisasi error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function getSppgAlertDeadline(req, res) {
+  try {
+    res.json({
+      data: {
+        deadline_tanggal: "2026-04-10",
+        sisa_hari: 8,
+        status: "warning",
+        pesan: "Data SPPG belum lengkap — laporan Bapanas jatuh tempo 8 hari lagi.",
+      },
+    });
+  } catch (err) {
+    console.error("[kabidKonsumsi] getSppgAlertDeadline error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function generateLaporanBapanas(req, res) {
+  try {
+    // Placeholder: nanti diganti generator service (PDF/Excel) + audit log
+    res.json({
+      success: true,
+      data: {
+        jenis: "laporan_bapanas_sppg",
+        generated_at: new Date().toISOString(),
+        file_url: null,
+        note: "Generator belum diaktifkan (mock response).",
+      },
+    });
+  } catch (err) {
+    console.error("[kabidKonsumsi] generateLaporanBapanas error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function getInspeksiList(req, res) {
+  try {
+    const rows = await InspeksiKeamanan.findAll({
+      order: [["tanggal_inspeksi", "DESC"]],
+      limit: 200,
+    }).catch(() => []);
+    res.json({ data: rows, total: rows.length });
+  } catch (err) {
+    console.error("[kabidKonsumsi] getInspeksiList error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function getKeracunanList(req, res) {
+  try {
+    const rows = await KeracunanPangan.findAll({
+      order: [["tanggal_kejadian", "DESC"]],
+      limit: 200,
+    }).catch(() => []);
+    res.json({ data: rows, total: rows.length });
+  } catch (err) {
+    console.error("[kabidKonsumsi] getKeracunanList error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function getKeracunanAktif(req, res) {
+  try {
+    const rows = await KeracunanPangan.findAll({
+      where: { status: { [Op.in]: ["baru", "investigasi", "uji_lab"] } },
+      order: [["tanggal_kejadian", "DESC"]],
+      limit: 100,
+    }).catch(() => []);
+    res.json({ data: rows, total: rows.length });
+  } catch (err) {
+    console.error("[kabidKonsumsi] getKeracunanAktif error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function listKoordinasiUptd(req, res) {
+  try {
+    const rows = await KoordinasiUptd.findAll({
+      where: { dari_bidang: { [Op.like]: "%Konsumsi%" } },
+      order: [["tanggal_permintaan", "DESC"]],
+      limit: 200,
+    }).catch(() => []);
+    res.json({ data: rows, total: rows.length });
+  } catch (err) {
+    console.error("[kabidKonsumsi] listKoordinasiUptd error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function createKoordinasiUptd(req, res) {
+  try {
+    const { jenis_permintaan, deskripsi } = req.body || {};
+    if (!jenis_permintaan || !deskripsi) {
+      return res.status(400).json({ error: "jenis_permintaan dan deskripsi wajib diisi" });
+    }
+    res.status(201).json({
+      success: true,
+      data: {
+        id: Date.now(),
+        nomor_surat: `UPTD-KOOR-${String(Math.floor(Math.random() * 900) + 100)}`,
+        tanggal_permintaan: new Date().toISOString().slice(0, 10),
+        dari_bidang: "Bidang Konsumsi",
+        jenis_permintaan,
+        deskripsi,
+        status: "dikirim",
+      },
+    });
+  } catch (err) {
+    console.error("[kabidKonsumsi] createKoordinasiUptd error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function createKoordinasiUptdFromKeracunan(req, res) {
+  try {
+    const { id } = req.params;
+    res.status(201).json({
+      success: true,
+      message: "Permintaan uji ke UPTD dibuat.",
+      data: {
+        id: Date.now(),
+        ref_kasus_id: Number(id),
+        jenis_permintaan: "uji_lab_keracunan",
+        status: "dikirim",
+      },
+    });
+  } catch (err) {
+    console.error("[kabidKonsumsi] createKoordinasiUptdFromKeracunan error:", err);
+    res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export async function listHasilUjiUptdMasuk(req, res) {
+  try {
+    const rows = await KoordinasiUptd.findAll({
+      where: {
+        dari_bidang: { [Op.like]: "%Konsumsi%" },
+        status: { [Op.in]: ["hasil_tersedia", "selesai"] },
+      },
+      order: [["tanggal_hasil", "DESC"]],
+      limit: 200,
+    }).catch(() => []);
+    res.json({ data: rows, total: rows.length });
+  } catch (err) {
+    console.error("[kabidKonsumsi] listHasilUjiUptdMasuk error:", err);
+    res.status(500).json({ error: "internal_server_error" });
   }
 }

@@ -11,6 +11,7 @@ import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import DpaBidangWidget from "../../components/DpaBidangWidget";
 import RenstraBidangWidget from "../../components/RenstraBidangWidget";
 import api from "../../utils/api";
+import DashboardKabidKonsumsi from "./DashboardKabidKonsumsi";
 
 function normalizeRoleName(user) {
   return (
@@ -159,6 +160,15 @@ export default function DashboardKonsumsi() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
   const unit = normalizeUnit(user);
+
+  // Jika role Kabid Konsumsi, pakai layout seragam Eselon III (Prompt 17)
+  if (
+    roleName === "kepala_bidang_konsumsi" ||
+    roleName === "kabid_konsumsi" ||
+    (roleName === "kepala_bidang" && unit.includes("konsumsi"))
+  ) {
+    return <DashboardKabidKonsumsi />;
+  }
 
   const isAllowed =
     !!user &&

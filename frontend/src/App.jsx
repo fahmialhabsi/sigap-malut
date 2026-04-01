@@ -160,7 +160,7 @@ function App() {
         />
 
         <Route
-          path="/dashboard/sekretariat"
+          path="/dashboard/sekretaris"
           element={
             <PrivateRoute>
               <DashboardSekretariat />

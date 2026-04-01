@@ -6,26 +6,44 @@ export default function JfVerifikasiDataMasukPanel({
   baseUrl,
   title = "Verifikasi Data Masuk",
   unitBadge,
+  subTypeOptions,
+  queryParamName = "type",
+  actionOk = "terima",
+  actionReturn = "kembalikan",
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState({});
   const [catatan, setCatatan] = useState({});
   const [msg, setMsg] = useState({});
+  const [activeSubType, setActiveSubType] = useState(
+    Array.isArray(subTypeOptions) && subTypeOptions.length ? subTypeOptions[0].id : "all",
+  );
 
   useEffect(() => {
     setLoading(true);
     api
-      .get(`${baseUrl}/verifikasi/masuk`)
+      .get(`${baseUrl}/verifikasi/masuk`, {
+        params:
+          activeSubType && activeSubType !== "all"
+            ? { [queryParamName]: activeSubType }
+            : undefined,
+      })
       .then((res) => setItems(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  }, [baseUrl]);
+  }, [baseUrl, activeSubType, queryParamName]);
 
   const handleVerifikasi = async (id, action) => {
     setActionLoading((s) => ({ ...s, [id]: action }));
     try {
-      await api.post(`${baseUrl}/verifikasi/${id}/${action}`, {
+      const pathAction =
+        action === "ok"
+          ? actionOk
+          : action === "return"
+            ? actionReturn
+            : action;
+      await api.post(`${baseUrl}/verifikasi/${id}/${pathAction}`, {
         catatan: catatan[id] ?? "",
       });
       setItems((prev) => prev.filter((item) => item.id !== id));
@@ -33,7 +51,8 @@ export default function JfVerifikasiDataMasukPanel({
         ...m,
         [id]: {
           ok: true,
-          text: action === "terima" ? "✅ Data diverifikasi." : "↩️ Data dikembalikan.",
+          text:
+            pathAction === actionReturn ? "↩️ Data dikembalikan." : "✅ Data diverifikasi.",
         },
       }));
     } catch {
@@ -71,6 +90,25 @@ export default function JfVerifikasiDataMasukPanel({
       <p className="text-xs text-gray-500 mb-3">
         Data dari Pelaksana untuk verifikasi teknis sebelum diteruskan ke Kepala Bidang.
       </p>
+
+      {Array.isArray(subTypeOptions) && subTypeOptions.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {[{ id: "all", label: "Semua" }, ...subTypeOptions].map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => setActiveSubType(opt.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
+                activeSubType === opt.id
+                  ? "bg-slate-900 border-slate-900 text-white"
+                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
       {loading ? (
         <p className="text-sm text-gray-400 animate-pulse">Memuat data masuk…</p>
       ) : items.length === 0 ? (
@@ -105,19 +143,19 @@ export default function JfVerifikasiDataMasukPanel({
               <div className="flex gap-2 mt-2">
                 <button
                   type="button"
-                  onClick={() => handleVerifikasi(item.id, "terima")}
+                  onClick={() => handleVerifikasi(item.id, "ok")}
                   disabled={!!actionLoading[item.id]}
                   className={`px-3 py-1 ${btnOk} disabled:opacity-50 text-white text-xs font-semibold rounded transition`}
                 >
-                  {actionLoading[item.id] === "terima" ? "…" : "✅ Verifikasi"}
+                  {actionLoading[item.id] === "ok" ? "…" : "✅ Verifikasi"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleVerifikasi(item.id, "kembalikan")}
+                  onClick={() => handleVerifikasi(item.id, "return")}
                   disabled={!!actionLoading[item.id]}
                   className="px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-semibold rounded transition"
                 >
-                  {actionLoading[item.id] === "kembalikan" ? "…" : "↩️ Kembalikan"}
+                  {actionLoading[item.id] === "return" ? "…" : "↩️ Kembalikan"}
                 </button>
               </div>
             </div>

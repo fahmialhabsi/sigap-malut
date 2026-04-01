@@ -16,6 +16,7 @@ const StokPangan = sequelize.define('StokPangan', {
     defaultValue: 'aman'
   },
   diinput_oleh: { type: DataTypes.INTEGER, allowNull: false },
+  catatan_revisi: { type: DataTypes.TEXT },
   created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, {

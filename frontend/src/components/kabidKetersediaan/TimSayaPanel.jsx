@@ -18,13 +18,18 @@ export default function TimSayaPanel({ unitKerja = "Bidang Ketersediaan" }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitMsg, setSubmitMsg] = useState("");
 
-  const endpoint = unitKerja.toLowerCase().includes("distribusi")
+  const uk = unitKerja.toLowerCase();
+  const endpoint = uk.includes("distribusi")
     ? "/api/kabid-distribusi/tim"
-    : "/api/kabid-ketersediaan/tim";
+    : uk.includes("konsumsi")
+      ? "/api/kabid-konsumsi/tim"
+      : "/api/kabid-ketersediaan/tim";
 
-  const assignEndpoint = unitKerja.toLowerCase().includes("distribusi")
+  const assignEndpoint = uk.includes("distribusi")
     ? "/api/kabid-distribusi/tugas"
-    : "/api/kabid-ketersediaan/tugas";
+    : uk.includes("konsumsi")
+      ? "/api/kabid-konsumsi/tugas"
+      : "/api/kabid-ketersediaan/tugas";
 
   useEffect(() => {
     setLoading(true);

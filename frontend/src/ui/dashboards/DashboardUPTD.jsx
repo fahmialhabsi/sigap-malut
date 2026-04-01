@@ -1,12 +1,13 @@
+// frontend/src/ui/dashboards/DashboardUPTD.jsx
+// Prompt 20: Dashboard Kepala UPTD — pola seperti Kabid (P11/P17)
 import React, { useEffect, useState } from "react";
-import useAuthStore from "../../stores/authStore";
-import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import { Navigate } from "react-router-dom";
-import FieldMappingPreview from "../../components/FieldMappingPreview";
+import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
-import DashboardUPTDLayout from "../../layouts/DashboardUPTDLayout";
-import uptdModules from "../../data/uptdModules";
+import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
+import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
+import HeroLabDashboardPanel from "../../components/uptd/HeroLabDashboardPanel";
 import api from "../../utils/api";
 
 function normalizeRoleName(user) {
@@ -19,572 +20,242 @@ function normalizeRoleName(user) {
   );
 }
 
-function HeroCard({ title, value, accent = "blue" }) {
-  const gradients = {
-    blue: "from-blue-900/80 to-blue-700/60",
-    cyan: "from-cyan-900/80 to-cyan-700/60",
-    amber: "from-amber-900/80 to-amber-700/60",
-    red: "from-red-900/80 to-red-700/60",
-  };
-
-  return (
-    <div
-      className={`bg-gradient-to-t ${gradients[accent]} border-2 border-blue-700/40 rounded-2xl px-4 py-3 min-h-[86px] flex flex-col justify-between shadow-lg hover:scale-105 transition`}
-      style={{ backdropFilter: "blur(10px)" }}
-    >
-      <div className="text-4xl font-bold text-white tracking-tight">
-        {value}
-      </div>
-      <div className="text-xs font-medium text-blue-200/90 uppercase tracking-wide">
-        {title}
-      </div>
-    </div>
-  );
+function normalizeUnit(user) {
+  return user?.unit_kerja ? String(user.unit_kerja).toLowerCase() : "";
 }
 
-function PanelBox({ title, children, customClass = "" }) {
-  return (
-    <div
-      className={`bg-blue-900/80 border-2 border-blue-700/50 rounded-2xl p-7 ${customClass} shadow-xl`}
-      style={{ backdropFilter: "blur(17px)" }}
-    >
-      <h2 className="font-bold text-blue-200 mb-5 text-xl flex items-center gap-2">
-        <span className="text-2xl">📦</span>
-        {title}
-      </h2>
-      {children}
-    </div>
-  );
-}
+const ALLOWED = ["kepala_uptd", "super_admin", "kepala_dinas"];
+
+const SIDEBAR_MENU = [
+  { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
+  { id: "inbox", label: "Inbox Kepala Dinas", icon: "📥", badge: 0 },
+  { id: "approval", label: "Approval Queue (3 TAB)", icon: "📤", badge: 0 },
+  { id: "dikembalikan", label: "Dikembalikan Sekretaris", icon: "↩️", badge: 0 },
+  { id: "alert-sertifikasi", label: "Alert Sertifikasi Expiry", icon: "🔔", badge: 0 },
+  { id: "alert-alat", label: "Alert Alat Lab", icon: "🔔", badge: 0 },
+  { divider: true, label: "MANAJEMEN TIM" },
+  { id: "tim", label: "Tim Saya (4 bawahan)", icon: "👥" },
+  { id: "assign", label: "Assign Tugas", icon: "📋" },
+  { id: "skp", label: "Nilai Kinerja (SKP)", icon: "📊" },
+  { divider: true, label: "MODUL LAB & TEKNIS" },
+  { id: "u1", label: "U1. Sample Queue & Uji Lab", icon: "🔬" },
+  { id: "u2", label: "U2. Sertifikasi", icon: "🏆" },
+  { id: "u3", label: "U3. Audit Mutu & Inspeksi", icon: "🔍" },
+  { id: "u6", label: "U6. Pelaporan & Monev", icon: "📊" },
+  { divider: true, label: "KOORDINASI" },
+  { id: "laporan-sek", label: "Laporan ke Sekretaris", icon: "📤" },
+  { id: "skp-saya", label: "SKP Saya (read)", icon: "🎯" },
+];
 
 export default function DashboardUPTD() {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((s) => s.user);
   const roleName = normalizeRoleName(user);
+  const unit = normalizeUnit(user);
 
-  const [renjaUPTD, setRenjaUPTD] = useState([]);
-  const [renjaLoading, setRenjaLoading] = useState(true);
-  const [labData, setLabData] = useState([]);
-  const [labLoading, setLabLoading] = useState(true);
-  const [equipData, setEquipData] = useState([]);
-  const [equipLoading, setEquipLoading] = useState(true);
-  const [sopItems, setSopItems] = useState([]);
-  const [sopLoading, setSopLoading] = useState(true);
-  const [sopChecks, setSopChecks] = useState({});
-  const [sopSaving, setSopSaving] = useState(false);
-  const [cocData, setCocData] = useState([]);
-  const [cocLoading, setCocLoading] = useState(true);
+  const [activeMenu, setActiveMenu] = useState("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
 
-  React.useEffect(() => {
-    if (user) {
-      workflowStatusUpdateAPI({
-        user,
-        modulId: "UPT-TKN",
-        status: "akses",
-        detail: "Akses modul layanan teknis UPTD",
-      });
-    }
+  useEffect(() => {
+    if (!user) return;
+    workflowStatusUpdateAPI({
+      user,
+      modulId: "UPTD-001",
+      status: "akses",
+      detail: "Akses Dashboard Kepala UPTD",
+    });
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
-    setRenjaLoading(true);
+    setSummaryLoading(true);
     api
-      .get("/api/epelara/renja", { params: { limit: 6 } })
-      .then((res) => {
-        const d = res.data;
-        setRenjaUPTD(Array.isArray(d) ? d : d?.data || []);
-      })
-      .catch(() => setRenjaUPTD([]))
-      .finally(() => setRenjaLoading(false));
+      .get("/api/uptd/dashboard/summary")
+      .then((res) => setSummary(res.data?.data ?? null))
+      .catch(() => setSummary(null))
+      .finally(() => setSummaryLoading(false));
   }, [user]);
 
-  useEffect(() => {
-    if (!user) return;
-    setLabLoading(true);
-    api
-      .get("/api/epelara/realisasi-indikator", { params: { limit: 10 } })
-      .then((res) => {
-        const d = res.data;
-        setLabData(
-          Array.isArray(d) ? d.slice(0, 10) : d?.data?.slice(0, 10) || [],
-        );
-      })
-      .catch(() => setLabData([]))
-      .finally(() => setLabLoading(false));
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-    setEquipLoading(true);
-    api.get("/api/uptd-ops/equipment")
-      .then((res) => { const d = res.data; setEquipData(Array.isArray(d) ? d : d?.data || []); })
-      .catch(() => setEquipData([]))
-      .finally(() => setEquipLoading(false));
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-    setSopLoading(true);
-    api.get("/api/uptd-ops/sop-check")
-      .then((res) => {
-        const items = Array.isArray(res.data?.items) ? res.data.items : res.data?.data || [];
-        setSopItems(items);
-        const init = {};
-        items.forEach((s) => { init[s.item] = s.is_compliant ?? false; });
-        setSopChecks(init);
-      })
-      .catch(() => setSopItems([]))
-      .finally(() => setSopLoading(false));
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-    setCocLoading(true);
-    api.get("/api/uptd-ops/tracking", { params: { limit: 10 } })
-      .then((res) => { const d = res.data; setCocData(Array.isArray(d) ? d : d?.data || []); })
-      .catch(() => setCocData([]))
-      .finally(() => setCocLoading(false));
-  }, [user]);
-
-  const handleSopSave = async () => {
-    if (!sopItems.length) return;
-    setSopSaving(true);
-    try {
-      await api.post("/api/uptd-ops/sop-check/bulk", {
-        checks: sopItems.map((s) => ({ checklist_item: s.item, kategori: s.kategori, is_compliant: sopChecks[s.item] ?? false })),
-      });
-    } catch (_) {}
-    setSopSaving(false);
-  };
-
-  const unitKerja = user?.unit_kerja
-    ? String(user.unit_kerja).toLowerCase()
-    : "";
   const isAllowed =
     !!user &&
-    (roleName === "kepala_uptd" ||
-      roleName === "super_admin" ||
-      roleName === "kepala_dinas" ||
-      roleName === "gubernur" ||
-      unitKerja.includes("uptd"));
-
+    (ALLOWED.includes(roleName) ||
+      (unit.includes("uptd") &&
+        (roleName === "kepala_uptd" || roleName?.includes("kepala"))));
   if (!isAllowed) return <Navigate to="/" replace />;
 
-  const moduleCards = [...uptdModules]
-    .filter(
-      (row) =>
-        row?.is_active === undefined ||
-        row?.is_active === null ||
-        row?.is_active === true ||
-        String(row?.is_active).toLowerCase() === "true" ||
-        String(row?.is_active) === "1",
-    )
-    .sort((a, b) => {
-      const orderA = Number(a?.menu_order ?? a?.menuOrder ?? 9999);
-      const orderB = Number(b?.menu_order ?? b?.menuOrder ?? 9999);
-      return orderA - orderB;
-    });
+  const renderContent = () => {
+    switch (activeMenu) {
+      case "overview":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                {
+                  label: "Uji Lab (Total)",
+                  value: summaryLoading ? "…" : summary?.uji_total ?? 0,
+                  color: "blue",
+                },
+                {
+                  label: "Sertifikasi (Total)",
+                  value: summaryLoading ? "…" : summary?.sertifikasi_total ?? 0,
+                  color: "amber",
+                },
+                { label: "Approval Pending", value: "—", color: "indigo" },
+                { label: "Alert Aktif", value: "—", color: "red" },
+              ].map((kpi) => (
+                <div
+                  key={kpi.label}
+                  className={`rounded-xl border p-4 flex flex-col gap-1 bg-${kpi.color}-50 border-${kpi.color}-200`}
+                >
+                  <div className={`text-3xl font-bold text-${kpi.color}-700`}>
+                    {kpi.value}
+                  </div>
+                  <div className={`text-xs font-medium text-${kpi.color}-600`}>
+                    {kpi.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <HeroLabDashboardPanel />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+                <h2 className="font-bold text-gray-800 mb-2">
+                  📤 Approval Queue — 3 Tab
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Data per tab akan dihubungkan saat prompt 21/22/23 (Kasubag TU
+                  / Kasi Mutu / Kasi Teknis).
+                </p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+                <h2 className="font-bold text-gray-800 mb-2">
+                  👥 Tim Saya (4 bawahan)
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Kasubag TU, Kasi Mutu, Kasi Teknis, JF UPTD (tanpa pelaksana).
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
+            <p className="text-gray-400 text-sm">
+              Modul ini sedang dalam pengembangan.
+            </p>
+          </div>
+        );
+    }
+  };
 
   return (
-    <DashboardUPTDLayout modules={moduleCards}>
-      <div className="w-full px-6 md:px-12 py-8 space-y-8">
-        {/* Hero Section */}
-        <div
-          className="bg-gradient-to-r from-blue-900/95 to-slate-900/80 border-2 border-blue-700/50 rounded-2xl p-8 shadow-2xl"
-          style={{ backdropFilter: "blur(15px)" }}
-        >
-          <h1 className="text-3xl font-bold text-white mb-3 flex items-center gap-3">
-            <span className="text-4xl">🏛️</span>
-            Dashboard UPTD
-          </h1>
-          <p className="text-blue-200/80 text-base leading-relaxed">
-            Ringkasan KPI dan modul UPTD Balai Pengawasan Mutu dan Keamanan
-            Pangan
-          </p>
-        </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <HeroCard title="Indikator Monitoring" value="59" accent="blue" />
-          <HeroCard title="Compliance Alur" value="99%" accent="cyan" />
-          <HeroCard title="Bypass Terdeteksi" value="0" accent="amber" />
-          <HeroCard title="Data Valid" value="98%" accent="blue" />
-        </div>
-
-        {/* Module Cards Panel */}
-        <PanelBox title="Modul UPTD">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {moduleCards.map((modul) => (
-              <div
-                id={`uptd-${String(modul.id).toLowerCase()}`}
-                key={modul.id}
-                className="bg-gradient-to-br from-blue-800/70 to-blue-900/60 border-2 border-blue-600/40 rounded-xl p-5 flex flex-col gap-3 shadow-lg hover:scale-105 transition"
-                style={{ backdropFilter: "blur(8px)" }}
-              >
-                <div className="font-bold text-lg text-blue-100">
-                  {modul.name}
-                </div>
-                <div className="text-xs text-blue-300/80 font-mono">
-                  ID: {modul.id}
-                </div>
-                <div className="mt-2">
-                  <FieldMappingPreview modulId={modul.id} />
-                </div>
-              </div>
-            ))}
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      <aside
+        className={`${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-40 w-72 bg-slate-900 flex flex-col transition-transform duration-200`}
+      >
+        <div className="p-5 border-b border-slate-700">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🏛️</span>
+            <div>
+              <p className="font-bold text-white text-sm">SIGAP-MALUT</p>
+              <p className="text-xs text-slate-400">
+                Kepala UPTD — Balai Pengawasan
+              </p>
+            </div>
           </div>
-        </PanelBox>
-
-        <div className="mt-8">
+        </div>
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {SIDEBAR_MENU.map((item, i) => {
+            if (item.divider) {
+              return (
+                <div key={i} className="px-3 pt-3 pb-1">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    {item.label}
+                  </p>
+                </div>
+              );
+            }
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveMenu(item.id);
+                  setSidebarOpen(false);
+                }}
+                className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition ${
+                  activeMenu === item.id
+                    ? "bg-green-600 text-white"
+                    : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <span>{item.icon}</span>
+                  <span className="truncate">{item.label}</span>
+                </span>
+                {item.badge != null && item.badge > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-xs bg-amber-500 text-white font-bold min-w-[18px] text-center">
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+        <div className="p-4 border-t border-slate-700 space-y-2">
           <BukaEPelaraButton
-            label="Buka e-Pelara — UPTD"
+            label="e-Pelara"
             targetPath="/"
-            className="w-full md:w-auto"
+            className="w-full !py-2 !text-xs"
           />
         </div>
+      </aside>
 
-        {/* Panel Perencanaan UPTD — Bagian IV, Role 5 */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="bg-white/10 rounded-xl border border-blue-300/20 p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-blue-100 text-base">
-                📄 Renstra UPTD
-              </h2>
-              <BukaEPelaraButton
-                label="Lihat/Edit →"
-                targetPath="/dashboard-renstra"
-                className="!py-1 !px-2 !text-xs"
-              />
-            </div>
-            <p className="text-xs text-blue-200/80">
-              Dokumen Renstra untuk unit UPTD (lab pengujian, sertifikasi).
-              Submit ke Sekretaris sebelum ke Kepala Dinas.
-            </p>
-          </div>
-          <div className="bg-white/10 rounded-xl border border-cyan-300/20 p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-cyan-100 text-base">
-                💰 DPA UPTD
-              </h2>
-              <BukaEPelaraButton
-                label="Lihat DPA →"
-                targetPath="/dashboard-dpa"
-                className="!py-1 !px-2 !text-xs"
-              />
-            </div>
-            <p className="text-xs text-cyan-200/80">
-              Anggaran UPTD yang sudah disahkan. Gunakan sebagai dasar realisasi
-              dan pelaporan.
-            </p>
-          </div>
-        </div>
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-        {/* ─── PANEL RENJA UPTD SPESIFIK — Bagian IV Priority 1 ─── */}
-        <div className="mt-6 bg-white/10 rounded-xl border border-emerald-300/20 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-emerald-100 text-base flex items-center gap-2">
-              📝 Renja UPTD — Input &amp; Status
-            </h2>
-            <div className="flex gap-2">
-              <BukaEPelaraButton
-                label="Input Renja →"
-                targetPath="/dashboard-renja"
-                className="!py-1 !px-2 !text-xs"
-              />
-              <BukaEPelaraButton
-                label="Lihat Status"
-                targetPath="/dashboard-renja?view=status"
-                className="!py-1 !px-2 !text-xs !bg-white/10"
-              />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="bg-gradient-to-r from-green-900/95 to-slate-900/80 border-b border-green-700/50 px-6 py-4 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              className="lg:hidden text-white p-1 rounded hover:bg-white/10"
+              onClick={() => setSidebarOpen(true)}
+            >
+              ☰
+            </button>
+            <div>
+              <h1 className="font-bold text-white text-lg">Kepala UPTD</h1>
+              <p className="text-green-200/70 text-xs">
+                {user?.nama_lengkap || user?.name || "—"} ·{" "}
+                {new Date().toLocaleDateString("id-ID", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
             </div>
           </div>
-          <p className="text-xs text-emerald-200/70 mb-4">
-            Rencana Kerja Tahunan UPTD — dokumen ini harus diajukan ke
-            Sekretariat sebelum batas waktu. Status:{" "}
-            <strong className="text-white">
-              Diajukan → Diverifikasi → Disetujui
-            </strong>
-            .
-          </p>
-          {renjaLoading ? (
-            <p className="text-xs text-blue-300/70 animate-pulse">
-              Memuat data Renja…
-            </p>
-          ) : renjaUPTD.length === 0 ? (
-            <div className="bg-amber-900/30 border border-amber-400/30 rounded-lg p-3 text-xs text-amber-200">
-              ⚠️ Belum ada dokumen Renja yang tersimpan untuk unit ini. Klik{" "}
-              <strong>Input Renja</strong> untuk memulai.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-xs">
-                <thead className="text-emerald-300/80 uppercase">
-                  <tr>
-                    <th className="px-2 py-1.5 text-left">Dokumen Renja</th>
-                    <th className="px-2 py-1.5 text-left">Tahun</th>
-                    <th className="px-2 py-1.5 text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {renjaUPTD.map((renja, i) => {
-                    const st = renja.status ?? "draft";
-                    const badge =
-                      st === "disetujui" || st === "approved"
-                        ? "bg-green-500/30 text-green-200"
-                        : st === "diverifikasi" || st === "verifikasi"
-                          ? "bg-teal-500/30 text-teal-200"
-                          : st === "diajukan"
-                            ? "bg-amber-500/30 text-amber-200"
-                            : st === "ditolak"
-                              ? "bg-red-500/30 text-red-200"
-                              : "bg-gray-500/30 text-gray-300";
-                    return (
-                      <tr
-                        key={renja.id ?? i}
-                        className="border-t border-white/5 hover:bg-white/5"
-                      >
-                        <td className="px-2 py-2 text-blue-100 max-w-[200px] truncate">
-                          {renja.judul ??
-                            renja.nama ??
-                            renja.jenis_dokumen ??
-                            `Renja #${i + 1}`}
-                        </td>
-                        <td className="px-2 py-2 text-blue-300/70">
-                          {renja.tahun ?? "—"}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-xs font-semibold ${badge}`}
-                          >
-                            {st}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* ─── PANEL REALISASI HASIL LAB vs TARGET — Priority 2 ─── */}
-        <div className="mt-6 bg-white/10 rounded-xl border border-violet-300/20 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-violet-100 text-base flex items-center gap-2">
-              🔬 Realisasi Hasil Lab vs Target Indikator
-            </h2>
-            <BukaEPelaraButton
-              label="Detail Monev →"
-              targetPath="/dashboard-monev"
-              className="!py-1 !px-2 !text-xs"
-            />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <UploadSuratMasukQuickAction showBendaharaHint />
+            <span className="px-2 py-1 bg-amber-500/20 border border-amber-500/40 rounded-full text-amber-200 text-xs font-medium">
+              🔔 {summaryLoading ? "…" : 0} notif
+            </span>
           </div>
-          {labLoading ? (
-            <p className="text-xs text-violet-300/70 animate-pulse">
-              Memuat data indikator lab…
-            </p>
-          ) : labData.length === 0 ? (
-            <div className="bg-amber-900/30 border border-amber-400/30 rounded-lg p-3 text-xs text-amber-200">
-              ⚠️ Belum ada data realisasi indikator untuk unit ini. Data berasal
-              dari e-Pelara Monev.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {labData.map((row, i) => {
-                const target = Number(row.target ?? row.target_nilai ?? 0);
-                const realisasi = Number(
-                  row.realisasi ??
-                    row.realisasi_nilai ??
-                    row.nilai_realisasi ??
-                    0,
-                );
-                const pct =
-                  target > 0
-                    ? Math.min(Math.round((realisasi / target) * 100), 100)
-                    : 0;
-                const barColor =
-                  pct >= 100
-                    ? "bg-green-400"
-                    : pct >= 80
-                      ? "bg-teal-400"
-                      : pct >= 50
-                        ? "bg-amber-400"
-                        : target > 0
-                          ? "bg-red-400"
-                          : "bg-gray-500";
-                const label =
-                  pct >= 100
-                    ? "Tercapai"
-                    : pct >= 80
-                      ? "On Track"
-                      : pct >= 50
-                        ? "Perlu Perhatian"
-                        : target > 0
-                          ? "Kritis"
-                          : "—";
-                return (
-                  <div key={row.id ?? i} className="flex flex-col gap-1.5">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-violet-100 font-medium truncate max-w-[280px]">
-                        {row.nama_indikator ??
-                          row.indikator ??
-                          row.nama ??
-                          `Indikator #${i + 1}`}
-                      </span>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-violet-300/70">
-                          {realisasi > 0
-                            ? realisasi.toLocaleString("id-ID")
-                            : "—"}
-                          {" / "}
-                          {target > 0 ? target.toLocaleString("id-ID") : "—"}
-                          {row.satuan ? ` ${row.satuan}` : ""}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                            pct >= 100
-                              ? "bg-green-500/30 text-green-200"
-                              : pct >= 80
-                                ? "bg-teal-500/30 text-teal-200"
-                                : pct >= 50
-                                  ? "bg-amber-500/30 text-amber-200"
-                                  : target > 0
-                                    ? "bg-red-500/30 text-red-200"
-                                    : "bg-gray-500/30 text-gray-400"
-                          }`}
-                        >
-                          {target > 0 ? `${pct}%` : "—"}{" "}
-                          {label !== "—" ? `· ${label}` : ""}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${barColor}`}
-                        style={{ width: `${target > 0 ? pct : 0}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        </header>
 
-        {/* Panel: Jadwal Pemeliharaan Alat Lab */}
-        <div className="bg-blue-900/80 border-2 border-blue-700/50 rounded-2xl p-7 shadow-xl" style={{ backdropFilter: "blur(17px)" }}>
-          <h2 className="font-bold text-blue-200 mb-5 text-xl flex items-center gap-2">
-            <span className="text-2xl">🔧</span> Jadwal Pemeliharaan Alat Lab
-          </h2>
-          {equipLoading ? (
-            <p className="text-xs text-blue-300/70 animate-pulse">Memuat data peralatan…</p>
-          ) : equipData.length === 0 ? (
-            <p className="text-xs text-blue-300/60">Belum ada data jadwal pemeliharaan.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-blue-100">
-                <thead>
-                  <tr className="border-b border-blue-700/40 text-blue-300 uppercase text-[10px]">
-                    <th className="text-left py-2 pr-3">Nama Alat</th>
-                    <th className="text-left py-2 pr-3">Jad. Berikutnya</th>
-                    <th className="text-left py-2 pr-3">Status</th>
-                    <th className="text-left py-2">Penanggung Jawab</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {equipData.map((eq, i) => {
-                    const next = eq.tanggal_berikutnya ? new Date(eq.tanggal_berikutnya) : null;
-                    const now = new Date();
-                    const isOverdue = next && next < now;
-                    const isDueSoon = next && !isOverdue && (next - now) < 7 * 24 * 3600 * 1000;
-                    const rowColor = isOverdue ? "text-red-300" : isDueSoon ? "text-amber-300" : "text-green-300";
-                    const badge = eq.status === "selesai" ? "bg-green-500/30 text-green-200" : eq.status === "terlambat" || isOverdue ? "bg-red-500/30 text-red-200" : "bg-blue-500/30 text-blue-200";
-                    return (
-                      <tr key={eq.id ?? i} className="border-b border-blue-800/30">
-                        <td className="py-2 pr-3 font-medium">{eq.nama_alat}</td>
-                        <td className={`py-2 pr-3 ${rowColor}`}>{next ? next.toLocaleDateString("id-ID") : "—"}</td>
-                        <td className="py-2 pr-3"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${badge}`}>{isOverdue ? "Terlambat" : eq.status || "Terjadwal"}</span></td>
-                        <td className="py-2">{eq.penanggung_jawab || "—"}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Panel: SOP Compliance Check */}
-        <div className="bg-blue-900/80 border-2 border-blue-700/50 rounded-2xl p-7 shadow-xl" style={{ backdropFilter: "blur(17px)" }}>
-          <h2 className="font-bold text-blue-200 mb-5 text-xl flex items-center gap-2">
-            <span className="text-2xl">✅</span> SOP Compliance Check
-          </h2>
-          {sopLoading ? (
-            <p className="text-xs text-blue-300/70 animate-pulse">Memuat checklist SOP…</p>
-          ) : (
-            <div className="space-y-2">
-              {sopItems.map((s, i) => (
-                <label key={i} className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!sopChecks[s.item]}
-                    onChange={(e) => setSopChecks((prev) => ({ ...prev, [s.item]: e.target.checked }))}
-                    className="w-4 h-4 accent-teal-400"
-                  />
-                  <span className="text-xs text-blue-100 flex-1">{s.item}</span>
-                  <span className="text-[10px] text-blue-400/60">{s.kategori}</span>
-                </label>
-              ))}
-              <button
-                onClick={handleSopSave}
-                disabled={sopSaving || sopItems.length === 0}
-                className="mt-4 px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white text-xs font-semibold transition"
-              >
-                {sopSaving ? "Menyimpan…" : "Simpan Hasil Check"}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Panel: Chain of Custody Sampel */}
-        <div className="bg-blue-900/80 border-2 border-blue-700/50 rounded-2xl p-7 shadow-xl" style={{ backdropFilter: "blur(17px)" }}>
-          <h2 className="font-bold text-blue-200 mb-5 text-xl flex items-center gap-2">
-            <span className="text-2xl">📦</span> Chain of Custody Sampel
-          </h2>
-          {cocLoading ? (
-            <p className="text-xs text-blue-300/70 animate-pulse">Memuat data sampel…</p>
-          ) : cocData.length === 0 ? (
-            <p className="text-xs text-blue-300/60">Belum ada log pelacakan sampel.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-blue-100">
-                <thead>
-                  <tr className="border-b border-blue-700/40 text-blue-300 uppercase text-[10px]">
-                    <th className="text-left py-2 pr-3">No. Sampel</th>
-                    <th className="text-left py-2 pr-3">Komoditas</th>
-                    <th className="text-left py-2 pr-3">Status</th>
-                    <th className="text-left py-2">Waktu</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cocData.map((row, i) => {
-                    const statusColor = row.status === "selesai" ? "bg-green-500/30 text-green-200" : row.status === "dikembalikan" ? "bg-red-500/30 text-red-200" : row.status === "dalam_proses" ? "bg-amber-500/30 text-amber-200" : "bg-blue-500/30 text-blue-200";
-                    return (
-                      <tr key={row.id ?? i} className="border-b border-blue-800/30">
-                        <td className="py-2 pr-3 font-mono">{row.nomor_sampel}</td>
-                        <td className="py-2 pr-3">{row.nama_komoditas || "—"}</td>
-                        <td className="py-2 pr-3"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusColor}`}>{row.status}</span></td>
-                        <td className="py-2 text-blue-300/70">{row.timestamp_event ? new Date(row.timestamp_event).toLocaleString("id-ID") : "—"}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>
-    </DashboardUPTDLayout>
+    </div>
   );
 }
+

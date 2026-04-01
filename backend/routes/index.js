@@ -91,9 +91,20 @@ import workflowTransitionLogRoutes from "./workflowTransitionLog.js";
 import workflowsRoutes from "./workflows.js";
 import kabidKetersediaanRoutes from "./kabid-ketersediaan.js";
 import kabidDistribusiRoutes from "./kabid-distribusi.js";
+import kabidKonsumsiRoutes from "./kabid-konsumsi.js";
 import jfKetersediaanRoutes from "./jf-ketersediaan.js";
 import jfDistribusiRoutes from "./jf-distribusi.js";
+import jfKonsumsiRoutes from "./jf-konsumsi.js";
+import jfPerencanaanRoutes from "./jf-perencanaan.js";
+import jfKeuanganRoutes from "./jf-keuangan.js";
+import bendaharaPengeluaranRoutes from "./bendahara-pengeluaran.js";
+import bendaharaGajiRoutes from "./bendahara-gaji.js";
+import bendaharaBarangRoutes from "./bendahara-barang.js";
 import pelaksanaBidangRoutes from "./pelaksana-bidang.js";
+import uptdRoutes from "./uptd.js";
+import kasubagRoutes from "./kasubag.js";
+import gubernurRoutes from "./gubernur.js";
+import kadinRoutes from "./kadin.js";
 import { protect } from "../middleware/auth.js";
 import { createReplicationPilotGuard } from "../middleware/uptdPilotGuard.js";
 
@@ -209,9 +220,20 @@ export default function registerRoutes(app) {
   // Prompts 11-16: Bidang Ketersediaan & Distribusi
   app.use("/api/kabid-ketersediaan", kabidKetersediaanRoutes);
   app.use("/api/kabid-distribusi", kabidDistribusiRoutes);
+  app.use("/api/kabid-konsumsi", kabidKonsumsiRoutes);
   app.use("/api/jf-ketersediaan", jfKetersediaanRoutes);
   app.use("/api/jf-distribusi", jfDistribusiRoutes);
+  app.use("/api/jf-konsumsi", jfKonsumsiRoutes);
+  app.use("/api/jf-perencanaan", jfPerencanaanRoutes);
+  app.use("/api/jf-keuangan", jfKeuanganRoutes);
+  app.use("/api/bendahara-pengeluaran", bendaharaPengeluaranRoutes);
+  app.use("/api/bendahara-gaji", bendaharaGajiRoutes);
+  app.use("/api/bendahara-barang", bendaharaBarangRoutes);
   app.use("/api/pelaksana", pelaksanaBidangRoutes);
+  app.use("/api/uptd", uptdRoutes);
+  app.use("/api/kasubag", kasubagRoutes);
+  app.use("/api/gubernur", gubernurRoutes);
+  app.use("/api/kadin", kadinRoutes);
 
   console.log("✅ API routes registered (incl. kabid/jf distribusi, pelaksana bidang)\n");
 }

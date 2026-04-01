@@ -1,28 +1,25 @@
-// frontend/src/ui/dashboards/DashboardKasubag.jsx
-// A-10: Dashboard Kepala Sub Bagian Umum & Kepegawaian
-// config/roles.json: kasubag_umum_kepegawaian → view_unit_tasks, assign_to_pelaksana, verify, create_task_unit
-// e-Pelara role (D-10): kasubag unit yang ada di bidang → ADMINISTRATOR
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
+import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import api from "../../utils/api";
 
 function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
+  const v =
+    (user?.roleName && String(user.roleName)) ||
+    (user?.role && String(user.role)) ||
     roleIdToName?.[user?.role_id] ||
     roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
+    null;
+  return v ? String(v).trim().toLowerCase().replace(/[\s-]+/g, "_") : null;
 }
 
 const ALLOWED = [
-  "kasubag",
   "kasubag_umum_kepegawaian",
+  "kasubag",
   "kasubbag",
   "kasubbag_umum",
   "kasubbag_kepegawaian",
@@ -35,8 +32,18 @@ export default function DashboardKasubag() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
 
-  const [tasks, setTasks] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState("overview");
+  const [unitTasks, setUnitTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [inboxRows, setInboxRows] = useState([]);
+  const [inboxLoading, setInboxLoading] = useState(true);
+  const [verifRows, setVerifRows] = useState([]);
+  const [verifLoading, setVerifLoading] = useState(true);
+  const [kanban, setKanban] = useState(null);
+  const [kanbanLoading, setKanbanLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -55,193 +62,518 @@ export default function DashboardKasubag() {
     api
       .get("/tasks/unit", { params: { limit: 10 } })
       .then((res) =>
-        setTasks(Array.isArray(res.data?.data) ? res.data.data : []),
+        setUnitTasks(Array.isArray(res.data?.data) ? res.data.data : []),
       )
-      .catch(() => setTasks([]))
+      .catch(() => setUnitTasks([]))
       .finally(() => setLoading(false));
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    setSummaryLoading(true);
+    api
+      .get("/api/kasubag/dashboard/summary")
+      .then((res) => setSummary(res.data?.data || null))
+      .catch(() => setSummary(null))
+      .finally(() => setSummaryLoading(false));
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    setInboxLoading(true);
+    api
+      .get("/api/kasubag/inbox-sekretaris", { params: { limit: 12 } })
+      .then((res) => setInboxRows(Array.isArray(res.data?.data) ? res.data.data : []))
+      .catch(() => setInboxRows([]))
+      .finally(() => setInboxLoading(false));
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    setVerifLoading(true);
+    api
+      .get("/api/kasubag/verifikasi", { params: { limit: 12 } })
+      .then((res) => setVerifRows(Array.isArray(res.data?.data) ? res.data.data : []))
+      .catch(() => setVerifRows([]))
+      .finally(() => setVerifLoading(false));
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    setKanbanLoading(true);
+    api
+      .get("/api/kasubag/tim/kanban")
+      .then((res) => setKanban(res.data?.data || null))
+      .catch(() => setKanban(null))
+      .finally(() => setKanbanLoading(false));
   }, [user]);
 
   const isAllowed = !!user && ALLOWED.includes(roleName);
   if (!isAllowed) return <Navigate to="/" replace />;
 
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-teal-900/95 to-slate-900/80 border-2 border-teal-700/50 rounded-2xl p-8 shadow-xl">
-        <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
-          <span className="text-4xl">📁</span>
-          Dashboard Kasubag Umum &amp; Kepegawaian
-        </h1>
-        <p className="text-teal-200/80 text-sm">
-          Unit:{" "}
-          <span className="font-semibold text-white">
-            {user?.unit_kerja || "—"}
-          </span>
-        </p>
-      </div>
+  const SIDEBAR_MENU = useMemo(
+    () => [
+      { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
+      {
+        id: "inbox",
+        label: "Inbox Sekretaris",
+        icon: "📥",
+        badge: summaryLoading ? null : summary?.inbox_sekretaris || null,
+      },
+      {
+        id: "verif",
+        label: "Verifikasi Queue",
+        icon: "🔍",
+        badge: summaryLoading ? null : summary?.verifikasi_queue || null,
+      },
+      { id: "unit", label: "Tugas Unit", icon: "📋", badge: null },
+      { divider: true, label: "MODUL KEPEGAWAIAN" },
+      { id: "asn", label: "Data ASN & Profil", icon: "👤" },
+      {
+        id: "kgb",
+        label: "Tracking KGB (Semua ASN)",
+        icon: "🎯",
+        badge: summaryLoading ? null : summary?.kgb_alert_30hari || null,
+      },
+      { id: "pangkat", label: "Tracking Pangkat", icon: "📈" },
+      { id: "cuti", label: "Data Cuti", icon: "📋" },
+      { id: "sppd", label: "Perjalanan Dinas (SPPD)", icon: "✈️" },
+      { id: "diklat", label: "Diklat & Pelatihan", icon: "🎓" },
+      { id: "absensi", label: "Absensi & Kehadiran", icon: "📅" },
+      { divider: true, label: "KINERJA" },
+      { id: "scorecard", label: "Nilai Kinerja Pelaksana", icon: "🎯" },
+      { id: "tim", label: "Tim Saya", icon: "👥" },
+    ],
+    [summary, summaryLoading],
+  );
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          {
-            label: "Tugas Unit",
-            value: loading ? "…" : tasks.length,
-            color: "teal",
-          },
-          { label: "Tugas Pending Assign", value: "—", color: "amber" },
-          { label: "Terverifikasi", value: "—", color: "emerald" },
-          { label: "Baru Dibuat", value: "—", color: "blue" },
-        ].map((kpi) => (
-          <div
-            key={kpi.label}
-            className={`rounded-xl border p-4 flex flex-col gap-1 bg-${kpi.color}-50 border-${kpi.color}-200`}
-          >
-            <div className={`text-3xl font-bold text-${kpi.color}-700`}>
-              {kpi.value}
+  const PanelBox = ({ title, children }) => (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <h2 className="font-bold text-gray-800 mb-3">{title}</h2>
+      {children}
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (activeMenu) {
+      case "overview":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {[
+                {
+                  label: "Inbox Sekretaris",
+                  value: summaryLoading ? "…" : summary?.inbox_sekretaris ?? "—",
+                  color: "rose",
+                },
+                {
+                  label: "Verifikasi Queue",
+                  value: summaryLoading ? "…" : summary?.verifikasi_queue ?? "—",
+                  color: "amber",
+                },
+                {
+                  label: "KGB Alert (H-30)",
+                  value: summaryLoading ? "…" : summary?.kgb_alert_30hari ?? "—",
+                  color: "red",
+                },
+                {
+                  label: "SLA Tim",
+                  value: summaryLoading ? "…" : summary?.sla_tim_pct ?? "—",
+                  color: "emerald",
+                },
+                {
+                  label: "Kinerja Pelaksana",
+                  value: summaryLoading ? "…" : summary?.skor_kinerja_pelaksana_avg ?? "—",
+                  color: "cyan",
+                },
+              ].map((kpi) => (
+                <div
+                  key={kpi.label}
+                  className={`rounded-xl border p-4 flex flex-col gap-1 bg-${kpi.color}-50 border-${kpi.color}-200`}
+                >
+                  <div className={`text-3xl font-bold text-${kpi.color}-700`}>{kpi.value}</div>
+                  <div className={`text-xs font-medium text-${kpi.color}-700`}>{kpi.label}</div>
+                </div>
+              ))}
             </div>
-            <div className={`text-xs font-medium text-${kpi.color}-600`}>
-              {kpi.label}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PanelBox title="📥 Inbox Sekretaris — Tugas untuk Kasubag">
+                {inboxLoading ? (
+                  <p className="text-sm text-gray-500 animate-pulse">Memuat…</p>
+                ) : inboxRows.length === 0 ? (
+                  <p className="text-sm text-gray-400 italic">Tidak ada item.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {inboxRows.slice(0, 8).map((t) => (
+                      <div key={t.id} className="border border-gray-100 bg-slate-50 rounded-lg p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold text-gray-800 truncate">
+                              {t.title || `Tugas #${t.id}`}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-0.5">
+                              Prioritas: {t.priority ?? "—"} · Status: {t.status || "—"}
+                            </div>
+                          </div>
+                          <a
+                            href={`/tasks/${t.id}`}
+                            className="text-xs font-semibold px-2 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shrink-0"
+                          >
+                            Buka
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PanelBox>
+
+              <PanelBox title="🔍 Verifikasi Queue — Menunggu verifikasi Kasubag">
+                {verifLoading ? (
+                  <p className="text-sm text-gray-500 animate-pulse">Memuat…</p>
+                ) : verifRows.length === 0 ? (
+                  <p className="text-sm text-gray-400 italic">Tidak ada item.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {verifRows.slice(0, 8).map((t) => (
+                      <div key={t.id} className="border border-gray-100 bg-amber-50 rounded-lg p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold text-gray-800 truncate">
+                              {t.title || `Tugas #${t.id}`}
+                            </div>
+                            <div className="text-xs text-gray-600 mt-0.5">
+                              Status: {t.status || "—"} · Update:{" "}
+                              {t.updated_at ? String(t.updated_at).slice(0, 10) : "—"}
+                            </div>
+                          </div>
+                          <a
+                            href={`/tasks/${t.id}`}
+                            className="text-xs font-semibold px-2 py-1 rounded-lg bg-white border border-amber-200 text-amber-800 hover:bg-amber-100 shrink-0"
+                          >
+                            Verifikasi
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PanelBox>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Daftar Tugas Unit */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="font-bold text-gray-800 mb-4">📋 Tugas Unit</h2>
-        {loading ? (
-          <p className="text-sm text-gray-500 animate-pulse">Memuat data…</p>
-        ) : tasks.length === 0 ? (
-          <p className="text-sm text-gray-400 italic">
-            Belum ada tugas di unit Anda.
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
-                <tr>
-                  <th className="px-3 py-2 text-left">Judul</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Pelaksana</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.map((t, i) => (
-                  <tr
-                    key={t.id ?? i}
-                    className="border-t border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-3 py-2 font-medium">
-                      {t.judul || t.title || "—"}
-                    </td>
-                    <td className="px-3 py-2">
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-teal-100 text-teal-700">
-                        {t.status || "—"}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-gray-500">
-                      {t.pelaksana || t.assigned_to || "—"}
-                    </td>
-                  </tr>
+        );
+      case "inbox":
+        return (
+          <PanelBox title="📥 Inbox Sekretaris">
+            {inboxLoading ? (
+              <p className="text-sm text-gray-500 animate-pulse">Memuat…</p>
+            ) : inboxRows.length === 0 ? (
+              <p className="text-sm text-gray-400 italic">Tidak ada item.</p>
+            ) : (
+              <div className="space-y-2">
+                {inboxRows.map((t) => (
+                  <div key={t.id} className="border border-gray-100 rounded-lg p-3 bg-slate-50">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-gray-800 truncate">
+                          {t.title || `Tugas #${t.id}`}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          Prioritas: {t.priority ?? "—"} · Deadline:{" "}
+                          {t.due_date ? String(t.due_date).slice(0, 10) : "—"} · Status:{" "}
+                          {t.status || "—"}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href={`/tasks/${t.id}`}
+                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
+                        >
+                          Detail
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            api
+                              .post(`/api/tasks/${t.id}/accept`)
+                              .then(() => {
+                                setInboxRows((rows) =>
+                                  rows.map((r) => (r.id === t.id ? { ...r, status: "accepted" } : r)),
+                                );
+                              })
+                              .catch(() => {})
+                          }
+                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white"
+                        >
+                          Konfirmasi Terima
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
+          </PanelBox>
+        );
+      case "verif":
+        return (
+          <PanelBox title="🔍 Verifikasi Queue">
+            {verifLoading ? (
+              <p className="text-sm text-gray-500 animate-pulse">Memuat…</p>
+            ) : verifRows.length === 0 ? (
+              <p className="text-sm text-gray-400 italic">Tidak ada item.</p>
+            ) : (
+              <div className="space-y-2">
+                {verifRows.map((t) => (
+                  <div key={t.id} className="border border-gray-100 rounded-lg p-3 bg-amber-50">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-gray-800 truncate">
+                          {t.title || `Tugas #${t.id}`}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-0.5">
+                          Status: {t.status || "—"} · Update:{" "}
+                          {t.updated_at ? String(t.updated_at).slice(0, 10) : "—"}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href={`/tasks/${t.id}`}
+                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-white border border-amber-200 text-amber-800 hover:bg-amber-100"
+                        >
+                          Buka
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const catatan = window.prompt("Catatan perbaikan (wajib):", "");
+                            if (!catatan || !String(catatan).trim()) return;
+                            api
+                              .post(`/api/kasubag/verifikasi/${t.id}/kembalikan`, { catatan })
+                              .then(() => setVerifRows((rows) => rows.filter((r) => r.id !== t.id)))
+                              .catch(() => {});
+                          }}
+                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          Kembalikan
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            api
+                              .post(`/api/kasubag/verifikasi/${t.id}/ok`)
+                              .then(() => setVerifRows((rows) => rows.filter((r) => r.id !== t.id)))
+                              .catch(() => {});
+                          }}
+                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          Verifikasi OK
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </PanelBox>
+        );
+      case "tim":
+        return (
+          <PanelBox title="👥 Tim Saya — Kanban Task Pelaksana">
+            {kanbanLoading ? (
+              <p className="text-sm text-gray-500 animate-pulse">Memuat…</p>
+            ) : !kanban ? (
+              <p className="text-sm text-gray-400 italic">
+                Belum ada data tim (pastikan relasi <span className="font-mono">user_hierarchy</span>).
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
+                {[
+                  { key: "todo", title: "TO DO", tone: "bg-slate-50 border-slate-200" },
+                  { key: "in_progress", title: "IN PROGRESS", tone: "bg-blue-50 border-blue-200" },
+                  { key: "menunggu_review", title: "MENUNGGU REVIEW", tone: "bg-amber-50 border-amber-200" },
+                  { key: "dikembalikan", title: "DIKEMBALIKAN", tone: "bg-red-50 border-red-200" },
+                  { key: "selesai", title: "SELESAI", tone: "bg-emerald-50 border-emerald-200" },
+                ].map((lane) => {
+                  const items = Array.isArray(kanban?.lanes?.[lane.key])
+                    ? kanban.lanes[lane.key]
+                    : [];
+                  return (
+                    <div key={lane.key} className={`rounded-xl border ${lane.tone} p-3`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-xs font-bold text-slate-700">{lane.title}</div>
+                        <div className="text-xs font-semibold text-slate-500">{items.length}</div>
+                      </div>
+                      {items.length === 0 ? (
+                        <p className="text-xs text-slate-400 italic">Kosong</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {items.slice(0, 12).map((it) => (
+                            <div key={it.id} className="bg-white/80 border border-white rounded-lg p-2">
+                              <div className="text-xs font-semibold text-slate-800 truncate">
+                                {it.title || `Task #${it.id}`}
+                              </div>
+                              <div className="text-[11px] text-slate-500 mt-0.5">
+                                Pelaksana #{it.assignee_user_id} · Revisi: {it.revisi_ke ?? 0}
+                              </div>
+                              {lane.key === "dikembalikan" && it.catatan_verifikasi ? (
+                                <div className="text-[11px] text-red-700 mt-1 line-clamp-2">
+                                  Catatan: {it.catatan_verifikasi}
+                                </div>
+                              ) : null}
+                              <div className="mt-1">
+                                <a
+                                  href={`/tasks/${it.id}`}
+                                  className="text-[11px] font-semibold text-slate-700 hover:underline"
+                                >
+                                  Buka →
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </PanelBox>
+        );
+      case "unit":
+        return (
+          <PanelBox title="📋 Tugas Unit">
+            {loading ? (
+              <p className="text-sm text-gray-500 animate-pulse">Memuat…</p>
+            ) : unitTasks.length === 0 ? (
+              <p className="text-sm text-gray-400 italic">Belum ada data.</p>
+            ) : (
+              <div className="space-y-2">
+                {unitTasks.map((t) => (
+                  <div key={t.id} className="border border-gray-100 bg-slate-50 rounded-lg p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-gray-800 truncate">
+                          {t.judul || t.title || `Tugas #${t.id}`}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5">Status: {t.status || "—"}</div>
+                      </div>
+                      <a
+                        href={`/tasks/${t.id}`}
+                        className="text-xs font-semibold px-2 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shrink-0"
+                      >
+                        Detail
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </PanelBox>
+        );
+      default:
+        return (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
+            <p className="text-gray-400 text-sm">Modul ini sedang dalam pengembangan.</p>
           </div>
-        )}
-      </div>
+        );
+    }
+  };
 
-      {/* Panel Perencanaan SDM — Bagian IV, Role 7 */}
-      <div className="bg-white rounded-xl border border-teal-100 shadow-sm p-5">
-        <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-          👥 Perencanaan SDM &amp; Administrasi
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-4 bg-teal-50 border border-teal-200 rounded-xl">
-            <div className="font-semibold text-teal-800 text-sm mb-1">
-              📋 Formasi Pegawai
+  return (
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      <aside
+        className={`${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-40 w-72 bg-slate-900 flex flex-col transition-transform duration-200`}
+      >
+        <div className="p-5 border-b border-slate-700">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🏛️</span>
+            <div>
+              <p className="font-bold text-white text-sm">SIGAP-MALUT</p>
+              <p className="text-xs text-slate-400">Kasubag Umum & Kepegawaian</p>
             </div>
-            <p className="text-xs text-teal-600 mb-2">
-              Data jumlah pegawai per jabatan — menjadi input sisi SDM di
-              Renstra.
-            </p>
-            <a
-              href="/kepegawaian/formasi"
-              className="inline-block text-xs font-medium text-teal-700 hover:underline"
-            >
-              → Lihat Formasi
-            </a>
-          </div>
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-            <div className="font-semibold text-blue-800 text-sm mb-1">
-              🎓 Kebutuhan Diklat
-            </div>
-            <p className="text-xs text-blue-600 mb-2">
-              Usulan kegiatan pendidikan & pelatihan untuk dimasukkan ke Renja
-              Sekretariat.
-            </p>
-            <a
-              href="/kepegawaian/diklat"
-              className="inline-block text-xs font-medium text-blue-700 hover:underline"
-            >
-              → Input Diklat
-            </a>
-          </div>
-          <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-            <div className="font-semibold text-indigo-800 text-sm mb-1">
-              📝 Renja Sekretariat
-            </div>
-            <p className="text-xs text-indigo-600 mb-2">
-              Input sub-kegiatan administrasi umum & kepegawaian ke Renja di
-              e-Pelara.
-            </p>
-            <BukaEPelaraButton
-              label="Input Renja →"
-              targetPath="/dashboard-renja"
-              className="!py-1 !px-2 !text-xs"
-            />
           </div>
         </div>
-      </div>
-
-      {/* Akreditasi Kepegawaian Quick Links */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="font-bold text-gray-800 mb-3">🔗 Akses Cepat</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {[
-            {
-              label: "Kepegawaian",
-              href: "/dashboard/kepegawaian",
-              icon: "👥",
-            },
-            { label: "Keuangan", href: "/dashboard/keuangan", icon: "💰" },
-            {
-              label: "Tugas Sekretariat",
-              href: "/sekretariat-tasks",
-              icon: "📋",
-            },
-          ].map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-teal-50 border border-gray-100 hover:border-teal-200 rounded-xl transition text-center"
-            >
-              <span className="text-2xl">{link.icon}</span>
-              <span className="text-xs font-medium text-gray-700">
-                {link.label}
-              </span>
-            </a>
-          ))}
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {SIDEBAR_MENU.map((item, i) => {
+            if (item.divider) {
+              return (
+                <div key={i} className="px-3 pt-3 pb-1">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    {item.label}
+                  </p>
+                </div>
+              );
+            }
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveMenu(item.id);
+                  setSidebarOpen(false);
+                }}
+                className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition ${
+                  activeMenu === item.id
+                    ? "bg-cyan-600 text-white"
+                    : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <span>{item.icon}</span>
+                  <span className="truncate">{item.label}</span>
+                </span>
+                {item.badge ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-xs bg-amber-500 text-white font-bold min-w-[18px] text-center">
+                    {item.badge}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </nav>
+        <div className="p-4 border-t border-slate-700 space-y-2">
+          <BukaEPelaraButton label="e-Pelara" targetPath="/" className="w-full !py-2 !text-xs" />
         </div>
-      </div>
+      </aside>
 
-      {/* e-Pelara */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="font-bold text-gray-800 mb-2">Akses e-Pelara</h2>
-        <BukaEPelaraButton
-          label="Buka e-Pelara — Administrasi"
-          targetPath="/"
-          className="w-full md:w-auto"
-        />
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="bg-gradient-to-r from-cyan-900/95 to-slate-900/80 border-b border-cyan-700/50 px-6 py-4 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              className="lg:hidden text-white p-1 rounded hover:bg-white/10"
+              onClick={() => setSidebarOpen(true)}
+            >
+              ☰
+            </button>
+            <div>
+              <h1 className="font-bold text-white text-lg">Kasubag Umum & Kepegawaian</h1>
+              <p className="text-cyan-200/70 text-xs">
+                {user?.nama_lengkap || user?.name || "—"} ·{" "}
+                {new Date().toLocaleDateString("id-ID", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+              <p className="text-cyan-200/60 text-[11px]">
+                Unit: <span className="font-semibold text-white">{user?.unit_kerja || "—"}</span>
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <UploadSuratMasukQuickAction showBendaharaHint />
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>
     </div>
   );

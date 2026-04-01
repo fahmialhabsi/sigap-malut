@@ -10,19 +10,26 @@ export default function ApprovalQueueJF({ unitKerja = "Bidang Ketersediaan" }) {
   const [showCatatan, setShowCatatan] = useState({});
   const [msg, setMsg] = useState({});
 
-  const endpoint = unitKerja.toLowerCase().includes("distribusi")
+  const uk = unitKerja.toLowerCase();
+  const endpoint = uk.includes("distribusi")
     ? "/api/kabid-distribusi/approval-queue"
-    : "/api/kabid-ketersediaan/approval-queue";
+    : uk.includes("konsumsi")
+      ? "/api/kabid-konsumsi/approval-queue"
+      : "/api/kabid-ketersediaan/approval-queue";
 
   const setujuiEndpoint = (id) =>
-    unitKerja.toLowerCase().includes("distribusi")
+    uk.includes("distribusi")
       ? `/api/kabid-distribusi/approval-queue/${id}/setujui`
-      : `/api/kabid-ketersediaan/approval-queue/${id}/setujui`;
+      : uk.includes("konsumsi")
+        ? `/api/kabid-konsumsi/approval-queue/${id}/setujui`
+        : `/api/kabid-ketersediaan/approval-queue/${id}/setujui`;
 
   const kembalikanEndpoint = (id) =>
-    unitKerja.toLowerCase().includes("distribusi")
+    uk.includes("distribusi")
       ? `/api/kabid-distribusi/approval-queue/${id}/kembalikan`
-      : `/api/kabid-ketersediaan/approval-queue/${id}/kembalikan`;
+      : uk.includes("konsumsi")
+        ? `/api/kabid-konsumsi/approval-queue/${id}/kembalikan`
+        : `/api/kabid-ketersediaan/approval-queue/${id}/kembalikan`;
 
   useEffect(() => {
     setLoading(true);

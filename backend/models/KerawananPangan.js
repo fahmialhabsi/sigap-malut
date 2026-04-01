@@ -18,6 +18,7 @@ const KerawananPangan = sequelize.define('KerawananPangan', {
   aspek_stabilitas: { type: DataTypes.DECIMAL(5, 2) },
   jumlah_penduduk_terdampak: { type: DataTypes.INTEGER },
   catatan: { type: DataTypes.TEXT },
+  catatan_revisi: { type: DataTypes.TEXT },
   diinput_oleh: { type: DataTypes.INTEGER, allowNull: false },
   diverifikasi_oleh: { type: DataTypes.INTEGER },
   created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
