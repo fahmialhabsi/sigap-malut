@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 const KELOMPOK_PANGAN = [
   { key: "padi_padian", label: "Padi-padian (beras)" },

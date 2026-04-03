@@ -6,6 +6,7 @@
 
 import BksKmn from "../models/BKS-KMN.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BksKmn records
 // @route   GET /api/bks-kmn
@@ -76,6 +77,8 @@ export const getBksKmnById = async (req, res) => {
 // @access  Private
 export const createBksKmn = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BksKmn.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBksKmn = async (req, res) => {
         message: "BksKmn not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

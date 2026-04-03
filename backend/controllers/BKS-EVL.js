@@ -6,6 +6,7 @@
 
 import BksEvl from "../models/BKS-EVL.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BksEvl records
 // @route   GET /api/bks-evl
@@ -76,6 +77,8 @@ export const getBksEvlById = async (req, res) => {
 // @access  Private
 export const createBksEvl = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BksEvl.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBksEvl = async (req, res) => {
         message: "BksEvl not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

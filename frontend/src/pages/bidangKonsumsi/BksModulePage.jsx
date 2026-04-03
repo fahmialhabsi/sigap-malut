@@ -3,7 +3,7 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
-import api from "../../utils/api";
+import api from "../../services/api";
 import {
   parseFieldsCsv,
   normalizeFieldDef,

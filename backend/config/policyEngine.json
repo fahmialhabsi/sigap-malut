@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "policy_thread_health_critical",
+      "label": "Kesehatan thread dalam status kritis",
+      "severity": "high",
+      "when": { "health_status_eq": "critical" }
+    },
+    {
+      "id": "policy_thread_health_warning",
+      "label": "Kesehatan thread perlu perhatian",
+      "severity": "warning",
+      "when": { "health_status_eq": "warning" }
+    },
+    {
+      "id": "policy_sla_breach_open",
+      "label": "Ada tugas terbuka yang melewati SLA",
+      "severity": "high",
+      "when": { "sla_breach_open_tasks_gte": 1 }
+    },
+    {
+      "id": "policy_horizontal_coord_overdue",
+      "label": "Koordinasi horizontal melewati tenggat SLA",
+      "severity": "warning",
+      "when": { "horizontal_sla_overdue_gte": 1 }
+    },
+    {
+      "id": "policy_decision_intervensi",
+      "label": "Skor keputusan mesin membantu menunjukkan perlu intervensi",
+      "severity": "high",
+      "when": { "decision_score_lte": 40 }
+    }
+  ]
+}

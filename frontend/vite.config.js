@@ -31,8 +31,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunks — cached terpisah oleh browser
-          "vendor-react": ["react", "react-dom"],
+          // react/react-dom tidak dipecah manual — memaksa split sering menghasilkan chunk kosong (rollup)
           "vendor-router": ["react-router-dom"],
           "vendor-charts": ["recharts", "chart.js", "react-chartjs-2"],
           "vendor-ui": ["react-hot-toast", "react-icons"],
@@ -42,8 +41,8 @@ export default defineConfig({
         },
       },
     },
-    // Batas warning chunk size 500KB (default 500), set lebih tinggi agar tidak noisy
-    chunkSizeWarningLimit: 600,
+    // Bundle utama + vendor-export masih >600kB; naikkan agar build tidak memunculkan warning noise
+    chunkSizeWarningLimit: 1600,
     // Source map untuk production debugging (bisa dinonaktifkan jika ingin lebih cepat build)
     sourcemap: false,
     // CSS code splitting

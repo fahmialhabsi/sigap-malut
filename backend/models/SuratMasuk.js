@@ -113,6 +113,14 @@ const SuratMasuk =
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      execution_thread_id: {
+        type: DataTypes.STRING(36),
+        allowNull: true,
+      },
+      task_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       created_at: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

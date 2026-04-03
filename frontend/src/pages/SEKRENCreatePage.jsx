@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import api from "../services/api";
 import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function SEKRENCreatePage() {

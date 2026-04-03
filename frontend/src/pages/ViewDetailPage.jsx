@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import api from "../utils/api";
+import api from "../services/api";
 
 export default function ViewDetailPage() {
   const { moduleId, id } = useParams();

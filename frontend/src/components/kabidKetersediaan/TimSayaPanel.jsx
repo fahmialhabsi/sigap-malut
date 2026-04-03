@@ -1,7 +1,7 @@
 // Tim Saya Panel — Kepala Bidang memantau JF 1 & JF 2
 // Kepala Bidang TIDAK BOLEH melihat nilai SKP Pelaksana (PP 30/2019)
 import React, { useState, useEffect } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 const STATUS_CONFIG = {
   in_progress: { label: "🔄 In Progress", color: "text-blue-600" },
@@ -20,16 +20,16 @@ export default function TimSayaPanel({ unitKerja = "Bidang Ketersediaan" }) {
 
   const uk = unitKerja.toLowerCase();
   const endpoint = uk.includes("distribusi")
-    ? "/api/kabid-distribusi/tim"
+    ? "/kabid-distribusi/tim"
     : uk.includes("konsumsi")
-      ? "/api/kabid-konsumsi/tim"
-      : "/api/kabid-ketersediaan/tim";
+      ? "/kabid-konsumsi/tim"
+      : "/kabid-ketersediaan/tim";
 
   const assignEndpoint = uk.includes("distribusi")
-    ? "/api/kabid-distribusi/tugas"
+    ? "/kabid-distribusi/tugas"
     : uk.includes("konsumsi")
-      ? "/api/kabid-konsumsi/tugas"
-      : "/api/kabid-ketersediaan/tugas";
+      ? "/kabid-konsumsi/tugas"
+      : "/kabid-ketersediaan/tugas";
 
   useEffect(() => {
     setLoading(true);

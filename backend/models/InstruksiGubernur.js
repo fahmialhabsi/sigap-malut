@@ -42,6 +42,8 @@ const InstruksiGubernur = sequelize.define(
     diproses_at: { type: DataTypes.DATE },
     selesai_at: { type: DataTypes.DATE },
     laporan_pelaksanaan: { type: DataTypes.TEXT },
+    /** Thread eksekusi end-to-end (instruksi → tugas → pengajuan → klarifikasi). */
+    execution_thread_id: { type: DataTypes.STRING(36), allowNull: true },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   },

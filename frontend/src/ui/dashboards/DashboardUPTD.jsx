@@ -8,7 +8,19 @@ import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
 import HeroLabDashboardPanel from "../../components/uptd/HeroLabDashboardPanel";
-import api from "../../utils/api";
+import api from "../../services/api";
+import HorizontalCoordinationRoleDashboard from "../../components/coordination/HorizontalCoordinationRoleDashboard.jsx";
+import CoordinationComposer from "../../components/coordination/CoordinationComposer";
+import CoordinationInboxPanel from "../../components/coordination/CoordinationInboxPanel";
+import CoordinationOutboxPanel from "../../components/coordination/CoordinationOutboxPanel";
+import {
+  COORDINATION_KIND_OPTIONS,
+  SEKRETARIS_ONLY_TARGET_OPTION,
+} from "../../components/coordination/coordinationOptions";
+import KomunikasiPanel, {
+  LANES as KOM_LANES,
+} from "../../components/panel/KomunikasiPanel.jsx";
+import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
 
 function normalizeRoleName(user) {
   return (
@@ -71,7 +83,7 @@ export default function DashboardUPTD() {
     if (!user) return;
     setSummaryLoading(true);
     api
-      .get("/api/uptd/dashboard/summary")
+      .get("/uptd/dashboard/summary")
       .then((res) => setSummary(res.data?.data ?? null))
       .catch(() => setSummary(null))
       .finally(() => setSummaryLoading(false));
@@ -89,6 +101,11 @@ export default function DashboardUPTD() {
       case "overview":
         return (
           <div className="space-y-6">
+            <HorizontalCoordinationRoleDashboard
+              variant="uptd"
+              title="Koordinasi & permintaan lapangan (UPTD)"
+            />
+            <ExecutionThreadObservabilityPanel title="Thread eksekusi UPTD" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 {
@@ -139,6 +156,45 @@ export default function DashboardUPTD() {
                 </p>
               </div>
             </div>
+          </div>
+        );
+      case "inbox":
+        return (
+          <CoordinationInboxPanel
+            title="Inbox Sekretaris"
+            subtitle="Perintah dan koordinasi dari Sekretaris untuk Kepala UPTD Balai Pengawasan."
+            sourceRole="sekretaris"
+            emptyText="Belum ada arahan atau koordinasi dari Sekretaris."
+            allowClose
+          />
+        );
+      case "komunikasi":
+        return (
+          <KomunikasiPanel
+            lane={KOM_LANES.ES3_ES4}
+            titleTanggapan="Tanggapan Kasubag / Kasi / JF UPTD"
+            titleDiskusi="Diskusi dengan bawahan (task)"
+          />
+        );
+      case "laporan-sek":
+        return (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <CoordinationComposer
+              title="Kirim Koordinasi ke Sekretaris"
+              subtitle="Gunakan kanal ini untuk menyampaikan hasil pengawasan, kebutuhan dukungan, atau tindak lanjut laboratorium kepada Sekretaris."
+              targetOptions={SEKRETARIS_ONLY_TARGET_OPTION}
+              kindOptions={COORDINATION_KIND_OPTIONS}
+              defaultTargetRole="sekretaris"
+              defaultKind="koordinasi"
+              submitLabel="Kirim Koordinasi"
+            />
+            <CoordinationOutboxPanel
+              title="Outbox Koordinasi Sekretaris"
+              subtitle="Pantau status koordinasi UPTD yang sudah dikirim ke Sekretaris."
+              targetRole="sekretaris"
+              kind="koordinasi"
+              emptyText="Belum ada koordinasi yang dikirim ke Sekretaris."
+            />
           </div>
         );
       default:

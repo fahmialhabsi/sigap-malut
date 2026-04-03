@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import uptdModules from "../data/uptdModules";
-import api from "../utils/api";
+import api from "../services/api";
 import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 function isActiveModule(row) {

@@ -1,16 +1,6 @@
 import DashboardMain from "../ui/dashboards/DashboardMain";
 import useAuthStore from "../stores/authStore";
-import { roleIdToName } from "../utils/roleMap";
-
-function normalizeRoleName(user) {
-  const v =
-    (user?.roleName && String(user.roleName)) ||
-    (user?.role && String(user.role)) ||
-    roleIdToName?.[user?.role_id] ||
-    roleIdToName?.[String(user?.role_id)] ||
-    null;
-  return v ? String(v).trim().toLowerCase().replace(/[\s-]+/g, "_") : null;
-}
+import { normalizeRoleKey } from "../utils/normalizeRole";
 
 import { useNavigate } from "react-router-dom";
 
@@ -27,7 +17,7 @@ export default function DashboardPage() {
     );
   }
 
-  const roleName = normalizeRoleName(user);
+  const roleName = normalizeRoleKey(user);
 
   if (roleName === "sekretaris") {
     navigate("/dashboard/sekretaris", { replace: true });
@@ -53,6 +43,13 @@ export default function DashboardPage() {
     // A-10: 6 dashboard baru (Fase 3)
     "jabatan_fungsional",
     "pejabat_fungsional",
+    "fungsional_perencana",
+    "fungsional_perencanaan",
+    "fungsional_keuangan",
+    "fungsional_ketersediaan",
+    "fungsional_distribusi",
+    "fungsional_konsumsi",
+    "fungsional_analis",
     "kasubag",
     "kasubag_umum_kepegawaian",
     "kasubbag",
@@ -64,6 +61,9 @@ export default function DashboardPage() {
     "bendahara_barang",
     "pelaksana",
     "staf_pelaksana",
+    "pelaksana_ketersediaan",
+    "pelaksana_distribusi",
+    "pelaksana_konsumsi",
     "subbag_tata_usaha",
     "kasubag_uptd",
     "kasubbag_tata_usaha",

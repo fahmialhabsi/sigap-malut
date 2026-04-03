@@ -1,0 +1,6 @@
+level_kemungkinan_kode,level_kemungkinan_label,persentase_dalam_1_tahun,jumlah_frekuensi_dalam_1_tahun,kejadian_toleransi_rendah,catatan
+1,"Hampir tidak terjadi",0% < x ≤ 5%,"sangat jarang: < 2 kali","1 kejadian dalam 5 tahun terakhir",
+2,"Jarang terjadi",5% < x ≤ 10%,"jarang: 2 kali s.d. 5 kali","1 kejadian dalam 4 tahun terakhir",
+3,"Kadang terjadi",10% < x ≤ 20%,"cukup sering: 6 s.d. 9 kali","1 kejadian dalam 3 tahun terakhir",
+4,"Sering terjadi",20% < x ≤ 50%,"sering: 10 kali s.d. 12 kali","1 kejadian dalam 2 tahun terakhir",
+5,"Hampir pasti terjadi",50% < x < 100%,"sangat sering: > 12 kali","1 kejadian dalam 1 tahun terakhir",

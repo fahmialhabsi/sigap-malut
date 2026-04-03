@@ -1,0 +1,19 @@
+{
+  "$schema": "sigap-malut/instruksi-deadline-matrix/v1",
+  "description": "Hari kalender ditambahkan ke tanggal dibuat/terbit (override manual tetap diperbolehkan). Ubah file ini tanpa deploy kode untuk penyesuaian kebijakan.",
+  "baseDaysByJenis": {
+    "instruksi": 7,
+    "disposisi": 3,
+    "arahan_strategis": 14,
+    "minta_laporan": 10,
+    "tanggap_darurat": 1
+  },
+  "priorityAdjustDays": {
+    "normal": 0,
+    "tinggi": -2,
+    "mendesak": -4
+  },
+  "minimumDays": 1,
+  "tanggap_darurat_minimumDays": 1,
+  "tanggap_darurat_ignorePriorityAdjust": true
+}

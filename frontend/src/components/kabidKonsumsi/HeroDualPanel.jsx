@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function ProgressBar({ value = 0 }) {
   const v = Math.max(0, Math.min(Number(value) || 0, 100));

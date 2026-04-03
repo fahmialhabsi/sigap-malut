@@ -1,6 +1,11 @@
 import { Op } from "sequelize";
 import { PengajuanKeKepalaDinas } from "../../models/index.js";
 import { getIO, ROOMS } from "../../services/socketService.js";
+import {
+  auditExecutiveAction,
+  EXEC_AUDIT_MODUL,
+} from "../../services/executiveAuditService.js";
+import { enqueueSocketDelivery } from "../../services/notificationOutboxService.js";
 
 /** Jenis pengajuan yang memerlukan PIN (aksi kritikal) */
 const JENIS_MEMERLUKAN_PIN = new Set(["persetujuan_anggaran"]);
@@ -82,6 +87,8 @@ export async function putuskanApproval(req, res) {
     const row = await PengajuanKeKepalaDinas.findByPk(id);
     if (!row) return res.status(404).json({ success: false, message: "Pengajuan tidak ditemukan" });
 
+    const sebelum = row.get({ plain: true });
+
     if (!row.divalidasi_sekretaris) {
       return res.status(403).json({
         success: false,
@@ -120,13 +127,30 @@ export async function putuskanApproval(req, res) {
     }
     await row.save();
 
-    if (io) {
-      io.to(ROOMS.SEKRETARIS).emit("kadin:approval:diputuskan", {
-        id: row.id,
-        status: row.status,
-        catatan_kadin: row.catatan_kadin,
+    const sock = {
+      id: row.id,
+      status: row.status,
+      catatan_kadin: row.catatan_kadin,
+    };
+    try {
+      if (io) io.to(ROOMS.SEKRETARIS).emit("kadin:approval:diputuskan", sock);
+    } catch {
+      void enqueueSocketDelivery({
+        eventKey: `kadin-appr|${row.id}|${Date.now()}`,
+        room: ROOMS.SEKRETARIS,
+        event: "kadin:approval:diputuskan",
+        data: sock,
       });
     }
+
+    void auditExecutiveAction({
+      modul: EXEC_AUDIT_MODUL.KADIN_APPROVAL_INTERNAL,
+      entitas_id: row.id,
+      aksi: `PUTUS_${String(keputusan).toUpperCase()}`,
+      pegawai_id: kadinId,
+      data_lama: sebelum,
+      data_baru: row.get({ plain: true }),
+    });
 
     return res.json({ success: true, data: row });
   } catch (err) {

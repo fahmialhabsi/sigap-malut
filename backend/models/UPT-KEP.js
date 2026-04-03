@@ -26,7 +26,17 @@ const UptKep = sequelize.define('UptKep', {
     allowNull: false,
     defaultValue: 'read_write',
     comment: 'UPTD bisa update data tertentu (cuti SKP) (field khusus UPTD)',
-  }
+  },
+  execution_thread_id: {
+    type: DataTypes.STRING(36),
+    allowNull: true,
+    comment: 'Rantai eksekusi (execution thread)',
+  },
+  task_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Opsional: Tasks.id',
+  },
 }, {
   tableName: 'upt_kep',
   timestamps: true,

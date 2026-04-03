@@ -1,31 +1,33 @@
 // =====================================================
-// ROUTES: Auditlog
-// Base Path: /api/auditlog
-// Generated: 2026-03-19T23:39:36.455Z
+// Routes: Auditlog CRUD — /api/auditlog
+// Baca: izin audit-log:read. Tulis/hapus: hanya super_admin.
 // =====================================================
 
-import express from 'express';
+import express from "express";
 import {
   getAllAuditlog,
   getAuditlogById,
   createAuditlog,
   updateAuditlog,
-  deleteAuditlog
-} from '../controllers/auditLog.js';
-// import { protect } from '../middleware/auth.js'; // Uncomment when auth is ready
+  deleteAuditlog,
+} from "../controllers/auditLog.js";
+import { protect } from "../middleware/auth.js";
+import { authorize } from "../middleware/roleCheck.js";
+import { requirePermission } from "../middleware/permissionCheck.js";
 
 const router = express.Router();
 
-// All routes are protected (uncomment when auth is ready)
-// router.use(protect);
+router.use(protect);
 
-router.route('/')
-  .get(getAllAuditlog)
-  .post(createAuditlog);
+router
+  .route("/")
+  .get(requirePermission("audit-log", "read"), getAllAuditlog)
+  .post(authorize("super_admin"), createAuditlog);
 
-router.route('/:id')
-  .get(getAuditlogById)
-  .put(updateAuditlog)
-  .delete(deleteAuditlog);
+router
+  .route("/:id")
+  .get(requirePermission("audit-log", "read"), getAuditlogById)
+  .put(authorize("super_admin"), updateAuditlog)
+  .delete(authorize("super_admin"), deleteAuditlog);
 
 export default router;

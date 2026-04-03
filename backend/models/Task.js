@@ -89,6 +89,10 @@ const Task =
         type: DataTypes.JSON,
         allowNull: true,
       },
+      execution_thread_id: {
+        type: DataTypes.STRING(36),
+        allowNull: true,
+      },
       // Return workflow (Kasubag/JF mengembalikan ke Pelaksana)
       returned_by: { type: DataTypes.INTEGER, allowNull: true },
       returned_at: { type: DataTypes.DATE, allowNull: true },

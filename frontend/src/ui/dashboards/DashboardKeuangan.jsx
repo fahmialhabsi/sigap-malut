@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import DashboardKeuanganLayout from "../../layouts/DashboardKeuanganLayout";
-import api from "../../utils/api";
+import api from "../../services/api";
+import { isDemoDataAllowed } from "../../config/appMode.js";
 import useAuthStore from "../../stores/authStore";
 import { notifySuccess, notifyError, notifyWarning } from "../../utils/notify";
 
@@ -382,13 +383,26 @@ const DUMMY_SUMMARY = {
   totalDPA: 1_850_000_000,
 };
 
+const EMPTY_SUMMARY = {
+  totalTransaksi: 0,
+  spjPending: 0,
+  rejectRate: 0,
+  avgVerifyHours: 0,
+  serapanAnggaran: 0,
+  totalDPA: 0,
+};
+
 // ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 export default function DashboardKeuangan() {
   const user = useAuthStore((s) => s.user);
   const roleName = normalizeRole(user);
 
-  const [summary, setSummary] = useState(DUMMY_SUMMARY);
-  const [spjList, setSpjList] = useState(DUMMY_SPJ);
+  const [summary, setSummary] = useState(() =>
+    isDemoDataAllowed() ? DUMMY_SUMMARY : EMPTY_SUMMARY,
+  );
+  const [spjList, setSpjList] = useState(() =>
+    isDemoDataAllowed() ? DUMMY_SPJ : [],
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("Semua");
   const [showOCR, setShowOCR] = useState(false);
@@ -401,10 +415,16 @@ export default function DashboardKeuangan() {
         api.get("/keuangan/summary"),
         api.get("/keuangan/spj"),
       ]);
-      setSummary(summaryRes.data?.data || DUMMY_SUMMARY);
-      setSpjList(spjRes.data?.data || DUMMY_SPJ);
+      setSummary(summaryRes.data?.data || (isDemoDataAllowed() ? DUMMY_SUMMARY : EMPTY_SUMMARY));
+      setSpjList(spjRes.data?.data || (isDemoDataAllowed() ? DUMMY_SPJ : []));
     } catch {
-      // use dummy data
+      if (isDemoDataAllowed()) {
+        setSummary(DUMMY_SUMMARY);
+        setSpjList(DUMMY_SPJ);
+      } else {
+        setSummary(EMPTY_SUMMARY);
+        setSpjList([]);
+      }
     } finally {
       setLoading(false);
     }

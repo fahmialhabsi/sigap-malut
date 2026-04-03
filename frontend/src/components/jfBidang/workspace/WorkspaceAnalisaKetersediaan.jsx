@@ -1,6 +1,6 @@
 // Workspace analisa — JF Bidang Ketersediaan (split kiri ringkas data, kanan form analisa)
 import React, { useEffect, useState } from "react";
-import api from "../../../utils/api";
+import api from "../../../services/api";
 
 export default function WorkspaceAnalisaKetersediaan() {
   const [form, setForm] = useState({

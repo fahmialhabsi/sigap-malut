@@ -33,6 +33,11 @@ const Spj =
       revisi_ke: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       jenis_bendahara: { type: DataTypes.STRING(16), allowNull: true }, // pengeluaran|gaji|barang
       bendahara_pengirim_id: { type: DataTypes.INTEGER, allowNull: true },
+      execution_thread_id: {
+        type: DataTypes.STRING(36),
+        allowNull: true,
+      },
+      task_id: { type: DataTypes.INTEGER, allowNull: true },
       created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
       updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     },

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function kategoriBadge(kategori) {
   const k = String(kategori || "").toLowerCase();
@@ -21,8 +21,8 @@ export default function ScorecardBawahanPanel() {
     setLoading(true);
     try {
       const [listRes, avgRes] = await Promise.all([
-        api.get("/api/sekretaris/kinerja/bawahan"),
-        api.get("/api/sekretaris/kinerja/bawahan/avg"),
+        api.get("/sekretaris/kinerja/bawahan"),
+        api.get("/sekretaris/kinerja/bawahan/avg"),
       ]);
       setRows(Array.isArray(listRes.data?.data) ? listRes.data.data : []);
       setAvg(avgRes.data?.data?.avg_score ?? null);

@@ -1,6 +1,6 @@
 // Panel tim pelaksana (CONFIDENTIAL) — hanya untuk JF yang punya bawahan
 import React, { useEffect, useMemo, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 export default function TimPelaksanaPanel({ baseUrl = "/api/jf-ketersediaan" }) {
   const [data, setData] = useState({ pelaksana: [], tugas_aktif: [] });

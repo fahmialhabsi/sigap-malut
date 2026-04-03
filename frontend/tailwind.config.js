@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: false,
+  // v3 default / v4: jangan pakai `false` (deprecated); `media` = dark: mengikuti prefers-color-scheme
+  darkMode: "media",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {

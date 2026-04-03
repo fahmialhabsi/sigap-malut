@@ -117,11 +117,22 @@ import PengajuanKeGubernur from "./PengajuanKeGubernur.js";
 import KpiKepalaDinas from "./KpiKepalaDinas.js";
 import NotifikasiGubernur from "./NotifikasiGubernur.js";
 import PengajuanKeKepalaDinas from "./PengajuanKeKepalaDinas.js";
+import ClarificationThread from "./ClarificationThread.js";
+import ClarificationMessage from "./ClarificationMessage.js";
+import NotificationOutbox from "./NotificationOutbox.js";
+import ExecutionThreadEvent from "./ExecutionThreadEvent.js";
+import HorizontalCoordinationRequest from "./HorizontalCoordinationRequest.js";
 
 // Asosiasi Foreign Key Komoditas
-BdsCpd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
-BdsHrg.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
-BdsMon.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
+if (!BdsCpd.associations?.komoditas) {
+  BdsCpd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
+}
+if (!BdsHrg.associations?.komoditas) {
+  BdsHrg.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
+}
+if (!BdsMon.associations?.komoditas) {
+  BdsMon.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
+}
 
 // Associate new models
 ApprovalSekretariat.associate?.(sequelize.models);
@@ -232,6 +243,10 @@ export {
   KpiKepalaDinas,
   NotifikasiGubernur,
   PengajuanKeKepalaDinas,
+  ClarificationThread,
+  ClarificationMessage,
+  NotificationOutbox,
+  ExecutionThreadEvent,
+  HorizontalCoordinationRequest,
 };
 export default sequelize;
-

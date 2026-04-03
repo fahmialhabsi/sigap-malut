@@ -6,6 +6,7 @@
 
 import SekKbj from "../models/SEK-KBJ.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekKbj records
 // @route   GET /api/sek-kbj
@@ -76,6 +77,8 @@ export const getSekKbjById = async (req, res) => {
 // @access  Private
 export const createSekKbj = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekKbj.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekKbj = async (req, res) => {
         message: "SekKbj not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

@@ -1,6 +1,6 @@
 // Panel: Dokumen yang Dikembalikan oleh Sekretaris ke Kepala Bidang
 import React, { useState, useEffect } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 export default function DikembalikanSekretarisPanel({ unitKerja = "Bidang Ketersediaan" }) {
   const [items, setItems] = useState([]);
@@ -8,10 +8,10 @@ export default function DikembalikanSekretarisPanel({ unitKerja = "Bidang Keters
 
   const uk = unitKerja.toLowerCase();
   const endpoint = uk.includes("distribusi")
-    ? "/api/kabid-distribusi/laporan-ke-sekretaris/status"
+    ? "/kabid-distribusi/laporan-ke-sekretaris/status"
     : uk.includes("konsumsi")
-      ? "/api/kabid-konsumsi/laporan-ke-sekretaris/status"
-      : "/api/kabid-ketersediaan/laporan-ke-sekretaris/status";
+      ? "/kabid-konsumsi/laporan-ke-sekretaris/status"
+      : "/kabid-ketersediaan/laporan-ke-sekretaris/status";
 
   useEffect(() => {
     setLoading(true);

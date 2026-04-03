@@ -9,7 +9,7 @@ import { roleIdToName } from "../../utils/roleMap";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function normalizeRoleName(user) {
   return (
@@ -29,6 +29,7 @@ const ALLOWED = [
   "subbag_tata_usaha",
   "kasubag_uptd",
   "kasubbag_tata_usaha",
+  "kasubbag_tu_uptd",
   "super_admin",
   "kepala_dinas",
   "kepala_uptd",

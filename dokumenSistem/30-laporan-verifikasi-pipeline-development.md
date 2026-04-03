@@ -207,10 +207,12 @@ CREATE TABLE bds_bmb (
 );
 ```
 
-#### 5. Migrations (`migrations/auto-generated/`)
+#### 5. Migrations (`backend/migrations/*.cjs`)
+
+File migrasi Sequelize CLI memakai **CommonJS** dan ekstensi **`.cjs`** (bukan `.js`); lihat `dokumenSistem/database-migration-deployment.md`.
 
 ```javascript
-// Contoh: migration_BDS-BMB.js
+// Contoh: backend/migrations/YYYYMMDD-migration-bds-bmb.cjs
 "use strict";
 
 module.exports = {

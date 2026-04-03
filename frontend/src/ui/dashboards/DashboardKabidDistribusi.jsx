@@ -5,7 +5,8 @@ import { Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
-import api from "../../utils/api";
+import api from "../../services/api";
+import HorizontalCoordinationRoleDashboard from "../../components/coordination/HorizontalCoordinationRoleDashboard.jsx";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import HeroKpiTilesKabid from "../../components/kabidKetersediaan/HeroKpiTilesKabid";
 import HeroInflasiPanel from "../../components/distribusi/HeroInflasiPanel";
@@ -14,6 +15,17 @@ import AlertHargaKritisPanel from "../../components/distribusi/AlertHargaKritisP
 import ApprovalQueueJF from "../../components/kabidKetersediaan/ApprovalQueueJF";
 import TimSayaPanel from "../../components/kabidKetersediaan/TimSayaPanel";
 import DikembalikanSekretarisPanel from "../../components/kabidKetersediaan/DikembalikanSekretarisPanel";
+import CoordinationComposer from "../../components/coordination/CoordinationComposer";
+import CoordinationInboxPanel from "../../components/coordination/CoordinationInboxPanel";
+import CoordinationOutboxPanel from "../../components/coordination/CoordinationOutboxPanel";
+import {
+  COORDINATION_KIND_OPTIONS,
+  SEKRETARIS_ONLY_TARGET_OPTION,
+} from "../../components/coordination/coordinationOptions";
+import KomunikasiPanel, {
+  LANES as KOM_LANES,
+} from "../../components/panel/KomunikasiPanel.jsx";
+import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
 
 function normalizeRoleName(user) {
   return (
@@ -40,6 +52,7 @@ const ALLOWED = [
 const SIDEBAR_MENU = [
   { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
   { id: "inbox", label: "Inbox Kepala Dinas", icon: "📥", badge: 1 },
+  { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
   { id: "approval", label: "Approval Queue (JF)", icon: "📤", badge: 3 },
   { id: "dikembalikan", label: "Dikembalikan Sekretaris", icon: "↩️", badge: 1 },
   { id: "tim", label: "Tim Saya (JF)", icon: "👥" },
@@ -155,7 +168,7 @@ function LaporanMendagriPanel() {
     setErr("");
     setGenerated(false);
     try {
-      await api.post("/api/kabid-distribusi/inflasi/generate-mendagri", { periode_label: periode });
+      await api.post("/kabid-distribusi/inflasi/generate-mendagri", { periode_label: periode });
       setGenerated(true);
     } catch {
       setErr("Gagal membuat laporan. Periksa sesi login atau coba lagi.");
@@ -255,7 +268,7 @@ export default function DashboardKabidDistribusi() {
     if (!user) return;
     setSummaryLoading(true);
     api
-      .get("/api/kabid-distribusi/dashboard/summary")
+      .get("/kabid-distribusi/dashboard/summary")
       .then((res) => setSummary(res.data?.data ?? null))
       .catch(() => setSummary(null))
       .finally(() => setSummaryLoading(false));
@@ -269,6 +282,11 @@ export default function DashboardKabidDistribusi() {
         return (
           <div className="space-y-6">
             <HeroKpiTilesKabid variant="distribusi" summary={summary} loading={summaryLoading} />
+            <HorizontalCoordinationRoleDashboard
+              variant="kabid"
+              title="Koordinasi horizontal & dependensi (Distribusi)"
+            />
+            <ExecutionThreadObservabilityPanel title="Thread eksekusi bidang distribusi" />
             <HeroInflasiPanel />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ApprovalQueueJF unitKerja="Bidang Distribusi" />
@@ -283,6 +301,17 @@ export default function DashboardKabidDistribusi() {
         );
 
       case "inbox":
+        return (
+          <CoordinationInboxPanel
+            title="Inbox Sekretaris"
+            subtitle="Perintah dan koordinasi yang masuk dari Sekretaris untuk Bidang Distribusi."
+            sourceRole="sekretaris"
+            emptyText="Belum ada arahan atau koordinasi dari Sekretaris."
+            allowClose
+          />
+        );
+
+      case "legacy_inbox":
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
             <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -299,6 +328,15 @@ export default function DashboardKabidDistribusi() {
 
       case "approval":
         return <ApprovalQueueJF unitKerja="Bidang Distribusi" />;
+
+      case "komunikasi":
+        return (
+          <KomunikasiPanel
+            lane={KOM_LANES.ES3_ES4}
+            titleTanggapan="Tanggapan JF / Kasubag / Pelaksana"
+            titleDiskusi="Diskusi dengan bawahan (task)"
+          />
+        );
 
       case "dikembalikan":
         return <DikembalikanSekretarisPanel unitKerja="Bidang Distribusi" />;
@@ -414,6 +452,28 @@ export default function DashboardKabidDistribusi() {
         return <LaporanMendagriPanel />;
 
       case "laporan-sekretaris":
+        return (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <CoordinationComposer
+              title="Kirim Koordinasi ke Sekretaris"
+              subtitle="Gunakan kanal ini untuk menyampaikan update TPID, operasi pasar, atau kebutuhan keputusan lintas unit."
+              targetOptions={SEKRETARIS_ONLY_TARGET_OPTION}
+              kindOptions={COORDINATION_KIND_OPTIONS}
+              defaultTargetRole="sekretaris"
+              defaultKind="koordinasi"
+              submitLabel="Kirim Koordinasi"
+            />
+            <CoordinationOutboxPanel
+              title="Outbox Koordinasi Sekretaris"
+              subtitle="Pantau status koordinasi Bidang Distribusi yang sudah dikirim ke Sekretaris."
+              targetRole="sekretaris"
+              kind="koordinasi"
+              emptyText="Belum ada koordinasi yang dikirim ke Sekretaris."
+            />
+          </div>
+        );
+
+      case "legacy_laporan_sekretaris":
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
             <h2 className="font-bold text-gray-800 mb-4">📤 Laporan ke Sekretaris Dinas</h2>

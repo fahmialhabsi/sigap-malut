@@ -6,6 +6,7 @@
 
 import SekRen from "../models/SEK-REN.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekRen records
 // @route   GET /api/sek-ren
@@ -76,6 +77,8 @@ export const getSekRenById = async (req, res) => {
 // @access  Private
 export const createSekRen = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekRen.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekRen = async (req, res) => {
         message: "SekRen not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

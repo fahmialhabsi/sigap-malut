@@ -160,14 +160,14 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
   }, [activeDate, months]);
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-[0_16px_32px_-24px_rgba(2,6,23,0.8)]">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50 flex-wrap gap-3">
-        <div className="font-semibold text-slate-700 text-sm">{title}</div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 bg-slate-900 px-5 py-3">
+        <div className="text-sm font-semibold text-slate-100">{title}</div>
 
         {/* Date slider */}
-        <div className="flex items-center gap-3 flex-1 min-w-[220px]">
-          <span className="text-xs text-slate-500 whitespace-nowrap">
+        <div className="flex min-w-[220px] flex-1 items-center gap-3">
+          <span className="whitespace-nowrap text-xs text-slate-400">
             Periode:
           </span>
           <input
@@ -176,11 +176,11 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
             max={5}
             value={activeDate}
             onChange={(e) => setActiveDate(Number(e.target.value))}
-            className="flex-1 accent-blue-600"
+            className="flex-1 accent-sky-500"
             aria-label="Pilih periode bulan"
           />
           <span
-            className="text-xs font-medium px-2 py-0.5 rounded-full text-white"
+            className="rounded-full px-2 py-0.5 text-xs font-medium text-white"
             style={{ backgroundColor: "var(--color-primary, #0B5FFF)" }}
           >
             {months[activeDate]}
@@ -191,9 +191,9 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
         <button
           onClick={handleExportPNG}
           disabled={exportLoading}
-          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 transition hover:bg-slate-800 disabled:opacity-50"
         >
-          {exportLoading ? "⏳" : "📷"} Ekspor PNG
+          {exportLoading ? "Mengekspor..." : "Ekspor PNG"}
         </button>
       </div>
 
@@ -202,12 +202,19 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
         ref={mapRef}
         center={[0.5, 127.8]}
         zoom={7}
+        className="dark-leaflet-map"
         style={{ height: 420, width: "100%" }}
         scrollWheelZoom={true}
       >
         <LayersControl position="topright">
           {/* Base layers */}
-          <BaseLayer checked name="Peta Standar">
+          <BaseLayer checked name="Peta Gelap">
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; CARTO'
+            />
+          </BaseLayer>
+          <BaseLayer name="Peta Standar">
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -221,7 +228,7 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
           </BaseLayer>
 
           {/* Overlay: Kerawanan Pangan */}
-          <Overlay checked name="🔴 Kerawanan Pangan">
+          <Overlay checked name="Kerawanan Pangan">
             <LayerGroup>
               {data.map((w) => (
                 <CircleMarker
@@ -235,7 +242,7 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
                     weight: 2,
                   }}
                 >
-                  <Popup>
+                  <Popup className="dark-leaflet-popup">
                     <div className="text-sm">
                       <b>{w.nama}</b>
                       <br />
@@ -253,7 +260,7 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
           </Overlay>
 
           {/* Overlay: Stok Komoditas */}
-          <Overlay checked name="🟢 Stok Komoditas">
+          <Overlay checked name="Stok Komoditas">
             <LayerGroup>
               {data.map((w) => (
                 <CircleMarker
@@ -267,7 +274,7 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
                     weight: 2,
                   }}
                 >
-                  <Popup>
+                  <Popup className="dark-leaflet-popup">
                     <div className="text-sm">
                       <b>{w.nama}</b>
                       <br />
@@ -282,7 +289,7 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
           </Overlay>
 
           {/* Overlay: Distribusi */}
-          <Overlay name="🔵 Volume Distribusi">
+          <Overlay name="Volume Distribusi">
             <LayerGroup>
               {data.map((w) => (
                 <CircleMarker
@@ -296,7 +303,7 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
                     weight: 1,
                   }}
                 >
-                  <Popup>
+                  <Popup className="dark-leaflet-popup">
                     <div className="text-sm">
                       <b>{w.nama}</b>
                       <br />
@@ -314,8 +321,8 @@ export default function MapLayerPanel({ title = "Peta Sebaran Wilayah" }) {
       </MapContainer>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-4 px-5 py-3 border-t border-slate-100 text-xs text-slate-600">
-        <div className="font-medium text-slate-500">Legenda:</div>
+      <div className="flex flex-wrap gap-4 border-t border-slate-800 bg-slate-900 px-5 py-3 text-xs text-slate-300">
+        <div className="font-medium text-slate-400">Legenda:</div>
         {[
           { color: "#22c55e", label: "Aman / Stok Cukup" },
           { color: "#f59e0b", label: "Waspada / Stok Sedang" },

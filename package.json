@@ -43,6 +43,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
+    "verify:govtech-final": "npm run verify:govtech-final --prefix backend",
     "integration:dry-run": "node scripts/integration-generator/dry-run.js",
     "generate:master-files": "node scripts/generate_master_files.js",
     "generate:fields-m1-9": "node scripts/generate_fields_M001_M009.js",

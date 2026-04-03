@@ -1,7 +1,11 @@
 ﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import api from "../services/api";
 import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
+import {
+  fetchKomoditasOptions,
+  fetchPasarStrategisMalut,
+} from "../services/panganMasterDataService";
 
 export default function BDSHRGCreatePage() {
   const navigate = useNavigate();
@@ -64,28 +68,18 @@ export default function BDSHRGCreatePage() {
   }, []);
 
   const fetchMasterData = async () => {
-    // Hardcode master data (atau bisa fetch dari API)
-    setKomoditasList([
-      { id: 1, nama: "Beras" },
-      { id: 2, nama: "Jagung" },
-      { id: 3, nama: "Kedelai" },
-      { id: 4, nama: "Gula Pasir" },
-      { id: 5, nama: "Minyak Goreng" },
-      { id: 6, nama: "Daging Sapi" },
-      { id: 7, nama: "Daging Ayam" },
-      { id: 8, nama: "Telur Ayam" },
-      { id: 9, nama: "Cabai Merah" },
-      { id: 10, nama: "Bawang Merah" },
-    ]);
+    try {
+      const [komoditas, pasar] = await Promise.all([
+        fetchKomoditasOptions(),
+        fetchPasarStrategisMalut(),
+      ]);
 
-    setPasarList([
-      "Pasar Gamalama Ternate",
-      "Pasar Tobelo",
-      "Pasar Sofifi",
-      "Pasar Labuha",
-      "Pasar Sanana",
-      "Pasar Utama",
-    ]);
+      setKomoditasList(komoditas);
+      setPasarList(pasar);
+    } catch (error) {
+      console.error("Error fetching master data:", error);
+      notifyWarning("Master data komoditas atau pasar belum berhasil dimuat.");
+    }
   };
 
   const handleChange = (e) => {
@@ -260,8 +254,8 @@ export default function BDSHRGCreatePage() {
             >
               <option value="">Pilih Pasar</option>
               {pasarList.map((pasar) => (
-                <option key={pasar} value={pasar}>
-                  {pasar}
+                <option key={pasar.id || pasar.nama} value={pasar.nama}>
+                  {pasar.nama}
                 </option>
               ))}
             </select>

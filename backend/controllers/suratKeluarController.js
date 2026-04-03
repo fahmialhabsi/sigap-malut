@@ -6,6 +6,7 @@ import {
   generateNomorSuratKeluar,
   generateArsipCode,
 } from "../utils/suratUtils.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // POST /api/surat/keluar
 export const createSuratKeluar = async (req, res) => {
@@ -33,6 +34,9 @@ export const createSuratKeluar = async (req, res) => {
         message: "jenis_naskah, tanggal_surat, kepada, dan perihal wajib diisi.",
       });
     }
+
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
 
     const fileDraft = req.file ? req.file.path : null;
 
@@ -136,6 +140,9 @@ export const updateSuratKeluar = async (req, res) => {
         .json({ success: false, message: "Surat keluar tidak ditemukan." });
     }
 
+    const threadUp = await gateOperationalUpdate(req, res, surat);
+    if (!threadUp) return;
+
     const allowedFields = [
       "jenis_naskah",
       "tanggal_surat",
@@ -188,6 +195,9 @@ export const submitSuratKeluar = async (req, res) => {
         .json({ success: false, message: "Surat keluar tidak ditemukan." });
     }
 
+    const threadSubmit = await gateOperationalUpdate(req, res, surat);
+    if (!threadSubmit) return;
+
     if (surat.status !== "draft") {
       return res.status(400).json({
         success: false,
@@ -219,6 +229,9 @@ export const approveSuratKeluar = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Surat keluar tidak ditemukan." });
     }
+
+    const threadAppr = await gateOperationalUpdate(req, res, surat);
+    if (!threadAppr) return;
 
     if (surat.status !== "review") {
       return res.status(400).json({

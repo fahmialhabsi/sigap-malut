@@ -6,6 +6,7 @@
 
 import SekAst from "../models/SEK-AST.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekAst records
 // @route   GET /api/sek-ast
@@ -76,6 +77,8 @@ export const getSekAstById = async (req, res) => {
 // @access  Private
 export const createSekAst = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekAst.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekAst = async (req, res) => {
         message: "SekAst not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

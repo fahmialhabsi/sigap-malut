@@ -9,10 +9,13 @@ import {
   KODE_KLASIFIKASI_ARSIP,
 } from "../utils/suratUtils.js";
 import { emitSuratMasukBaru } from "../services/socketService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // POST /api/surat/masuk/upload
 export const uploadSuratMasuk = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const userId = req.user.id;
     const {
       media_terima = "Langsung",
@@ -39,6 +42,11 @@ export const uploadSuratMasuk = async (req, res) => {
       status: "masuk",
       diterima_oleh: userId,
       keterangan: keterangan || null,
+      execution_thread_id: req.body.execution_thread_id ?? null,
+      task_id:
+        req.body.task_id != null && Number.isFinite(Number(req.body.task_id))
+          ? Number(req.body.task_id)
+          : null,
     });
 
     // Buat record agenda surat
@@ -151,6 +159,9 @@ export const konfirmasiSuratMasuk = async (req, res) => {
         .json({ success: false, message: "Surat tidak ditemukan." });
     }
 
+    const threadUp = await gateOperationalUpdate(req, res, surat);
+    if (!threadUp) return;
+
     const {
       nomor_surat,
       tanggal_surat,
@@ -217,6 +228,15 @@ export const buatDisposisi = async (req, res) => {
         .json({ success: false, message: "Surat tidak ditemukan." });
     }
 
+    req.body = {
+      ...req.body,
+      surat_masuk_id,
+      execution_thread_id: req.body.execution_thread_id || surat.execution_thread_id,
+      task_id: req.body.task_id ?? surat.task_id,
+    };
+    const gateOk = await gateOperationalUpdate(req, res, surat);
+    if (!gateOk) return;
+
     const disposisi = await Disposisi.create({
       surat_masuk_id,
       dari_user_id: userId,
@@ -254,6 +274,20 @@ export const selesaikanDisposisi = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Disposisi tidak ditemukan." });
     }
+
+    const suratGate = await SuratMasuk.findByPk(disposisi.surat_masuk_id);
+    if (!suratGate) {
+      return res.status(404).json({ success: false, message: "Surat terkait tidak ditemukan." });
+    }
+    req.body = {
+      ...req.body,
+      disposisi_id: disposisi.id,
+      surat_masuk_id: suratGate.id,
+      execution_thread_id: req.body.execution_thread_id || suratGate.execution_thread_id,
+      task_id: req.body.task_id ?? suratGate.task_id,
+    };
+    const gateOk = await gateOperationalUpdate(req, res, suratGate);
+    if (!gateOk) return;
 
     const fileBalasan = req.files
       ? req.files.map((f) => ({ path: f.path, originalname: f.originalname }))

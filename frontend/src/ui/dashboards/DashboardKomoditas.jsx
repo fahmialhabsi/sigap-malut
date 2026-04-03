@@ -12,9 +12,10 @@ import {
   ReferenceLine,
 } from "recharts";
 import DashboardKomoditasLayout from "../../layouts/DashboardKomoditasLayout";
-import api from "../../utils/api";
+import api from "../../services/api";
 import useAuthStore from "../../stores/authStore";
 import { notifySuccess, notifyWarning } from "../../utils/notify";
+import { isDemoDataAllowed } from "../../config/appMode.js";
 
 const ALLOWED_ROLES = [
   "super_admin",
@@ -435,8 +436,12 @@ export default function DashboardKomoditas() {
   const user = useAuthStore((s) => s.user);
   const roleName = normalizeRole(user);
 
-  const [komoditasList, setKomoditasList] = useState(DUMMY_KOMODITAS);
-  const [alerts, setAlerts] = useState(DUMMY_ALERTS);
+  const [komoditasList, setKomoditasList] = useState(() =>
+    isDemoDataAllowed() ? DUMMY_KOMODITAS : [],
+  );
+  const [alerts, setAlerts] = useState(() =>
+    isDemoDataAllowed() ? DUMMY_ALERTS : [],
+  );
   const [selectedKomoditas, setSelectedKomoditas] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [kategoriFilter, setKategoriFilter] = useState("Semua");
@@ -488,7 +493,13 @@ export default function DashboardKomoditas() {
         if (liveAlerts.length > 0) setAlerts(liveAlerts);
       }
     } catch {
-      // use dummy data as fallback
+      if (isDemoDataAllowed()) {
+        setKomoditasList(DUMMY_KOMODITAS);
+        setAlerts(DUMMY_ALERTS);
+      } else {
+        setKomoditasList([]);
+        setAlerts([]);
+      }
     } finally {
       setLoading(false);
     }

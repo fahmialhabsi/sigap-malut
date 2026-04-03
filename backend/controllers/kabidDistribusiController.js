@@ -4,8 +4,15 @@ import Task from "../models/Task.js";
 import Notification from "../models/Notification.js";
 import InflasiHarian from "../models/InflasiHarian.js";
 import HargaPangan from "../models/HargaPangan.js";
+import BdsCpd from "../models/BDS-CPD.js";
+import Komoditas from "../models/komoditas.js";
 import { listRecentAnomalyRows } from "../services/hargaPanganRepository.js";
 import { adminAmendHargaPanganRow } from "../services/hargaPanganService.js";
+import { buildCppdStatusSummary } from "../services/bdsCpdService.js";
+
+if (!BdsCpd.associations?.komoditas) {
+  BdsCpd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
+}
 
 /** Penyumbang relatif dari detail_perhitungan.komoditas_detail (audit-friendly, bukan narasi AI). */
 function penyumbangFromDetail(detail) {
@@ -226,37 +233,23 @@ export async function adminAmendHargaPangan(req, res) {
 // === STATUS CPPD (CADANGAN PANGAN PEMERINTAH DAERAH) ===
 export async function getCppdStatus(req, res) {
   try {
-    const cppdData = {
-      status_keseluruhan: 'aman',
-      update_terakhir: new Date().toISOString(),
-      stok_cadangan: [
+    const rows = await BdsCpd.findAll({
+      include: [
         {
-          komoditas: 'Beras',
-          stok_ton: 245.5,
-          target_ton: 300.0,
-          persen_tercapai: 81.8,
-          lokasi_gudang: 'Gudang Badan Pangan Ternate',
-          status: 'aman'
+          model: Komoditas,
+          as: "komoditas",
+          attributes: ["id", "nama", "kode", "satuan"],
+          required: false,
         },
-        {
-          komoditas: 'Jagung',
-          stok_ton: 12.3,
-          target_ton: 50.0,
-          persen_tercapai: 24.6,
-          lokasi_gudang: 'Gudang Badan Pangan Sofifi',
-          status: 'kritis'
-        },
-        {
-          komoditas: 'Kedelai',
-          stok_ton: 8.7,
-          target_ton: 20.0,
-          persen_tercapai: 43.5,
-          lokasi_gudang: 'Gudang Badan Pangan Ternate',
-          status: 'waspada'
-        }
       ],
-      catatan: 'Data CPPD berdasarkan laporan gudang periode terakhir'
-    };
+      order: [
+        ["periode", "DESC"],
+        ["updated_at", "DESC"],
+        ["created_at", "DESC"],
+      ],
+    }).catch(() => []);
+
+    const cppdData = buildCppdStatusSummary(rows);
 
     res.json({ data: cppdData });
   } catch (err) {

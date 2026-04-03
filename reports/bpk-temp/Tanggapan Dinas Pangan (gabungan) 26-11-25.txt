@@ -1,0 +1,715 @@
+              PEMERINTAH PROVINSI MALUKU UTARA
+
+                                  D I N A S PANGAN
+
+                          JL.Raya Sultan Nuku, Sofifi Kec. Oba Selatan, Kota Tidore Kepulauan
+
+                                          SOFIFI
+
+Sehubungan dengan adanya Surat dari Tim BPK Perwakilan Provinsi Maluku Utara
+Nomor 49.b/Terinci.ProvMalut/11/2025, Perihal Pembahasan dan Permintaan
+Tanggapan Konsep Temuan Pemeriksaan Dinas Pangan, maka setelah dilakukan
+pembahasan dengan bidang terkait, bersama ini perkenan kami sampaikan
+tanggapan sebagai berikut :
+
+1.2.1 Penerapan Sistem Informasi Pangan oleh Pemerintah Daerah Belum
+         Memadai
+
+Menindaklanjuti konsep hasil pemeriksaan mengenai Penerapan Sistem Informasi
+Pangan oleh Pemerintah Daerah Belum Memadai, bersama ini perkenan kami
+menyampaikan tanggapan sebagai berikut :
+
+a. Pemerintah Daerah Belum Memaksimalkan Penggunaan Aplikasi dalam
+   SiPangan untuk Menyediakan Data dan Informasi Pangan.
+
+   Terkait point a ini, dapat kami sampaikan bahwa output dari Panel Harga, FSVA,
+   Neraca Pangan, dan NBM telah menjadi data referensi dan data dukung
+   penyusunan/perumusan kebijakan RPJMD dan Renstra Dinas Pangan, hal ini
+   dapat dilihat dari dokumen Renstra Dinas Pangan Provinsi Maluku Utara 2020-
+   2024 yang memuat indikator kinerja antara lain :
+
+   - Kabupaten/kota tersedia infrastruktur Pencadangan Pangan (Output Neraca
+       Pangan);
+
+   - Rasio Ketersediaan Pangan Daerah (Output Neraca Pangan);
+   - Persentase Kecamatan Rawan Pangan (Output FSVA);
+   - Ketersediaan Energi Perkapita, Ketersediaan Protein Perkapita (Output NBM);
+   - Cakupan Pengawasan Keamanan Pangan (Output SIPSAT)
+   - Data Harga Pangan (Output Panel Harga)
+
+    � Aplikasi Simonstok dilakukan pada tahun 2022 di Kota Ternate dan tidak
+         berlanjut pada tahun berikutnya karena Badan Pangan Nasional tidak
+         menunjuk Provinsi Maluku Utara untuk melakukan penginputan data
+         Simonstok, tetapi Kota Ternate yang ditunjuk sebagai kota pusat distribusi
+         terbesar di Maluku Utara.
+
+   Aplikasi berbasis web "Kedai Panganmu" yang dikembangkan Dinas Pangan
+   Provinsi Maluku Utara terintegrasi dengan SiPangan dan belum mencakup seluruh
+   aplikasi yang tersedia dalam SiPangan, kerana pada saat aplikasi web "Kedai
+   Panganmu" dibuat pada tahun 2024, sesuai berita acara kesepakatan integrasi
+   data dengan Pusdatin Badan Pangan Nasional, aplikasi yang siap dan
+   memungkinkan diintegrasikan pada saat itu adalah Panel Harga, FSVA dan
+   SINBM, sehingga baru 3 (tiga) aplikasi itu yang dintegrasikan.
+    Sebagai Tindak lanjut :
+
+    1. Dinas Pangan Provinsi Maluku Utara, kedepan akan mengembangkan aplikasi
+         berbasis web "Kedai Panganmu" untuk dintegrasikan dengan semua aplikasi
+         yang sudah tersedia dalam SiPangan pada Pusdatin Badan Pangan Nasional;
+
+    2. Melakukan pemeliharaan dan pemutakhiran data pada Web Kedai Panganmu
+         termasuk peningkatan kapasitas SDM pengelola data, pengembangan
+         backend, dan perbaikan alur integrasi API;
+
+    3. Mengoptimalkan keberlanjutan pemanfaatan data SiPangan dalam dokumen
+         perencanaan daerah dan dokumen perencanaan dinas.
+
+b. Pemerintah Daerah Belum Sepenuhnya Dapat Menyediakan Data dan
+   Informasi yang Dibutuhkan dalam SiPangan
+
+   Terkait point b ini, dapat kami sampaikan bahwa tidak dapat dipungkiri ada sedikit
+   kekeliruan input data panel harga ke SKPG, dan kendala tidak tersedia data
+   pendukung untuk pangan keluar, terutama data yang harus diperoleh dari instansi
+   terkait.
+
+   Sebagai tindak lanjut, Dinas Pangan akan:
+
+    1. Melakukan verifikasi ulang serta peningkatan pengawasan terhadap proses
+         input data oleh petugas untuk memastikan konsistensi data di seluruh aplikasi.
+
+    2. Mengoptimalkan pengumpulan data "Pangan Keluar" dari OPD terkait,
+         BUMN/BUMD pangan, pelaku usaha pangan, dan/atau asosiasi pangan,
+         sesuai ketentuan teknis terbaru;
+
+    3. Dinas Pangan Provinsi Maluku Utara akan mengoptimalkan verifikasi dan
+         validasi data yang lebih cermat dan akurat untuk SiPangan.
+
+    Komitmen Perbaikan ke Depan
+
+    Dinas Pangan berkomitmen untuk:
+
+    � Mengoptimalkan pemanfaatan seluruh aplikasi dalam SiPangan untuk
+         mendukung perencanaan berbasis data;
+
+    � Meningkatkan integrasi penuh antara aplikasi Kedai Panganmu dan SiPangan
+         nasional.
+
+    � Menguatkan kompetensi SDM dalam pengelolaan data, analisis, dan
+         pemutakhiran informasi.
+
+    � Meningkatkan kolaborasi lintas perangkat daerah/instansi untuk pemenuhan
+         data pangan secara menyeluruh.
+
+Dengan langkah-langkah perbaikan ini, kami berharap kualitas sistem informasi
+pangan daerah semakin baik dan mampu mendukung perumusan kebijakan pangan
+yang efektif, tepat sasaran, dan berkelanjutan.
+  1.2.2. Penyusunan dan Pemanfaatan Neraca Pangan Pemerintah Provinsi
+            Maluku Utara Belum Sepenuhnya Didukung Data yang Valid
+
+Menindaklanjuti konsep hasil pemeriksaan mengenai Penyusunan dan Pemanfaatan
+Neraca Pangan Pemerintah Provinsi Maluku Utara Belum Sepenuhnya Didukung data
+yang Valid, bersama ini perkenan kami menyampaikan tanggapan sebagai berikut :
+
+a. Data Ketersediaan Pangan dalam Proyeksi Neraca Pangan Provinsi Maluku
+   Utara Belum Sepenuhnya Didukung Data yang Valid dan Lengkap
+
+  Terkait point a di atas, dapat kami sampaikan tanggapan sebagai berikut :
+
+    1) Data Stok Awal
+
+         Tim penyusun Neraca Pangan telah bekerja secara sungguh-sungguh untuk
+         mendapatkan hasil penyusunan yang terbaik dan handal. Namun masih
+         terdapat perbedaan/kekeliruan, seperti Perbedaan stok awal tahun 2023 pada
+         komoditas beras sebesar 455 ton yang adalah merupakan koreksi dari data
+         cadangan beras Perum Bulog yang baru diterima pada bulan Maret 2023.
+
+         Kemudian adanya format neraca yang belum otomatis mengintegrasikan stok
+         akhir ke stok awal sehingga ada selisih pada komoditas beras, jagung, dan
+         kedelai di tahun berikutnya.
+
+     Sebagai tindak lanjut:
+
+    1. Kami sedang melakukan penataan ulang perhitungan stok awal.
+
+    2. Kami akan menyusun kertas kerja stok awal yang terdokumentasi dengan baik
+         sesuai standar petunjuk teknis Bapanas.
+
+    2) Data Produksi
+
+         Perbedaan data produksi beras, jagung dan kedelai pada tahun 2024 s.d 2025,
+         disebabkan perubahan data proyeksi dan data realiasi KSA-BPS melalui
+         Bapanas, dan Dinas Pangan mencatat data produksi pada saat diumumkan
+         informasi data produksi KSA-BPS realisasi bulan berjalan.
+
+      Tindak lanjut yang akan dilakukan:
+
+    1. Menyelaraskan data ralisasi KSA-BPS dan data pada format awal neraca
+         pangan.
+
+    2. Menggunakan data KSA-BPS dari Bappanas secara konsisten.
+
+    3. Meningkatkan pemahaman teknis petugas.
+    3) Data Pangan Masuk dan Keluar
+
+         Proyeksi data pangan masuk beras dan kedelai untuk neraca pangan tahun
+         2024 dan 2025 menggunakan estimasi data barang masuk tahun sebelumnya
+         ditambah 10%. Untuk data pangan masuk beras realisasi neraca pada tahun
+         2024 dan 2025 diperoleh dari laporan barang masuk yang dikirimkan 9
+         kabupaten/kota kecuali Kota Ternate, serta data pemantauan barang masuk
+         yang dilakukan oleh staf Bidang Ketersediaan dan Kerawanan Pangan di Kota
+         Ternate. Untuk data pangan keluar terkendala data yang harus diperoleh dari
+         instansi terkait.
+
+      Sebagai langkah perbaikan:
+
+    1. Dinas Pangan akan mengoptimalkan koordinasi dengan OPD terkait
+         (perhubungan, perdagangan, karantina, Jasa Pengurusan Transportasi (JPT),
+         Bulog serta Pelaku Usaha Pangan) untuk memperoleh data barang masuk dan
+         keluar secara periodik.
+
+    2. Kami akan menggunakan metode alternatif sesuai juknis (rata-rata dua tahun
+         terakhir) jika data riil tidak tersedia.
+
+    3. Sistem pelaporan dari kabupaten/kota akan dikoordinasikan agar data pangan
+         masuk dapat dihimpun secara lebih konsisten.
+
+b. Pemerintah Daerah Belum Memanfaatkan Proyeksi Neraca Pangan sebagai
+   Pertimbangan Pengambilan Kebijakan
+
+   Terkait point b di atas, dapat kami sampaikan bahwa Pemerintah Daerah, telah
+   menjadikan data Proyeksi Neraca Pangan Provinsi Maluku Utara sebagai
+   pertimbangan dalam Pengambilan Kebijakan, Perumusan Program/Kegiatan. Hal
+   ini dapat dibuktikan dengan telah dirumuskan output Neraca Pangan sebagai
+   indikator kinerja pada RPJMD, Renstra Dinas Pangan 2020-2024 dan Periode
+   2025-2029. Kemudian Pelaksanaan Rapat Koordinasi Perencanaan Program
+   Kegiatan yang dilaksanakan Dinas Pangan Provinsi Maluku Utara setiap tahun dan
+   Musrenbang Pertanian yang dilaksanakan Dinas Pertanian Provinsi Maluku Utara
+   setiap tahun, data Proyeksi Neraca Pangan Provinsi Maluku Utara tetap menjadi
+   data yang diminta untuk dipaparkan Kepala Dinas Pangan Provinsi Maluku Utara
+   pada forum Rakor Perencanaan dan Musrenbangtan tersebut. Termasuk Rapat
+   Koordinasi Ketahanan Pangan Provinsi Maluku Utara yang dilaksanakan Dinas
+   Pangan pada tanggal 20 Agustus 2025 yang menghadirkan juga narasumber
+   Kepala Badan Pangan Nasional RI dan Kepala Badan Gizi Nasional RI.
+
+   Bukti lainnya, sesuai data Neraca Pangan, Ketersediaan Pangan Maluku Utara
+   masih minim diproduksi sendiri di Maluku Utara atau sebagian besar didatangkan
+   dari luar Maluku Utara, sehingga berdasarkan data Neraca Pangan tersebut, maka
+   Pemerintah Provinsi Maluku Utara mendorong peningkatan alokasi anggaran pada
+   APBD untuk program/kegiatan peningkatan produksi komoditi pangan pada Dinas
+   terkait, terutama Dinas Pertanian.
+   Sebagai Tindak lanjut :
+
+    - Dinas Pangan Provinsi Maluku Utara, akan mengoptimalkan koordinasi dan
+         integrasi data lintas sektor;
+
+    - Kepala Dinas Pangan Provinsi Maluku Utara akan mengoptimalkan
+         pengawasan penyusunan proyeksi neraca pangan;
+
+    - Dinas Pangan Provinsi Maluku Utara, akan terus mengoptimalkan
+         pemanfaatan proyeksi dan realisasi Neraca Pangan untuk
+         perumusan/pengambilan kebijakan;
+
+    - Kepala Dinas Pangan Provinsi Maluku Utara akan mendorong/memerintahkan
+         Kepala Bidang Terkait/Tim Terkait untuk optimal memahami ketentuan
+         petunjuk teknis penyusunan neraca pangan.
+
+Komitmen Peningkatan ke Depan
+
+Dinas Pangan berkomitmen untuk:
+
+    � Meningkatkan koordinasi lintas sektor guna memastikan kelengkapan dan
+         validitas data pangan;
+
+    � Meningkatkan kapasitas SDM dalam penyusunan Neraca Pangan sesuai
+         juknis terbaru;
+
+    � Menoptimalkan hasil proyeksi dan realisasi Neraca Pangan dimanfaatkan
+         sebagai dasar dalam menetapkan kebijakan;
+
+    � Menyempurnakan mekanisme dokumentasi data agar lebih tertib, akuntabel,
+         dan dapat dipertanggungjawabkan.
+
+Dengan pelaksanaan langkah-langkah tersebut, kami optimis bahwa penyusunan dan
+pemanfaatan Neraca Pangan di Provinsi Maluku Utara ke depan akan lebih akurat,
+andal dan relevan sebagai dasar penyusunan kebijakan pangan.
+
+1.2.14. Penyelanggaran Cadangan Pangan Pemerintah Daerah Provinsi Maluku
+          Utara Belum Memadai
+
+Menindaklanjuti konsep hasil pemeriksaan mengenai Penyelenggaran Cadangan
+Pangan Pemerintah Daerah Provinsi Maluku Utara Belum Memadai, bersama ini
+perkenan kami menyampaikan tanggapan sebagai berikut :
+
+a. Perhitungan Cadangan Beras Pemerintah Provinsi Maluku Utara Belum
+    Ditetapkan dalam Peraturan Gubernur
+
+   Terkait point a ini, dapat kami sampaikan bahwa Cadangan Pangan Pemerintah
+   Daerah (CPPD) Provinsi Maluku Utara telah ditetapkan dan diatur dalam regulasi
+   atau telah ada kepastian hukum, yaitu :
+
+    - Peraturan Daerah Provinsi Maluku Utara Nomor 4 Tahun 2023 tentang
+         Cadangan Pangan Pemerintah Daerah;
+
+    - Paraturan Gubenur Maluku Utara Nomor 10.1 Tahun 2025 tentang Peraturan
+         Pelaksanaan Peraturan Daerah Provinsi Maluku Utara Nomor 4 Tahun 2023
+         Tentang Cadangan Pangan Pemerintah Daerah, dan
+
+    - Surat Keputusan Gubernur Maluku Utara Nomor 346/KPTS/MU/2025 tentang
+         Penetapan Jenis dan Jumlah Cadangan Pangan Pemerintah Daerah.
+         Perhitungan Cadangan Beras Pemerintah Daerah telah disiyaratkan dalam
+         Peraturan Gubernur Maluku Utara Nomor 10.1 Tahun 2025 tentang Peraturan
+         Pelaksanaan Peraturan Daerah Provinsi Maluku Utara Nomor 4 Tahun 2023
+         Tentang Cadangan Pangan Pemerintah Daerah;
+
+   Dengan demikian, Perhitungan Cadangan Beras Pemerintah Provinsi Maluku Utara
+   telah ada regulasinya yang ditetapkan dalam Peraturan Gubenur Maluku Utara
+   Nomor 10.1 Tahun 2025, yaitu pada Pasal 4 ayat (1) mengatur "Perencanaan
+   kebutuhan dan jumlah CPPD Provinsi berupa pangan pokok dari jenis beras
+   berdasarkan perhitungan sesuai peraturan perundang-undangan". Dalam hal ini
+   sesuai dengan Peraturan Kepala Badan Pangan Nasional. Kemudian Pada ayat (6)
+   Jumlah CPPD Provinsi berupa pangan pokok dari jenis beras sebagaimana
+   dimaksud pada ayat (1) ditetapkan dengan Keputusan Gubernur.
+
+   Sehingga untuk Penatapan jumlah dan jenis CPPD ditetapkan dengan Keputusan
+   Gubernur Maluku Utara Nomor 346/KPTS/MU/2025.
+
+   Tindak lanjut yang dilakukan dan direncanakan:
+
+    � Hasil perhitungan CPPD akan ditetapkan lebih lanjut dengan Surat Keputusan;
+
+    � Perencanaan kebutuhan dan jumlah CBPP mengacu pada perhitungan teknis
+         Badan Pangan Nasional, hal ini sesuai dengan isyarat Paraturan Gubernur
+         Maluku Utara Nomor 10.1 Tahun 2025 pada Pasal 4 ayat (1);
+
+    � Peningkatan koordinasi dengan Bapanas akan dilakukan untuk memastikan
+         keselarasan data perhitungan, prevalensi kerawanan pangan, IRBI serta
+         dinamika produksi pangan daerah.
+
+b. Pengadaan CPPD Belum Memenuhi Cadangan Minimum
+
+  Terkait point b ini, dapat kami sampaikan pengadaan CPPD Provinsi Maluku Utara
+   disesuaikan dengan alokasi anggaran yang tersedia pada APBD Provinsi. Hal ini
+   sesuai dengan Peraturan Gubenur Maluku Utara Nomor 10.1 Tahun 2025 pada
+   Pasal 4 ayat (2) yang mengamanatkan: "Jumlah penyediaan/pengadaan beras
+   yang dijadikan sebagai CPPD provinsi disesuikan dengan alokasi anggaran yang
+   tersedia dalam APBD Provinsi."
+
+   Keterbatasan anggaran menjadi faktor utama belum tercapainya target minimal.
+   Meskipun demikian, Pemerintah Provinsi Maluku Utara telah mengalokasikan
+   anggaran pengadaan CPPD pada tahun 2024 dan 2025 sebagai bentuk keseriusan
+   pemenuhan kebutuhan cadangan pangan.
+
+   Untuk pangadaan beras CPPD Tahun 2025, pengadaan tahap I sebesar 12,75 Ton,
+   dan pada APBD Perubahan Tahun 2025 akan dilakukan pengadaan Tahap II
+   sebesar 12,75 Ton sehingga total akan menjadi 25,5 Ton sampai akhir tahun 2025.
+   Untuk alokasi anggaran tahap III dan IV masuk dalam skema
+   efisiensi/pemangkasan pada Perubahan APBD Tahun 2025.
+   Tindak lanjut yang telah dilakukan dan akan diperkuat:
+
+    � Kepala Dinas Pangan Provinsi Maluku Utara, kedepan akan memprioritaskan
+         peningkatan anggaran pengadaan CPPD pada APBD Provinsi tahun
+         berkenan dan APBD tahun berikutnya.
+
+    � Melakukan penyediaan CPPD secara bertahap dalam setiap tahun anggaran
+         agar CPPD tetap tersedia dan terjaga kualitasnya.
+
+c. Mekanisme Penyaluran Cadangan Pangan Pemerintah Daerah Provinsi
+   Maluku Utara Belum Diatur Dalam Peraturan Gubernur.
+
+   Terkait point c ini, dapat kami sampaikan bahwa Mekanisme Penyaluran
+   Cadangan Pangan Pemerintah Daerah Provinsi Maluku Utara telah diatur dan
+   ditetapkan dalam Peraturan Gubernur Maluku Utara Nomor 10.1 Tahun 2025
+   tentang Peraturan Pelaksanaan Peraturan Daerah Provinsi Maluku Utara Nomor 4
+   Tahun 2023 Tentang Cadangan Pangan Pemerintah Daerah, khususnya pada BAB
+   V PENYALURAN CADANGAN PANGAN PEMRINTAH DAERAH, Pasal 10 sampai
+   Pasal 19.
+
+   Kepala Dinas Pangan Provinsi Maluku Utara, telah menginisiasi dan telah
+   menyiapkan mekanisme penyaluran CPPD untuk Penanggulangan
+   Bencana/Keadaan Darurat dalam bentuk Keputusan Kepala Dinas Pangan Provinsi
+   Maluku Utara yaitu Petunjuk Teknis Nomor : 14.a/KPTSDISPANGAN/2025
+   tentang Petunjuk Teknis Pelaksanaan Penyaluran Cadangan Pangan Pemerintah
+   Daerah Untuk Menanggulangi Bencana Dan/Atau Keadaan Darurat.
+
+   CPPD Provinsi Maluku Utara belum dilakukan penyaluran untuk rawan pangan
+   karena pada APBD Tahun 2025 telah ada alokasi anggaran tersendiri untuk
+   Bantuan Pangan Intervensi Kerawanan Pangan dan Gizi.
+
+   Kemudian CPPD Provinsi Maluku Utara juga belum disalurkan untuk stabilisasi
+   harga/gejolak harga atau pengendalian inflasi karena dalam APBD Tahun
+   Anggaran 2025 telah dialokasikan anggaran tersendiri untuk Stabiliasi Pasokan dan
+   Harga Pangan melalui Gerakan Pangan Murah yang untuk Tahun 2025 ini sejak
+   bulan Januari sampai 23 November 2025, Pemerintah Provinsi Maluku Utara
+   (Dinas Pangan) telah melaksanakan Gerakan Pangan Murah sebanyak 15
+   titik/lokasi yang tersebar di kabupaten/kota.
+
+   Selain itu, dalam rangka stabilisasi harga dan penguatan daya beli masyarakat
+   Pemerintah Pusat juga telah menyalurkan Bantuan CPP Beras melalui BULOG
+   kepada masyarakat penerima manfaat.
+
+   Kepala Dinas Pangan telah memerintahkan Kepala Bidang Distribusi dan
+   Cadangan Pangan untuk Menyusun Juknis yang belum di susun, tetapi karena
+   keterbatasan SDM di Bidang Distribusi sehingga belum selesai disusun dan masih
+   dalam proses.
+
+   Respon Pemerintah Provinsi Maluku Utara terhadap kejadian bencana tetap sesuai
+   mekanisme penyaluran CPPD, yaitu bila ada penetapan status bencana dan
+   permohonan dari Bupati/Walikota memohon bantuan peyaluran CPPD Provinsi
+   yang ditujukan kepada Gubernur, maka saat itu juga akan direspon Pemerintah
+   Provinsi untuk menyalurkan CPPD.
+
+    Sebagai Tindak Lanjut :
+
+    - Dinas Pangan Provinsi Maluku Utara kedepan akan mengoptimalkan intervensi
+         pasar atau penanggulangan kondisi rawan pangan, mengoptimalkan stabilisasi
+         pasokan dan harga pangan;
+
+    - Kepala Dinas Pangan Provinsi Maluku Utara kedepan akan terus menginisiasi
+         penyusunan Petunjuk Teknis mekanisme penyaluran CPPD selain
+         Bancana/Keadaan Darurat, dengan akan terus memerintahkan Kepala Bidang
+         Distribusi dan Cadangan Pangan/Kepala Bidang terkait untuk menyelesaikan
+         Juknis yang belum selesai di susun.
+
+     Komitmen Perbaikan
+
+     Sebagai tindak lanjut, Dinas Pangan Provinsi Maluku Utara berkomitmen untuk:
+
+    1. Memperkuat pengelolaan CPPD agar seluruh tahapan (pengadaan,
+         pengelolaan, penyaluran) sejalan dengan ketentuan PP 17/2015, Peraturan
+         Bapanas Nomor 15 Tahun 2023, dan Perda Provinsi Nomor 4 Tahun 2023,
+         serta Pergub Nomor 10.1 Tahun 2025.
+
+    2. Melakukan penyaluran CPPD, dengan memperhatikan dan memenuhi aspek
+         fungsi penyaluran CPPD selain keadaan darurat/bencana, tetapi juga untuk
+         mengintervensi terhadap gejolak harga pangan/pengendalian inflasi, rawan
+         pangan, stunting dan fungsi lainnya.
+
+1.2.15 Pemerintah Provinsi Maluku Utara Belum Sepenuhnya Menetapkan
+          Regulasi dan Melakukan Pengawasan atas Pelaksanaan Stabilisasi
+          Pasokan dan Harga Pangan
+
+Menindaklanjuti konsep hasil pemeriksaan mengenai Pemerintah Provinsi Maluku
+Utara Belum Sepenuhnya Menetapkan Regulasi dan Melakukan Pengawasan atas
+Pelaksanaan Stabilisasi Pasokan dan Harga Pangan, bersama ini perkenaan kami
+menyampaikan tanggapan sebagai berikut :
+
+a. Mekanisme Penyaluran CPPD untuk SPHP Berdasarkan Terjadinya Gejolak
+     Harga Pangan Belum Diatur
+
+    Terkait point a ini, dapat kami sampaikan bahwa Mekanisme Penyaluran
+     Cadangan Pangan Pemerintah Daerah (CPPD) Provinsi Maluku Utara untuk
+     SPHP telah diatur dalam Peraturan Gubernur Maluku Utara Nomor 10.1 Tahun
+     2025 tentang Peraturan Pelaksanaan Peraturan Daerah Provinsi Maluku Utara
+     Nomor 4 Tahun 2023 Tentang Cadangan Pangan Pemerintah Daerah, khususnya
+     pada BAB V PENYALURAN CADANGAN PANGAN PEMRINTAH DAERAH,
+     Pasal 10 sampai Pasal 19.
+
+  Mekanisme pelaporan gejolak harga pangan dilakukan melalui rapat koordinasi
+  penyediaan data dan informasi harga pangan yang dilaksanakan setiap tahun oleh
+  Dinas Pangan melalui Bidang Distribusi dan Cadangan Pangan yang menghadirkan
+  seluruh Enumerator harga pangan kabupaten/kota dan pejabat struktural Dinas
+  Pangan Kabupaten/Kota. Pelaporan juga dilakukan oleh Enumerator yang mencatat
+  harga pangan setiap hari dan melaporkan melalui inputan data pada aplikasi Panel
+  Harga Pusdatin Bapanas yang terintegrasi dengan web Dinas Pangan (Web Kedai
+  Panganmu). Selain itu, pelaporan juga dilakukan melalui rapat Tim Pengendalian
+  Inflasi Daerah (TPID) Provinsi Maluku Utara.
+
+  Tindak lanjut yang akan dilakukan:
+
+    1. Kepala Dinas Pangan akan menginstruksikan Kepala Bidang Distribusi dan
+         Cadangan Pangan untuk menyusun Petunjuk Teknis Penyaluran CPPD
+         untuk SPHP;
+
+    2. Mengoptimalkan mekanisme pelaporan gejolak harga pangan, baik melalui
+         rapat koordinasi dan pelaporan tertulis maupun pelaporan oleh enumerator
+         harga pangan melalui penginputan data harga pangan di aplikasi Panel Harga.
+
+b. Pemantauan dan Evaluasi Kegiatan SPHP oleh Pemerintah Daerah Belum
+     Optimal
+
+     Terkait point b ini, dapat kami sampaikan bahwa Keputusan Kepala Badan
+     Pangan Nasional Republik Indonesia Nomor :
+
+    - Nomor 09/KS.04.03/K/1/2023 tentang Tim Pemantauan dan Evaluasi
+         Pelaksanaan Stabilisasi Pasokan dan Harga Pangan Beras di Tingkat
+         Konsumen Tahun 2023;
+
+    - Nomor 13 Tahu 2024 tentang Tim Pemantauan dan Evaluasi Pelaksanaan
+         Stabilisasi Pasokan dan Harga Pangan Beras di Tingkat Konsumen Tahun
+         2024
+
+    - Nomor 1.5 Tahun 2025 tentang Tim Pemantauan dan Evaluasi Pelaksanaan
+         Stabilisasi Pasokan dan Harga Pangan Beras di Tingkat Konsumen Tahun
+         2025
+
+     Keputusan Kepala Badan Pangan Nasional tersebut pada Diktum "KETIGA"
+     menegaskan bahwa: "Dalam Melaksanakan Tugas, Ketua Pelaksana
+     bertanggungjawab dan menyampaikan laporan kepada Ketua Pengarah",
+
+     Dengan demikian sesuai Keputusan Kepala Badan Pangan Nasional Republik
+     Indonesia tersebut, yang menyampaikan Laporan monitoring dan evaluasi
+     pelaksanaan SPHP kepada Ketua Pangarah (Kepala Badan Pangan Nasional)
+     adalah Ketua Pelaksana (Deputi Bidang Ketersediaan dan Stabilisasi Pangan,
+     Badan Pangan Nasional), jadi bukan Kepala Dinas Pangan/Kepala Dinas yang
+     menyelenggarakan Urusan Pemerintahan Bidang Pangan Provinsi dan
+     Kabupaten/Kota yang hanya sebagai anggota tim.
+
+     Ketua Pelaksana (Deputi Bidang Ketersediaan dan Stabilisasi Pangan, Badan
+     Pangan Nasional) dalam upayanya untuk mendapatkan informasi terkait
+     pelaksanaan kegiatan Stabilisasi Pasokan dan Harga Pangan (SPHP) di masing-
+     masing daerah, maka dilaksanakan rapat baik secara hybrid maupun daring.
+     Kepala Dinas Provinsi Maluku Utara juga selalu mengikuti rapat tim dan
+     menyampaikan laporan terkait pelaksanaan SPHP di Maluku Utara. Laporan
+     pelaksanaan SPHP di Provinsi Maluku berupa pemantauan harga di
+ pasar/distributor/agen/ritel modern dan pedagang/pengecer maupun melalui
+ Gerakan Pangan Murah. Staf teknis di Bidang Distribusi dan Cadangan Pangan,
+ selalu menyiapkan laporan dan disampaikan secara tertulis ke Ketua Pelaksana
+ pada Badan Pangan Nasonal.
+
+ Pedoman penyaluran CPPD Provinsi Maluku Utara untuk kegiatan SPHP atas
+ terjadinya gejolak harga telah disusun dan diatur dalam Peraturan Gubernur
+ Maluku Utara Nomor 10.1 Tahun 2025 tentang Peraturan Pelaksanaan
+ Peraturan Daerah Provinsi Maluku Utara Nomor 4 Tahun 2023 Tentang
+ Cadangan Pangan Pemerintah Daerah, khususnya pada BAB V PENYALURAN
+ CADANGAN PANGAN PEMRINTAH DAERAH, Pasal 10 sampai Pasal 19.
+
+ Kepala Dinas Pangan Provinsi Maluku Utara memerintahkan/menugaskan
+ Kepala Bidang Distribusi dan Cadangan Pangan beserta staf teknisnya selalu
+ Menyusun/merekap pelaksanaan SPHP di Provinsi Maluku Utara dan
+ menyampaikan laporan yang juga diteruskan ke Badan Pangan Nasional dan juga
+ Kemendagri.
+
+ Kepala Dinas Pangan Provinsi Maluku Utara/Dinas Pangan telah melaksanakan
+ Pemantauan dan Evaluasi Kegiatan SPHP sesuai ketentuan yang berlaku, tetapi
+ belum optimal.
+
+Sebagai Tindak Lanjut :
+
+1. Kepala Dinas Pangan Provinsi Maluku Utara, akan mengoptimalkan
+    pelaksanaan pemantauan dan evaluasi kegiatan SPHP sesuai ketentuan yang
+    berlaku;
+
+2. Dinas Pangan Provinsi Maluku Utara menyampaikan laporan resmi
+    pelaksanaan SPHP di Provinsi Maluku Utara kepada Ketua Pelaksana pada
+    Bapanas sesuai ketentuan Pasal 14 Peraturan Bapanas Nomor 15 Tahun
+    2022;
+
+3. Memperkuat fungsi Tim Pemantauan Pasokan dan Harga Pangan agar dapat
+    menghasilkan analisis gejolak harga dan rekomendasi penanganan yang lebih
+    komprehensif.
+
+ Komitmen Kedepan :
+
+1. Kepala Dinas Pangan akan meningkatkan kualitas pemantauan harga pangan
+    dan pelaporan.
+
+2. Mengoptimalkan koordinasi dengan Bapanas, TPID, dan instansi terkait
+    lainnya dalam penanganan gejolak harga pangan.
+1.2.18. Pemerintah Provinsi Maluku Utara Belum Sepenuhnya Memetakan Pola
+          Distribusi Barang Kebutuhan Pokok
+
+Menindaklanjuti konsep hasil pemeriksaan mengenai belum sepenuhnya memetakan
+pola distribusi barang kebutuhan pokok, bersama ini perkenan kami menyampaikan
+tanggapan sebagai berikut :
+
+a. Dinas Pangan Belum Mengkaji Pengaturan Arus Distribusi Pangan
+
+    Terkait point a ini, dapat kami sampaikan bahwa Dinas Pangan Provinsi Maluku
+    Utara pada Tahun 2019 menyampaikan usulan Rancangan Peraturan Daerah
+    (Perda) yang didalamnya juga mengatur tentang mobilisasi pangan dan arus/alur
+    distribusi, akan tetapi Rancangan Perda tersebut belum berlanjut sampai pada
+    pembahasan dengan DPRD. Dinas pangan juga melakukan identifikasi dan
+    update data terkait pasokan pangan.
+
+    Untuk mendukung ketersedian pasokan pangan, mandukung distribusi pangan,
+    dan sebagai penyeimbang pasar, Dinas Pangan telah membentuk Superkedai
+    Pangan (Kios Pangan) di Sofifi.
+
+    Dokumen perencanaan pangan seperti Neraca Pangan, Peta Ketahanan dan
+    Kerentanan Pangan, NBM, SKPG, serta Analisis PPH belum dimanfaatkan secara
+    komprehensif untuk menyusun kajian pengaturan arus distribusi pangan, termasuk
+    pergerakan pasokan antar wilayah. Kondisi ini terjadi karena transisi adanya
+    perubahan penanggung jawab bidang distribusi dari Bidang Distribusi dan
+    Cadangan Pangan ke Bidang Ketersediaan dan Kerawanan Pangan dan tidak ada
+    alokasi anggaran pada APBD untuk pelaksanaan kajian secara ilmiah
+    bekerjasama dengan tim ahli/akademisi sehingga proses kajian belum terlaksana.
+
+     Sebagai tindak lanjut, Dinas Pangan akan:
+
+    1. Mengusulkan/mengoptimalkan alokasi anggaran pada APBD untuk kajian
+         secara ilmiyah pengaturan arus distribusi pangan berbasis data dari seluruh
+         dokumen perencanaan pangan;
+
+    2. Mengoptimalkan koordinasi lintas bidang untuk penegasan tugas dan
+         percepatan penyusunan kajian;
+
+    3. Mengintegrasikan hasil kajian dengan dokumen perencanaan dan kebijakan
+         distribusi pangan daerah.
+
+b. Dinas Pangan Belum Mengkaji Pengaturan Distribusi Pangan dan/atau
+    Mobilisasi Cadangan Pangan dari Wilayah Surplus ke Wilayah Rentan Rawan
+    Pangan
+
+    Terkait point b ini, dapat kami sampaikan bahwa mekanisme Penyaluran
+    Cadangan Pangan telah dimasukkan dalam Perda Nomor 4 Tahun 2023 dan
+    Pergub Nomor 10.1 Tahun 2025.
+
+    Cadangan Pangan Pemerintah Daerah Provinsi Maluku Utara dan
+    Kabupaten/Kota masih pada jenis komoditi beras dan penyediaan beras
+    bekerjsama dengan BULOG yang mendatangkan beras dari luar Maluku Utara
+    karena Maluku Utara belum surplus beras (belum swasembada beras) sehingga
+    belum dilakukan kajian khusus tentang mobilisasi Cadangan Pangan dari Wilayah
+    surplus ke Wilayah Rentan Rawan Pangan.
+
+    Saat ini Intervensi yang dilakukan Dinas Pangan untuk daerah rentan rawan
+    pangan adalah pelaksanaan bantuan pangan intervensi kerawanan pangan dan
+    gizi serta pelaksanaan Stabilisasi Pasokan dan Harga Pangan melalui Gerakan
+    Pangan Murah yang bukan dari komoditi Cadangan Pangan Pemerintah Daerah.
+
+   Sebagai tindak lanjut, Dinas Pangan akan:
+
+    1. Menyusun kajian khusus terkait mobilisasi cadangan pangan dari wilayah
+         surplus ke wilayah rentan rawan pangan;
+
+    2. Mengoptimalkan data kerentanan wilayah sebagai dasar penyaluran cadangan
+         pangan.
+
+    3. Pengadaan cadangan pangan agar memperhatikan pola produksi dan potensi
+         wilayah surplus.
+
+c. Pemerintah Daerah Belum Optimal dalam Mengupayakan Kegiatan Fasilitasi
+    Distibusi Pangan
+
+    Terkait point c ini, dapat kami sampaikan bahwa Dinas Pangan Provinsi Maluku
+    Utara telah melakukan Fasilitasi Distribusi Pangan (FDP) pada tahun 2024 untuk
+    terbatas pada beberapa distributor/pedagang yang mendistribusikan komoditi
+    pangan dari Kota Ternate ke Kabupaten Halteng, Haltim, Halbar dan Kota Tidore
+    Kepulauan. Kemudian pada Tahun 2025 ada pagu anggaran Ro.100.000.000,-
+    (seratus juta rupiah) yang diperuntukkan untuk Fasilitasi Distribusi Pangan.
+    Keterabatasan anggaran mengakibatkan belum optimal melaksanakan Fasilitasi
+    Distribusi Pangan.
+
+    Untuk Fasilitasi Distribusi Pangan antar provinsi yang dapat difasilitasi Badan
+    Pangan Nasional, Dinas Pangan telah beberapa kali mensosialisasikan kepada
+    agen/distributor/asosiasi barito tetapi mereka belum berminat memanfaatkan
+    Fasilitasi Distribusi Pangan (subsidi angkutan) dari Badan Pangan Nasional
+    karena alasan prosedur birokratis dan cenderung tidak mau diintervensi
+    kesepakatan pengaturan harga penjualan.
+
+     Sebagai tindak lanjut, Dinas Pangan akan:
+
+    1. Mengoptimalkan fungsi Superkedai Pangan/Kios Pangan di Sofifi;
+
+    2. Menyusun skema baru fasilitasi distribusi pangan agar lebih menarik bagi
+         pelaku usaha pangan;
+
+    3. Mengajukan kembali usulan pendanaan fasilitasi distribusi pangan dalam
+         perencanaan APBD dan dana dekonsentrasi.
+
+     Komitmen Perbaikan ke Depan
+
+     Dinas Pangan berkomitmen untuk:
+
+     � Memperkuat koordinasi lintas sektor/instansi dan melibatkan tenaga
+          ahli/akademisi dalam pemetaan pola distribusi pangan;
+     � Meningkatkan kualitas data dan analisis distribusi pangan;
+
+1.2.19 Pemerintah Provinsi Maluku Utara Belum Sepenuhnya Memetakan dan
+          Mengupayakan Sarana dan Prasarana Distribusi Pangan
+
+Menindaklanjuti konsep hasil pemeriksaan mengenai belum sepenuhnya memetakan
+dan mengupayakan sarana dan prasarana distribusi pangan, bersama ini perkenan
+kami menyampaikan tanggapan sebagai berikut :
+
+b. Belum Seluruh Pemerintah Kabupaten/Kota memiliki Gudang Kebutuhan
+    Bahan Pokok dan/atau Gudang Cadangan Pangan
+
+    Terkait point a ini, dapat kami sampaikan bahwa Dinas Pangan Provinsi Maluku
+    Utara pada tahun 2023 telah memfasilitasi membangun Gudang Cadangan
+    Pangan dengan APBD Provinsi Maluku Utara di 6 kabupaten/Kota (Kab. Halsel,
+    Kepulauan Sula, Pulau Taliabu, Pulau Morotai, Kota Ternate dan Kota Tidore
+    Kepulauan) dan pada Tahun 2025 sementara dibangun gudang cadangan pangan
+    di Kabupaten Halmahera Barat.
+
+    Sebagai tindak lanjut, Dinas Pangan akan:
+
+    1. Mengupayakan memfasilitasi membangun Gudang Cadangan Pangan di
+         kabupaten yang belum dibangun;
+
+    2. Mengoptimalkan koordinasi dengan kabupaten/kota yang belum membangun
+         gudang kebutuhan bahan pokok agar dapat secara mandiri membangun
+         gudang kebutuhan pokok di kabupaten/kota setempat.
+
+    c. Ketersediaan Prasarana Transportasi dan Ketersediaan Angkutan Umum
+         Belum Sepenuhnya Memadai di Kabupaten/Kota
+
+         Terkait point b ini, merupakan tupoksi dari Dinas Perhubungan.
+
+     Sebagai tindak lanjut, Dinas Pangan akan:
+
+    1. Melakukan koordinasi dengan Dinas Perhubungan Provinsi Maluku Utara
+         untuk ketersediaan Prasarana Transportasi dan Ketersediaan Angkutan Umum
+         di Kabupaten/Kota.
+
+1.2.20 Pemerintah Provinsi Maluku Utara Belum Sepenuhnya memetakan dan
+          Mengupayakan Kebutuhan atas Lembaga Distribusi Pangan
+
+Menindaklanjuti konsep hasil pemeriksaan mengenai belum sepenuhnya memetakan
+dan mengupayakan kebutuhan atas Lembaga Distribusi Pangan, bersama ini
+perkenan kami menyampaikan tanggapan sebagai berikut :
+
+    - Lembaga Distribusi Pangan Masyarakat (LDPM) adalah Lembaga yang
+         dibentuk kelompok tani, seperti Kelompok Tani (Poktan), dan Gabungan
+         Kelompok Tani (Gapoktan). Di Maluku Utara telah dilakukan
+         pemetaan/identifikasi LDPM dan diketahui terdapat banyak kelompok tani dan
+         gabungan kelompok tani yang masih aktif dan menjadi binaan Dinas Pertanian.
+
+    - Lembaga disrtibusi pangan pemerintah di tingkat daerah adalah antara lain
+         Dinas/Badan/UPTD yang dibentuk untuk menyelenggarakan urusan pangan
+    (termasuk urusan distribusi pangan). Di Provinsi Maluku Utara telah dibentuk
+    Dinas Pangan (yang membawahi Bidang Distribusi dan Cadangan Pangan),
+    Dinas Pertanian, Dinas Perindustrian dan Perdagangan dan Dinas
+    Perhubungan yang ditetapkan dengan Peraturan Daerah Nomor 5 Tahun 2016
+    tentang Organisasi dan Tata Kerja SKPD Provinsi Maluku Utara. Untuk Dinas
+    Pangan ditetapkan juga dengan Peraturan Gubernur Maluku Utara nomor 56
+    Tahun 2021 tentang Uraian Tugas dan Fungsi Dinas Pangan Provinsi Maluku
+    Utara.
+    Salah satu Lembaga Distribusi Pangan yang dibentuk Dinas Pangan Provinsi
+    Maluku Utara adalah Superkedai Panganmu (Kios Pangan) di Sofifi yang
+    dibentuk berdasarkan amanat Peraturan Gubernur Maluku Utara Nomor 8
+    Tahun 2024 tentang Kebijakan Stabilisasi Pasokan dan Harga Pangan namun
+    belum berjalan optimal.
+- Lembaga Distribusi Pangan Lainnya antara lain : Pedagang Besar dan Kecil,
+    Agen, Eksportir, Importir, Distributor, Asosiasi Pangan, Koperasi, Perusahaan
+    Logisitik. Lembaga-lembaga ini berperan sebagai perantara antara produsen
+    dan konsumen untuk menyalurkan/mendistribusikan komoditi pangan.
+
+Sebagai tindak lanjut, Dinas Pangan akan:
+
+1. Mengoptimalkan pemetaan dan identifikasi Lembaga Distribusi Pangan untuk
+    memperkuat koordinasi dan mengupayakan kebutuhan;
+
+2. Kedepan mengoptimalkan pengelolaan Superkedai Pangan (Kios Pangan) di
+    Sofifi. Mengusulkan Kembali anggaran operasional Kios Pangan baik APBD
+    Provinsi maupun Dana Dekonsentrasi;
+
+3. Berkoordinasi Kembali dengan kabupaten/kota untuk membuat Kios Pangan
+    dimasing-masing kabupaten/kota setempat sehingga peningkatan
+    pengendalian dan aksebilitas masyarakat terhadap pangan pokok dengan
+    harga wajar dan berkualitas.
+
+    Komitmen Perbaikan :
+
+    Pemerintah Provinsi Maluku Utara melalui Dinas Pangan berkomitmen untuk:
+
+    � Mendorong kabupaten/kota agar membentuk Kios Pangan di daerah
+         masing-masing;
+
+    � Identifikasi keberadaan Lembaga Distribusi Pangan di Provinsi Maluku
+         Utara.
+Dengan langkah-langkah tersebut, ketersediaan Lembaga Distribusi Pangan akan
+lebih terkoordinasi, sehingga dapat mendukung stabilitas harga dan ketersediaan
+pangan di Maluku Utara yang lebih optimal.
+
+                                                                        Sofifi, 24 November 2025
+
+                                                                        NIP. 197507302001121001

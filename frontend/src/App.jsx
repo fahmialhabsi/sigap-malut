@@ -14,8 +14,16 @@ const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import GenericCreatePage from "./pages/GenericCreatePage";
+import ModulePage from "./pages/ModulePage";
 import ViewDetailPage from "./pages/ViewDetailPage";
 import EditPage from "./pages/EditPage";
+import BDSCPDCreatePage from "./pages/BDSCPDCreatePage";
+import BDSHRGCreatePage from "./pages/BDSHRGCreatePage";
+import BDSKBJCreatePage from "./pages/BDSKBJCreatePage";
+import BDSLAPCreatePage from "./pages/BDSLAPCreatePage";
+import BDSMONCreatePage from "./pages/BDSMONCreatePage";
+import BKTPGDCreatePage from "./pages/BKTPGDCreatePage";
+import BKTKRWCreatePage from "./pages/BKTKRWCreatePage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import useAuthStore from "./stores/authStore";
 import GeneratedRoutes from "./routes/generatedRoutes";
@@ -26,6 +34,7 @@ import DashboardDistribusi from "./ui/dashboards/DashboardDistribusi";
 import DashboardKonsumsi from "./ui/dashboards/DashboardKonsumsi";
 import DashboardUPTD from "./ui/dashboards/DashboardUPTD";
 import DashboardGubernur from "./ui/dashboards/DashboardGubernur";
+import ExecutionThreadFocusPage from "./pages/ExecutionThreadFocusPage";
 import DashboardInflasi from "./ui/dashboards/DashboardInflasi";
 import DashboardKepegawaian from "./ui/dashboards/DashboardKepegawaian";
 import DashboardKeuangan from "./ui/dashboards/DashboardKeuangan";
@@ -39,8 +48,6 @@ import DashboardBendahara from "./ui/dashboards/DashboardBendahara";
 import DashboardPelaksana from "./ui/dashboards/DashboardPelaksana";
 import DashboardKasubagUPTD from "./ui/dashboards/DashboardKasubagUPTD";
 import DashboardKasiUPTD from "./ui/dashboards/DashboardKasiUPTD";
-import MasterDataSyncPanel from "./components/MasterDataSyncPanel.jsx";
-import IntegrationLogPanel from "./components/IntegrationLogPanel.jsx";
 import AuditTrailPage from "./pages/AuditTrailPage";
 import WorkflowStatusPage from "./pages/WorkflowStatusPage";
 import ApprovalWorkflowPage from "./pages/ApprovalWorkflowPage";
@@ -138,8 +145,6 @@ function App() {
           element={
             <PrivateRoute>
               <DashboardSuperAdmin />
-              <MasterDataSyncPanel />
-              <IntegrationLogPanel />
             </PrivateRoute>
           }
         />
@@ -215,6 +220,15 @@ function App() {
           element={
             <PrivateRoute>
               <DashboardGubernur />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/execution-thread/:threadId"
+          element={
+            <PrivateRoute>
+              <ExecutionThreadFocusPage />
             </PrivateRoute>
           }
         />
@@ -356,6 +370,70 @@ function App() {
           }
         />
 
+        <Route
+          path="/module/bds-hrg/create"
+          element={
+            <PrivateRoute>
+              <BDSHRGCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-cpd/create"
+          element={
+            <PrivateRoute>
+              <BDSCPDCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-mon/create"
+          element={
+            <PrivateRoute>
+              <BDSMONCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-kbj/create"
+          element={
+            <PrivateRoute>
+              <BDSKBJCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bds-lap/create"
+          element={
+            <PrivateRoute>
+              <BDSLAPCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-pgd/create"
+          element={
+            <PrivateRoute>
+              <BKTPGDCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/bkt-krw/create"
+          element={
+            <PrivateRoute>
+              <BKTKRWCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module/:moduleId"
+          element={
+            <PrivateRoute>
+              <ModulePage />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/module/:moduleId/create"
           element={

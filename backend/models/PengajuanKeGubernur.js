@@ -37,6 +37,7 @@ const PengajuanKeGubernur = sequelize.define(
     diputuskan_oleh: { type: DataTypes.INTEGER }, // Gubernur
     revisi_ke: { type: DataTypes.INTEGER, defaultValue: 0 },
     revisi_dari: { type: DataTypes.INTEGER },
+    execution_thread_id: { type: DataTypes.STRING(36), allowNull: true },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   },

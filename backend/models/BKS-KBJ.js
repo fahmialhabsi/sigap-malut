@@ -194,6 +194,16 @@ const BksKbj = sequelize.define('BksKbj', {
     type: DataTypes.TEXT,
     comment: 'Catatan',
   },
+  task_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Tautan ke tugas rantai eksekusi (opsional)',
+  },
+  execution_thread_id: {
+    type: DataTypes.STRING(36),
+    allowNull: true,
+    comment: 'UUID rantai eksekusi (propagasi dari task/instruksi)',
+  },
   created_by: {
     type: DataTypes.INTEGER,
     allowNull: false,

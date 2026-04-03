@@ -19,17 +19,17 @@ const POLL_INTERVAL_MS = 5 * 60 * 1000;
 // Map tipe KPI ke endpoint dan event
 const KPI_CONFIG = {
   inflasi: {
-    endpoint: "/api/inflasi/latest",
+    endpoint: "/inflasi/latest",
     event: "kpi:update",
     filter: (data) => data?.type === "inflasi",
   },
   ketersediaan: {
-    endpoint: "/api/komoditas/stock",
+    endpoint: "/komoditas/stock",
     event: "kpi:update",
     filter: (data) => data?.type === "ketersediaan",
   },
   distribusi: {
-    endpoint: "/api/dashboard/sekretaris/summary",
+    endpoint: "/dashboard/sekretaris/summary",
     event: "kpi:update",
     filter: (data) => data?.type === "distribusi",
   },

@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import api from "../utils/api";
+import api from "../services/api";
 import React from "react";
 import { notifySuccess, notifyError } from "../utils/notify";
 import { sanitizeObject } from "../utils/sanitize";

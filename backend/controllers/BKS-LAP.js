@@ -6,6 +6,7 @@
 
 import BksLap from "../models/BKS-LAP.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BksLap records
 // @route   GET /api/bks-lap
@@ -76,6 +77,8 @@ export const getBksLapById = async (req, res) => {
 // @access  Private
 export const createBksLap = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BksLap.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBksLap = async (req, res) => {
         message: "BksLap not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

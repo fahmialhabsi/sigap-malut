@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import api from "../utils/api";
+import api from "../services/api";
 import { notifySuccess, notifyError } from "../utils/notify";
 import { sanitizeObject } from "../utils/sanitize";
 

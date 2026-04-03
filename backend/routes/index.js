@@ -65,6 +65,7 @@ import dataRoutes from "./data.js";
 import dataIntegrationLogRoutes from "./dataIntegrationLog.js";
 import integrationLogRoutes from "./integrationLog.js";
 import integrationLogControllerRoutes from "./integrationLogController.js";
+import spipRoutes from "./spip.js";
 import kgbRoutes from "./kgb.js";
 import kgbControllerRoutes from "./kgbController.js";
 import komoditasRoutes from "./komoditas.js";
@@ -105,6 +106,9 @@ import uptdRoutes from "./uptd.js";
 import kasubagRoutes from "./kasubag.js";
 import gubernurRoutes from "./gubernur.js";
 import kadinRoutes from "./kadin.js";
+import clarificationRoutes from "./clarification.js";
+import panelRoutes from "./panel.js";
+import executionThreadRoutes from "./executionThread.js";
 import { protect } from "../middleware/auth.js";
 import { createReplicationPilotGuard } from "../middleware/uptdPilotGuard.js";
 
@@ -192,6 +196,7 @@ export default function registerRoutes(app) {
   app.use("/api/dataintegrationlog", dataIntegrationLogRoutes);
   app.use("/api/integrationlog", integrationLogRoutes);
   app.use("/api/integrationlogcontroller", integrationLogControllerRoutes);
+  app.use("/api/spip", spipRoutes);
   app.use("/api/kgb", kgbRoutes);
   app.use("/api/kgbcontroller", kgbControllerRoutes);
   app.use("/api/komoditas", komoditasRoutes);
@@ -234,6 +239,9 @@ export default function registerRoutes(app) {
   app.use("/api/kasubag", kasubagRoutes);
   app.use("/api/gubernur", gubernurRoutes);
   app.use("/api/kadin", kadinRoutes);
+  app.use("/api/clarification", clarificationRoutes);
+  app.use("/api/panel", panelRoutes);
+  app.use("/api/execution-thread", executionThreadRoutes);
 
   console.log("✅ API routes registered (incl. kabid/jf distribusi, pelaksana bidang)\n");
 }

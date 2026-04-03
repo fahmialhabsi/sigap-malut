@@ -5,6 +5,9 @@ node_modules/
 *.log
 logs/
 
+# Database dumps (skrip backup-postgres.*)
+/backups/
+
 # Environment
 .env
 .env.*

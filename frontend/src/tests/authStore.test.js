@@ -2,7 +2,7 @@
 
 import useAuthStore from "../stores/authStore";
 
-jest.mock("../utils/api", () => ({
+jest.mock("../services/api", () => ({
   post: jest.fn((url, data) => {
     if (data.username === "valid" && data.password === "valid") {
       return Promise.resolve({

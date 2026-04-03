@@ -3,6 +3,14 @@
 import { roleIdToName } from "./roleMap";
 import { unitNameToId, unitIdToName } from "./unitMap"; // gunakan kedua mapping
 
+function normRoleKey(v) {
+  if (v == null || v === "") return "";
+  return String(v)
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+}
+
 export function getDashboardPath(user) {
   if (!user) return "/dashboard";
 
@@ -17,6 +25,10 @@ export function getDashboardPath(user) {
     kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
     kepala_bidang_distribusi: "/dashboard/distribusi",
     kepala_bidang_konsumsi: "/dashboard/konsumsi",
+    kasubag_tu_uptd: "/dashboard/kasubag-uptd",
+    kasi_mutu: "/dashboard/kasi-uptd",
+    kasi_teknis: "/dashboard/kasi-uptd",
+    pelaksana_sekretariat: "/dashboard/kasubag",
     // Kasubag Umum & Kepegawaian
     kasubag_umum_kepegawaian: "/dashboard/kasubag",
     kasubag: "/dashboard/kasubag",
@@ -34,27 +46,41 @@ export function getDashboardPath(user) {
     kasi_uptd: "/dashboard/kasi-uptd",
     kasi_mutu: "/dashboard/kasi-uptd",
     kasi_teknis: "/dashboard/kasi-uptd",
+    kasi_mutu_uptd: "/dashboard/kasi-uptd",
+    kasi_teknis_uptd: "/dashboard/kasi-uptd",
+    kasubbag_tu_uptd: "/dashboard/kasubag-uptd",
 
     // Bendahara (sub-role)
     bendahara_pengeluaran: "/dashboard/bendahara",
     bendahara_gaji: "/dashboard/bendahara",
     bendahara_barang: "/dashboard/bendahara",
+
+    // Jabatan fungsional (sekretariat & bidang)
+    jabatan_fungsional: "/dashboard/fungsional",
+    pejabat_fungsional: "/dashboard/fungsional",
+    fungsional: "/dashboard/fungsional",
+    fungsional_perencana: "/dashboard/fungsional",
+    fungsional_perencanaan: "/dashboard/fungsional",
+    fungsional_keuangan: "/dashboard/fungsional",
+    fungsional_analis: "/dashboard/fungsional",
+    fungsional_ketersediaan: "/dashboard/fungsional",
+    fungsional_distribusi: "/dashboard/fungsional",
+    fungsional_konsumsi: "/dashboard/fungsional",
+    fungsional_uptd_mutu: "/dashboard/fungsional",
+    fungsional_uptd_teknis: "/dashboard/fungsional",
+    pelaksana_ketersediaan: "/dashboard/pelaksana",
+    pelaksana_distribusi: "/dashboard/pelaksana",
+    pelaksana_konsumsi: "/dashboard/pelaksana",
   };
 
   // 0) jika backend sudah memberi dashboardUrl
   if (user.dashboardUrl) return user.dashboardUrl;
 
-  // 1) role (string) langsung, normalize
-  if (user.role) {
-    const roleKey = String(user.role).toLowerCase();
-    if (dashboardMapping[roleKey]) return dashboardMapping[roleKey];
-  }
-
-  // 1b) jika ada roleName field gunakan itu
-  if (user.roleName) {
-    const roleNameKey = String(user.roleName).toLowerCase();
-    if (dashboardMapping[roleNameKey]) return dashboardMapping[roleNameKey];
-  }
+  // 1) role / roleName — normalisasi underscore (selaras authStore)
+  const rk = normRoleKey(user.role);
+  const rnk = normRoleKey(user.roleName);
+  if (rk && dashboardMapping[rk]) return dashboardMapping[rk];
+  if (rnk && dashboardMapping[rnk]) return dashboardMapping[rnk];
 
   // 2) cek role_id -> map via roleIdToName jika ada
   if (user.role_id) {
@@ -62,11 +88,17 @@ export function getDashboardPath(user) {
       roleIdToName?.[String(user.role_id)] ||
       roleIdToName?.[String(user.role_id).toLowerCase()];
     if (mapped) {
-      const mappedKey = String(mapped).toLowerCase();
+      const mappedKey = normRoleKey(mapped);
       if (dashboardMapping[mappedKey]) return dashboardMapping[mappedKey];
       // kalau mapped === 'kepala_bidang', lanjutkan ke inferensi unit di bawah
     }
   }
+
+  // 2b) JF bidang / UPTD / pelaksana bidang — hindari salah ke dashboard Kabid dari unit
+  if (rk.startsWith("fungsional_uptd_")) return "/dashboard/fungsional";
+  if (rk.startsWith("fungsional_")) return "/dashboard/fungsional";
+  if (rk === "pelaksana_sekretariat") return "/dashboard/kasubag";
+  if (rk.startsWith("pelaksana_")) return "/dashboard/pelaksana";
 
   // Build inverse map id -> display name (lowercased keys) (fallback jika unitIdToName tidak diekspor)
   const idToUnitName =

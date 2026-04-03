@@ -8,7 +8,7 @@
 import { useState, useEffect, useCallback } from "react";
 import DashboardInflasiLayout from "../layouts/DashboardInflasiLayout";
 import MendagriPPTXModal from "../components/export/MendagriPPTXModal";
-import api from "../utils/api";
+import api from "../services/api";
 
 const DUMMY_DATA = {
   periode: "Maret 2026",

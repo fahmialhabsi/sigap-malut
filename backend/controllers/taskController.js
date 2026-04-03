@@ -283,6 +283,16 @@ function transitionHandler(actionName, buildNote, buildNotification) {
       );
       await t.commit();
 
+      if (actionName === "close") {
+        try {
+          const { checkAndCompleteInstruksiIfDueAfterTaskClosed } =
+            await import("../services/kadinInstruksiAutoService.js");
+          await checkAndCompleteInstruksiIfDueAfterTaskClosed(task);
+        } catch (_) {
+          /* non-fatal */
+        }
+      }
+
       if (buildNotification) {
         const { userId, msg, link } = buildNotification(task, req);
         await notifyUser(userId, task.id, msg, link);

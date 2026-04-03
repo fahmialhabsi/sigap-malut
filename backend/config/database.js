@@ -8,7 +8,18 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-console.log("DB_DIALECT:", process.env.DB_DIALECT);
+if (process.env.SIGAP_SKIP_DB_DIALECT_LOG !== "1") {
+  console.log("DB_DIALECT:", process.env.DB_DIALECT);
+}
+
+const sequelizeLoggingEnv = String(
+  process.env.SEQUELIZE_LOGGING ?? "",
+).toLowerCase();
+const sequelizeLoggingEnabled =
+  sequelizeLoggingEnv === "true" ||
+  sequelizeLoggingEnv === "1" ||
+  (!["false", "0", "off", "no"].includes(sequelizeLoggingEnv) &&
+    process.env.NODE_ENV === "development");
 
 const sequelize = new Sequelize({
   dialect: process.env.DB_DIALECT || "sqlite",
@@ -28,7 +39,7 @@ const sequelize = new Sequelize({
     password: process.env.DB_PASSWORD,
   }),
 
-  logging: process.env.NODE_ENV === "development" ? console.log : false,
+  logging: sequelizeLoggingEnabled ? console.log : false,
 
   define: {
     timestamps: true,

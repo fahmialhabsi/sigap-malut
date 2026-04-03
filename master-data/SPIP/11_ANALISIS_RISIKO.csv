@@ -1,0 +1,2 @@
+kode,pernyataan_risiko,skor_probabilitas_melekat,skor_dampak_melekat,level_risiko_melekat,pengendalian_ada_belum,uraian_pengendalian,memadai_belum_memadai,skor_probabilitas_residu,skor_dampak_residu,level_risiko_residu,klasifikasi_unit
+R1,"Membuat justifikasi teknis sebagai dasar lelang kegiatan pekerjaan yang tidak tertuang pada rencana kerja atau pekerjaan yang tidak direncanakan untuk memenangkan kontraktor/vendor/perusahaan tertentu",5,4,23,belum,"","",5,4,23,Sekretariat

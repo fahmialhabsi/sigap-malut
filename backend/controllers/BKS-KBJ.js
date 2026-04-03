@@ -6,6 +6,7 @@
 
 import BksKbj from "../models/BKS-KBJ.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BksKbj records
 // @route   GET /api/bks-kbj
@@ -76,6 +77,8 @@ export const getBksKbjById = async (req, res) => {
 // @access  Private
 export const createBksKbj = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BksKbj.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBksKbj = async (req, res) => {
         message: "BksKbj not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

@@ -1,28 +1,26 @@
-// =====================================================
-// CONTROLLER: BktKrwController
-// MODEL: BktKrw
-// Generated: 2026-03-19T23:39:27.514Z
-// =====================================================
-
 import BktKrw from "../models/BKT-KRW.js";
 import { logAudit } from "../services/auditLogService.js";
+import {
+  buildBktKrwWhere,
+  normalizeBktKrwPayload,
+} from "../services/bktKrwService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
-// @desc    Get all BktKrw records
-// @route   GET /api/bkt-krw
-// @access  Private
 export const getAllBktKrw = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, ...filters } = req.query;
-
-    const offset = (page - 1) * limit;
-
-    const where = { ...filters };
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (Number(page) - 1) * Number(limit);
+    const where = buildBktKrwWhere(req.query);
 
     const { count, rows } = await BktKrw.findAndCountAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      limit: Number(limit),
+      offset,
+      order: [
+        ["periode", "DESC"],
+        ["updated_at", "DESC"],
+        ["created_at", "DESC"],
+      ],
     });
 
     res.json({
@@ -30,9 +28,9 @@ export const getAllBktKrw = async (req, res) => {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(count / Number(limit)),
       },
     });
   } catch (error) {
@@ -44,9 +42,6 @@ export const getAllBktKrw = async (req, res) => {
   }
 };
 
-// @desc    Get single BktKrw by ID
-// @route   GET /api/bkt-krw/:id
-// @access  Private
 export const getBktKrwById = async (req, res) => {
   try {
     const record = await BktKrw.findByPk(req.params.id);
@@ -71,15 +66,17 @@ export const getBktKrwById = async (req, res) => {
   }
 };
 
-// @desc    Create new BktKrw
-// @route   POST /api/bkt-krw
-// @access  Private
 export const createBktKrw = async (req, res) => {
   try {
-    const record = await BktKrw.create({
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
+    const payload = normalizeBktKrwPayload({
       ...req.body,
-      created_by: req.user?.id,
+      created_by: req.user?.id ?? req.body?.created_by,
     });
+
+    const record = await BktKrw.create(payload);
+
     await logAudit({
       modul: "BKT-KRW",
       entitas_id: record.id,
@@ -88,6 +85,7 @@ export const createBktKrw = async (req, res) => {
       data_baru: record,
       pegawai_id: req.user?.id || null,
     });
+
     res.status(201).json({
       success: true,
       message: "BktKrw created successfully",
@@ -102,23 +100,25 @@ export const createBktKrw = async (req, res) => {
   }
 };
 
-// @desc    Update BktKrw
-// @route   PUT /api/bkt-krw/:id
-// @access  Private
 export const updateBktKrw = async (req, res) => {
   try {
     const record = await BktKrw.findByPk(req.params.id);
+
     if (!record) {
       return res.status(404).json({
         success: false,
         message: "BktKrw not found",
       });
     }
+
     const dataLama = { ...record.get() };
-    await record.update({
+    const payload = normalizeBktKrwPayload({
       ...req.body,
       updated_by: req.user?.id,
     });
+
+    await record.update(payload);
+
     await logAudit({
       modul: "BKT-KRW",
       entitas_id: record.id,
@@ -127,6 +127,7 @@ export const updateBktKrw = async (req, res) => {
       data_baru: record,
       pegawai_id: req.user?.id || null,
     });
+
     res.json({
       success: true,
       message: "BktKrw updated successfully",
@@ -141,20 +142,20 @@ export const updateBktKrw = async (req, res) => {
   }
 };
 
-// @desc    Delete BktKrw
-// @route   DELETE /api/bkt-krw/:id
-// @access  Private
 export const deleteBktKrw = async (req, res) => {
   try {
     const record = await BktKrw.findByPk(req.params.id);
+
     if (!record) {
       return res.status(404).json({
         success: false,
         message: "BktKrw not found",
       });
     }
+
     const dataLama = { ...record.get() };
-    await record.update({ is_deleted: true, deleted_at: new Date(), deleted_by: req.user?.id || null });
+    await record.destroy();
+
     await logAudit({
       modul: "BKT-KRW",
       entitas_id: req.params.id,
@@ -163,6 +164,7 @@ export const deleteBktKrw = async (req, res) => {
       data_baru: null,
       pegawai_id: req.user?.id || null,
     });
+
     res.json({
       success: true,
       message: "BktKrw deleted successfully",

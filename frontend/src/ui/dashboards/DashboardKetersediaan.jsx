@@ -3,7 +3,7 @@ console.log("Loaded: DashboardKetersediaan wrapper");
 import React, { useState, useEffect } from "react";
 import DashboardKetersediaanLayout from "../../layouts/DashboardKetersediaanLayout";
 import ketersediaanModules from "../../data/ketersediaanModules";
-import api from "../../utils/api";
+import api from "../../services/api";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import DashboardKabidKetersediaan from "./DashboardKabidKetersediaan";

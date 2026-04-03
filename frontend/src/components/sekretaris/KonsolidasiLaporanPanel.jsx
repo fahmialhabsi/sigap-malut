@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function unitPill(ok, label) {
   if (ok) return <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">{label} ✅</span>;
@@ -14,7 +14,7 @@ export default function KonsolidasiLaporanPanel() {
   const fetchStatus = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/api/sekretaris/konsolidasi");
+      const res = await api.get("/sekretaris/konsolidasi");
       setRow(res.data?.data ?? null);
       setMeta(res.data?.meta ?? null);
     } catch {
@@ -28,7 +28,7 @@ export default function KonsolidasiLaporanPanel() {
   const ensure = async () => {
     setLoading(true);
     try {
-      await api.post("/api/sekretaris/konsolidasi/ensure", {});
+      await api.post("/sekretaris/konsolidasi/ensure", {});
       await fetchStatus();
     } finally {
       setLoading(false);

@@ -6,6 +6,7 @@
 
 import SekRmh from "../models/SEK-RMH.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekRmh records
 // @route   GET /api/sek-rmh
@@ -76,6 +77,8 @@ export const getSekRmhById = async (req, res) => {
 // @access  Private
 export const createSekRmh = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekRmh.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekRmh = async (req, res) => {
         message: "SekRmh not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

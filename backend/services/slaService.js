@@ -98,9 +98,12 @@ export async function runSLACheck() {
       return;
     }
 
+    /** Harus cocok dengan enum kolom `Tasks.status` di PostgreSQL (models/Task.js). */
+    const TASK_STATUS_TERMINAL = ["closed", "rejected"];
+
     const activeTasks = await Task.findAll({
       where: {
-        status: { [Op.notIn]: ["selesai", "ditolak", "dibatalkan"] },
+        status: { [Op.notIn]: TASK_STATUS_TERMINAL },
       },
     });
 
@@ -162,7 +165,7 @@ export async function runSLACheck() {
           );
         }
         await task
-          .update({ sla_breached: true, status: "eskalasi" })
+          .update({ sla_breached: true, status: "escalated" })
           .catch(() => null);
         breaches++;
       }

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function priorityLabel(p) {
   const n = Number(p);
@@ -33,7 +33,7 @@ export default function InboxKadinPanel() {
   const fetchInbox = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/api/sekretaris/inbox-kadin", { params: { limit: 50 } });
+      const res = await api.get("/sekretaris/inbox-kadin", { params: { limit: 50 } });
       setRows(Array.isArray(res.data?.data) ? res.data.data : []);
     } catch (e) {
       setRows([]);
@@ -49,7 +49,7 @@ export default function InboxKadinPanel() {
   const konfirmasi = async (id) => {
     setActing((p) => ({ ...p, [id]: true }));
     try {
-      await api.post(`/api/sekretaris/inbox-kadin/${id}/konfirmasi`);
+      await api.post(`/sekretaris/inbox-kadin/${id}/konfirmasi`);
       await fetchInbox();
     } finally {
       setActing((p) => {
@@ -64,9 +64,12 @@ export default function InboxKadinPanel() {
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <h2 className="font-bold text-gray-800">📥 Inbox Kepala Dinas</h2>
+          <h2 className="font-bold text-gray-800">
+            📥 Inbox Kepala Dinas & Bawahan
+          </h2>
           <p className="text-xs text-gray-500 mt-1">
-            Daftar perintah dari Kepala Dinas yang wajib ditindaklanjuti Sekretaris.
+            Perintah dari Kepala Dinas dan koordinasi dari bawahan yang wajib
+            ditindaklanjuti Sekretaris.
           </p>
         </div>
         <button

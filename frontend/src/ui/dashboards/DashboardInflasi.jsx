@@ -26,8 +26,9 @@ import {
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import DashboardInflasiLayout from "../../layouts/DashboardInflasiLayout";
-import api from "../../utils/api";
+import api from "../../services/api";
 import { notifyError, notifySuccess } from "../../utils/notify";
+import { isDemoDataAllowed, showSimulationBadge } from "../../config/appMode.js";
 
 // ─── Allowed Roles ────────────────────────────────────────────────────────────
 const ALLOWED_ROLES = [
@@ -93,6 +94,14 @@ const DUMMY_INFLASI = {
       },
     ],
   },
+};
+
+const EMPTY_INFLASI = {
+  inflasi_persen: null,
+  status: "on_target",
+  top_10: [],
+  trend_6bulan: [],
+  prediksi: { bulan_depan: null, confidence: null, rekomendasi: [] },
 };
 
 const PERIODE_OPTIONS = [
@@ -313,7 +322,9 @@ export default function DashboardInflasi() {
   const roleName = normalizeRole(user);
 
   const [periode, setPeriode] = useState("Maret 2026");
-  const [data, setData] = useState(DUMMY_INFLASI);
+  const [data, setData] = useState(() =>
+    isDemoDataAllowed() ? DUMMY_INFLASI : EMPTY_INFLASI,
+  );
   const [loading, setLoading] = useState(false);
   const [pptxLoading, setPptxLoading] = useState(false);
   const [drilldownKomoditas, setDrilldownKomoditas] = useState(null);
@@ -327,6 +338,7 @@ export default function DashboardInflasi() {
       if (d && d.inflasiPangan !== null) {
         // Map API response to component data shape
         setData({
+          inflasi_persen: d.inflasiPangan,
           inflasiPangan: d.inflasiPangan,
           status:
             d.inflasiPangan > 5
@@ -341,14 +353,25 @@ export default function DashboardInflasi() {
             hargaBulanLalu: c.hargaBulanLalu,
             tren: c.tren,
           })),
+          top_10: (d.contributors || []).map((c) => ({
+            komoditas: c.nama,
+            perubahan: parseFloat(c.perubahan || c.kontribusi || 0),
+            kontribusi: parseFloat(c.kontribusi),
+          })),
           tren6Bulan: d.tren6Bulan || [],
-          prediksi: DUMMY_INFLASI.prediksi, // prediksi tetap dari model ML lokal
-          rekomendasi: DUMMY_INFLASI.rekomendasi,
+          trend_6bulan: (d.tren6Bulan || []).map((x) => ({
+            bulan: x.bulan || x.label,
+            inflasi: x.inflasi ?? x.nilai,
+          })),
+          prediksi: isDemoDataAllowed()
+            ? DUMMY_INFLASI.prediksi
+            : { bulan_depan: null, confidence: null, rekomendasi: [] },
         });
         if (d.periode) setPeriode(d.periode);
       }
     } catch {
-      // endpoint belum tersedia — gunakan dummy
+      if (isDemoDataAllowed()) setData(DUMMY_INFLASI);
+      else setData(EMPTY_INFLASI);
     } finally {
       setLoading(false);
     }
@@ -370,6 +393,10 @@ export default function DashboardInflasi() {
   const statusConf = STATUS_CONFIG[data.status] || STATUS_CONFIG.on_target;
 
   const handleExportPPTX = async () => {
+    if (data.inflasi_persen == null) {
+      notifyError("Belum ada data inflasi untuk diekspor.");
+      return;
+    }
     setPptxLoading(true);
     try {
       await exportToPPTX(data, periode);
@@ -383,6 +410,12 @@ export default function DashboardInflasi() {
 
   return (
     <DashboardInflasiLayout>
+      {showSimulationBadge() ? (
+        <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          Mode demo/simulasi: prediksi &amp; rekomendasi dapat berisi contoh.
+          Produksi: set VITE_DEMO_DATA=0.
+        </div>
+      ) : null}
       {/* ── Toolbar ──────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
@@ -438,7 +471,9 @@ export default function DashboardInflasi() {
             Inflasi Pangan — {periode}
           </div>
           <div className="text-6xl font-bold text-blue-700 mb-2">
-            {data.inflasi_persen}%
+            {data.inflasi_persen != null && !Number.isNaN(Number(data.inflasi_persen))
+              ? `${Number(data.inflasi_persen).toFixed(2)}%`
+              : "—"}
           </div>
           <span
             className={`px-3 py-1 rounded-full text-xs font-bold border ${statusConf.cls}`}
@@ -455,18 +490,25 @@ export default function DashboardInflasi() {
           </div>
           <div className="flex items-baseline gap-2 mb-1">
             <span className="text-4xl font-bold text-violet-600">
-              {data.prediksi.bulan_depan}%
+              {data.prediksi?.bulan_depan != null
+                ? `${data.prediksi.bulan_depan}%`
+                : "—"}
             </span>
             <span className="text-sm text-slate-500">estimasi</span>
           </div>
           <div className="text-xs text-slate-500 mb-3">
-            Confidence: <strong>{data.prediksi.confidence}%</strong>
+            Confidence:{" "}
+            <strong>
+              {data.prediksi?.confidence != null
+                ? `${data.prediksi.confidence}%`
+                : "—"}
+            </strong>
           </div>
           <div className="text-xs font-semibold text-slate-600 mb-2">
             Rekomendasi Intervensi:
           </div>
           <div className="space-y-2">
-            {data.prediksi.rekomendasi.map((r) => (
+            {(data.prediksi?.rekomendasi || []).map((r) => (
               <div
                 key={r.id}
                 className="bg-violet-50 border border-violet-100 rounded-lg p-3"
@@ -488,7 +530,7 @@ export default function DashboardInflasi() {
             <span>📉</span> Tren 6 Bulan
           </div>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={data.trend_6bulan}>
+            <LineChart data={data.trend_6bulan || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="bulan" tick={{ fontSize: 11 }} />
               <YAxis domain={[0, 5]} tick={{ fontSize: 11 }} unit="%" />
@@ -522,7 +564,9 @@ export default function DashboardInflasi() {
         </div>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart
-            data={[...data.top_10].sort((a, b) => b.kontribusi - a.kontribusi)}
+            data={[...(data.top_10 || [])].sort(
+              (a, b) => b.kontribusi - a.kontribusi,
+            )}
             layout="vertical"
             margin={{ left: 120, right: 40, top: 8, bottom: 8 }}
             onClick={(payload) => {
@@ -586,7 +630,7 @@ export default function DashboardInflasi() {
             </div>
             <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-800">
               Kontributor ke-
-              {data.top_10.findIndex(
+              {(data.top_10 || []).findIndex(
                 (x) => x.komoditas === drilldownKomoditas.komoditas,
               ) + 1}{" "}
               dari 10 komoditas penyumbang inflasi terbesar.

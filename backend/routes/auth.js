@@ -10,14 +10,23 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  getUserManagementAuditLog,
+  getUserManagementAuditArchiveLog,
+  exportUserManagementAuditCsv,
+  archiveUserManagementAuditRetention,
   generateSsoToken,
 } from "../controllers/authController.js";
 import { protect } from "../middleware/auth.js";
+import { authorize } from "../middleware/roleCheck.js";
+import {
+  authLoginLimiter,
+  authRegisterLimiter,
+} from "../middleware/authRateLimiter.js";
 
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", authRegisterLimiter, register);
+router.post("/login", authLoginLimiter, login);
 router.get("/me", protect, getMe);
 router.get("/profile", protect, getMe); // alias for /me
 router.post("/logout", protect, logout);
@@ -26,15 +35,34 @@ router.post("/sso-token", protect, generateSsoToken); // SSO: generate token unt
 
 // Route untuk mengambil seluruh data user
 
-// Tambah user (admin)
-router.post("/users", protect, createUser);
-// Ambil semua user (admin)
-router.get("/users", protect, getAllUsers);
-
-// Update user (admin)
-router.put("/users/:id", protect, updateUser);
-
-// Hapus user (admin)
-router.delete("/users/:id", protect, deleteUser);
+// Manajemen user — hanya super_admin (Tahap 1 keamanan / matriks dokumen 14)
+router.post("/users", protect, authorize("super_admin"), createUser);
+router.get("/users", protect, authorize("super_admin"), getAllUsers);
+router.get(
+  "/users/audit-log/export",
+  protect,
+  authorize("super_admin"),
+  exportUserManagementAuditCsv,
+);
+router.post(
+  "/users/audit-log/archive-retention",
+  protect,
+  authorize("super_admin"),
+  archiveUserManagementAuditRetention,
+);
+router.get(
+  "/users/audit-log/archive",
+  protect,
+  authorize("super_admin"),
+  getUserManagementAuditArchiveLog,
+);
+router.get(
+  "/users/audit-log",
+  protect,
+  authorize("super_admin"),
+  getUserManagementAuditLog,
+);
+router.put("/users/:id", protect, authorize("super_admin"), updateUser);
+router.delete("/users/:id", protect, authorize("super_admin"), deleteUser);
 
 export default router;

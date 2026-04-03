@@ -1,28 +1,35 @@
-// =====================================================
-// CONTROLLER: BdsKbjController
-// MODEL: BdsKbj
-// Generated: 2026-03-19T23:39:27.501Z
-// =====================================================
-
 import BdsKbj from "../models/BDS-KBJ.js";
 import { logAudit } from "../services/auditLogService.js";
+import {
+  buildBdsKbjWhere,
+  normalizeBdsKbjPayload,
+} from "../services/bdsKbjService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
-// @desc    Get all BdsKbj records
-// @route   GET /api/bds-kbj
-// @access  Private
+function parsePagination(query = {}) {
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.min(100, Math.max(1, Number(query.limit) || 10));
+  return {
+    page,
+    limit,
+    offset: (page - 1) * limit,
+  };
+}
+
 export const getAllBdsKbj = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, ...filters } = req.query;
-
-    const offset = (page - 1) * limit;
-
-    const where = { ...filters };
+    const { page, limit, offset } = parsePagination(req.query);
+    const where = buildBdsKbjWhere(req.query);
 
     const { count, rows } = await BdsKbj.findAndCountAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      limit,
+      offset,
+      order: [
+        ["tanggal_dokumen", "DESC"],
+        ["updated_at", "DESC"],
+        ["created_at", "DESC"],
+      ],
     });
 
     res.json({
@@ -30,8 +37,8 @@ export const getAllBdsKbj = async (req, res) => {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page,
+        limit,
         totalPages: Math.ceil(count / limit),
       },
     });
@@ -44,9 +51,6 @@ export const getAllBdsKbj = async (req, res) => {
   }
 };
 
-// @desc    Get single BdsKbj by ID
-// @route   GET /api/bds-kbj/:id
-// @access  Private
 export const getBdsKbjById = async (req, res) => {
   try {
     const record = await BdsKbj.findByPk(req.params.id);
@@ -71,15 +75,17 @@ export const getBdsKbjById = async (req, res) => {
   }
 };
 
-// @desc    Create new BdsKbj
-// @route   POST /api/bds-kbj
-// @access  Private
 export const createBdsKbj = async (req, res) => {
   try {
-    const record = await BdsKbj.create({
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
+    const payload = normalizeBdsKbjPayload({
       ...req.body,
-      created_by: req.user?.id,
+      created_by: req.user?.id ?? req.body?.created_by,
     });
+
+    const record = await BdsKbj.create(payload);
+
     await logAudit({
       modul: "BDS-KBJ",
       entitas_id: record.id,
@@ -88,6 +94,7 @@ export const createBdsKbj = async (req, res) => {
       data_baru: record,
       pegawai_id: req.user?.id || null,
     });
+
     res.status(201).json({
       success: true,
       message: "BdsKbj created successfully",
@@ -102,9 +109,6 @@ export const createBdsKbj = async (req, res) => {
   }
 };
 
-// @desc    Update BdsKbj
-// @route   PUT /api/bds-kbj/:id
-// @access  Private
 export const updateBdsKbj = async (req, res) => {
   try {
     const record = await BdsKbj.findByPk(req.params.id);
@@ -114,11 +118,17 @@ export const updateBdsKbj = async (req, res) => {
         message: "BdsKbj not found",
       });
     }
-    const dataLama = { ...record.get() };
-    await record.update({
+
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
+    const dataLama = record.toJSON();
+    const payload = normalizeBdsKbjPayload({
       ...req.body,
-      updated_by: req.user?.id,
+      created_by: record.created_by,
     });
+
+    await record.update(payload);
+
     await logAudit({
       modul: "BDS-KBJ",
       entitas_id: record.id,
@@ -127,6 +137,7 @@ export const updateBdsKbj = async (req, res) => {
       data_baru: record,
       pegawai_id: req.user?.id || null,
     });
+
     res.json({
       success: true,
       message: "BdsKbj updated successfully",
@@ -141,9 +152,6 @@ export const updateBdsKbj = async (req, res) => {
   }
 };
 
-// @desc    Delete BdsKbj
-// @route   DELETE /api/bds-kbj/:id
-// @access  Private
 export const deleteBdsKbj = async (req, res) => {
   try {
     const record = await BdsKbj.findByPk(req.params.id);
@@ -153,8 +161,10 @@ export const deleteBdsKbj = async (req, res) => {
         message: "BdsKbj not found",
       });
     }
-    const dataLama = { ...record.get() };
-    await record.update({ is_deleted: true, deleted_at: new Date(), deleted_by: req.user?.id || null });
+
+    const dataLama = record.toJSON();
+    await record.destroy();
+
     await logAudit({
       modul: "BDS-KBJ",
       entitas_id: req.params.id,
@@ -163,6 +173,7 @@ export const deleteBdsKbj = async (req, res) => {
       data_baru: null,
       pegawai_id: req.user?.id || null,
     });
+
     res.json({
       success: true,
       message: "BdsKbj deleted successfully",

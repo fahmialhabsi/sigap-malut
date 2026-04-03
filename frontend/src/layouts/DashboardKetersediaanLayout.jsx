@@ -11,7 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import api from "../utils/api";
+import api from "../services/api";
 import { roleIdToName } from "../utils/roleMap";
 import { notifyError } from "../utils/notify";
 import BukaEPelaraButton from "../components/BukaEPelaraButton";

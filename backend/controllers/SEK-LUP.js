@@ -6,6 +6,7 @@
 
 import SekLup from "../models/SEK-LUP.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekLup records
 // @route   GET /api/sek-lup
@@ -76,6 +77,8 @@ export const getSekLupById = async (req, res) => {
 // @access  Private
 export const createSekLup = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekLup.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekLup = async (req, res) => {
         message: "SekLup not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

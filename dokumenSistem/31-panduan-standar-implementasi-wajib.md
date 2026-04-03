@@ -410,27 +410,40 @@ Lihat `dokumenSistem/09-Role-Module-Matrix.md` dan `dokumenSistem/09-matriks-rol
 
 ### 9.1 Setiap Tabel Baru Wajib Migration
 
-```js
-// File: backend/migrations/YYYYMMDD-nama-migrasi.js
-export async function up(queryInterface, Sequelize) {
-  await queryInterface.createTable("nama_tabel", {
-    id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    // ... kolom-kolom
-    deleted_at: { type: Sequelize.DATE, allowNull: true }, // WAJIB: soft delete
-    created_at: { type: Sequelize.DATE, allowNull: false },
-    updated_at: { type: Sequelize.DATE, allowNull: false },
-  });
-}
+Kebijakan lengkap (sync vs CLI, `SequelizeMeta`, env `DB_SYNC_ON_BOOT`, ekstensi file): **`dokumenSistem/database-migration-deployment.md`**.
 
-export async function down(queryInterface) {
-  await queryInterface.dropTable("nama_tabel");
-}
+**Format file migrasi (wajib untuk `sequelize-cli` di repo ini):**
+
+- Nama berkas: `backend/migrations/YYYYMMDD-nama-migrasi.cjs` (bukan `.js`).
+- Isi **CommonJS**: `module.exports = { async up, async down }` — **bukan** `export` / `import`, karena `backend/package.json` memakai `"type": "module"` dan CLI memuat migrasi sebagai CommonJS (lihat dokumen migrasi di atas).
+- Jalankan dari folder `backend`: `npm run db:migrate:cli` (setelah dependensi terpasang).
+
+```js
+// File: backend/migrations/YYYYMMDD-nama-migrasi.cjs
+"use strict";
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("nama_tabel", {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      // ... kolom-kolom
+      deleted_at: { type: Sequelize.DATE, allowNull: true }, // WAJIB: soft delete
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+    });
+  },
+
+  async down(queryInterface) {
+    await queryInterface.dropTable("nama_tabel");
+  },
+};
 ```
 
 ### 9.2 Soft Delete Wajib
 
 Semua tabel data operasional **wajib** memiliki kolom `deleted_at`.  
-Model Sequelize: gunakan `paranoid: true`.
+Model Sequelize: gunakan `paranoid: true`.  
+*(Definisi model dan route backend tetap ESM `import`/`export`; hanya file migrasi `sequelize-cli` yang memakai pola §9.1.)*
 
 ```js
 const Model = sequelize.define("NamaModel", { ... }, {
@@ -454,7 +467,7 @@ Setiap developer **wajib mencentang semua** sebelum membuat commit/pull request:
 □ Sidebar baru menggunakan AppSidebar komponen (bukan inline aside)
 □ Warna primary menggunakan bg-primary / var(--color-primary)
 □ Tidak ada w-64 untuk sidebar — gunakan w-[280px] / w-[72px]
-□ Tabel baru punya migration file + soft delete (deleted_at)
+□ Tabel baru: migrasi `*.cjs` (§9.1), `npm run db:migrate:cli` tanpa error, + soft delete (`deleted_at`)
 □ roleModuleMapping.json sudah diupdate untuk fitur baru
 □ File baru tidak menduplikasi komponen/hook/service yang sudah ada
 □ get_errors tidak menampilkan compile error baru
@@ -473,6 +486,7 @@ Setiap developer **wajib mencentang semua** sebelum membuat commit/pull request:
 | `20-strategi-testing-dan-quality-gate.md`  | Quality gate dan testing               |
 | `03-spesifikasi-uiux-dashboard.md`         | Spec UX/UI yang wajib diikuti          |
 | `openapi.yaml`                             | Kontrak API resmi                      |
+| `database-migration-deployment.md`         | Migrasi CLI, `SequelizeMeta`, dev/prod |
 
 ---
 

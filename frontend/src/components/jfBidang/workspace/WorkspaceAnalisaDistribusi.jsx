@@ -1,6 +1,6 @@
 // Workspace analisa inflasi & harga — JF Bidang Distribusi (read kiri, form kanan)
 import React, { useState, useEffect } from "react";
-import api from "../../../utils/api";
+import api from "../../../services/api";
 
 export default function WorkspaceAnalisaDistribusi() {
   const [form, setForm] = useState({

@@ -1,7 +1,15 @@
 import { Op } from "sequelize";
-import { InstruksiGubernur, NotifikasiGubernur, User } from "../../models/index.js";
+import { InstruksiGubernur, NotifikasiGubernur } from "../../models/index.js";
 import { getIO, ROOMS } from "../../services/socketService.js";
-
+import { getDefaultKepalaDinasUserId } from "../../services/gubernurUserService.js";
+import {
+  computeDefaultDeadline,
+  generateJudulFromIsi,
+} from "../../services/instruksiDeadlineService.js";
+import {
+  auditExecutiveAction,
+  EXEC_AUDIT_MODUL,
+} from "../../services/executiveAuditService.js";
 function pad3(n) {
   return String(n).padStart(3, "0");
 }
@@ -29,27 +37,64 @@ export async function createInstruksi(req, res) {
       jenis,
       prioritas = "normal",
       deadline,
+      deadline_manual,
       lampiran_url,
-      assigned_to, // kepala dinas user_id
+      assigned_to, // opsional — default Kepala Dinas Pangan (satu akun)
     } = req.body || {};
 
-    if (!judul || !isi_perintah || !jenis || !assigned_to) {
-      return res.status(400).json({ success: false, message: "Field wajib: judul, isi_perintah, jenis, assigned_to" });
+    if (!isi_perintah || !jenis) {
+      return res.status(400).json({
+        success: false,
+        message: "Field wajib: isi_perintah, jenis",
+      });
     }
+
+    let penerimaId =
+      assigned_to != null && String(assigned_to).trim() !== ""
+        ? Number(assigned_to)
+        : null;
+    if (penerimaId == null || !Number.isFinite(penerimaId)) {
+      penerimaId = await getDefaultKepalaDinasUserId();
+    }
+    if (penerimaId == null || !Number.isFinite(penerimaId)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Belum ada akun Kepala Dinas aktif — tidak dapat menetapkan penerima instruksi.",
+      });
+    }
+
+    const judulFinal =
+      String(judul || "").trim() || generateJudulFromIsi(isi_perintah);
+    const explicitManual = deadline_manual === true;
+    const deadlineFinal = explicitManual
+      ? deadline && String(deadline).trim() !== ""
+        ? String(deadline).slice(0, 10)
+        : null
+      : computeDefaultDeadline(jenis, prioritas);
 
     const nomor_instruksi = await genNomorInstruksi();
 
     const row = await InstruksiGubernur.create({
       nomor_instruksi,
-      judul,
+      judul: judulFinal.slice(0, 255),
       isi_perintah,
       jenis,
       prioritas,
-      deadline: deadline || null,
+      deadline: deadlineFinal,
       lampiran_url: lampiran_url || null,
       created_by: gubernurId,
-      assigned_to: Number(assigned_to),
+      assigned_to: penerimaId,
       status: "draf",
+    });
+
+    void auditExecutiveAction({
+      modul: EXEC_AUDIT_MODUL.INSTRUKSI,
+      entitas_id: row.id,
+      aksi: "CREATE_DRAF",
+      pegawai_id: gubernurId,
+      data_lama: null,
+      data_baru: row.get({ plain: true }),
     });
 
     return res.json({ success: true, data: row });
@@ -104,6 +149,8 @@ export async function updateStatusInstruksi(req, res) {
     const row = await InstruksiGubernur.findByPk(id);
     if (!row) return res.status(404).json({ success: false, message: "Instruksi tidak ditemukan" });
 
+    const sebelum = row.get({ plain: true });
+
     // Hanya Gubernur yang boleh publish/close/hapus; status lainnya dipakai di Prompt 2 (aksi Kadin)
     if (status === "diterbitkan") {
       if (row.status !== "draf") {
@@ -135,6 +182,16 @@ export async function updateStatusInstruksi(req, res) {
     }
 
     await row.save();
+
+    void auditExecutiveAction({
+      modul: EXEC_AUDIT_MODUL.INSTRUKSI,
+      entitas_id: row.id,
+      aksi: `UPDATE_STATUS_${String(status || "").toUpperCase()}`,
+      pegawai_id: gubernurId,
+      data_lama: sebelum,
+      data_baru: row.get({ plain: true }),
+    });
+
     return res.json({ success: true, data: row });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Gagal update status instruksi", error: err.message });
@@ -149,7 +206,17 @@ export async function deleteInstruksi(req, res) {
     if (row.status !== "draf") {
       return res.status(400).json({ success: false, message: "Hanya instruksi status draf yang boleh dihapus" });
     }
+    const snap = row.get({ plain: true });
+    const pid = req.user?.id;
     await row.destroy();
+    void auditExecutiveAction({
+      modul: EXEC_AUDIT_MODUL.INSTRUKSI,
+      entitas_id: id,
+      aksi: "DELETE_DRAF",
+      pegawai_id: pid,
+      data_lama: snap,
+      data_baru: null,
+    });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Gagal hapus instruksi", error: err.message });

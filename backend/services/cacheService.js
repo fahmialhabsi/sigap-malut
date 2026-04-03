@@ -113,6 +113,33 @@ async function getRedis() {
 // Initialize on import (non-blocking)
 getRedis().catch(() => {});
 
+/**
+ * Log sekali saat startup: Redis vs fallback memori (setelah getRedis mencoba koneksi).
+ */
+export async function logCacheStartupSummary() {
+  try {
+    await getRedis();
+  } catch {
+    /* ignore */
+  }
+  console.log(`${"=".repeat(60)}`);
+  console.log("[Cache] Startup");
+  if (_useRedis && _redis) {
+    console.log("[Cache] Redis: terhubung — cache KPI/dashboard dapat dibagi antar instance backend.");
+  } else {
+    console.log(
+      "[Cache] Redis: tidak tersedia (mis. ECONNREFUSED) — memakai cache in-memory per proses.",
+    );
+    console.log(
+      "[Cache] Dampak: setiap instance Node punya cache sendiri; invalidasi tidak otomatis terbagi.",
+    );
+    console.log(
+      "[Cache] Fitur tetap berjalan (TTL lokal); untuk multi-instance gunakan Redis aktif.",
+    );
+  }
+  console.log(`${"=".repeat(60)}`);
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
@@ -200,6 +227,35 @@ export function getCacheStats() {
   };
 }
 
+/**
+ * Diagnostik cache untuk health check mendalam (ping Redis jika aktif).
+ */
+export async function getCacheHealth() {
+  const stats = getCacheStats();
+  if (_useRedis && _redis) {
+    try {
+      const t0 = Date.now();
+      await _redis.ping();
+      return {
+        ...stats,
+        redisReachable: true,
+        pingMs: Date.now() - t0,
+      };
+    } catch (err) {
+      return {
+        ...stats,
+        redisReachable: false,
+        error: err?.message || String(err),
+      };
+    }
+  }
+  return {
+    ...stats,
+    redisReachable: null,
+    note: "Redis tidak dipakai — cache in-memory",
+  };
+}
+
 export default {
   cacheSet,
   cacheGet,
@@ -207,5 +263,7 @@ export default {
   cacheFlushPattern,
   isRedisActive,
   getCacheStats,
+  getCacheHealth,
+  logCacheStartupSummary,
   TTL,
 };

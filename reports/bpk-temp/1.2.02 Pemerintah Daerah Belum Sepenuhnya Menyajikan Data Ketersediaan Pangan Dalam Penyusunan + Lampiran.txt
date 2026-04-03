@@ -1,0 +1,507 @@
+                                                      Halaman : 1.2.2.1
+                                                      Paraf :
+
+1.2.2. Penyusunan dan Pemanfaatan Neraca Pangan Pemerintah Provinsi Maluku Utara
+         Belum Sepenuhnya Didukung Data yang Valid
+
+Kondisi
+     . Neraca Pangan merupakan sistem berbasis web yang menampilkan proyeksi dan
+
+realisasi atas ketersediaan dan kebutuhan pangan di suatu wilayah pada periode waktu
+tertentu. Selisih antara ketersediaan dan kebutuhan pangan menggambarkan surplus dan
+defisit pangan di suatu wilayah. Ketersediaan pangan dihitung dari produksi domestik, stok
+serta pangan masuk dan pangan keluar wilayah. Kebutuhan pangan dihitung dari konsumsi
+pangan, baik di rumah tangga maupun di luar rumah tangga, seperti hotel, restoran, warung,
+catering, industri, serta kebutuhan lainnya seperti kebutuhan untuk bibit/benih, pakan dan
+tercecer. Data komoditas pangan pada Neraca Pangan memuat 15 komoditas yaitu Beras,
+Jagung, Bawang merah, Bawang putih, Cabai besar, Rabai rawit, Daging sapi, Daging
+ayam, Telur ayam, Gula pasir, Minyak goreng, Kedelai, Tepung Terigu, Garam dan Ikan.
+
+     Penyusunan proyeksi dan realiasi Neraca Pangan membutuhkan data yang valid,
+lengkap, dan dapat dipertanggungjawabkan. Hasil pemeriksaan menunjukkan penyusunan
+dan pemanfaatan Neraca Pangan belum sepenuhnya didukung data yang valid, sehingga
+masih terdapat beberapa permasalahan yang berpotensi mempengaruhi keakuratan
+informasi ketersediaan dan kebutuhan pangan Provinsi Maluku Utara. Permasalahan
+tersebut diuraikan sebagai berikut.
+
+a. Data Ketersediaan Pangan dalam Proyeksi Neraca Pangan Provinsi Maluku
+
+Utara Belum Sepenuhnya Didukung Data yang Valid dan Lengkap
+     Hasil pemeriksaan terhadap proses penyusunan proyeksi neraca pangan Provinsi
+
+Maluku Utara menunjukkan adanya sejumlah kelemahan dalam validitas dan
+
+kelengkapan data ketersediaan pangan yang digunakan sebagai berikut.
+
+1) Data Stok Awal
+
+Hasil pemeriksaan menunjukkan pencatatan stok awal Neraca Pangan
+
+Provinsi Maluku Utara dimulai tahun 2022 namun sumber data stok awal tahun
+
+2022 belum didukung dengan kertas kerja. Kepala Bidang Ketersediaan dan
+
+Kerawan Pangan menjelaskan data stok awal kedelai tidak ada, namun beras dan
+
+jagung pada tahun 2022 menggunakan data Simonstok. Data beras menggunakan
+
+data Simonstok ditambah data stok Bulog. Berdasarkan Petunjuk Teknis Tata
+
+Cara Penyusunan Proyeksi Neraca Pangan, stok awal merupakan carry over
+neraca dari bulan/tahun sebelumnya namun pada bulan Februari s.d. Desember
+
+tahun 2022 terdapat perbedaan stok awal dengan hasil perhitungan neraca bulan-
+bulan sebelumnya pada komoditas Beras karena format belum terintegrasi dari
+
+stok akhir bulan sebelumnya. Ketidaksesuaian tersebut belum dikoordinasikan
+
+untuk dilakukan koreksi/revisi/perubahan dengan Bapanas.
+     Pengujian perbandingan stok awal Proyeksi Neraca Pangan tahun berjalan
+
+dengan bulan Desember tahun sebelumnya diuraikan pada tabel berikut.
+
+Tabel 1. Perbandingan Stok Awal Bulan Berjalan dengan Neraca Tahun
+
+                   Sebelumnya Proyeksi Neraca Pangan
+
+No Komoditas       Keterangan                         Selisih
+
+1 Beras            Pengujian Saldo Stok Awal Tahun 2023 dengan 455
+
+                   Saldo Stok Akhir Tahun 2022
+
+                   Pengujian Saldo Stok Awal Tahun 2025 dengan - 33.171
+
+                   Saldo Stok Akhir Tahun 2024
+                                                  Halaman : 1.2.2.2
+                                                  Paraf :
+
+No Komoditas  Keterangan                            Selisih
+
+2 Jagung      Pengujian Saldo Stok Awal Tahun 2025 dengan - 46.042
+
+              Saldo Stok Akhir Tahun 2024
+
+3 Kedelai     Pengujian Saldo Stok Awal Tahun 2024 dengan 1.770
+
+              Saldo Stok Akhir Tahun 2023
+
+              Pengujian Saldo Stok Awal Tahun 2025 dengan - 3.114
+
+              Saldo Stok Akhir Tahun 2024
+
+     Tabel 1 menunjukan terdapat perbedaan pada masing-masing komoditas
+beras, jagung dan kedelai. Perbandingan saldo stok awal tahun 2023
+dibandingkan dengan saldo stok akhir tahun 2022 pada komoditas beras sebesar
+455. Saldo stok awal tahun 2024 dibandingkan dengan saldo stok akhir tahun
+2023 pada komoditas kedelai sebesar 1.770. Sedangkan saldo stok awal pada
+tahun 2025 dibandingkan dengan saldo stok akhir tahun 2024 terjadi perbedaan
+pada ketiga komoditas yaitu komoditas beras sebesar -33.171, komoditas jagung
+sebesaar -46.042 dan komoditas kedelai sebesar -3.114, rincian dapat dilihat pada
+Lampiran 1.
+
+     Pengujian perbandingan stok awal Realisasi Neraca Pangan tahun berjalan
+dengan bulan Desember tahun sebelumnya diuraikan pada tabel berikut.
+
+Tabel 2. Perbandingan Stok Awal Bulan Berjalan dengan Neraca Tahun
+
+           Sebelumnya Realisasi Neraca Pangan
+
+No Komoditas  Keterangan                            Selisih
+
+1 Beras       Pengujian Saldo Stok Awal Tahun 2023  455
+
+              dengan Saldo Stok Akhir Tahun 2022
+
+2 Jagung      Pengujian Saldo Stok Awal Tahun 2024 -36.885
+
+              dengan Saldo Stok Akhir Tahun 2023
+
+              Pengujian Saldo Stok Awal Tahun 2025 - 3.792
+
+              dengan Saldo Stok Akhir Tahun 2024
+
+3 Kedelai     Pengujian Saldo Stok Awal Tahun 2024 3.662
+
+              dengan Saldo Stok Akhir Tahun 2023
+
+     Tabel 2 menunjukan terdapat perbedaan pada masing-masing komoditas
+beras, jagung dan kedelai. Perbandingan saldo stok awal tahun 2023
+dibandingkan dengan saldo stok akhir tahun 2022 hanya pada beras sebesar 455.
+Tahun 2024 dibandingkan dengan saldo stok akhir tahun 2023 hanya pada jagung
+dan kedelai masing-masing sebesar -36.885 dan 3.662. Sedangkan pada tahun
+2025 dibandingkan dengan saldo stok akhir tahun 2024 terjadi perbedaan jagung
+sebesaar - 3.792, rincian dapat dilihat pada Lampiran 2.
+
+     Kepala Bidang Ketersediaan dan Kerawan Pangan menjelaskan bahwa
+perbedaan data saldo stok awal 2023 dengan saldo stok akhir tahun 2022 pada
+beras sebesar 455 merupakan tambahan stok cadangan beras dari Perum Bulog.
+Data persediaan stok komoditi Perum Bulog Kantor Cabang Ternate
+menunjukkan jumlah stok sebesar 454.528,26 Kg atau 455 ton (dibulatkan)
+diperoleh tanggal 1 Maret 2023 karena permintaan data dan penyusunan saldo
+stok akhir Pangan Bulan Januari Tahun 2023 baru dilaksanakanan di Bulan
+Maret. Data stok tersebut terkonfirmasi merupakan stok di Gudang Perum Bulog
+awal Januari 2023.
+                                                                              Halaman : 1.2.2.3
+                                                                              Paraf :
+
+2) Data Produksi
+           Pemeriksaan dan pengujian perhitungan data produksi pangan untuk
+
+     komoditas beras, jagung dan kedelai dari tahun 2022 s.d. 2025 menggunakan data
+     kertas kerja dari Dinas Pangan Provinsi Maluku Utara dibandingkan dengan data
+     Produksi Kerangka Sampel Area - Badan Pusat Statistik (KSA - BPS). Hasil
+     pengujian menunjukkan kondisi berikut:
+     a. Terdapat perbedaan penyajian data produksi beras dari tahun 2022, 2024 dan
+
+           2025. Pada tahun 2022, Dinas Pangan menggunakan data produksi beras
+           KSA BPS untuk mengisi data produksi Gabah Kering Giling (GKG).
+           Produksi GKG merupakan produksi gabah yang telah dikeringkan dan siap
+           digiling sedangkan beras adalah hasil akhir dari proses penggilingan gabah
+           tersebut. GKG memiliki kadar air maksimal 14% dan siap diolah sementara
+           beras adalah bulir padi yang sudah terlepas dari kulit (sekam), rincian data
+           dapat dilihat pada Lampiran 3;
+     b. Rincian perbedaan pengisian data produksi jagung karena pemahaman
+           pelaksana yang kurang cermat dalam pengisian data tahun 2023, 2024 s.d.
+           2025 diuraikan pada Lampiran 4; dan
+     c. Perbedaan pengisian data produksi komoditas kedelai terdapat pada tahun
+           2024 dan tahun 2025 Rincian perbedaan tersebut diuraikan pada Lampiran
+           5.
+           Hasil konfirmasi dengan Kepala Bidang Ketersedian dan Kerawanan
+     Pangan,diketahui penjelasan sebagai berikut.
+     a. Dinas Pangan salah menggunakan data pada produksi beras yang seharusnya
+          menggunakan produksi GKG pada tahun 2022;
+     b. Selisih data produksi jagung pada tahun 2023 belum dapat ditelaah
+          disebabkan Kepala Bidang Ketersedian dan Kerawanan Pangan tidak dapat
+          menjelaskan kembali sumber perolehan data dampai dengan akhir
+          pemeriksaaan;
+     c. Perbedaan data produksi beras, jagung dan kedelai pada tahun 2024 s.d. 2025,
+          disebabkan data KSA-BPS melalui Bapanas berubah-ubah setiap bulannya
+          dan Dinas Pangan mencatat data produksi pada saat diumumkan informasi
+          data produksi KSA-BPS bulan tersebut.
+3) Data Pangan Masuk dan Keluar
+           Berdasarkan hasil wawancara dengan Kepala Bidang Ketersediaan dan
+     Kerawanan Pangan, ditemukan bahwa sumber data pangan masuk (beras, jagung,
+     dan kedelai) dalam proyeksi dan realisasi neraca pangan tahun 2022 dan 2023
+     belum dapat dijelaskan. Proyeksi data pangan masuk beras dan kedelai untuk
+     neraca pangan tahun 2024 dan 2025 menggunakan estimasi data barang masuk
+     tahun sebelumnya ditambah 10%. Sementara itu, data pangan masuk beras dan
+     kedelai pada realisasi neraca pangan tahun 2024 dan 2025 diperoleh dari laporan
+     barang masuk yang dikirimkan oleh sembilan Kabupaten/Kota kecuali Kota
+     Ternate serta data pemantauan barang masuk yang dilakukan oleh staf Bidang
+     Ketersediaan dan Kerawanan Pangan Provinsi Maluku Utara di Kota Ternate.
+     Data pangan masuk jagung tahun 2024 sampai dengan 2025 tidak terdapat data,
+     karena Bidang Ketersediaan dan Kerawanan Pangan menyampaikan tidak ada
+     data barang masuk untuk komoditas jagung. Selain itu, Dinas Pangan belum
+                                                                                    Halaman : 1.2.2.4
+                                                                                    Paraf :
+
+           memperhitungkan data pangan keluar dikarenakan tidak tersedia data barang
+           keluar.
+
+b. Pemerintah Daerah Belum Memanfaatkan Proyeksi Neraca Pangan sebagai
+     Pertimbangan Pengambilan Kebijakan
+           Hasil pemeriksaan menunjukkan bahwa Pemerintah Provinsi Maluku Utara
+     belum memanfaatkan proyeksi neraca pangan sebagai dasar pertimbangan dalam
+     pengambilan kebijakan. Neraca pangan dapat berfungsi sebagai sistem peringatan
+     dini/early warning system (EWS) untuk antisipasi potensi masalah pangan, penetapan
+     kebutuhan pangan masuk dan pangan keluar dalam neraca komoditas, pengaturan
+     pemasukan dan pengeluaran pangan antarwaktu dan antarwilayah serta pemetaan
+     wilayah surplus dan defisit pangan pada praktiknya masih sebatas dokumen pelaporan
+     periodik. Kondisi tersebut tidak terlepas dari belum optimalnya koordinasi dan
+     integrasi data lintas sektor.
+           Hasil wawancara dengan Kepala Bidang Ketersediaan dan Kerawanan Pangan
+     diketahui bahwa permasalahan utama adalah ketidaktersediaan data yang lengkap dari
+     lintas sektor terkait sehingga Neraca Pangan yang dihasilkan belum sepenuhnya valid
+     dan akurat. Kepala Dinas Pangan berencana untuk membentuk tim validasi data neraca
+     pangan lintas sektor yang juga melibatkan unsur akademisi agar penyusunan Neraca
+     Pangan dapat didukung dengan data yang lebih akurat dan andal, sehingga Neraca
+     Pangan dapat digunakan sebagai bahan rekomendasi kebijakan ketersediaan pangan
+     yang lebih tepat sasaran dan berorientasi pada pencegahan risiko.
+           Fungsional Perencanaan Ahli Muda Dinas Pangan menjelaskan bahwa
+     penggunaan Neraca Pangan masih bersifat ke program kegiatan dan penggunaan data
+     ketersediaan pada Dinas Pangan. Selain itu, Kepala Dinas Pangan menjelaskan belum
+     ada kajian terkait pemanfaatan neraca pangan terkait EWS untuk antisipasi terhadap
+     masalah pangan, penanganan pemenuhan ketersediaan dan pasokan pangan serta
+     dalam upaya stabilitas harga pangan. Namun, Neraca Pangan sudah menjadi bahan
+     diskusi dengan Badan Perencanaan Pembangunan Daerah.
+
+Kriteria
+     Kondisi tersebut tidak sesuai dengan:
+
+a. Peraturan Badan Pangan Nasional Republik Indonesia Nomor 22 Tahun 2023 tentang
+     Tata Cara Penyusunan Proyeksi Neraca Pangan pada Pasal 2 menyatakan bahwa
+     Proyeksi Neraca Pangan digunakan bagi Pemerintah Pusat, Pemerintah Daerah
+     provinsi, dan Pemerintah Daerah kabupaten/kota untuk:
+     1) Bahan perumusan kebijakan di bidang Pangan;
+     2) Bahan perumusan kebijakan penetapan kebutuhan Ekspor Pangan dan Impor
+           Pangan dalam neraca komoditas;
+     3) Bahan perumusan kebijakan penetapan kebutuhan pemasukan dan pengeluaran
+           antarwaktu dan antarwilayah; dan/atau
+     4) Pemetaan surplus atau defisit Pangan.
+
+b. Keputusan Kepala Badan Pangan Nasional Nomor 27 Tahun 2025 tentang Petunjuk
+     Teknis Penyusunan Neraca Pangan Tahun 2025 pada Bab II Metodologi huruf C
+     tentang Metode Penghitungan dan Sumber Data pada:
+     1) Poin 2 huruf a Paragraf 3 menyatakan bahwa, untuk proyeksi neraca pangan yang
+           disusun oleh gubernur dan bupati/wali kota, stok pangan terdiri atas: (1) cadangan
+           pangan pemerintah yang dikuasai dan dikelola Perum BULOG dan BUMN
+                                                          Halaman : 1.2.2.5
+                                                          Paraf :
+
+Pangan di provinsi dan kabupaten/kota; (2) cadangan pangan Pemerintah Daerah
+
+provinsi dan Pemerintah Daerah kabupaten/kota yang dikuasai dan dikelola oleh
+
+BUMD; dan (3) cadangan pangan yang dikuasai dan dikelola oleh pedagang,
+
+komunitas, dan rumah tangga pada periode waktu tertentu;
+
+2) Poin 2 huruf b pada:
+
+a) Paragraf 1 menyatakan Data produksi dalam negeri berupa data produksi
+
+Pangan segar atau Pangan olahan yang siap dikonsumsi. Data produksi
+
+beberapa jenis Pangan perlu dikonversi dari bentuk segar atau ternak hidup
+
+menjadi bentuk siap dikonsumsi, yaitu gabah kering giling (GKG)
+
+dikonversi menjadi beras, bawang putih, dan bawang merah dikonversi dari
+
+bentuk konde menjadi bentuk rogol kering, serta ayam dan sapi hidup
+
+dikonversi menjadi daging.
+
+b) Paragraf 3 menyatakan Untuk Proyeksi Neraca Pangan yang disusun oleh
+
+Gubernur dan Bupati/Wali kota, data proyeksi dan realisasi produksi
+
+bersumber dari organisasi Perangkat Daerah yang menyelenggarakan urusan
+
+pemerintahan             di       bidang      Pangan/pertanian/perkebunan/
+
+peternakan/perindustrian/ perikanan, dan lembaga pemerintah
+
+nonkementerian yang menyelenggarakan tugas pemerintahan di bidang
+
+kegiatan statistik.
+
+3) Poin 2 huruf c Poin 1) pada:
+
+a) huruf (a) menyatakan Data Pangan Masuk bersumber dari data organisasi
+
+Perangkat Daerah yang menyelenggarakan urusan pemerintahan di bidang
+
+Pangan/pertanian/peternakan/perikanan/perindustrian/perkebunan/perhubu
+
+ngan/perdagangan, lembaga pemerintah yang menyelenggarakan tugas
+
+pemerintahan di bidang kegiatan statistik, lembaga pemerintah
+
+nonkementerian yang menyelenggarakan tugas pemerintahan di bidang
+
+karantina hewan, ikan dan tumbuhan, BUMN Pangan, BUMD, Pelaku
+
+Usaha Pangan, dan/atau asosiasi di bidang Pangan;
+
+b) huruf (b) menyatakan Data Pangan masuk digunakan untuk penyusunan
+
+Proyeksi Neraca Pangan yang disusun oleh Gubernur/Bupati/Wali Kota; dan
+
+c) huruf (c) menyatakan Apabila data Pangan masuk tidak tersedia, maka
+
+menggunakan pendekatan penghitungan rata-rata realisasi data Pangan
+
+masuk bulanan minimal 2 (dua) tahun terakhir.
+
+4) Point 2 huruf c Poin 2) pada:
+
+a) huruf (a) menyatakan Data Pangan keluar bersumber dari data organisasi
+
+Perangkat Daerah yang menyelenggarakan urusan pemerintahan di bidang
+
+Pangan/                           pertanian/              peternakan/
+
+perikanan/perindustrian/perkebunan/perhubungan/ perdagangan, lembaga
+
+pemerintah nonkementerian yang menyelenggarakan tugas pemerintahan di
+
+bidang kegiatan statistik, lembaga pemerintah nonkementerian yang
+
+menyelenggarakan tugas pemerintahan di bidang karantina hewan, ikan dan
+
+tumbuhan, BUMN Pangan, BUMD, Pelaku Usaha Pangan, dan/atau asosiasi
+
+di bidang Pangan;
+
+b) huruf (b) menyatakan Data Pangan keluar digunakan untuk penyusunan
+
+Proyeksi Neraca Pangan yang disusun oleh Gubernur/Bupati/Wali Kota; dan
+                                                                                    Halaman : 1.2.2.6
+                                                                                    Paraf :
+
+           c) huruf (c) menyatakan Apabila data Pangan keluar tidak tersedia, maka
+                 menggunakan pendekatan penghitungan rata-rata realisasi data Pangan
+                 keluar bulanan minimal 2 (dua) tahun terakhir
+
+Akibat
+     Kondisi tersebut mengakibatkan:
+
+a. Proyeksi dan realisasi neraca pangan kurang andal sebagai dasar pengambilan
+     keputusan; dan
+
+b. Pemanfaatan Proyeksi Neraca Pangan belum sesuai dengan tujuan yang diharapkan.
+
+Sebab
+Kondisi tersebut disebabkan
+a. Kepala Dinas Pangan belum optimal:
+
+     1) Melakukan koordinasi dan integrasi data lintas sektor;
+     2) Melakukan pengawasan penyusunan proyeksi neraca pangan; dan
+     3) Memanfaatkan proyeksi dan realisasi Neraca Pangan untuk pengambilan
+
+           kebijakan.
+b. Kepala Bidang Ketersediaan dan Kerawanan Pangan Dinas Pangan belum optimal
+
+     memahami ketentuan petunjuk teknis penyusunan neraca pangan.; dan
+
+Komentar Instansi
+(Terlampir)
+                                                                                                                                                                                                                                 Lampiran 1
+
+                                                            Rincian Data Produksi Beras pada Kertas Kerja yang Dibandingkan dengan Data BPS
+
+   Bulan   Kertas Kerja Provinsi  Tahun 2022                Selisih                   Kertas Kerja Provinsi  Tahun 2024                Selisih                     Kertas Kerja Provinsi  Tahun 2025                Selisih
+                                   Data BPS                                                                   Data BPS                                                                    Data BPS
+  Januari
+ Februari  Produksi  Produksi     Produksi     Produksi     Produksi     Produksi     Produksi  Produksi     Produksi     Produksi     Produksi     Produksi       Produksi  Produksi     Produksi     Produksi     Produksi     Produksi
+              GKG     (Beras)        GKG        (Beras)        GKG        (Beras)        GKG     (Beras)        GKG        (Beras)        GKG        (Beras)          GKG     (Beras)        GKG        (Beras)        GKG        (Beras)
+   Maret     2,666                      4,765                                           4,222                      4,197                     25.04                   4,580                      4,268                    312.36
+    April               1657                         2,666   (2,098.26)        2,098              2,363                         2,349                          14              2,563                         2,651                     1,616
+     Mei
+    Juni   3,419     2124         6,110        3,419        (2,690.66)   2,691        5,850     3,274        6,721        3,761        (870.06)     (487)          3,619     2,025        3,372        2,095        246.82       1,277
+     Juli
+ Agustus   1,493     927          2,668        1,493        (1,174.75)   1,175        3,758     2,103        3,623        2,027        135.38       76             1,643     920          1,531        951          112.05       580
+September
+  Oktober  558       346          996          558          (438.83)     439          823       461          672          376          150.76       84             1,011     566          942          585          68.95        357
+November
+Desember   529       329          946          529          (416.47)     416          1,473     824          1,629        911          (155.63)     (87)           2,073     1,160        1,130        702          942.73       428
+
+           1,012     628          1,808        1,012        (796.07)     796          1,546     865          1,816        1,016        (269.25)     (151)          2,034     1,138        2,131        1,324        (97.03)      807
+
+           1,609     999          2,875        1,609        (1,265.97)   1,266        2,767     1,548        3,767        2,108        (1,000.57)   (560)          810       453          2,977        1,850        (2,167.10)   1,128
+
+           1,576     979          2,816        1,576        (1,240.05)   1,240        3,359     1,880        5,440        3,044        (2,080.78)   (1,164)        1,335     747          3,390        2,106        (2,054.89)   1,284
+
+           414       257          739          414          (325.43)     325          3,609     2,019        2,042        1,143        1,566.61     877            1,503     841          1,114        692          388.57       422
+
+           387       240          691          387          (304.43)     304          712       399          415          232          297.19       167            629       352          121          75           507.87       46
+
+           98        61           176          98           (77.47)      77           719       402                                    719.00       402            825       462          396          246          428.99       150
+
+           67        42           120          67           (52.65)      53           1,936     10,868                                 1,936.00     10,868         2,013     1,127        25,232       15,676       (23,219.21)  9,557
+                                                                                                                                                                                                                                                       Lampiran 2
+
+                                                                         Rincian Data Produksi Jagung pada Kertas Kerja yang Dibandingkan dengan Data BPS
+
+                                           Tahun 2023                                                                       Tahun 2024                                                                        Tahun 2025
+                                            Data BPS
+           Kertas Kerja Provinsi                                         Selisih                 Kertas Kerja Provinsi      Data BPS                     Selisih                     Kertas Kerja Provinsi    Data BPS                   Selisih
+
+   Bulan   Produksi JPK       Konversi     Produksi JPK      Konversi    Produksi JPK Konversi   Produksi     Konversi      Produksi      Konversi       Produksi       Konversi     Produksi     Konversi    Produksi     Konversi      Produksi      Konversi
+             ka.27,81%         ka.14%        ka.27,81%         ka.14%                                          ka.14%           JPK        ka.14%                        ka.14%                    ka.14%         JPK       ka.14%                      ka.14%
+  Januari                                                                ka.27,81%   ka.14%          JPK                                                     JPK                         JPK                                                 JPK
+ Februari         6,769.50      4,999.28          1,917.47   1917.47145                                                371  ka.27,81%               600                    (228.60)                   579.57  ka.27,81%             579                        0.37
+                  6,015.50      4,442.45          1,575.41   1192.12361  4,852.03    3,081.80    ka.27,81%                           811          1308   ka.27,81%                   ka.27,81%                     783.50           792  ka.27,81%
+   Maret          6,026.10      4,450.27          1,292.65   978.151717  4,440.09    3,250.32         502.00                                                     (309)                    784.00                                    302          0.50
+   April          1,196.10                        1,779.32   1346.41811  4,733.45    3,472.12                                      1,770            410                                                         1,071.31            229
+     Mei          4,801.20        883.32                     470.606219                          1,105.00     817                    554            380  (665) (203.28)              1,071.00     791.74           408.93           265  (0.31)        279.03
+    Juni          4,021.90      3,545.69             552.16  470.606219   (583.22)    (463.10)                                       513            770                                                            309.84
+     Juli         3,669.00      2,970.17             621.91  260.113372  4,249.04    3,075.08    427.00       316                                        (127)          17.38        409.00       302.35           357.89                0.07          106.70
+ Agustus          3,530.20      2,709.56             343.74  376.574051  3,399.99    2,499.57                                      1,042
+September         3,443.60      2,607.05             497.65              3,325.26    2,449.44    392.00       290                                        (121)          12.41        310.00       229.17                                 0.16          80.95
+  Oktober                       2,543.10          1,093.13    827.17807  3,032.55    2,230.48
+November             271.60                          853.96  646.198093  2,350.47    1,715.92    921.00       681                                        (121)          150.50       358.00       264.65                                 0.11          93.43
+Desember               95.50      200.58             127.19  96.2447853
+                       80.50        70.53         1,011.14   765.137995   (582.36)    (445.62)   289.00       214           308           770            (19) (481.50)               303.00       223.99      302.70       224           0.30          79.23
+                                    59.45                                   (31.69)     (25.72)
+                                                                                                 681.00       503           663           490            18             190.66       287.00       212.17      286.90       212           0.10          74.91
+                                                                          (930.64)    (705.69)
+                                                                                                 1,440.00     1,065         1,347         996            93             444.31       345.00       255.04      345.04       255           (0.04)        89.93
+
+                                                                                                 41.00        30            446           330            (405) (288.76)              760.00       561.83      589.47       436           170.53        324.23
+
+                                                                                                 159.00       503           204           151            (45)           8.48         547.00       404.37      438.23       324           108.77        223.04
+
+                                                                                                 206.00       831                                        206            206.00       337.00       249.13      1,100.18     813           (763.18) (476.31)
+
+                                                                                                 193.00       332                                        193            193.00       171.00       126.41      646.49       478           (475.49) (306.92)
+                                                                                                                          Lampiran 3
+
+           Rincian Data Produksi Kedelai pada Kertas Kerja yang Dibandingkan dengan Data BPS
+
+                                  Tahun 2024                                    Tahun 2025
+
+   Bulan   Kertas Kerja Provinsi  Data BPS            Selisih      Kertas Kerja Provinsi  Data BPS          Selisih
+
+  Januari  Produksi               Produksi                         Produksi               Produksi                     8
+ Februari                    -                   -                                                       8          -
+                             -                   -    -                      -                                      -
+   Maret                     -                   -                                                    -             -
+    April                    -                   -    -                      -                        -             -
+    Mei                      -                   -                                                    -             -
+    Juni                     -                    14  -                      -                        -             -
+     Juli                    -                   -                                                    -             -
+  Agustus                    -                   -    -                      -                        -
+September                    -                   -                                                    -                2
+  Oktober                    -                   -    -                      -                                      -
+November                     -                   -                                                       2          -
+Desember                      72                  13  (14)                   -                        -             -
+
+                                                      -                      -
+
+                                                      -                      -
+
+                                                      -                      -
+
+                                                      -                      -
+
+                                                      -                      -
+
+                                                               59            -
+                                                                                                                                                                       Lampiran 4
+
+                                                     Rincian Data Produksi Beras pada Kertas Kerja yang Dibandingkan dengan Data BPS
+
+                                    Beras                                                            Jagung                                               Kedelai
+                                 Data BPS                                                           Data BPS
+          Kertas Kerja Provinsi                      Selisih                 Kertas Kerja Provinsi                     Selisih                  Kertas Kerja Provinsi  Data BPS
+
+ Bulan    Produksi  Produksi     Produksi  Produksi  Produksi       Produksi Produksi JPK Konversi Produksi JPK Konversi Produksi JPK Konversi  Produksi               Produksi  Selisih
+             GKG     (Beras)        GKG     (Beras)     GKG
+Jan-25                                                              (Beras)  ka.27,81%  ka.14%      ka.27,81%  ka.14%  ka.27,81%      ka.14%
+Feb-25
+Mar-25    4,580     2,563         4,268     2,651         312.36    1,616      784.00   579.57      783.50     579         0.50           0.37            -               8         8
+Apr-25    3,619     2,025         3,372     2,095         246.82    1,277    1,071.00   791.74                            (0.31)      279.03
+Mei - 25  1,643      920          1,531                   112.05                        302.35      1,071.31   792         0.07       106.70              -            -         -
+Jun-25    1,011      566                       951                    580      409.00   229.17                             0.16
+ Jul-25   2,073     1,160            942       585          68.95     357      310.00   264.65      408.93     302         0.11         80.95             -            -         -
+Aug-25    2,034     1,138         1,130        702        942.73      428      358.00   223.99                             0.30         93.43
+Sep-25     810       453          2,131     1,324          (97.03)    807      303.00   212.17      309.84     229         0.10         79.23             -            -         -
+Oct-25    1,335      747          2,977     1,850     (2,167.10)    1,128      287.00   255.04                            (0.04)        74.91
+Nov-25    1,503      841          3,390     2,106     (2,054.89)    1,284      345.00   561.83      357.89     265     170.53           89.93             -            -         -
+Dec-25     629       352          1,114        692        388.57      422      760.00   404.37                         108.77         324.23
+           825       462                                  507.87               547.00   249.13      302.70     224     (763.18)       223.04              -            -         -
+          2,013     1,127            121         75       428.99        46     337.00   126.41                         (475.49)       (476.31)
+                                     396       246   (23,219.21)      150      171.00               286.90     212                    (306.92)            -            -         -
+                                 25,232    15,676                   9,557
+                                                                                                    345.04     255                                        -            -         -
+
+                                                                                                    589.47     436                                        -               2         2
+
+                                                                                                    438.23     324                                        -            -         -
+
+                                                                                                    1,100.18   813                                        -                      -
+
+                                                                                                    646.49     478                                        -                      -

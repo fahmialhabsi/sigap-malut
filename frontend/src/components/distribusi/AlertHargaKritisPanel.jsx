@@ -1,6 +1,6 @@
 // Alert anomali harga (is_anomaly) — data nyata dari harga_pangan
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function summarizeReason(raw) {
   if (raw == null || raw === "") return null;

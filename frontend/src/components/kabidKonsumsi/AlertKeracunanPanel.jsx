@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 const STATUS_STYLE = {
   baru: "bg-red-50 border-red-200 text-red-700",

@@ -6,6 +6,7 @@ import {
   getDashboardSummary,
   getEwsPanel,
   kirimEwsKeKadin,
+  getLaporanKeSekretarisStatus,
   getApprovalQueue,
   setujuiDokumenJF,
   kembalikanDokumenKJF,
@@ -27,6 +28,7 @@ router.use(requireKabidKetersediaan);
 router.get('/dashboard/summary', getDashboardSummary);
 router.get('/dashboard/ews', getEwsPanel);
 router.post('/ews/kirim-kadin', kirimEwsKeKadin);
+router.get("/laporan-ke-sekretaris/status", getLaporanKeSekretarisStatus);
 
 // Approval Queue
 router.get('/approval-queue', getApprovalQueue);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import api from "../utils/api";
+import api from "../services/api";
 import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
 
 export default function ModulePage() {
@@ -88,6 +88,20 @@ export default function ModulePage() {
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
           >
             + Input Data Harga
+          </Link>
+        ) : moduleId === "bds-kbj" ? (
+          <Link
+            to={`/module/bds-kbj/create`}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+          >
+            + Input Sarpras/Kelembagaan
+          </Link>
+        ) : moduleId === "bds-lap" ? (
+          <Link
+            to={`/module/bds-lap/create`}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+          >
+            + Finalisasi Laporan
           </Link>
         ) : (
           <Link
@@ -241,6 +255,7 @@ function getModuleName(moduleId) {
     "bds-cpd": "Cadangan Pangan",
     "bds-mon": "Monitoring Distribusi",
     "bds-kbj": "Kebijakan Distribusi",
+    "bds-lap": "Laporan Distribusi Final",
     "bkt-pgd": "Produksi Pangan",
     "bkt-krw": "Kerawanan Pangan",
     "bkt-fsl": "Fasilitasi Ketersediaan",
@@ -280,6 +295,22 @@ function getColumns(moduleId) {
       { key: "luas_tanam", label: "Luas Tanam (Ha)", type: "number" },
       { key: "luas_panen", label: "Luas Panen (Ha)", type: "number" },
       { key: "produksi_total", label: "Produksi (Ton)", type: "number" },
+      { key: "status", label: "Status", type: "badge" },
+    ],
+    "bds-kbj": [
+      { key: "tanggal_dokumen", label: "Tanggal", type: "date" },
+      { key: "jenis_kebijakan", label: "Jenis", type: "text" },
+      { key: "judul_kebijakan", label: "Judul", type: "text" },
+      { key: "tahun", label: "Tahun", type: "number" },
+      { key: "jenis_data", label: "Fokus", type: "text" },
+      { key: "status", label: "Status", type: "badge" },
+    ],
+    "bds-lap": [
+      { key: "periode", label: "Periode", type: "date" },
+      { key: "judul_laporan", label: "Judul", type: "text" },
+      { key: "tahun", label: "Tahun", type: "number" },
+      { key: "volume_distribusi_total", label: "Volume", type: "number" },
+      { key: "stok_cppd", label: "Stok CPPD", type: "number" },
       { key: "status", label: "Status", type: "badge" },
     ],
   };

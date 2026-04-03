@@ -1,0 +1,12 @@
+[
+  { "id": "pasar-gamalama-ternate", "nama": "Pasar Gamalama Ternate", "kabupaten": "Kota Ternate" },
+  { "id": "pasar-hygienis-bahari-ternate", "nama": "Pasar Higienis Bahari Ternate", "kabupaten": "Kota Ternate" },
+  { "id": "pasar-sofifi", "nama": "Pasar Sofifi", "kabupaten": "Kota Tidore Kepulauan" },
+  { "id": "pasar-tobelo", "nama": "Pasar Tobelo", "kabupaten": "Halmahera Utara" },
+  { "id": "pasar-weda", "nama": "Pasar Weda", "kabupaten": "Halmahera Tengah" },
+  { "id": "pasar-jailolo", "nama": "Pasar Jailolo", "kabupaten": "Halmahera Barat" },
+  { "id": "pasar-maba", "nama": "Pasar Maba", "kabupaten": "Halmahera Timur" },
+  { "id": "pasar-labuha", "nama": "Pasar Labuha", "kabupaten": "Halmahera Selatan" },
+  { "id": "pasar-daruba", "nama": "Pasar Daruba", "kabupaten": "Pulau Morotai" },
+  { "id": "pasar-sanana", "nama": "Pasar Sanana", "kabupaten": "Kepulauan Sula" }
+]

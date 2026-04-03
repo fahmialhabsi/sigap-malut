@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import Spj from "../../models/Spj.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../../services/executionThreadGate.js";
 
 function ensureOwner(row, userId) {
   return row && Number(row.dibuat_oleh) === Number(userId);
@@ -34,6 +35,8 @@ export async function getSpjDetail(req, res) {
 
 export async function createSpj(req, res) {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const userId = req.user?.id;
     const body = req.body || {};
 
@@ -50,6 +53,11 @@ export async function createSpj(req, res) {
       status: "draft",
       revisi_ke: 0,
       jenis_bendahara: "pengeluaran",
+      execution_thread_id: req.body.execution_thread_id ?? null,
+      task_id:
+        req.body.task_id != null && Number.isFinite(Number(req.body.task_id))
+          ? Number(req.body.task_id)
+          : null,
     });
 
     return res.json({ success: true, message: "SPJ draft dibuat", data: row });
@@ -64,6 +72,8 @@ export async function updateSpj(req, res) {
     const id = parseInt(req.params.id, 10);
     const row = await Spj.findByPk(id);
     if (!ensureOwner(row, userId)) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
+    const threadUp = await gateOperationalUpdate(req, res, row);
+    if (!threadUp) return;
     if (!["draft", "dikembalikan_bendahara", "dikembalikan_ppk"].includes(row.status)) {
       return res.status(400).json({ success: false, message: "SPJ tidak bisa diubah pada status ini" });
     }

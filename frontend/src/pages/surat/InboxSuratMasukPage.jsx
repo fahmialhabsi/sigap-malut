@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../utils/api";
+import api from "../../services/api";
 import { notifyError } from "../../utils/notify";
 
 const STATUS_FILTERS = [

@@ -11,7 +11,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import DashboardKepegawaianLayout from "../../layouts/DashboardKepegawaianLayout";
-import api from "../../utils/api";
+import api from "../../services/api";
+import { isDemoDataAllowed } from "../../config/appMode.js";
 import { notifySuccess, notifyError } from "../../utils/notify";
 
 const ALLOWED_ROLES = [
@@ -297,7 +298,9 @@ export default function DashboardKepegawaian() {
   const user = useAuthStore((s) => s.user);
   const roleName = normalizeRole(user);
 
-  const [records, setRecords] = useState(DUMMY_KGB);
+  const [records, setRecords] = useState(() =>
+    isDemoDataAllowed() ? DUMMY_KGB : [],
+  );
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("semua");
   const [selectedASN, setSelectedASN] = useState(null);
@@ -309,7 +312,8 @@ export default function DashboardKepegawaian() {
       const res = await api.get("/kepegawaian/kgb");
       if (Array.isArray(res.data?.data)) setRecords(res.data.data);
     } catch {
-      // gunakan dummy
+      if (isDemoDataAllowed()) setRecords(DUMMY_KGB);
+      else setRecords([]);
     } finally {
       setLoading(false);
     }

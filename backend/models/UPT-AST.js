@@ -29,7 +29,17 @@ const UptAst = sequelize.define('UptAst', {
     allowNull: false,
     defaultValue: true,
     comment: 'UPTD hanya bisa akses aset sendiri (field khusus UPTD)',
-  }
+  },
+  execution_thread_id: {
+    type: DataTypes.STRING(36),
+    allowNull: true,
+    comment: 'Rantai eksekusi (execution thread)',
+  },
+  task_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Opsional: Tasks.id',
+  },
 }, {
   tableName: 'upt_ast',
   timestamps: true,

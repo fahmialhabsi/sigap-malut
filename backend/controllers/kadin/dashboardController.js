@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import Task from "../../models/Task.js";
 import TaskAssignment from "../../models/TaskAssignment.js";
 import { InstruksiGubernur, PengajuanKeKepalaDinas } from "../../models/index.js";
+import { buildKadinExecutiveCockpit } from "../../services/kadinExecutiveCockpitService.js";
 
 function ensureAssoc() {
   if (!Task.associations?.assignments) {
@@ -41,6 +42,20 @@ export async function getSummary(req, res) {
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Gagal ambil summary Kadis", error: err.message });
+  }
+}
+
+export async function getKadinCockpit(req, res) {
+  try {
+    const kadinId = req.user?.id;
+    const data = await buildKadinExecutiveCockpit(kadinId);
+    return res.json({ success: true, data });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Gagal memuat cockpit Kepala Dinas",
+      error: err.message,
+    });
   }
 }
 

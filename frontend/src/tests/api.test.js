@@ -1,4 +1,4 @@
-import api from "../utils/api";
+import api from "../services/api";
 
 jest.mock("axios", () => {
   const original = jest.requireActual("axios");

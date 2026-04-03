@@ -15,8 +15,12 @@ import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
+import DashboardNotificationStrip from "../../components/notifications/DashboardNotificationStrip";
 import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
-import api from "../../utils/api";
+import KomunikasiPanel, {
+  LANES as KOM_LANES,
+} from "../../components/panel/KomunikasiPanel.jsx";
+import api from "../../services/api";
 
 // ─── Inline component: Modul Input Data Pangan (Pelaksana Bidang Teknis) ───
 function ModulInputDataPanganKetersediaan({ unitKerja }) {
@@ -50,13 +54,11 @@ function ModulInputDataPanganKetersediaan({ unitKerja }) {
 
   useEffect(() => {
     setHistoryLoading(true);
-    import("../../utils/api").then(({ default: api }) => {
-      api
-        .get("/api/pelaksana/data-pangan/riwayat", { params: { limit: 5 } })
-        .then((res) => setHistory(Array.isArray(res.data?.data) ? res.data.data : []))
-        .catch(() => setHistory([]))
-        .finally(() => setHistoryLoading(false));
-    });
+    api
+      .get("/api/pelaksana/data-pangan/riwayat", { params: { limit: 5 } })
+      .then((res) => setHistory(Array.isArray(res.data?.data) ? res.data.data : []))
+      .catch(() => setHistory([]))
+      .finally(() => setHistoryLoading(false));
   }, []);
 
   const handleSubmit = async (e) => {
@@ -64,7 +66,6 @@ function ModulInputDataPanganKetersediaan({ unitKerja }) {
     setSubmitting(true);
     setResult(null);
     try {
-      const { default: api } = await import("../../utils/api");
       const payload =
         tab === "produksi"
           ? {
@@ -442,7 +443,15 @@ function normalizeRoleName(user) {
   return v ? String(v).trim().toLowerCase().replace(/[\s-]+/g, "_") : null;
 }
 
-const ALLOWED = ["pelaksana", "staf_pelaksana", "super_admin", "kepala_dinas"];
+const ALLOWED = [
+  "pelaksana",
+  "staf_pelaksana",
+  "pelaksana_ketersediaan",
+  "pelaksana_distribusi",
+  "pelaksana_konsumsi",
+  "super_admin",
+  "kepala_dinas",
+];
 
 const PROGRESS_COLOR = {
   pending: "bg-gray-200",
@@ -463,6 +472,8 @@ export default function DashboardPelaksana() {
   const isUptdMutu = unitKerja.includes("uptd_mutu");
   const isUptdTeknis = unitKerja.includes("uptd_teknis");
   const isUptd = isUptdTu || isUptdMutu || isUptdTeknis;
+  /** Tema visual khusus Pelaksana UPTD: nyaman dipandang lama, layar lebar */
+  const themeUptdPl = isUptd;
   // Modul Data Pangan tersedia untuk semua Pelaksana KECUALI sekretariat
   const showDataPangan = unitKerja !== "sekretariat" && !unitKerja.includes("sekretariat");
 
@@ -576,6 +587,7 @@ export default function DashboardPelaksana() {
   const menuKetersediaan = [
     { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
     { id: "tasks", label: "Tugas Saya", icon: "📋", badge: loading ? null : tasks.length },
+    { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "data-pangan", label: "Data Pangan (Submit ke JF)", icon: "🌾" },
     { id: "dikembalikan", label: "Dikembalikan JF", icon: "↩️", badge: loading ? null : returned },
     { divider: true, label: "PRIBADI" },
@@ -587,6 +599,7 @@ export default function DashboardPelaksana() {
 
   const menuSekretariat = [
     { id: "tasks", label: "Tugas Saya", icon: "📋", badge: loading ? null : tasks.length },
+    { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "buat-spj", label: "Buat SPJ", icon: "➕" },
     { id: "spj", label: "SPJ Saya", icon: "📁" },
     { id: "surat", label: "Surat Saya", icon: "📬" },
@@ -603,6 +616,7 @@ export default function DashboardPelaksana() {
   const menuDistribusi = [
     { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
     { id: "tasks", label: "Tugas Saya", icon: "📋", badge: loading ? null : tasks.length },
+    { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "harga-pasar", label: "Input Harga Pasar (Submit ke JF)", icon: "🛒" },
     { id: "dikembalikan", label: "Dikembalikan JF", icon: "↩️", badge: loading ? null : returned },
     { divider: true, label: "PRIBADI" },
@@ -615,6 +629,7 @@ export default function DashboardPelaksana() {
   const menuKonsumsi = [
     { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
     { id: "tasks", label: "Tugas Saya", icon: "📋", badge: loading ? null : tasks.length },
+    { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "data-konsumsi", label: "Input Data Konsumsi (Submit ke JF)", icon: "🍽️" },
     { id: "dikembalikan", label: "Dikembalikan JF", icon: "↩️", badge: loading ? null : returned },
     { divider: true, label: "PRIBADI" },
@@ -627,6 +642,7 @@ export default function DashboardPelaksana() {
   const menuUptdTu = [
     { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
     { id: "tasks", label: "Tugas Saya", icon: "📋", badge: loading ? null : tasks.length },
+    { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "uptd-admin-tu", label: "Admin TU (Submit ke Kasubag)", icon: "🗂️" },
     { id: "dikembalikan", label: "Dikembalikan", icon: "↩️", badge: loading ? null : returned },
     { divider: true, label: "PRIBADI" },
@@ -639,6 +655,7 @@ export default function DashboardPelaksana() {
   const menuUptdMutu = [
     { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
     { id: "tasks", label: "Tugas Saya", icon: "📋", badge: loading ? null : tasks.length },
+    { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "uptd-sertifikasi", label: "Sertifikasi (Submit ke Kasi Mutu)", icon: "🏆" },
     { id: "dikembalikan", label: "Dikembalikan", icon: "↩️", badge: loading ? null : returned },
     { divider: true, label: "PRIBADI" },
@@ -651,6 +668,7 @@ export default function DashboardPelaksana() {
   const menuUptdTeknis = [
     { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
     { id: "tasks", label: "Tugas Saya", icon: "📋", badge: loading ? null : tasks.length },
+    { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "uptd-uji-lab", label: "Hasil Uji Lab (Submit ke Kasi Teknis)", icon: "🧪" },
     { id: "dikembalikan", label: "Dikembalikan", icon: "↩️", badge: loading ? null : returned },
     { divider: true, label: "PRIBADI" },
@@ -819,13 +837,13 @@ export default function DashboardPelaksana() {
 
     return (
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-bold text-gray-800">📋 Tugas Saya Hari Ini</h2>
-          <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+          <h2 className="font-bold text-gray-800 text-base sm:text-lg shrink-0">📋 Tugas Saya Hari Ini</h2>
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-end">
             {["Semua", "Aktif", "Rutin", "Overdue"].map((f) => (
               <span
                 key={f}
-                className="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold"
+                className="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold whitespace-nowrap shrink-0"
               >
                 {f}
               </span>
@@ -952,6 +970,14 @@ export default function DashboardPelaksana() {
         );
       case "tasks":
         return <PanelTugasKanban />;
+      case "komunikasi":
+        return (
+          <KomunikasiPanel
+            lane={KOM_LANES.ES4_OPERATOR}
+            titleTanggapan="Tanggapan ke atasan (task Anda)"
+            titleDiskusi="Diskusi dengan Kasubag / JF (task)"
+          />
+        );
       case "data-pangan":
         return <ModulInputDataPanganKetersediaan unitKerja={user?.unit_kerja} />;
       case "dikembalikan":
@@ -980,13 +1006,18 @@ export default function DashboardPelaksana() {
   };
 
   const renderLegacy = () => (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div className="min-h-[100dvh] h-[100dvh] flex flex-col bg-slate-50 overflow-hidden">
+      <DashboardNotificationStrip />
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain">
+        <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
       {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-900/95 to-slate-900/80 border-2 border-blue-700/50 rounded-2xl p-8 shadow-xl">
+      <div className="bg-gradient-to-r from-blue-900/95 to-slate-900/80 border-2 border-blue-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-2">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <span className="text-4xl">⚙️</span>
-            Dashboard Pelaksana
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
+            <span className="text-3xl sm:text-4xl shrink-0" aria-hidden>
+              ⚙️
+            </span>
+            <span className="min-w-0">Dashboard Pelaksana</span>
           </h1>
           <UploadSuratMasukQuickAction />
         </div>
@@ -1141,6 +1172,8 @@ export default function DashboardPelaksana() {
           className="w-full md:w-auto"
         />
       </div>
+        </div>
+      </div>
     </div>
   );
 
@@ -1266,6 +1299,14 @@ export default function DashboardPelaksana() {
         );
       case "tasks":
         return <PanelTugasKanban />;
+      case "komunikasi":
+        return (
+          <KomunikasiPanel
+            lane={KOM_LANES.ES4_OPERATOR}
+            titleTanggapan="Tanggapan ke atasan (task Anda)"
+            titleDiskusi="Diskusi dengan Kasubag / JF (task)"
+          />
+        );
       case "buat-spj":
         return (
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
@@ -1448,16 +1489,30 @@ export default function DashboardPelaksana() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div
+      className={`flex flex-col min-h-[100dvh] h-[100dvh] overflow-hidden ${
+        themeUptdPl
+          ? "bg-gradient-to-br from-slate-400/40 via-slate-300/50 to-slate-400/35 text-slate-900"
+          : "bg-gray-50 text-slate-900"
+      }`}
+    >
+      <DashboardNotificationStrip />
+      <div className="flex flex-1 min-h-0 overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-40 w-64 bg-slate-900 flex flex-col transition-transform duration-200`}
+        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static top-11 bottom-0 left-0 lg:top-auto lg:inset-y-0 z-40 w-[min(280px,88vw)] lg:w-64 shrink-0 flex flex-col transition-transform duration-200 ease-out ${
+          themeUptdPl
+            ? "bg-slate-950 border-r border-teal-900/40"
+            : "bg-slate-900"
+        }`}
       >
-        <div className="p-5 border-b border-slate-700">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🏛️</span>
-            <div>
-              <p className="font-bold text-white text-sm">SIGAP-MALUT</p>
+        <div className="p-4 sm:p-5 border-b border-slate-700 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-2xl shrink-0" aria-hidden>
+              🏛️
+            </span>
+            <div className="min-w-0">
+              <p className="font-bold text-white text-sm truncate">SIGAP-MALUT</p>
               <p className="text-xs text-slate-400">
                 {isSekretariat
                   ? "Pelaksana Sekretariat"
@@ -1476,7 +1531,7 @@ export default function DashboardPelaksana() {
             </div>
           </div>
         </div>
-        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-3 space-y-1 min-h-0">
           {menuActive.map((item, i) => {
             if (item.divider) {
               return (
@@ -1494,15 +1549,19 @@ export default function DashboardPelaksana() {
                   setActiveMenu(item.id);
                   setSidebarOpen(false);
                 }}
-                className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition ${
+                className={`w-full flex items-center justify-between gap-2 px-2.5 sm:px-3 py-2 rounded-lg text-left text-xs sm:text-sm transition touch-manipulation ${
                   activeMenu === item.id
-                    ? "bg-green-600 text-white"
-                    : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                    ? themeUptdPl
+                      ? "bg-teal-700 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+                      : "bg-green-600 text-white"
+                    : themeUptdPl
+                      ? "text-slate-300 hover:bg-slate-800 hover:text-white"
+                      : "text-slate-300 hover:bg-slate-700 hover:text-white"
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
+                <span className="flex items-center gap-2 min-w-0">
+                  <span className="shrink-0">{item.icon}</span>
+                  <span className="truncate">{item.label}</span>
                 </span>
                 {item.badge != null && (
                   <span className="px-1.5 py-0.5 rounded-full text-xs bg-amber-500 text-white font-bold min-w-[18px] text-center">
@@ -1513,35 +1572,49 @@ export default function DashboardPelaksana() {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-3 sm:p-4 border-t border-slate-700 shrink-0">
           <BukaEPelaraButton label="e-Pelara" targetPath="/" className="w-full !py-2 !text-xs" />
         </div>
       </aside>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+        <button
+          type="button"
+          aria-label="Tutup menu"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden border-0 cursor-default"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         {/* Header */}
-        <header className="bg-gradient-to-r from-blue-900/95 to-slate-900/80 border-b border-blue-700/50 px-6 py-4 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3">
+        <header
+          className={`border-b px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between shrink-0 ${
+            themeUptdPl
+              ? "bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border-teal-900/50"
+              : "bg-gradient-to-r from-blue-900/95 to-slate-900/80 border-blue-700/50"
+          }`}
+        >
+          <div className="flex items-start gap-2 sm:gap-3 min-w-0">
             <button
-              className="lg:hidden text-white p-1 rounded hover:bg-white/10"
+              type="button"
+              className="lg:hidden shrink-0 text-white p-2 rounded-lg hover:bg-white/10 touch-manipulation"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Buka menu"
             >
               ☰
             </button>
-            <div>
-              <h1 className="font-bold text-white text-lg">
+            <div className="min-w-0">
+              <h1 className="font-bold text-white text-base sm:text-lg truncate">
                 Halo, {user?.nama_lengkap || user?.name || "—"}
               </h1>
-              <p className="text-blue-200/70 text-xs">
+              <p
+                className={`text-[11px] sm:text-xs leading-snug ${
+                  themeUptdPl ? "text-teal-100/85" : "text-blue-200/70"
+                }`}
+              >
                 {isKetersediaan
                   ? "Pelaksana Bidang Ketersediaan"
                   : isDistribusi
@@ -1563,16 +1636,25 @@ export default function DashboardPelaksana() {
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 w-full sm:w-auto">
             <UploadSuratMasukQuickAction />
-            <span className="px-2 py-1 bg-amber-500/20 border border-amber-500/40 rounded-full text-amber-200 text-xs font-medium">
+            <span className="px-2 py-1 bg-amber-500/20 border border-amber-500/40 rounded-full text-amber-200 text-[11px] sm:text-xs font-medium whitespace-nowrap">
               🔔 {loading ? "…" : tasks.length} notif
             </span>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6">{renderSidebarContent()}</main>
+        <main
+          className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-[max(1rem,env(safe-area-inset-bottom))] ${
+            themeUptdPl
+              ? "p-4 sm:p-5 md:p-6 lg:px-10 xl:px-14 2xl:px-16 bg-gradient-to-b from-slate-300/35 to-slate-400/25 text-slate-900 max-w-[1920px] w-full mx-auto [&_.bg-white]:!bg-slate-100/95 [&_.border-gray-100]:!border-slate-400/35 [&_.text-gray-800]:!text-slate-900 [&_.text-gray-700]:!text-slate-800 [&_.text-gray-600]:!text-slate-700 [&_.text-gray-500]:!text-slate-600 [&_.text-gray-400]:!text-slate-500"
+              : "p-3 sm:p-4 md:p-6"
+          }`}
+        >
+          {renderSidebarContent()}
+        </main>
+      </div>
       </div>
     </div>
   );

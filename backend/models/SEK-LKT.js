@@ -130,6 +130,17 @@ const SekLkt = sequelize.define('SekLkt', {
     type: DataTypes.TEXT,
     comment: 'Catatan',
   },
+  execution_thread_id: {
+    type: DataTypes.STRING(36),
+    allowNull: true,
+    comment: 'Rantai eksekusi (execution thread)',
+  },
+  task_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Opsional: Tasks.id',
+  },
+
   created_by: {
     type: DataTypes.INTEGER,
     allowNull: false,

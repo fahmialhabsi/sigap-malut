@@ -1,20 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Navigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
-import { roleIdToName } from "../../utils/roleMap";
+import { normalizeRoleKey } from "../../utils/normalizeRole";
 import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
-import api from "../../utils/api";
-
-function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
-    roleIdToName?.[user?.role_id] ||
-    roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
-}
+import SekretariatSubordinateWorkspace from "../../components/coordination/SekretariatSubordinateWorkspace";
+import KomunikasiPanel, {
+  LANES as KOM_LANES,
+} from "../../components/panel/KomunikasiPanel.jsx";
+import api from "../../services/api";
 
 const ALLOWED = [
   "bendahara",
@@ -53,7 +47,7 @@ function Badge({ n, tone = "default" }) {
 
 export default function DashboardBendahara() {
   const user = useAuthStore((state) => state.user);
-  const roleName = normalizeRoleName(user);
+  const roleName = normalizeRoleKey(user);
 
   const isPengeluaran = roleName === "bendahara_pengeluaran";
   const isGaji = roleName === "bendahara_gaji";
@@ -70,6 +64,43 @@ export default function DashboardBendahara() {
   const isAllowed = !!user && ALLOWED.includes(roleName);
   if (!isAllowed) return <Navigate to="/" replace />;
 
+  const [coordinationHighlightId, setCoordinationHighlightId] = useState(null);
+  const [active, setActive] = useState("overview");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const processedCoordTaskRef = useRef(null);
+
+  useEffect(() => {
+    const raw = searchParams.get("coordinationTask");
+    if (!raw || processedCoordTaskRef.current === raw) return;
+    const id = Number(raw);
+    if (!Number.isFinite(id)) return;
+    processedCoordTaskRef.current = raw;
+    setActive("inbox");
+    setCoordinationHighlightId(id);
+    setSearchParams(
+      (prev) => {
+        const n = new URLSearchParams(prev);
+        n.delete("coordinationTask");
+        return n;
+      },
+      { replace: true },
+    );
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (coordinationHighlightId == null) return;
+    const t = setTimeout(() => setCoordinationHighlightId(null), 8000);
+    return () => clearTimeout(t);
+  }, [coordinationHighlightId]);
+
+  const coordinationWorkspace = (
+    <SekretariatSubordinateWorkspace
+      actorRole={roleName}
+      actorLabel={title}
+      highlightTaskId={coordinationHighlightId}
+    />
+  );
+
   const baseUrl = isPengeluaran
     ? "/api/bendahara-pengeluaran"
     : isGaji
@@ -77,7 +108,6 @@ export default function DashboardBendahara() {
       : isBarang
         ? "/api/bendahara-barang"
       : "/api/bendahara-pengeluaran";
-  const [active, setActive] = useState("overview");
 
   const [summary, setSummary] = useState(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
@@ -400,6 +430,12 @@ export default function DashboardBendahara() {
           tone: (summary?.inbox_sekretaris || 0) > 0 ? "danger" : "default",
         },
         {
+          id: "komunikasi",
+          label: "💬 Tanggapan & diskusi",
+          badge: null,
+          tone: "default",
+        },
+        {
           id: "spj_masuk",
           label: "📄 SPJ Masuk (Verifikasi)",
           badge: summary?.spj_masuk || 0,
@@ -663,6 +699,7 @@ export default function DashboardBendahara() {
                 </div>
 
                 {active === "inbox" ? (
+                  <div className="space-y-6">
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div className="font-bold text-slate-900">
@@ -673,6 +710,10 @@ export default function DashboardBendahara() {
                         tone="danger"
                       />
                     </div>
+                    <p className="text-xs text-slate-500 mb-3">
+                      Tabel ringkas di bawah badge; perintah lengkap, tanggapan, dan outbox ke Sekretaris
+                      ada di blok berikut dalam halaman yang sama.
+                    </p>
                     {inboxLoading ? (
                       <div className="text-sm text-slate-500 animate-pulse">
                         Memuat…
@@ -697,7 +738,7 @@ export default function DashboardBendahara() {
                                 key={t.id}
                                 className="border-t border-slate-100"
                               >
-                                <td className="px-3 py-2 font-medium">
+                                <td className="px-3 py-2 font-medium text-slate-900">
                                   {t.title || "—"}
                                 </td>
                                 <td className="px-3 py-2 text-xs text-slate-600">
@@ -718,6 +759,14 @@ export default function DashboardBendahara() {
                       </div>
                     )}
                   </div>
+                    {coordinationWorkspace}
+                  </div>
+                ) : active === "komunikasi" ? (
+                  <KomunikasiPanel
+                    lane={KOM_LANES.ES4_OPERATOR}
+                    titleTanggapan="Tanggapan ke atasan (task Anda)"
+                    titleDiskusi="Diskusi dengan Kasubag / JF (task)"
+                  />
                 ) : active === "spj_masuk" ? (
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                     <div className="flex items-center justify-between mb-3">
@@ -1033,57 +1082,56 @@ export default function DashboardBendahara() {
                 </div>
 
                 {active === "inbox" ? (
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="font-bold text-slate-900">
-                        📥 Inbox Sekretaris
+                  <div className="space-y-6">
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="font-bold text-slate-900">
+                          📥 Inbox Sekretaris
+                        </div>
+                        <Badge n={summary?.inbox_sekretaris || 0} tone="danger" />
                       </div>
-                      <Badge n={summary?.inbox_sekretaris || 0} tone="danger" />
-                    </div>
-                    {inboxLoading ? (
-                      <div className="text-sm text-slate-500 animate-pulse">
-                        Memuat…
-                      </div>
-                    ) : inbox.length === 0 ? (
-                      <div className="text-sm text-slate-500 italic">
-                        Inbox kosong.
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full text-sm">
-                          <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
-                            <tr>
-                              <th className="px-3 py-2 text-left">Judul</th>
-                              <th className="px-3 py-2 text-left">Status</th>
-                              <th className="px-3 py-2 text-left">Aksi</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {inbox.map((t) => (
-                              <tr
-                                key={t.id}
-                                className="border-t border-slate-100"
-                              >
-                                <td className="px-3 py-2 font-medium">
-                                  {t.title || "—"}
-                                </td>
-                                <td className="px-3 py-2 text-xs text-slate-600">
-                                  {t.assignment_status || t.status || "—"}
-                                </td>
-                                <td className="px-3 py-2">
-                                  <button
-                                    onClick={() => aksiKonfirmasiInbox(t)}
-                                    className="text-xs px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
-                                  >
-                                    Konfirmasi Terima
-                                  </button>
-                                </td>
+                      <p className="text-xs text-slate-500 mb-3">
+                        Tabel ringkas; perintah lengkap, tanggapan, dan outbox ke Sekretaris ada di blok
+                        berikut.
+                      </p>
+                      {inboxLoading ? (
+                        <div className="text-sm text-slate-500 animate-pulse">Memuat…</div>
+                      ) : inbox.length === 0 ? (
+                        <div className="text-sm text-slate-500 italic">Inbox kosong.</div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full text-sm">
+                            <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+                              <tr>
+                                <th className="px-3 py-2 text-left">Judul</th>
+                                <th className="px-3 py-2 text-left">Status</th>
+                                <th className="px-3 py-2 text-left">Aksi</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+                            </thead>
+                            <tbody>
+                              {inbox.map((t) => (
+                                <tr key={t.id} className="border-t border-slate-100">
+                                  <td className="px-3 py-2 font-medium text-slate-900">{t.title || "—"}</td>
+                                  <td className="px-3 py-2 text-xs text-slate-600">
+                                    {t.assignment_status || t.status || "—"}
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => aksiKonfirmasiInbox(t)}
+                                      className="text-xs px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
+                                    >
+                                      Konfirmasi Terima
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                    {coordinationWorkspace}
                   </div>
                 ) : active === "dikembalikan" ? (
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
@@ -1307,54 +1355,56 @@ export default function DashboardBendahara() {
                 </div>
 
                 {active === "inbox" ? (
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="font-bold text-slate-900">
-                        📥 Inbox Sekretaris
+                  <div className="space-y-6">
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="font-bold text-slate-900">
+                          📥 Inbox Sekretaris
+                        </div>
+                        <Badge n={summary?.inbox_sekretaris || 0} tone="danger" />
                       </div>
-                      <Badge n={summary?.inbox_sekretaris || 0} tone="danger" />
-                    </div>
-                    {inboxLoading ? (
-                      <div className="text-sm text-slate-500 animate-pulse">
-                        Memuat…
-                      </div>
-                    ) : inbox.length === 0 ? (
-                      <div className="text-sm text-slate-500 italic">
-                        Inbox kosong.
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full text-sm">
-                          <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
-                            <tr>
-                              <th className="px-3 py-2 text-left">Judul</th>
-                              <th className="px-3 py-2 text-left">Status</th>
-                              <th className="px-3 py-2 text-left">Aksi</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {inbox.map((t) => (
-                              <tr key={t.id} className="border-t border-slate-100">
-                                <td className="px-3 py-2 font-medium">
-                                  {t.title || "—"}
-                                </td>
-                                <td className="px-3 py-2 text-xs text-slate-600">
-                                  {t.assignment_status || t.status || "—"}
-                                </td>
-                                <td className="px-3 py-2">
-                                  <button
-                                    onClick={() => aksiKonfirmasiInbox(t)}
-                                    className="text-xs px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
-                                  >
-                                    Konfirmasi Terima
-                                  </button>
-                                </td>
+                      <p className="text-xs text-slate-500 mb-3">
+                        Tabel ringkas; perintah lengkap, tanggapan, dan outbox ke Sekretaris ada di blok
+                        berikut.
+                      </p>
+                      {inboxLoading ? (
+                        <div className="text-sm text-slate-500 animate-pulse">Memuat…</div>
+                      ) : inbox.length === 0 ? (
+                        <div className="text-sm text-slate-500 italic">Inbox kosong.</div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full text-sm">
+                            <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+                              <tr>
+                                <th className="px-3 py-2 text-left">Judul</th>
+                                <th className="px-3 py-2 text-left">Status</th>
+                                <th className="px-3 py-2 text-left">Aksi</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+                            </thead>
+                            <tbody>
+                              {inbox.map((t) => (
+                                <tr key={t.id} className="border-t border-slate-100">
+                                  <td className="px-3 py-2 font-medium text-slate-900">{t.title || "—"}</td>
+                                  <td className="px-3 py-2 text-xs text-slate-600">
+                                    {t.assignment_status || t.status || "—"}
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => aksiKonfirmasiInbox(t)}
+                                      className="text-xs px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
+                                    >
+                                      Konfirmasi Terima
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                    {coordinationWorkspace}
                   </div>
                 ) : active === "penerimaan" ? (
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
@@ -1558,4 +1608,3 @@ export default function DashboardBendahara() {
     </div>
   );
 }
-

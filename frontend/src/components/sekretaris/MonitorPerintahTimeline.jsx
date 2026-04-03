@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function statusPill(status) {
   const s = String(status || "").toLowerCase();
   if (s === "assigned") return { text: "DITERBITKAN", cls: "bg-blue-50 text-blue-700 border-blue-200" };
   if (s === "accepted") return { text: "DIBACA", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
   if (s === "in_progress") return { text: "DIPROSES", cls: "bg-amber-50 text-amber-700 border-amber-200" };
-  if (s === "submitted") return { text: "MENUNGGU REVIEW", cls: "bg-amber-50 text-amber-700 border-amber-200" };
+  if (s === "submitted")
+    return { text: "MENUNGGU VERIFIKASI", cls: "bg-amber-50 text-amber-700 border-amber-200" };
   if (s === "closed") return { text: "SELESAI", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
   if (s === "rejected") return { text: "DITOLAK", cls: "bg-red-50 text-red-700 border-red-200" };
   return { text: status || "—", cls: "bg-gray-50 text-gray-700 border-gray-200" };
@@ -20,7 +21,7 @@ export default function MonitorPerintahTimeline() {
   const fetchTimeline = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/api/sekretaris/perintah/timeline", {
+      const res = await api.get("/sekretaris/perintah/timeline", {
         params: { limit: 80 },
       });
       setRows(Array.isArray(res.data?.data) ? res.data.data : []);

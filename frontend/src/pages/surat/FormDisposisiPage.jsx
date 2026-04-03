@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../../utils/api";
+import api from "../../services/api";
 import { notifySuccess, notifyError } from "../../utils/notify";
 
 const PRIORITAS_OPTIONS = ["Rendah", "Normal", "Tinggi", "Urgent"];

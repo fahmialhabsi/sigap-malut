@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import api from "../utils/api";
+import api from "../services/api";
 
 // Custom hook for Sekretaris dashboard data & periodic updates
 export const useSekretarisDashboard = () => {
@@ -17,11 +17,11 @@ export const useSekretarisDashboard = () => {
 
       const [sekretarisRes, kpiRes, kgbRes] = await Promise.all([
         // Hitung inbox KaDin, approval queue, SLA khusus Sekretaris
-        api.get("/api/sekretaris/dashboard/summary"),
+        api.get("/sekretaris/dashboard/summary"),
         // KPI 50 indikator + bypass dari controller umum dashboard
-        api.get("/api/dashboard/sekretaris/summary"),
+        api.get("/dashboard/sekretaris/summary"),
         // KGB jatuh tempo <30 hari
-        api.get("/api/sekretaris/dashboard/kgb-alert/count"),
+        api.get("/sekretaris/dashboard/kgb-alert/count"),
       ]);
 
       const sekretarisData = sekretarisRes.data?.data || sekretarisRes.data || {};

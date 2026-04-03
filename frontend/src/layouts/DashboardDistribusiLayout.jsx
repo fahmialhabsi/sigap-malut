@@ -11,7 +11,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { roleIdToName } from "../utils/roleMap";
-import api from "../utils/api";
+import api from "../services/api";
 import BukaEPelaraButton from "../components/BukaEPelaraButton";
 
 Chart.register(

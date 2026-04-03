@@ -6,6 +6,7 @@
 
 import BktBmb from "../models/BKT-BMB.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BktBmb records
 // @route   GET /api/bkt-bmb
@@ -76,6 +77,8 @@ export const getBktBmbById = async (req, res) => {
 // @access  Private
 export const createBktBmb = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BktBmb.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBktBmb = async (req, res) => {
         message: "BktBmb not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

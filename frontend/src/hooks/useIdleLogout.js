@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import toast from "react-hot-toast";
 import useAuthStore from "../stores/authStore";
 
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000; // 15 menit
@@ -26,6 +27,10 @@ export default function useIdleLogout({ onWarning, onLogout } = {}) {
 
     // Warning 1 menit sebelum logout
     warnTimerRef.current = setTimeout(() => {
+      toast("Sesi akan berakhir dalam 1 menit jika tidak ada aktivitas (kebijakan keamanan).", {
+        duration: 8000,
+        id: "idle-logout-warning",
+      });
       onWarning?.();
     }, IDLE_TIMEOUT_MS - WARNING_BEFORE_MS);
 

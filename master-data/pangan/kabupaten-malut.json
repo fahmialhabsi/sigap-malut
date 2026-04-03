@@ -1,0 +1,12 @@
+[
+  { "id": "halmahera-barat", "nama": "Halmahera Barat" },
+  { "id": "halmahera-tengah", "nama": "Halmahera Tengah" },
+  { "id": "halmahera-utara", "nama": "Halmahera Utara" },
+  { "id": "halmahera-selatan", "nama": "Halmahera Selatan" },
+  { "id": "halmahera-timur", "nama": "Halmahera Timur" },
+  { "id": "pulau-morotai", "nama": "Pulau Morotai" },
+  { "id": "pulau-taliabu", "nama": "Pulau Taliabu" },
+  { "id": "kepulauan-sula", "nama": "Kepulauan Sula" },
+  { "id": "kota-ternate", "nama": "Kota Ternate" },
+  { "id": "kota-tidore-kepulauan", "nama": "Kota Tidore Kepulauan" }
+]

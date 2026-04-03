@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import api from "../../../utils/api";
+import api from "../../../services/api";
 import FormAnalisaPPH from "./FormAnalisaPPH";
 import FormAnalisaInspeksi from "./FormAnalisaInspeksi";
 import FormAnalisaSPPG from "./FormAnalisaSPPG";

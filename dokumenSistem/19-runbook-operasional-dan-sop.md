@@ -108,3 +108,42 @@ Target:
 - [ ] Alert route tervalidasi.
 - [ ] Backup tervalidasi.
 - [ ] DR drill dijadwalkan.
+
+## 11. Referensi teknis (Tahap 2 — health, log, backup)
+
+### 11.1 Health API
+
+- `GET /health` — ringan untuk load balancer; isi singkat + statistik cache in-memory/Redis (tanpa ping DB).
+- `GET /health?deep=1` — uji koneksi database (Postgres/SQLite) + kesehatan Redis jika dikonfigurasi. Respons **503** jika deep check gagal (DB down).
+- `GET /metrics` — metrik Prometheus (request counter, dll.).
+- `GET /api/test-db` — diagnostik koneksi DB + perkiraan jumlah tabel.
+
+### 11.2 Logging terstruktur
+
+- Winston menulis JSON ke `backend/logs/combined.log` dan error ke `backend/logs/error.log`.
+- Setiap respons HTTP (kecuali `/health` dan `/metrics`) mencatat event `http_request` dengan `requestId`, `method`, `path`, `status`, `durationMs`, serta `userId`/`role` jika user terautentikasi.
+- Header `X-Request-Id` disetel pada respons (atau gunakan header masukan klien jika ada).
+- **Env:** `LOG_LEVEL` (default `info`) — mis. `debug`, `warn`, `error`.
+
+### 11.3 Cache / Redis (deep health)
+
+- **Env:** `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`, `REDIS_DB` — selaras dengan `backend/services/cacheService.js`.
+- Jika Redis tidak dipakai, aplikasi fallback ke cache in-memory; deep health tetap mencerminkan status tersebut.
+
+### 11.4 Backup Postgres
+
+Skrip di root repo (variabel `DB_*` sama dengan `backend/config/database.js`):
+
+- **Linux/macOS:** `scripts/backup-postgres.sh` — output gzip ke folder `backups/` di root (`BACKUP_DIR` opsional). Muat `.env` sebelum menjalankan, contoh: `set -a && source .env && set +a && ./scripts/backup-postgres.sh`
+- **Windows (PowerShell):** `scripts/backup-postgres.ps1` — output SQL tidak dikompresi; pastikan `pg_dump` ada di PATH. Set env `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` (atau `PGPASSWORD`).
+
+Folder `backups/` di-ignore Git agar dump tidak ter-commit.
+
+### 11.5 Uji restore (drill singkat)
+
+1. Siapkan instance Postgres kosong atau database uji.
+2. Untuk file `.sql.gz` (skrip shell): `gunzip -c backups/pg_<nama>_<timestamp>.sql.gz | psql -h <host> -U <user> -d <db_target>`
+3. Untuk file `.sql` (PowerShell): `psql -h <host> -U <user> -d <db_target> -f <path>`
+4. Verifikasi: jalankan migrasi jika perlu, lalu `GET /health?deep=1` dan smoke test login.
+
+**Catatan:** restore ke DB produksi hanya dengan prosedur change control dan snapshot pra-restore.

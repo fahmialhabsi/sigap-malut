@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import api from "../utils/api";
+import api from "../services/api";
 import sekretariatModules from "../data/sekretariatModules";
 import { roleIdToName } from "../utils/roleMap";
 import BukaEPelaraButton from "../components/BukaEPelaraButton";

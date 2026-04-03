@@ -140,8 +140,39 @@ export async function getMonev(token, params = {}) {
   return data;
 }
 
+export async function getPeriodeRpjmd(token) {
+  const { data } = await createClient(token).get("/api/periode-rpjmd");
+  return data;
+}
+
 export async function getLakip(token, params = {}) {
   const { data } = await createClient(token).get("/api/lakip", { params });
+  return data;
+}
+
+export async function resolvePeriodeRpjmdByYear(token, tahun) {
+  const rows = await getPeriodeRpjmd(token);
+  const tahunNum = Number(tahun);
+  if (!Array.isArray(rows) || !Number.isFinite(tahunNum)) return null;
+
+  return (
+    rows.find((row) => {
+      const start = Number(row?.tahun_awal);
+      const end = Number(row?.tahun_akhir);
+      return Number.isFinite(start) && Number.isFinite(end)
+        ? tahunNum >= start && tahunNum <= end
+        : false;
+    }) || null
+  );
+}
+
+export async function createMonev(token, body = {}) {
+  const { data } = await createClient(token).post("/api/monev", body);
+  return data;
+}
+
+export async function createLpkDispang(token, body = {}) {
+  const { data } = await createClient(token).post("/api/lpk-dispang", body);
   return data;
 }
 

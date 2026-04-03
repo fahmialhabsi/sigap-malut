@@ -102,6 +102,34 @@ export async function initSocketIOAsync(httpServer) {
   return lazyInit_internal(httpServer);
 }
 
+export async function closeSocketIO() {
+  if (!_io) return;
+
+  const io = _io;
+  _io = null;
+
+  try {
+    io.disconnectSockets(true);
+  } catch {
+    // Ignore disconnect errors during shutdown.
+  }
+
+  await new Promise((resolve) => {
+    try {
+      io.close(() => {
+        console.log("[WS] Socket.IO closed");
+        resolve();
+      });
+    } catch (error) {
+      console.warn(
+        "[WS] Socket.IO close skipped:",
+        error?.message || error,
+      );
+      resolve();
+    }
+  });
+}
+
 export function getIO() {
   return _io;
 }
@@ -126,6 +154,7 @@ export function emitSuratMasukBaru(payload) {
 
 export default {
   initSocketIOAsync,
+  closeSocketIO,
   getIO,
   ROOMS,
   EVENTS,

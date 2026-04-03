@@ -5,6 +5,7 @@
 // =====================================================
 
 import BdsEvl from "../models/BDS-EVL.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BdsEvl records
 // @route   GET /api/bds-evl
@@ -75,6 +76,8 @@ export const getBdsEvlById = async (req, res) => {
 // @access  Private
 export const createBdsEvl = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BdsEvl.create({
       ...req.body,
       created_by: req.user?.id,
@@ -116,6 +119,8 @@ export const updateBdsEvl = async (req, res) => {
       });
     }
 
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

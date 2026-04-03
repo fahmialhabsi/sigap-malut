@@ -6,6 +6,7 @@
 
 import BdsBmb from "../models/BDS-BMB.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BdsBmb records
 // @route   GET /api/bds-bmb
@@ -76,6 +77,8 @@ export const getBdsBmbById = async (req, res) => {
 // @access  Private
 export const createBdsBmb = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BdsBmb.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBdsBmb = async (req, res) => {
         message: "BdsBmb not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

@@ -6,6 +6,7 @@
 
 import BdsHrg from "../models/BDS-HRG.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BdsHrg records
 // @route   GET /api/bds-hrg
@@ -76,6 +77,8 @@ export const getBdsHrgById = async (req, res) => {
 // @access  Private
 export const createBdsHrg = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BdsHrg.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBdsHrg = async (req, res) => {
         message: "BdsHrg not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

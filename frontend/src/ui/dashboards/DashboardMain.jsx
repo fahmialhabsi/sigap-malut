@@ -3,17 +3,7 @@
 import useAuthStore from "../../stores/authStore";
 import { Navigate, useNavigate } from "react-router-dom";
 import ProfessionalCharts from "../components/ProfessionalCharts";
-import { roleIdToName } from "../../utils/roleMap";
-
-function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
-    roleIdToName?.[user?.role_id] ||
-    roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
-}
+import { normalizeRoleKey } from "../../utils/normalizeRole";
 
 function normalizeUnit(user) {
   const v = user?.unit_kerja || user?.unit_id || "";
@@ -26,7 +16,7 @@ export default function DashboardMain() {
 
   if (!user) return <Navigate to="/login" replace />;
 
-  const roleName = normalizeRoleName(user);
+  const roleName = normalizeRoleKey(user);
   const unit = normalizeUnit(user);
 
   if (roleName === "super_admin")
@@ -50,7 +40,7 @@ export default function DashboardMain() {
 
   // Role spesifik (kalau nanti backend mengirim spesifik)
   if (roleName === "sekretaris")
-    return <Navigate to="/dashboard/sekretariat" replace />;
+    return <Navigate to="/dashboard/sekretaris" replace />;
   if (roleName === "kepala_bidang_ketersediaan")
     return <Navigate to="/dashboard/ketersediaan" replace />;
   if (roleName === "kepala_bidang_distribusi")
@@ -60,8 +50,19 @@ export default function DashboardMain() {
   if (roleName === "kepala_uptd")
     return <Navigate to="/dashboard/uptd" replace />;
 
-  // Jabatan Fungsional
-  if (roleName === "jabatan_fungsional" || roleName === "pejabat_fungsional")
+  // Jabatan Fungsional (sekretariat: perencanaan / keuangan, bidang, UPTD)
+  if (
+    roleName === "jabatan_fungsional" ||
+    roleName === "pejabat_fungsional" ||
+    roleName === "fungsional" ||
+    roleName === "fungsional_perencana" ||
+    roleName === "fungsional_perencanaan" ||
+    roleName === "fungsional_keuangan" ||
+    roleName === "fungsional_analis" ||
+    roleName === "fungsional_ketersediaan" ||
+    roleName === "fungsional_distribusi" ||
+    roleName === "fungsional_konsumsi"
+  )
     return <Navigate to="/dashboard/fungsional" replace />;
 
   // Kasubag Umum & Kepegawaian
@@ -84,7 +85,13 @@ export default function DashboardMain() {
     return <Navigate to="/dashboard/bendahara" replace />;
 
   // Staf Pelaksana
-  if (roleName === "pelaksana" || roleName === "staf_pelaksana")
+  if (
+    roleName === "pelaksana" ||
+    roleName === "staf_pelaksana" ||
+    roleName === "pelaksana_ketersediaan" ||
+    roleName === "pelaksana_distribusi" ||
+    roleName === "pelaksana_konsumsi"
+  )
     return <Navigate to="/dashboard/pelaksana" replace />;
 
   // Kasubag Tata Usaha UPTD

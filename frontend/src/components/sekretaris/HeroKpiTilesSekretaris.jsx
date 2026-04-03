@@ -14,7 +14,7 @@ export const HeroKpiTilesSekretaris = ({ className = "" }) => {
 
   const tiles = [
     {
-      label: "Inbox Kepala Dinas",
+      label: "Inbox Kepala Dinas & Bawahan",
       value: loading ? "…" : inboxCount ?? 0,
       color: inboxCount > 0 ? "red" : "indigo",
       icon: "📥",

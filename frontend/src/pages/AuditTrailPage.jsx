@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 
+function authHeaders() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export default function AuditTrailPage() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -31,7 +36,13 @@ export default function AuditTrailPage() {
       }).forEach(([k, v]) => {
         if (v) url.searchParams.append(k, v);
       });
-      const res = await fetch(url, { credentials: "include" });
+      const res = await fetch(url, {
+        credentials: "include",
+        headers: { ...authHeaders() },
+      });
+      if (res.status === 401 || res.status === 403) {
+        throw new Error("Akses ditolak — login sebagai pengguna dengan izin audit.");
+      }
       if (!res.ok) throw new Error("Gagal mengambil data audit log");
       const data = await res.json();
       setLogs(data.data || []);
@@ -62,11 +73,29 @@ export default function AuditTrailPage() {
   };
 
   const handleExport = async (format) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Login diperlukan untuk ekspor audit.");
+      return;
+    }
     const url = new URL("/api/audit-trail/export", window.location.origin);
     Object.entries({ ...filters, format }).forEach(([k, v]) => {
       if (v) url.searchParams.append(k, v);
     });
-    window.open(url.toString(), "_blank");
+    try {
+      const res = await fetch(url.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Ekspor gagal");
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `audit-log.${format === "json" ? "json" : "csv"}`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch {
+      setError("Gagal mengekspor — pastikan token masih valid dan Anda punya izin.");
+    }
   };
 
   return (

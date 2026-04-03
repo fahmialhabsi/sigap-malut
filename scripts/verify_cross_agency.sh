@@ -8,7 +8,7 @@ MAX_LINES=200
 SEARCH_TERMS="domainSequence|currentDomain|currentAgency|domain_sequence|current_domain|current_agency|current_step_index"
 MODEL_FILE="backend/models/WorkflowInstance.js"
 MIGRATION_PATTERN="cross-agency"
-MIGRATION_FILE="backend/migrations/20260315-add-cross-agency-to-workflow-instance.js"
+MIGRATION_FILE="backend/migrations/20260315-add-cross-agency-to-workflow-instance.cjs"
 ENGINE_FILE="backend/services/workflowEngine.js"
 SERVICE_FILE="backend/services/workflowService.js"
 TEST_SCRIPT="backend/scripts/test_workflow.js"
@@ -47,7 +47,7 @@ MIGRATION_PRESENT=MISSING
 MIGRATION_FIELDS=(domain_sequence current_domain current_agency current_step_index current_state)
 MIGRATION_FIELD_STATUS=()
 MIGRATION_FILE_FOUND=""
-for mf in $(find backend/migrations -type f -iname "*$MIGRATION_PATTERN*.js" -o -iname "*add-cross-agency*.js" 2>/dev/null); do
+for mf in $(find backend/migrations -type f \( -iname "*$MIGRATION_PATTERN*.cjs" -o -iname "*add-cross-agency*.cjs" \) 2>/dev/null); do
   MIGRATION_FILE_FOUND="$mf"
   break
 done

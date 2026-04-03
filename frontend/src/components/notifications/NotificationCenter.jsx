@@ -1,9 +1,14 @@
 // components/notifications/NotificationCenter.jsx
 // Bell icon dengan dropdown in-app notifications (polling setiap 30 detik)
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../stores/authStore";
+import { getDashboardPath } from "../../utils/getDashboardPath";
 import { notificationService } from "../../services/taskService";
 
 export default function NotificationCenter() {
+  const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [unread, setUnread] = useState(0);
@@ -157,7 +162,20 @@ export default function NotificationCenter() {
                   key={n.id}
                   onClick={() => {
                     markRead(n.id);
-                    if (n.link) window.location.hash = n.link;
+                    const link = n.link ? String(n.link) : "";
+                    const taskMatch = link.match(/\/tasks\/(\d+)/);
+                    if (taskMatch && user) {
+                      const base = getDashboardPath(user);
+                      navigate(`${base}?coordinationTask=${taskMatch[1]}`);
+                      setOpen(false);
+                      return;
+                    }
+                    if (link.startsWith("/")) {
+                      navigate(link);
+                      setOpen(false);
+                      return;
+                    }
+                    if (link) window.location.hash = link;
                   }}
                   style={{
                     padding: "10px 16px",

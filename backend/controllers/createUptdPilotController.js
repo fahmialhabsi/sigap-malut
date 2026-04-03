@@ -1,5 +1,6 @@
 import { logAudit } from "../services/auditLogService.js";
 import { normalizeUnitKerja } from "../config/pilotProjectPolicy.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 const CONTROL_QUERY_KEYS = new Set([
   "page",
@@ -219,6 +220,8 @@ export const createUptdPilotController = ({
 
   const create = async (req, res) => {
     try {
+      const threadOk = await gateOperationalWrite(req, res);
+      if (!threadOk) return;
       const payload = buildWritePayload({
         input: req.body,
         user: req.user,
@@ -269,6 +272,9 @@ export const createUptdPilotController = ({
           message: `${entityName} not found`,
         });
       }
+
+      const threadUp = await gateOperationalUpdate(req, res, record);
+      if (!threadUp) return;
 
       const before = record.toJSON();
       const payload = buildWritePayload({

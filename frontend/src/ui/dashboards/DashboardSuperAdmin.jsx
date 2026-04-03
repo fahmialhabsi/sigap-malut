@@ -1,552 +1,644 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { NavLink, Navigate } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, NavLink, Navigate, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import {
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  ChartBarSquareIcon,
+  ChevronRightIcon,
+  ClipboardDocumentListIcon,
+  Cog6ToothIcon,
+  DocumentTextIcon,
+  GlobeAltIcon,
+  ServerStackIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
+  WrenchScrewdriverIcon,
+} from "@heroicons/react/24/outline";
 import useAuthStore from "../../stores/authStore";
-import { roleIdToName } from "../../utils/roleMap";
-import api from "../../utils/api";
+import { normalizeRoleKey } from "../../utils/normalizeRole";
+import api from "../../services/api";
 import superAdminModules from "../../data/superAdminModules";
+import MasterDataSyncPanel from "../../components/MasterDataSyncPanel.jsx";
+import IntegrationLogPanel from "../../components/IntegrationLogPanel.jsx";
 
-function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
-    roleIdToName?.[user?.role_id] ||
-    roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
-}
-
-// Default KPI (akan di-overwrite oleh API)
-
-// Hero Card Component
-function HeroCard({ title, value, info, accent = "blue" }) {
-  const accentMap = {
-    emerald: {
-      bg: "bg-gradient-to-t from-black/95 to-slate-900/85",
-      border: "border-slate-700",
-      title: "text-slate-200",
-      value: "text-slate-100",
-    },
-    blue: {
-      bg: "bg-gradient-to-t from-slate-950/90 to-blue-950/70",
-      border: "border-blue-700",
-      title: "text-blue-200",
-      value: "text-blue-100",
-    },
-    amber: {
-      bg: "bg-gradient-to-t from-slate-950/90 to-amber-950/70",
-      border: "border-amber-700",
-      title: "text-amber-200",
-      value: "text-amber-100",
-    },
-    red: {
-      bg: "bg-gradient-to-t from-slate-950/90 to-red-950/70",
-      border: "border-red-700",
-      title: "text-red-200",
-      value: "text-red-100",
-    },
-  };
-
-  const theme = accentMap[accent] || accentMap.blue;
-
+/** KPI tile — dokumen 05: KpiTile + tooltip definisi */
+function KpiTile({ label, value, hint, title: a11yTitle }) {
   return (
     <div
-      className={`rounded-2xl border-2 px-4 py-3 min-h-[86px] flex flex-col justify-between shadow-lg ${theme.bg} ${theme.border}`}
-      style={{
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-      }}
+      className="rounded-xl border border-exec-border bg-card p-4 shadow-soft-sm"
+      title={a11yTitle || hint}
     >
-      <div className={`text-2xl font-extrabold tracking-wide ${theme.value}`}>
-        {value}
+      <div className="text-xs font-semibold text-muted uppercase tracking-wide">
+        {label}
       </div>
-      <div>
-        <div className={`text-xs font-semibold ${theme.title}`}>{title}</div>
-        <div className="text-[11px] text-slate-200/80 mt-1">{info}</div>
-      </div>
+      <div className="text-2xl font-bold text-ink tabular-nums mt-1">{value}</div>
+      {hint ? (
+        <div className="text-[11px] text-muted mt-1 leading-snug">{hint}</div>
+      ) : null}
     </div>
   );
 }
 
-// Panel Box Component
-function PanelBox({ title, accent = "blue", children, className = "" }) {
-  const accentMap = {
-    emerald: "text-slate-200",
-    blue: "text-blue-200",
-    amber: "text-amber-200",
-    red: "text-red-200",
-  };
-  const titleColor = accentMap[accent] || accentMap.blue;
-
+function SectionCard({ title, subtitle, children, className = "" }) {
   return (
     <section
-      className={`rounded-2xl p-7 flex flex-col border border-slate-800/85 shadow-md flex-1 bg-slate-950/88 ${className}`}
-      style={{
-        backdropFilter: "blur(17px)",
-        WebkitBackdropFilter: "blur(17px)",
-      }}
+      className={`rounded-xl border border-exec-border bg-card shadow-soft-sm overflow-hidden ${className}`}
     >
-      <h2
-        className={`font-bold mb-4 text-xl flex items-center gap-2 ${titleColor}`}
-      >
-        {title}
-      </h2>
-      <div>{children}</div>
+      <div className="px-4 py-3 border-b border-muted/40 bg-bg/80">
+        <h2 className="text-h3 text-ink">{title}</h2>
+        {subtitle ? (
+          <p className="text-xs text-muted mt-0.5">{subtitle}</p>
+        ) : null}
+      </div>
+      <div className="p-4">{children}</div>
     </section>
   );
 }
 
-// Sidebar Item Component
-function SidebarItem({ to, label, sidebarOpen, onNavigate }) {
-  return (
-    <NavLink
-      to={to}
-      onClick={onNavigate}
-      className="relative w-full flex items-center group transition"
-    >
-      {({ isActive }) => (
-        <>
-          {isActive && (
-            <div className="absolute left-2 h-[52px] w-2 bg-gradient-to-b from-yellow-400 to-yellow-200 rounded-r-lg scale-105 shadow-lg transition" />
-          )}
-          <div
-            className={`
-              h-[52px] w-full pl-10 pr-5 text-lg flex items-center rounded-2xl font-semibold
-              ${
-                isActive
-                  ? "bg-slate-800/95 text-yellow-300"
-                  : "bg-slate-900/90 text-slate-100 hover:bg-slate-800/90"
-              }
-              shadow group-hover:scale-105
-              transition-all
-              relative
-            `}
-          >
-            <span className="flex-1 text-left">
-              {sidebarOpen ? label : label[0]}
-            </span>
-          </div>
-        </>
-      )}
-    </NavLink>
-  );
-}
+const MODULE_PATH = {
+  SA01: "/module/sa01",
+  SA02: "/module/sa02",
+  SA03: "/module/sa03",
+  SA04: "/module/sa04",
+  SA05: "/user-management",
+};
+
+const MODULE_ICONS = {
+  SA01: ChartBarSquareIcon,
+  SA02: WrenchScrewdriverIcon,
+  SA03: DocumentTextIcon,
+  SA04: ClipboardDocumentListIcon,
+  SA05: UserGroupIcon,
+};
 
 export default function DashboardSuperAdmin() {
   const user = useAuthStore((state) => state.user);
-  const roleName = normalizeRoleName(user);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
+  const roleName = normalizeRoleKey(user);
 
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.innerWidth < 768;
-  });
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return window.innerWidth >= 768;
-  });
-  const [waktu, setWaktu] = useState(new Date());
-  const [userData, setUserData] = useState(null);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 1024,
+  );
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => typeof window === "undefined" || window.innerWidth >= 1024,
+  );
+  const [clock, setClock] = useState(() => new Date());
+  const [userRow, setUserRow] = useState(null);
+  const [auditRows, setAuditRows] = useState([]);
+  const [auditLoading, setAuditLoading] = useState(true);
+  const [adminSummary, setAdminSummary] = useState(null);
+  const [apiHealth, setApiHealth] = useState("checking");
   const [avatarOpen, setAvatarOpen] = useState(false);
-  const avatarRef = useRef();
-  const [kpiData, setKpiData] = useState([
-    { label: "Indikator Monitoring", value: "—", info: "Memuat..." },
-    { label: "Compliance Alur", value: "—", info: "Memuat..." },
-    { label: "Bypass Terdeteksi", value: "—", info: "Memuat..." },
-    { label: "Data Valid", value: "—", info: "Memuat..." },
-  ]);
+  const avatarRef = useRef(null);
 
-  // Auth check
-  if (!user || roleName !== "super_admin") return <Navigate to="/" replace />;
+  if (!user || roleName !== "super_admin") {
+    return <Navigate to="/" replace />;
+  }
 
-  // Responsive handler
+  const menuItems = useMemo(
+    () => [
+      { to: "/dashboard/superadmin", label: "Beranda Admin", end: true },
+      { to: "/user-management", label: "Manajemen pengguna & peran" },
+      { to: "/audit-trail", label: "Audit trail & kepatuhan" },
+      { to: "/module-wizard", label: "Generator modul" },
+      { to: "/analytics", label: "Analitik mandiri" },
+      { to: "/dashboard/inflasi/mendagri", label: "Laporan Mendagri" },
+    ],
+    [],
+  );
+
   useEffect(() => {
-    if (typeof window === "undefined") return undefined;
+    const t = setInterval(() => setClock(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768;
+  useEffect(() => {
+    const onResize = () => {
+      const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
       if (!mobile) setSidebarOpen(true);
     };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Clock
   useEffect(() => {
-    const timer = setInterval(() => setWaktu(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Get user info
-  useEffect(() => {
-    let mounted = true;
-
-    api
-      .get("/auth/me")
-      .then((res) => {
-        if (!mounted) return;
-        const data = res.data?.data || res.data?.user || res.data;
-        setUserData(data);
-      })
-      .catch(() => {
-        if (!mounted) return;
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  // Fetch KPI dari backend
-  useEffect(() => {
-    let mounted = true;
-    api
-      .get("/api/dashboard/sekretaris/summary")
-      .then((res) => {
-        if (!mounted) return;
-        const d = res.data?.data || {};
-        setKpiData([
-          {
-            label: "Indikator Monitoring",
-            value: String(d.totalTasks ?? d.total_tugas ?? "50"),
-            info: "Total tugas/monitoring aktif",
-          },
-          {
-            label: "Compliance Alur",
-            value: d.completionRate != null ? `${d.completionRate}%` : "—",
-            info: "Persentase tugas selesai tepat waktu",
-          },
-          {
-            label: "Tugas Terlambat",
-            value: String(d.overdueTasks ?? d.overdue ?? 0),
-            info: "Tugas melewati batas waktu",
-          },
-          {
-            label: "Tugas Selesai",
-            value: String(d.completedTasks ?? d.selesai ?? 0),
-            info: "Total tugas telah diselesaikan",
-          },
-        ]);
-      })
-      .catch(() => {
-        if (!mounted) return;
-        setKpiData([
-          {
-            label: "Indikator Monitoring",
-            value: "50",
-            info: "Monitoring aktif",
-          },
-          {
-            label: "Compliance Alur",
-            value: "100%",
-            info: "Semua alur terpenuhi",
-          },
-          { label: "Bypass Terdeteksi", value: "0", info: "Tidak ada bypass" },
-          { label: "Data Valid", value: "99%", info: "Validitas data sistem" },
-        ]);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  // Avatar dropdown handler
-  useEffect(() => {
-    const handleClick = (e) => {
+    const onDoc = (e) => {
       if (avatarRef.current && !avatarRef.current.contains(e.target)) {
         setAvatarOpen(false);
       }
     };
-
-    if (avatarOpen) window.addEventListener("mousedown", handleClick);
-    return () => window.removeEventListener("mousedown", handleClick);
+    if (avatarOpen) document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
   }, [avatarOpen]);
 
-  const menuItems = [
-    {
-      id: "dashboard",
-      name: "Dashboard Super Admin",
-      path: "/dashboard/super-admin",
-    },
-    { id: "SA01", name: "Monitoring 50 indikator", path: "/module/sa01" },
-    { id: "SA02", name: "Tool modul tanpa coding", path: "/module/sa02" },
-    { id: "SA03", name: "Tata Naskah Dinas", path: "/module/sa03" },
-    { id: "SA04", name: "Database peraturan", path: "/module/sa04" },
-    { id: "SA05", name: "Manajemen User", path: "/user-management" },
-  ];
+  const loadDashboardData = useCallback(async () => {
+    setAuditLoading(true);
+    try {
+      const [meRes, auditRes, adminRes] = await Promise.allSettled([
+        api.get("/auth/me"),
+        api.get("/auditlogcontroller", { params: { limit: 12, page: 1 } }),
+        api.get("/dashboard/super-admin/summary"),
+      ]);
 
-  const formatWaktu = () => {
-    const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "Mei",
-      "Jun",
-      "Jul",
-      "Agt",
-      "Sep",
-      "Okt",
-      "Nov",
-      "Des",
-    ];
+      if (meRes.status === "fulfilled") {
+        const d = meRes.value.data?.data || meRes.value.data?.user || meRes.value.data;
+        setUserRow(d);
+      }
 
-    const day = days[waktu.getDay()];
-    const date = waktu.getDate();
-    const month = months[waktu.getMonth()];
-    const year = waktu.getFullYear();
-    const hours = String(waktu.getHours()).padStart(2, "0");
-    const minutes = String(waktu.getMinutes()).padStart(2, "0");
-    const seconds = String(waktu.getSeconds()).padStart(2, "0");
+      if (auditRes.status === "fulfilled") {
+        const body = auditRes.value.data;
+        setAuditRows(Array.isArray(body?.data) ? body.data : []);
+      } else {
+        setAuditRows([]);
+      }
 
-    return `${day}, ${date} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
+      if (adminRes.status === "fulfilled") {
+        setAdminSummary(adminRes.value.data?.data || null);
+      } else {
+        setAdminSummary(null);
+        const err = adminRes.status === "rejected" ? adminRes.reason : null;
+        const msg =
+          err?.response?.data?.message ||
+          (err?.response?.status === 403
+            ? "Akses ditolak — hanya super_admin"
+            : "Gagal memuat ringkasan Super Admin");
+        toast.error(msg);
+      }
+    } catch {
+      toast.error("Sebagian data dashboard gagal dimuat");
+    } finally {
+      setAuditLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${window.location.origin}/health`)
+      .then((r) => {
+        if (!cancelled) setApiHealth(r.ok ? "online" : "degraded");
+      })
+      .catch(() => {
+        if (!cancelled) setApiHealth("offline");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const formatClock = () => {
+    try {
+      return clock.toLocaleString("id-ID", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    } catch {
+      return String(clock);
+    }
+  };
+
+  const completionPct =
+    adminSummary?.tasks?.completionRate30dPct != null
+      ? `${adminSummary.tasks.completionRate30dPct}%`
+      : "—";
+
+  const overdue =
+    adminSummary?.tasks?.overdue != null ? adminSummary.tasks.overdue : null;
+
+  const userTotal = adminSummary?.users?.total;
+  const auditEntriesTotal = adminSummary?.auditLog?.entriesTotal;
+  const compliancePct = adminSummary?.compliance?.complianceAlurKoordinasiPct;
+
+  const displayName =
+    userRow?.nama_lengkap ||
+    user?.nama_lengkap ||
+    userRow?.name ||
+    user?.username ||
+    "Super Admin";
+
+  const initials = String(displayName)
+    .split(/\s+/)
+    .map((s) => s[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
   };
 
   return (
-    <div className="fixed inset-0 flex font-inter bg-gradient-to-br from-black via-slate-950 to-slate-900 text-slate-100 select-none">
-      {/* Sidebar Backdrop */}
-      {isMobile && sidebarOpen && (
+    <div className="min-h-[100dvh] w-full min-w-0 flex bg-bg text-ink font-sans antialiased">
+      {isMobile && sidebarOpen ? (
         <button
           type="button"
-          aria-label="Tutup sidebar"
-          className="fixed inset-0 z-20 bg-slate-950/45"
+          aria-label="Tutup menu"
+          className="fixed inset-0 z-40 bg-ink/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
-      )}
+      ) : null}
 
-      {/* Sidebar */}
       <aside
-        className={`h-full bg-black/95 z-30 flex flex-col items-center flex-shrink-0 transition-all duration-300 ${
-          isMobile
-            ? `${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed left-0 top-0 w-[275px] min-w-[275px]`
-            : sidebarOpen
-              ? "w-[275px] min-w-[275px]"
-              : "w-[72px] min-w-[72px]"
-        } border-r border-slate-800/80 shadow-xl`}
-        style={{
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-        }}
+        className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col border-r border-muted bg-ink text-surface transition-transform duration-200 lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } w-[min(100vw-3rem,280px)] shrink-0`}
       >
-        {/* Logo */}
-        <div className="flex items-center justify-center w-full py-8">
-          <img
-            src="/Logo.png"
-            alt="Logo"
-            className={`${sidebarOpen ? "w-24 h-24" : "w-12 h-12"} object-contain transition-all`}
-          />
+        <div className="p-4 border-b border-muted/50 flex items-center gap-3">
+          <img src="/Logo.png" alt="" className="w-10 h-10 object-contain" />
+          <div>
+            <div className="text-sm font-bold text-surface">SIGAP Malut</div>
+            <div className="text-[11px] text-muted">System Control Center</div>
+          </div>
         </div>
-
-        {/* Menu Items */}
-        <div
-          className={`flex flex-col ${sidebarOpen ? "w-[245px] gap-y-2 px-4" : "w-[58px] gap-y-2 px-1.5"} mt-6 transition-all flex-1 overflow-y-auto`}
-        >
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1" aria-label="Menu super admin">
           {menuItems.map((item) => (
-            <SidebarItem
-              key={item.id}
-              to={item.path}
-              label={item.name}
-              sidebarOpen={sidebarOpen}
-              onNavigate={() => {
-                if (isMobile) setSidebarOpen(false);
-              }}
-            />
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              onClick={() => isMobile && setSidebarOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-primary text-white"
+                    : "text-surface/90 hover:bg-surface/10"
+                }`
+              }
+            >
+              <span className="truncate">{item.label}</span>
+            </NavLink>
           ))}
-        </div>
-
-        {/* Toggle Sidebar Button (Desktop Only) */}
-        {!isMobile && (
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="mb-6 px-4 py-2 bg-slate-800/90 hover:bg-slate-700/90 rounded-2xl text-white font-semibold shadow-md border border-slate-700/80 transition"
+          <a
+            href="/dashboard-publik"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-surface/90 hover:bg-surface/10"
           >
-            {sidebarOpen ? "◀" : "▶"}
-          </button>
-        )}
+            <GlobeAltIcon className="w-5 h-5 shrink-0" />
+            Dashboard publik
+          </a>
+        </nav>
+        <div className="p-3 border-t border-muted/50 text-[10px] text-muted leading-relaxed">
+          Pedoman: <span className="text-surface/80">dokumenSistem/05, 14, 31</span>
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header
-          className="h-20 flex items-center justify-between px-8 bg-slate-950/90 border-b border-slate-800/85 shadow-lg z-10"
-          style={{
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-          }}
-        >
-          <div className="flex items-center gap-4">
-            {isMobile && (
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="px-3 py-2 bg-slate-800/90 hover:bg-slate-700/90 rounded-lg text-white"
-              >
-                ☰
-              </button>
-            )}
-            <div className="flex items-center gap-3">
-              <span className="text-2xl font-bold text-white">
-                SIGAP · Super Admin
-              </span>
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-muted bg-card/95 backdrop-blur-sm">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              className="lg:hidden p-2 rounded-lg border border-muted text-ink"
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label="Buka menu"
+            >
+              <Bars3Icon className="w-6 h-6" />
+            </button>
+            <div className="min-w-0">
+              <h1 className="text-h2 text-ink truncate">Dashboard Super Admin</h1>
+              <p className="text-xs text-muted truncate hidden sm:block">
+                Administrator sistem — RBAC, audit, master data, integrasi (Permenpan RB / SPBE)
+              </p>
             </div>
           </div>
-
-          <div className="flex items-center gap-6">
-            <div className="text-sm text-slate-200/90">{formatWaktu()}</div>
-            <div className="text-sm text-slate-300">
-              {userData?.email || user?.email || "superadmin@sigap.id"}
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+            <div className="hidden md:block text-right">
+              <div className="text-[11px] text-muted">Waktu server (klien)</div>
+              <div className="text-xs font-mono text-ink">{formatClock()}</div>
             </div>
-
-            {/* Avatar Dropdown */}
             <div className="relative" ref={avatarRef}>
               <button
-                onClick={() => setAvatarOpen(!avatarOpen)}
-                className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white font-bold text-lg shadow-lg hover:scale-110 transition"
+                type="button"
+                onClick={() => setAvatarOpen((o) => !o)}
+                className="w-10 h-10 rounded-full bg-primary text-white font-bold text-sm flex items-center justify-center shadow-soft-sm"
+                aria-expanded={avatarOpen}
+                aria-haspopup="true"
               >
-                {userData?.name?.[0]?.toUpperCase() || "SA"}
+                {initials || "SA"}
               </button>
-
-              {avatarOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-slate-900/95 border border-slate-700/90 rounded-xl shadow-2xl py-2 z-50">
-                  <div className="px-4 py-3 border-b border-slate-700/70">
-                    <div className="text-sm font-semibold text-slate-100">
-                      {userData?.name || "Super Admin"}
-                    </div>
-                    <div className="text-xs text-slate-300/80">
-                      {userData?.email || user?.email}
+              {avatarOpen ? (
+                <div className="absolute right-0 mt-2 w-56 rounded-xl border border-muted bg-card shadow-soft py-2 z-50">
+                  <div className="px-3 py-2 border-b border-muted/50">
+                    <div className="text-sm font-semibold text-ink">{displayName}</div>
+                    <div className="text-xs text-muted truncate">
+                      {userRow?.email || user?.email}
                     </div>
                   </div>
                   <button
-                    onClick={() => {
-                      localStorage.removeItem("token");
-                      window.location.href = "/login";
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-red-300 hover:bg-slate-800/90"
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-bg text-left"
                   >
-                    Logout
+                    <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                    Keluar
                   </button>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </header>
 
-        {/* Content Area */}
         <main className="flex-1 overflow-y-auto">
-          <div className="w-full px-6 md:px-12 py-8 space-y-8">
-            {/* Hero Banner */}
-            <div
-              className="bg-gradient-to-r from-black/95 to-slate-900/92 border-2 border-slate-800/85 rounded-2xl p-8 shadow-2xl"
-              style={{
-                backdropFilter: "blur(15px)",
-                WebkitBackdropFilter: "blur(15px)",
-              }}
-            >
-              <h1 className="text-3xl font-bold text-white mb-3 flex items-center gap-3">
-                <span className="text-4xl">🛡️</span>
-                Dashboard Super Admin
-              </h1>
-              <p className="text-slate-200/85 text-base leading-relaxed">
-                Executive Control Center — Semua Modul, KPI, dan Alert
-              </p>
-              <div className="flex gap-3 mt-4">
-                <button
-                  className="bg-blue-900 hover:bg-blue-800 text-blue-100 px-5 py-2 rounded-lg font-semibold shadow border border-blue-700/70 transition"
-                  onClick={() => alert("Generate Mendagri Report")}
-                >
-                  📄 Generate Mendagri Report
-                </button>
-                <button
-                  className="bg-slate-900 hover:bg-slate-800 text-slate-100 px-5 py-2 rounded-lg font-semibold shadow border border-slate-700/70 transition"
-                  onClick={() => alert("Open AI Inbox")}
-                >
-                  🤖 Open AI Inbox
-                </button>
-              </div>
-            </div>
-
-            {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <HeroCard
-                title={kpiData[0].label}
-                value={kpiData[0].value}
-                info={kpiData[0].info}
-                accent="blue"
-              />
-              <HeroCard
-                title={kpiData[1].label}
-                value={kpiData[1].value}
-                info={kpiData[1].info}
-                accent="emerald"
-              />
-              <HeroCard
-                title={kpiData[2].label}
-                value={kpiData[2].value}
-                info={kpiData[2].info}
-                accent="amber"
-              />
-              <HeroCard
-                title={kpiData[3].label}
-                value={kpiData[3].value}
-                info={kpiData[3].info}
-                accent="red"
-              />
-            </div>
-
-            {/* Module Section */}
-            <PanelBox title="Modul Super Admin" accent="blue">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {superAdminModules.map((modul, idx) => (
-                  <div
-                    key={modul.id}
-                    className={`bg-gradient-to-br from-slate-900/92 to-black/85 border-2 border-slate-700/70 rounded-xl p-5 flex flex-col gap-3 shadow-lg hover:scale-105 transition ${modul.id === "SA05" ? "cursor-pointer" : ""}`}
-                    style={{
-                      backdropFilter: "blur(8px)",
-                      WebkitBackdropFilter: "blur(8px)",
-                    }}
-                    onClick={() => {
-                      if (modul.id === "SA05") {
-                        window.location.href = "/user-management";
-                      }
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">
-                        {["📊", "🛠️", "📄", "🗄️", "👤"][idx % 5]}
-                      </span>
-                      <div className="font-bold text-lg text-slate-100">
-                        {modul.name}
-                      </div>
-                    </div>
-                    <div className="text-xs text-slate-300/80 font-mono">
-                      ID: {modul.id}
-                    </div>
-                    {modul.id === "SA05" && (
-                      <button className="mt-2 bg-blue-900 hover:bg-blue-800 text-blue-100 px-4 py-2 rounded-lg font-semibold text-sm shadow border border-blue-700/70 transition">
-                        Tambah User
-                      </button>
-                    )}
+          <div className="w-full max-w-[100vw] box-border px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+            {/* Status strip — dokumen 14: alert & API health */}
+            <div className="grid grid-cols-12 gap-3">
+              <div className="col-span-12 md:col-span-6 lg:col-span-4 flex items-center gap-2 rounded-lg border border-muted bg-card px-3 py-2">
+                <ServerStackIcon className="w-5 h-5 text-primary shrink-0" />
+                <div>
+                  <div className="text-xs font-semibold text-ink">API &amp; layanan</div>
+                  <div className="text-[11px] text-muted">
+                    {apiHealth === "online" && "Health endpoint merespons OK"}
+                    {apiHealth === "degraded" && "Health merespons non-200"}
+                    {apiHealth === "offline" && "Tidak terhubung ke health endpoint"}
+                    {apiHealth === "checking" && "Memeriksa…"}
                   </div>
-                ))}
+                </div>
               </div>
-            </PanelBox>
+              <div className="col-span-12 md:col-span-6 lg:col-span-4 flex items-center gap-2 rounded-lg border border-muted bg-card px-3 py-2">
+                <ShieldCheckIcon className="w-5 h-5 text-success shrink-0" />
+                <div>
+                  <div className="text-xs font-semibold text-ink">Kepatuhan alur (30 hari)</div>
+                  <div className="text-[11px] text-muted">
+                    {compliancePct != null
+                      ? `Skor compliance audit: ${compliancePct}% · Pelanggaran bypass: ${adminSummary?.compliance?.bypassViolations30d ?? "—"}`
+                      : "RBAC aktif · Audit log tersedia — muat ringkasan untuk metrik"}
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-12 lg:col-span-4 flex flex-wrap gap-2 items-center">
+                <Link
+                  to="/audit-trail"
+                  className="inline-flex items-center gap-1 rounded-lg border border-primary bg-primary/10 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/15"
+                >
+                  Audit trail penuh
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    loadDashboardData();
+                    toast.success("Data dashboard dimuat ulang");
+                  }}
+                  className="inline-flex items-center gap-1 rounded-lg border border-muted px-3 py-2 text-xs font-semibold text-ink hover:bg-bg"
+                >
+                  Muat ulang KPI
+                </button>
+              </div>
+            </div>
+
+            {/* Executive summary KPI — grid 12 kolom */}
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-12 sm:col-span-6 xl:col-span-3">
+                <KpiTile
+                  label="Pengguna terdaftar"
+                  value={userTotal != null ? String(userTotal) : "—"}
+                  hint="Sumber: GET /api/dashboard/super-admin/summary (users.total)"
+                  a11yTitle="Jumlah akun pengguna di sistem"
+                />
+              </div>
+              <div className="col-span-12 sm:col-span-6 xl:col-span-3">
+                <KpiTile
+                  label="Entri audit (total)"
+                  value={auditEntriesTotal != null ? String(auditEntriesTotal) : "—"}
+                  hint="Sumber: ringkasan Super Admin (auditLog.entriesTotal)"
+                  a11yTitle="Total rekaman audit trail di basis data"
+                />
+              </div>
+              <div className="col-span-12 sm:col-span-6 xl:col-span-3">
+                <KpiTile
+                  label="Tugas terlambat (lintas unit)"
+                  value={overdue != null ? String(overdue) : "—"}
+                  hint="Task due_date lewat & status belum closed/rejected"
+                  a11yTitle="Jumlah tugas seluruh organisasi yang melewati tenggat"
+                />
+              </div>
+              <div className="col-span-12 sm:col-span-6 xl:col-span-3">
+                <KpiTile
+                  label="Penutupan tugas (30 hari)"
+                  value={completionPct}
+                  hint="closed ÷ dibuat (30 hari) — agregat Tasks"
+                  a11yTitle="Persentase tugas ditutup terhadap tugas baru dalam 30 hari"
+                />
+              </div>
+            </div>
+
+            {/* Quick actions — dokumen 05 QuickActionBar */}
+            <SectionCard
+              title="Aksi cepat"
+              subtitle="Tautan operasional sesuai matriks layanan Super Admin (dokumen 14)"
+            >
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  to="/user-management"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-95"
+                >
+                  <UserGroupIcon className="w-5 h-5" />
+                  Manajemen pengguna
+                </Link>
+                <Link
+                  to="/module-wizard"
+                  className="inline-flex items-center gap-2 rounded-lg border border-muted px-4 py-2 text-sm font-semibold text-ink hover:bg-bg"
+                >
+                  <Cog6ToothIcon className="w-5 h-5 text-primary" />
+                  Generator modul
+                </Link>
+                <Link
+                  to="/dashboard/inflasi/mendagri"
+                  className="inline-flex items-center gap-2 rounded-lg border border-muted px-4 py-2 text-sm font-semibold text-ink hover:bg-bg"
+                >
+                  <DocumentTextIcon className="w-5 h-5 text-primary" />
+                  Laporan Mendagri
+                </Link>
+                <Link
+                  to="/analytics"
+                  className="inline-flex items-center gap-2 rounded-lg border border-muted px-4 py-2 text-sm font-semibold text-ink hover:bg-bg"
+                >
+                  <ChartBarSquareIcon className="w-5 h-5 text-primary" />
+                  Analitik mandiri
+                </Link>
+                <button
+                  type="button"
+                  onClick={() =>
+                    toast("Panel AI / rekomendasi: hubungkan ke layanan backend saat tersedia", {
+                      icon: "ℹ️",
+                    })
+                  }
+                  className="inline-flex items-center gap-2 rounded-lg border border-dashed border-muted px-4 py-2 text-sm font-medium text-muted"
+                >
+                  AI inbox (roadmap)
+                </button>
+              </div>
+            </SectionCard>
+
+            <div className="grid grid-cols-12 gap-6">
+              {/* Activity feed / audit — dokumen 05 AlertList & ActivityFeed */}
+              <div className="col-span-12 xl:col-span-7 space-y-4">
+                <SectionCard
+                  title="Audit trail — aktivitas terbaru"
+                  subtitle="Read-only; ekspor CSV tersedia di endpoint (lihat OpenAPI)"
+                >
+                  {auditLoading ? (
+                    <p className="text-sm text-muted">Memuat log…</p>
+                  ) : auditRows.length === 0 ? (
+                    <p className="text-sm text-muted">
+                      Belum ada entri atau endpoint audit tidak tersedia untuk sesi ini.
+                    </p>
+                  ) : (
+                    <div className="overflow-x-auto -mx-4 px-4">
+                      <table className="min-w-full text-sm">
+                        <thead>
+                          <tr className="text-left text-muted border-b border-muted">
+                            <th className="py-2 pr-3 font-semibold">Waktu</th>
+                            <th className="py-2 pr-3 font-semibold">Modul</th>
+                            <th className="py-2 pr-3 font-semibold">Aksi</th>
+                            <th className="py-2 pr-3 font-semibold">Entitas</th>
+                            <th className="py-2 font-semibold">Pelaku</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {auditRows.map((row) => (
+                            <tr key={row.id} className="border-b border-muted/40">
+                              <td className="py-2 pr-3 whitespace-nowrap text-xs font-mono text-muted">
+                                {row.created_at
+                                  ? new Date(row.created_at).toLocaleString("id-ID")
+                                  : "—"}
+                              </td>
+                              <td className="py-2 pr-3 text-ink">{row.modul || "—"}</td>
+                              <td className="py-2 pr-3">
+                                <span className="rounded bg-bg px-2 py-0.5 text-xs font-medium">
+                                  {row.aksi || "—"}
+                                </span>
+                              </td>
+                              <td className="py-2 pr-3 text-muted truncate max-w-[140px]">
+                                {row.entitas_id || "—"}
+                              </td>
+                              <td className="py-2 text-muted text-xs">{row.pegawai_id || "—"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {auditEntriesTotal != null ? (
+                    <p className="text-[11px] text-muted mt-3">
+                      Total entri audit di basis data:{" "}
+                      <span className="font-semibold text-ink">{auditEntriesTotal}</span>
+                      {" "}— tabel di atas menampilkan {auditRows.length} aktivitas terbaru.
+                    </p>
+                  ) : null}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      to="/audit-trail"
+                      className="text-sm font-semibold text-primary inline-flex items-center gap-1"
+                    >
+                      Buka halaman audit
+                      <ChevronRightIcon className="w-4 h-4" />
+                    </Link>
+                    <span className="text-xs text-muted self-center">
+                      Ekspor CSV audit memakai endpoint terautentikasi (lihat OpenAPI).
+                    </span>
+                  </div>
+                </SectionCard>
+              </div>
+
+              <div className="col-span-12 xl:col-span-5 space-y-4">
+                <SectionCard
+                  title="Modul administrasi sistem"
+                  subtitle="Master data & modul khusus Super Admin (CSV master-data)"
+                >
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {superAdminModules.map((mod) => {
+                      const Icon = MODULE_ICONS[mod.id] || Cog6ToothIcon;
+                      const href = MODULE_PATH[mod.id] || `/module/${String(mod.id).toLowerCase()}`;
+                      const inner = (
+                        <>
+                          <div className="flex items-start gap-3">
+                            <Icon className="w-8 h-8 text-primary shrink-0" />
+                            <div>
+                              <div className="font-semibold text-ink text-sm leading-snug">
+                                {mod.name}
+                              </div>
+                              <div className="text-[11px] text-muted font-mono mt-0.5">
+                                {mod.id}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="mt-3 inline-flex items-center text-xs font-semibold text-primary">
+                            Buka
+                            <ChevronRightIcon className="w-3.5 h-3.5 ml-0.5" />
+                          </span>
+                        </>
+                      );
+                      return (
+                        <li key={mod.id}>
+                          <Link
+                            to={href}
+                            className="flex flex-col rounded-xl border border-muted bg-bg/60 p-4 h-full hover:border-primary/40 hover:bg-card transition-colors"
+                          >
+                            {inner}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </SectionCard>
+
+                <SectionCard
+                  title="Integrasi &amp; master data"
+                  subtitle="Sinkronisasi evidence / master-data — dokumen 04 &amp; 28"
+                >
+                  <div className="space-y-6">
+                    <MasterDataSyncPanel />
+                    <IntegrationLogPanel />
+                  </div>
+                </SectionCard>
+
+                <SectionCard
+                  title="Catatan implementasi"
+                  subtitle="Roadmap vs dokumen 14 (System Control Panel infrastruktur)"
+                >
+                  <ul className="text-xs text-muted space-y-2 list-disc pl-4">
+                    <li>
+                      Metrik CPU/memori/disk &amp; status backup basis data memerlukan endpoint
+                      monitoring infrastruktur (belum disatukan di MVP ini).
+                    </li>
+                    <li>
+                      MFA, session idle timeout, dan rate limit penuh dicatat sebagai peningkatan
+                      keamanan pada dokumen 14 §1.4.
+                    </li>
+                    <li>
+                      Ringkasan KPI memakai{" "}
+                      <code className="text-[10px] bg-bg px-1 rounded">
+                        GET /api/dashboard/super-admin/summary
+                      </code>{" "}
+                      (cache ±60 dtk); gunakan &quot;Muat ulang KPI&quot; untuk snapshot manual.
+                    </li>
+                  </ul>
+                </SectionCard>
+              </div>
+            </div>
           </div>
         </main>
 
-        {/* Footer */}
-        <footer
-          className="h-12 flex items-center justify-between px-8 bg-black border-t border-slate-800/85 text-slate-400 text-sm"
-          style={{
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-          }}
-        >
-          <span>SIGAP Malut v1.0 | Dinas Pangan Maluku Utara</span>
-          <span>Super Admin Mode</span>
+        <footer className="border-t border-muted bg-card px-4 sm:px-6 py-2 text-[11px] text-muted flex flex-wrap justify-between gap-2">
+          <span>SIGAP Malut · Dinas Pangan Provinsi Maluku Utara</span>
+          <span>Super Admin · Template standar dokumen 05 / 14 / 31</span>
         </footer>
       </div>
     </div>
   );
 }
+
+DashboardSuperAdmin.displayName = "DashboardSuperAdmin";

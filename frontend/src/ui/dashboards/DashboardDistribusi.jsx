@@ -9,7 +9,7 @@ import { roleIdToName } from "../../utils/roleMap";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import DpaBidangWidget from "../../components/DpaBidangWidget";
 import RenstraBidangWidget from "../../components/RenstraBidangWidget";
-import api from "../../utils/api";
+import api from "../../services/api";
 import HeroInflasiPanel from "../../components/distribusi/HeroInflasiPanel";
 import CppdStatusPanel from "../../components/distribusi/CppdStatusPanel";
 import ApprovalQueueJF from "../../components/kabidKetersediaan/ApprovalQueueJF";

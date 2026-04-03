@@ -2,7 +2,7 @@ import express from "express";
 import { protect } from "../middleware/auth.js";
 import kadinGuard from "../middleware/kadinGuard.js";
 
-import { getSummary } from "../controllers/kadin/dashboardController.js";
+import { getSummary, getKadinCockpit } from "../controllers/kadin/dashboardController.js";
 import {
   listInboxGubernur,
   getInboxGubernurDetail,
@@ -12,12 +12,17 @@ import {
 import { createPerintah, listPerintah, getPerintahDetail } from "../controllers/kadin/perintahController.js";
 import { listApproval, getApprovalDetail, putuskanApproval } from "../controllers/kadin/approvalController.js";
 import { getKinerjaBawahan } from "../controllers/kadin/kinerjaBawahanController.js";
+import {
+  createPengajuanKeGubernur,
+  listPengajuanKeGubernurSaya,
+} from "../controllers/kadin/pengajuanKeGubernurController.js";
 
 const router = express.Router();
 router.use(protect, kadinGuard);
 
 // Dashboard
 router.get("/dashboard/summary", getSummary);
+router.get("/dashboard/cockpit", getKadinCockpit);
 
 // Inbox instruksi dari Gubernur
 router.get("/inbox-gubernur", listInboxGubernur);
@@ -37,6 +42,10 @@ router.post("/approval/:id/putuskan", putuskanApproval);
 
 // Monitoring kinerja 5 bawahan langsung
 router.get("/kinerja/bawahan", getKinerjaBawahan);
+
+// Pengajuan strategis ke Gubernur (alur lengkap Kadis → Gubernur)
+router.get("/pengajuan-gubernur", listPengajuanKeGubernurSaya);
+router.post("/pengajuan-gubernur", createPengajuanKeGubernur);
 
 export default router;
 

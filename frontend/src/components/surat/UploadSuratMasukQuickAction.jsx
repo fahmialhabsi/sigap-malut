@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 import { notifySuccess, notifyError } from "../../utils/notify";
 
 const MEDIA_OPTIONS = ["WA", "Email", "Pos", "Kurir", "Langsung", "SIPD"];

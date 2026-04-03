@@ -693,6 +693,55 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/dashboard/super-admin/summary:
+    get:
+      summary: Ringkasan dashboard Super Admin
+      description: |
+        Agregat sistem (pengguna, audit, tugas lintas unit, compliance 30 hari).
+        Hanya role `super_admin`. Respons di-cache singkat (≈60 dtk).
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Ringkasan System Control Center
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: object
+                        properties:
+                          total: { type: integer }
+                          active: { type: integer }
+                      auditLog:
+                        type: object
+                        properties:
+                          entriesTotal: { type: integer }
+                      compliance:
+                        type: object
+                      tasks:
+                        type: object
+                      workflow:
+                        type: object
+                      generatedAt:
+                        type: string
+                        format: date-time
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Bukan super_admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /api/dashboard/sekretaris/summary:
     get:
       summary: Dashboard summary Sekretaris
@@ -714,6 +763,489 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Alert"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/gubernur/dashboard/cockpit:
+    get:
+      summary: Cockpit eksekutif Gubernur (satu layar keputusan)
+      description: >
+        Prioritas hari ini, antrean maks. 5 (pengajuan + instruksi kritis),
+        peringatan pola, KPI dengan tren, dan meta audit modul.
+      tags: [Executive, Gubernur]
+      responses:
+        "200":
+          description: Payload cockpit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      generated_at: { type: string, format: date-time }
+                      prioritas_hari_ini:
+                        type: array
+                        items:
+                          type: object
+                      yang_harus_diputuskan:
+                        type: array
+                        description: Gabungan pengajuan dan instruksi, max 5
+                      highlight_masalah:
+                        type: array
+                      smart_kpi:
+                        type: object
+                      meta:
+                        type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/kadin/dashboard/cockpit:
+    get:
+      summary: Cockpit prioritas Kepala Dinas
+      description: >
+        Instruksi prioritas Gubernur, mendekati deadline, skor performa 90 hari,
+        pengajuan ke Gubernur yang dikembalikan.
+      tags: [Executive, KepalaDinas]
+      responses:
+        "200":
+          description: Payload cockpit Kadis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/execution-thread/hub/summary:
+    get:
+      summary: Ringkasan hub eksekusi multi-level per peran
+      description: >
+        Daftar thread eksekusi yang dapat diakses pengguna (Gubernur, Kadis, Sekretaris, Kabid, UPTD)
+        beserta KPI hierarkis sampel per thread.
+      tags: [Executive, ExecutionThread]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Ringkasan hub
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/execution-thread/{id}:
+    get:
+      summary: Timeline lengkap satu execution thread
+      description: >
+        Instruksi, tugas, log tugas, pengajuan, klarifikasi, dan event thread — terurut waktu.
+      tags: [Executive, ExecutionThread]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Timeline dan KPI hierarki
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      execution_thread_id: { type: string, format: uuid }
+                      timeline:
+                        type: array
+                        items:
+                          type: object
+                      aktivitas:
+                        type: array
+                        items:
+                          type: object
+                      kpi_hierarki:
+                        type: object
+        "400":
+          description: UUID tidak valid
+        "403":
+          description: Akses ditolak
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal/dashboard/sekretaris:
+    get:
+      tags: [CoordinationHorizontal, Dashboard]
+      summary: Dashboard koordinasi horizontal — Sekretaris
+      description: >
+        Ringkasan operasional lintas bidang untuk Sekretaris: antrean prioritas, item melewati SLA,
+        unit yang lambat merespons, thread yang tertahan koordinasi, dan tugas lapangan terkait thread.
+        Memerlukan peran Sekretaris atau super_admin.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter status persis (mis. diajukan, diproses).
+        - name: level
+          in: query
+          schema: { type: string }
+          description: Filter org level sumber/tujuan (mis. kabid, sekretaris).
+        - name: unit
+          in: query
+          schema: { type: string }
+          description: Substring pencarian pada from_unit / to_unit.
+        - name: sla
+          in: query
+          schema: { type: string, enum: [overdue] }
+          description: Jika overdue, hanya item terbuka yang melewati sla_due_at.
+      responses:
+        "200":
+          description: Payload dashboard Sekretaris
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationDashboardEnvelope"
+        "403":
+          description: Akses ditolak
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal/dashboard/kabid:
+    get:
+      tags: [CoordinationHorizontal, Dashboard]
+      summary: Dashboard koordinasi horizontal — Kepala Bidang
+      description: >
+        Scope permintaan masuk/keluar dan dependensi lintas unit untuk satu Kabid (berdasarkan unit_kerja
+        dan user id). super_admin dan kepala_bidang* / kabid.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: level
+          in: query
+          schema: { type: string }
+        - name: unit
+          in: query
+          schema: { type: string }
+        - name: sla
+          in: query
+          schema: { type: string, enum: [overdue] }
+      responses:
+        "200":
+          description: Payload dashboard Kabid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationDashboardEnvelope"
+        "403":
+          description: Akses ditolak
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal/dashboard/uptd:
+    get:
+      tags: [CoordinationHorizontal, Dashboard]
+      summary: Dashboard koordinasi horizontal — Kepala UPTD
+      description: >
+        Permintaan verifikasi/lapangan, backlog dari unit lain, tugas terbuka pada thread terkait.
+        super_admin dan kepala_uptd.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: level
+          in: query
+          schema: { type: string }
+        - name: unit
+          in: query
+          schema: { type: string }
+        - name: sla
+          in: query
+          schema: { type: string, enum: [overdue] }
+      responses:
+        "200":
+          description: Payload dashboard UPTD
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationDashboardEnvelope"
+        "403":
+          description: Akses ditolak
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal/dashboard/executive:
+    get:
+      tags: [CoordinationHorizontal, Executive]
+      summary: Ringkasan koordinasi horizontal — Gubernur / Kepala Dinas
+      description: >
+        Agregat risiko lintas thread, thread dengan SLA koordinasi lewat, dan sampel kritis.
+        gubernur, kepala_dinas, super_admin.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: sla
+          in: query
+          schema: { type: string, enum: [overdue] }
+      responses:
+        "200":
+          description: Payload eksekutif
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationDashboardEnvelope"
+        "403":
+          description: Akses ditolak
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal/thread/{threadId}:
+    get:
+      tags: [CoordinationHorizontal, ExecutionThread]
+      summary: Daftar item koordinasi horizontal pada satu execution thread
+      description: >
+        Hanya thread yang dapat diakses user (assignment tugas, instruksi, klarifikasi, dll.).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: threadId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Daftar horizontal_coordination_requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/HorizontalCoordinationRequest"
+        "400":
+          description: UUID tidak valid
+        "403":
+          description: Akses thread ditolak
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal:
+    post:
+      tags: [CoordinationHorizontal]
+      summary: Buat permintaan koordinasi horizontal pada thread
+      description: >
+        Mencatat koordinasi lintas unit pada execution_thread_id yang sama; memicu execution_thread_events
+        dan muncul di timeline sebagai kind koordinasi_horizontal.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HorizontalCoordinationCreate"
+      responses:
+        "201":
+          description: Dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    $ref: "#/components/schemas/HorizontalCoordinationRequest"
+        "400":
+          description: Validasi gagal / thread wajib
+        "403":
+          description: Akses thread ditolak
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal/{id}/status:
+    patch:
+      tags: [CoordinationHorizontal]
+      summary: Ubah status alur koordinasi (non-terminal / pembatalan / gagal dari terlambat)
+      description: >
+        State machine resmi (backend `horizontalCoordinationStateMachine.js`):
+        diajukan→diterima→diproses↔menunggu_balasan; diproses/menunggu_balasan→terlambat; terlambat→diproses|gagal_koordinasi|dibatalkan;
+        pembatalan jalur `dibatalkan` mengikuti peta transisi per status saat ini.
+        Untuk menutup dengan **selesai** atau **ditolak** gunakan `PATCH .../respond`.
+        Aktor: pengirim/penerima terkait, super_admin; Sekretaris jika `to_user_id` null.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HorizontalCoordinationPatchStatusBody"
+            examples:
+              terima:
+                summary: Terima permintaan
+                value: { status: diterima }
+              proses:
+                summary: Mulai proses
+                value: { status: diproses }
+              tunggu:
+                summary: Tunggu balasan pihak lain
+                value: { status: menunggu_balasan }
+              sla_terlambat:
+                summary: Tandai terlambat
+                value: { status: terlambat }
+              batal:
+                summary: Batalkan jalur
+                value: { status: dibatalkan }
+              gagal_setelah_sla:
+                summary: Gagal koordinasi (hanya jika status saat ini terlambat)
+                value: { status: gagal_koordinasi }
+      responses:
+        "200":
+          description: Diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    $ref: "#/components/schemas/HorizontalCoordinationRequest"
+              examples:
+                ok:
+                  value:
+                    success: true
+                    data:
+                      id: 42
+                      execution_thread_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                      status: diterima
+        "400":
+          description: Status / transisi tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationErrorBody"
+              examples:
+                transisi_ilegal:
+                  value:
+                    success: false
+                    code: HCOORD_INVALID_TRANSITION
+                    message: Transisi dari "diajukan" ke "diproses" tidak diizinkan.
+                    validation:
+                      from_status: diajukan
+                      to_status: diproses
+                      allowed_to: [diterima, dibatalkan]
+                pakai_respond:
+                  value:
+                    success: false
+                    code: HCOORD_USE_RESPOND_ENDPOINT
+                    message: Untuk menutup dengan selesai atau ditolak gunakan PATCH .../respond.
+        "403":
+          description: Bukan pihak terkait (HCOORD_FORBIDDEN_ACTOR)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationErrorBody"
+        "404":
+          description: Item tidak ditemukan (KOORDINASI_TIDAK_DITEMUKAN)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationErrorBody"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/coordination/horizontal/{id}/respond:
+    patch:
+      tags: [CoordinationHorizontal]
+      summary: Tutup / balas koordinasi horizontal
+      description: >
+        Penutupan formal: **selesai**, **ditolak**, **dibatalkan** dari alur terbuka;
+        **gagal_koordinasi** hanya jika status saat ini **terlambat** (konsisten dengan PATCH status).
+        Menyimpan `response_body`, `responded_at`, `responded_by_user_id`.
+        Penerima yang dituju atau super_admin.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [selesai, dibatalkan, ditolak, gagal_koordinasi]
+                response_body:
+                  type: string
+            examples:
+              selesai:
+                value:
+                  status: selesai
+                  response_body: "Data disepakati; lanjut ke tugas terkait."
+              tolak:
+                value:
+                  status: ditolak
+                  response_body: "Tidak dapat memenuhi karena keterbatasan kapasitas."
+      responses:
+        "200":
+          description: Diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    $ref: "#/components/schemas/HorizontalCoordinationRequest"
+        "400":
+          description: Validasi penutupan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalCoordinationErrorBody"
+        "403":
+          description: Bukan penerima (HCOORD_FORBIDDEN_ACTOR)
+        "404":
+          description: KOORDINASI_TIDAK_DITEMUKAN
         "401":
           $ref: "#/components/responses/Unauthorized"
 
@@ -950,3 +1482,94 @@ components:
           type: string
         summary:
           type: string
+
+    HorizontalCoordinationDashboardEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          description: >
+            Isi bervariasi per endpoint (summary, priority_queue, insights, role_lens, dll.).
+            Lihat dokumenSistem/dashboard-role-coordination-widgets.md untuk contoh JSON per peran.
+
+    HorizontalCoordinationRequest:
+      type: object
+      properties:
+        id: { type: integer }
+        execution_thread_id: { type: string, format: uuid }
+        coordination_kind: { type: string, example: sync_request }
+        status:
+          type: string
+          description: >
+            Alur terbuka diajukan, diterima, diproses, menunggu_balasan, terlambat;
+            penutupan selesai, dibatalkan, ditolak, gagal_koordinasi.
+        subject: { type: string, nullable: true }
+        body: { type: string, nullable: true }
+        from_user_id: { type: integer }
+        to_user_id: { type: integer, nullable: true }
+        from_unit: { type: string, nullable: true }
+        to_unit: { type: string, nullable: true }
+        from_org_level: { type: string, nullable: true }
+        to_org_level: { type: string, nullable: true }
+        sla_due_at: { type: string, format: date-time, nullable: true }
+        responded_at: { type: string, format: date-time, nullable: true }
+        response_body: { type: string, nullable: true }
+        surat_masuk_id: { type: integer, nullable: true }
+        task_id: { type: integer, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    HorizontalCoordinationCreate:
+      type: object
+      required: [execution_thread_id]
+      properties:
+        execution_thread_id: { type: string, format: uuid }
+        coordination_kind: { type: string, default: sync_request }
+        subject: { type: string }
+        body: { type: string }
+        to_user_id: { type: integer, nullable: true }
+        to_unit: { type: string }
+        from_org_level: { type: string }
+        to_org_level: { type: string }
+        sla_hours: { type: number, description: "Hitungan jam dari sekarang untuk sla_due_at" }
+        surat_masuk_id: { type: integer }
+        task_id: { type: integer }
+
+    HorizontalCoordinationPatchStatusBody:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          description: >
+            Alur kerja (non-terminal) atau pembatalan/gagal sesuai state machine.
+            `gagal_koordinasi` hanya valid dari status `terlambat`.
+            `selesai`/`ditolak` tidak lewat endpoint ini — gunakan `/respond`.
+          enum:
+            [
+              diterima,
+              diproses,
+              menunggu_balasan,
+              terlambat,
+              dibatalkan,
+              gagal_koordinasi,
+            ]
+
+    HorizontalCoordinationErrorBody:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        code:
+          type: string
+          description: >
+            Kode stabil untuk QA/automasi, mis. THREAD_WAJIB, KOORDINASI_TIDAK_DITEMUKAN,
+            HCOORD_INVALID_TRANSITION, HCOORD_USE_RESPOND_ENDPOINT, HCOORD_ALREADY_CLOSED,
+            HCOORD_GAGAL_REQUIRES_TERLAMBAT, HCOORD_FORBIDDEN_ACTOR, HCOORD_STATUS_INVALID.
+        message: { type: string }
+        validation:
+          type: object
+          description: Detail transisi (from_status, to_status, allowed_to) bila relevan
+          additionalProperties: true

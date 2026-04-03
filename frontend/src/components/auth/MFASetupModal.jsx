@@ -8,7 +8,7 @@
  */
 
 import { useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 import toast from "react-hot-toast";
 
 const STEPS = { INTRO: "intro", VERIFY: "verify", DONE: "done" };

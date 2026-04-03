@@ -1,0 +1,85 @@
+{
+  "$comment": "Kebijakan eksekutif Gubernur–Kepala Dinas: SLA semantik, eskalasi pasca-deadline, dan ambang decision-support. Ubah melalui admin/proses change management; jangan hardcode di UI.",
+  "version": 1,
+  "sla_semantics": {
+    "description": "Bagaimana status operasional ditafsirkan (bukan ulang matriks hari ke deadline — lihat instruksiDeadlineMatrix.json).",
+    "selesai": {
+      "instruksi": "status instruksi = selesai ATAU seluruh turunan tertaut closed (jika ada)",
+      "pengajuan": "status pengajuan ∈ {disetujui, ditolak} atau dikembalikan dengan revisi tercatat"
+    },
+    "terlambat": {
+      "instruksi": "tanggal hari ini > deadline dan status ∉ {selesai, draf}",
+      "pengajuan": "usia menunggu keputusan (hari kalender) > batas_pengajuan_hari"
+    },
+    "gagal": {
+      "instruksi": "terlambat > eskalasi.hari_kritis_tanpa_respons ATAU dibatalkan secara kebijakan (flag admin)",
+      "pengajuan": "dibatalkan sistem / tidak valid / duplikat (proses back-office)"
+    }
+  },
+  "response_expectations_by_jenis": {
+    "instruksi": { "kadis_baca_maks_jam_setelah_terbit": 48, "mulai_proses_maks_jam_setelah_baca": 72 },
+    "disposisi": { "kadis_baca_maks_jam_setelah_terbit": 24, "mulai_proses_maks_jam_setelah_baca": 48 },
+    "arahan_strategis": { "kadis_baca_maks_jam_setelah_terbit": 72, "mulai_proses_maks_jam_setelah_baca": 120 },
+    "minta_laporan": { "kadis_baca_maks_jam_setelah_terbit": 48, "mulai_proses_maks_jam_setelah_baca": 96 },
+    "tanggap_darurat": { "kadis_baca_maks_jam_setelah_terbit": 4, "mulai_proses_maks_jam_setelah_baca": 8 }
+  },
+  "pengajuan_ke_gubernur": {
+    "batas_menunggu_keputusan_hari": 14,
+    "peringatan_hari_sebelum_batas": [7, 3, 1]
+  },
+  "escalation_after_deadline": {
+    "H_plus_1": {
+      "action": "reminder_tambahan",
+      "notify": ["gubernur", "kadis_terkait"],
+      "channel_priority": ["in_app", "socket", "email_optional"]
+    },
+    "H_plus_2": {
+      "action": "escalation_gubernur_dashboard",
+      "notify": ["gubernur"],
+      "ui_badge": "perhatian_tinggi"
+    },
+    "H_plus_3": {
+      "action": "status_kritis",
+      "notify": ["gubernur", "sekretaris_dinas_optional"],
+      "set_visual": "merah"
+    }
+  },
+  "responsibility": {
+    "accountable_instruksi": "Gubernur (menerbitkan), Kepala Dinas (melaksanakan)",
+    "accountable_pengajuan": "Kepala Dinas (mengajukan), Gubernur (memutuskan)",
+    "notified_on_reminder": ["pembuat_instruksi", "penerima_instruksi"],
+    "escalation_target_default": "Gubernur",
+    "optional_copy": "Sekretaris Dinas (jika diaktifkan kebijakan provinsi)"
+  },
+  "decision_support_rules": [
+    {
+      "id": "DS-01",
+      "if": "pengajuan.revisi_ke >= 2",
+      "recommendation": "Perlu klarifikasi",
+      "severity": "medium"
+    },
+    {
+      "id": "DS-02",
+      "if": "kadis.terlambat_ratio_90d > 0.25",
+      "recommendation": "Risiko kinerja — tinjau sebelum menyetujui pengajuan besar",
+      "severity": "high"
+    },
+    {
+      "id": "DS-03",
+      "if": "pengajuan.jenis == persetujuan_anggaran && !lampiran_url",
+      "recommendation": "Lengkapi dokumen sebelum disetujui",
+      "severity": "high"
+    },
+    {
+      "id": "DS-04",
+      "if": "pengajuan.usia_hari <= 3 && catatan_tidak_ada",
+      "recommendation": "Disarankan dibaca — belum ada catatan Gubernur",
+      "severity": "low"
+    }
+  ],
+  "edge_cases": {
+    "kadis_tidak_merespon": "Setelah X jam (lihat response_expectations), tandai at_risk + notifikasi; setelah deadline +3 hari tandai kritis.",
+    "notifikasi_gagal": "Antrekan di outbox + retry exponential (contoh: 1m, 5m, 30m, 6j); fallback digest harian.",
+    "pengajuan_tanpa_keputusan": "Peringatan pada hari ke-7, 3, 1 sebelum batas_menunggu_keputusan_hari; opsi eskalasi ke Sekretaris Daerah (kebijakan)."
+  }
+}

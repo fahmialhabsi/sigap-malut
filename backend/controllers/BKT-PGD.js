@@ -1,28 +1,42 @@
-// =====================================================
-// CONTROLLER: BktPgdController
-// MODEL: BktPgd
-// Generated: 2026-03-19T23:39:27.516Z
-// =====================================================
-
 import BktPgd from "../models/BKT-PGD.js";
+import Komoditas from "../models/komoditas.js";
 import { logAudit } from "../services/auditLogService.js";
+import {
+  buildBktPgdWhere,
+  normalizeBktPgdPayload,
+} from "../services/bktPgdService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
-// @desc    Get all BktPgd records
-// @route   GET /api/bkt-pgd
-// @access  Private
+if (!BktPgd.associations?.komoditas) {
+  BktPgd.belongsTo(Komoditas, { foreignKey: "komoditas_id", as: "komoditas" });
+}
+
+const KOMODITAS_INCLUDE = [
+  {
+    model: Komoditas,
+    as: "komoditas",
+    attributes: ["id", "nama", "kode", "satuan"],
+    required: false,
+  },
+];
+
 export const getAllBktPgd = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, ...filters } = req.query;
-
-    const offset = (page - 1) * limit;
-
-    const where = { ...filters };
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (Number(page) - 1) * Number(limit);
+    const where = buildBktPgdWhere(req.query);
 
     const { count, rows } = await BktPgd.findAndCountAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      include: KOMODITAS_INCLUDE,
+      limit: Number(limit),
+      offset,
+      order: [
+        ["periode", "DESC"],
+        ["updated_at", "DESC"],
+        ["created_at", "DESC"],
+      ],
+      distinct: true,
     });
 
     res.json({
@@ -30,9 +44,9 @@ export const getAllBktPgd = async (req, res) => {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(count / Number(limit)),
       },
     });
   } catch (error) {
@@ -44,12 +58,11 @@ export const getAllBktPgd = async (req, res) => {
   }
 };
 
-// @desc    Get single BktPgd by ID
-// @route   GET /api/bkt-pgd/:id
-// @access  Private
 export const getBktPgdById = async (req, res) => {
   try {
-    const record = await BktPgd.findByPk(req.params.id);
+    const record = await BktPgd.findByPk(req.params.id, {
+      include: KOMODITAS_INCLUDE,
+    });
 
     if (!record) {
       return res.status(404).json({
@@ -71,15 +84,17 @@ export const getBktPgdById = async (req, res) => {
   }
 };
 
-// @desc    Create new BktPgd
-// @route   POST /api/bkt-pgd
-// @access  Private
 export const createBktPgd = async (req, res) => {
   try {
-    const record = await BktPgd.create({
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
+    const payload = normalizeBktPgdPayload({
       ...req.body,
-      created_by: req.user?.id,
+      created_by: req.user?.id ?? req.body?.created_by,
     });
+
+    const record = await BktPgd.create(payload);
+
     await logAudit({
       modul: "BKT-PGD",
       entitas_id: record.id,
@@ -88,6 +103,7 @@ export const createBktPgd = async (req, res) => {
       data_baru: record,
       pegawai_id: req.user?.id || null,
     });
+
     res.status(201).json({
       success: true,
       message: "BktPgd created successfully",
@@ -102,23 +118,25 @@ export const createBktPgd = async (req, res) => {
   }
 };
 
-// @desc    Update BktPgd
-// @route   PUT /api/bkt-pgd/:id
-// @access  Private
 export const updateBktPgd = async (req, res) => {
   try {
     const record = await BktPgd.findByPk(req.params.id);
+
     if (!record) {
       return res.status(404).json({
         success: false,
         message: "BktPgd not found",
       });
     }
+
     const dataLama = { ...record.get() };
-    await record.update({
+    const payload = normalizeBktPgdPayload({
       ...req.body,
       updated_by: req.user?.id,
     });
+
+    await record.update(payload);
+
     await logAudit({
       modul: "BKT-PGD",
       entitas_id: record.id,
@@ -127,6 +145,7 @@ export const updateBktPgd = async (req, res) => {
       data_baru: record,
       pegawai_id: req.user?.id || null,
     });
+
     res.json({
       success: true,
       message: "BktPgd updated successfully",
@@ -141,20 +160,20 @@ export const updateBktPgd = async (req, res) => {
   }
 };
 
-// @desc    Delete BktPgd
-// @route   DELETE /api/bkt-pgd/:id
-// @access  Private
 export const deleteBktPgd = async (req, res) => {
   try {
     const record = await BktPgd.findByPk(req.params.id);
+
     if (!record) {
       return res.status(404).json({
         success: false,
         message: "BktPgd not found",
       });
     }
+
     const dataLama = { ...record.get() };
-    await record.update({ is_deleted: true, deleted_at: new Date(), deleted_by: req.user?.id || null });
+    await record.destroy();
+
     await logAudit({
       modul: "BKT-PGD",
       entitas_id: req.params.id,
@@ -163,6 +182,7 @@ export const deleteBktPgd = async (req, res) => {
       data_baru: null,
       pegawai_id: req.user?.id || null,
     });
+
     res.json({
       success: true,
       message: "BktPgd deleted successfully",

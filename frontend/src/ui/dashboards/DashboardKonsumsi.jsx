@@ -10,7 +10,7 @@ import DashboardKonsumsiLayout from "../../layouts/DashboardKonsumsiLayout";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import DpaBidangWidget from "../../components/DpaBidangWidget";
 import RenstraBidangWidget from "../../components/RenstraBidangWidget";
-import api from "../../utils/api";
+import api from "../../services/api";
 import DashboardKabidKonsumsi from "./DashboardKabidKonsumsi";
 
 function normalizeRoleName(user) {

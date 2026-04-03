@@ -6,6 +6,7 @@
 
 import SekKep from "../models/SEK-KEP.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekKep records
 // @route   GET /api/sek-kep
@@ -76,6 +77,8 @@ export const getSekKepById = async (req, res) => {
 // @access  Private
 export const createSekKep = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekKep.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekKep = async (req, res) => {
         message: "SekKep not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

@@ -1,5 +1,4 @@
 import { sequelize, testConnection } from "./config/database.js";
-import SequelizePkg from "sequelize";
 import "./models/HargaPangan.js";
 import "./models/HargaPanganLog.js";
 import "./models/InflasiHarian.js";
@@ -17,6 +16,16 @@ import "./models/InspeksiKeamanan.js";
 import "./models/KeracunanPangan.js";
 import "./models/UmkmPangan.js";
 import "./models/KoordinasiUptd.js";
+import "./models/SpipRiskRegister.js";
+import "./models/SpipRtp.js";
+import "./models/SpipMonitoring.js";
+import "./models/SpipEvidenceLink.js";
+import "./models/Task.js";
+import "./models/InstruksiGubernur.js";
+import { registerExecutionThreadHooks } from "./services/executionThreadHooks.js";
+import { registerOperationalExecutionThreadHooks } from "./services/operationalExecutionThreadHooks.js";
+registerExecutionThreadHooks();
+registerOperationalExecutionThreadHooks();
 import { initInflasiHarianCron } from "./jobs/inflasiHarianCron.js";
 import registerRoutes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
@@ -38,9 +47,15 @@ import subKegiatanUsulRoutes from "./routes/subKegiatanUsul.js";
 import uptdOpsRoutes from "./routes/uptdOps.js";
 import { initSLAScheduler } from "./services/slaService.js";
 import { initDailyDigestScheduler } from "./services/dailyDigestService.js";
+import { initInstruksiReminderScheduler } from "./services/instruksiReminderScheduler.js";
+import { initSystemicThreadAlertScheduler } from "./services/executionThreadSystemicAlertScheduler.js";
+import { initPolicyExecutionLogScheduler } from "./services/policyExecutionLogScheduler.js";
+import { initExecutiveEnterpriseScheduler } from "./services/executiveEnterpriseScheduler.js";
 import sekretarisRoutes from "./routes/sekretaris/sekretarisIndex.js";
 import publicRoutes from "./routes/public.js";
+import coordinationRoutes from "./routes/coordination.js";
 
+import { existsSync, mkdirSync } from "fs";
 import http from "http";
 import helmet from "helmet";
 import cors from "cors";
@@ -51,12 +66,15 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
 import client from "prom-client";
-import { initSocketIOAsync } from "./services/socketService.js";
+import { closeSocketIO, initSocketIOAsync } from "./services/socketService.js";
 import {
   startKPIPolling,
   stopKPIPolling,
 } from "./services/kpiPollingService.js";
-import { getCacheStats } from "./services/cacheService.js";
+import { buildHealthPayload, checkDatabase } from "./services/healthCheckService.js";
+import { initDatabaseSchemaPolicy } from "./services/databaseStartupPolicy.js";
+import { logCacheStartupSummary } from "./services/cacheService.js";
+import { createRequestContextLogger } from "./middleware/requestContextLogger.js";
 const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics();
 
@@ -71,10 +89,25 @@ const __dirname = path.dirname(__filename);
 // Eksplisit path agar dotenv selalu baca dari direktori server.js, bukan process.cwd()
 dotenv.config({ path: path.join(__dirname, ".env") });
 
+// Pastikan direktori log ada (Winston file transport)
+try {
+  const logsDir = path.join(__dirname, "logs");
+  if (!existsSync(logsDir)) mkdirSync(logsDir, { recursive: true });
+} catch {
+  /* ignore */
+}
+
 const app = express();
 const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;
+const activeSockets = new Set();
+let shutdownPromise = null;
 import complianceRoutes from "./routes/compliance.js";
+
+httpServer.on("connection", (socket) => {
+  activeSockets.add(socket);
+  socket.on("close", () => activeSockets.delete(socket));
+});
 
 // Prometheus middleware
 app.use((req, res, next) => {
@@ -109,12 +142,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Morgan request logger
-app.use(morgan("dev"));
-
-// Winston logger setup
 const logger = winston.createLogger({
-  level: "info",
+  level: process.env.LOG_LEVEL || "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json(),
@@ -126,7 +155,8 @@ const logger = winston.createLogger({
   ],
 });
 
-// Example usage: logger.info("Server started");
+app.use(createRequestContextLogger(logger));
+app.use(morgan("dev"));
 
 // Serve master-data static files from repository root
 app.use(
@@ -134,33 +164,43 @@ app.use(
   express.static(path.join(__dirname, "..", "master-data")),
 );
 
-// Health check
-app.get("/health", (req, res) => {
-  const cacheStats = getCacheStats();
-  res.json({
-    success: true,
-    message: "SIGAP Malut API is running",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development",
-    cache: cacheStats,
-  });
+/** Health ringan (LB) — default. Tambah ?deep=1 untuk DB + Redis. */
+app.get("/health", async (req, res) => {
+  try {
+    const deep =
+      req.query.deep === "1" ||
+      req.query.deep === "true" ||
+      String(req.query.deep || "").toLowerCase() === "yes";
+    const body = await buildHealthPayload(deep);
+    if (deep && body.status === "unhealthy") {
+      return res.status(503).json(body);
+    }
+    res.json(body);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Health check error",
+      error: error.message,
+    });
+  }
 });
 
-// Test database connection
+/** Diagnostik DB — aman untuk Postgres & SQLite */
 app.get("/api/test-db", async (req, res) => {
   try {
-    await sequelize.authenticate();
-
-    // Get table count
-    const [tables] = await sequelize.query(
-      "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';",
-    );
-
+    const database = await checkDatabase();
+    if (!database.ok) {
+      return res.status(500).json({
+        success: false,
+        message: "Database connection failed",
+        error: database.error,
+      });
+    }
     res.json({
       success: true,
       message: "Database connection successful",
-      dialect: sequelize.getDialect(),
-      tables: tables[0].count,
+      dialect: database.dialect,
+      approxTableCount: database.approxTableCount,
     });
   } catch (error) {
     res.status(500).json({
@@ -885,12 +925,73 @@ async function ensureJfSekretariatTables() {
   }
 }
 
+/** Tabel jejak arsip Manajemen User (retensi) — selaras dengan migrations/20260402-create-audit-log-archive.cjs */
+async function ensureAuditLogArchiveTable() {
+  try {
+    const dialect = sequelize.getDialect?.() || process.env.DB_DIALECT || "";
+    const isPg = String(dialect).toLowerCase().includes("postgres");
+    if (isPg) {
+      await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS audit_log_archive (
+          id SERIAL PRIMARY KEY,
+          original_audit_log_id INTEGER NOT NULL,
+          modul VARCHAR(100) NOT NULL,
+          entitas_id VARCHAR(100) NOT NULL,
+          aksi VARCHAR(50) NOT NULL,
+          data_lama JSONB,
+          data_baru JSONB,
+          pegawai_id VARCHAR(100) NOT NULL,
+          source_created_at TIMESTAMPTZ NOT NULL,
+          archived_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS audit_log_archive_modul_idx ON audit_log_archive (modul);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS audit_log_archive_archived_at_idx ON audit_log_archive (archived_at);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS audit_log_archive_source_created_at_idx ON audit_log_archive (source_created_at);
+      `);
+    } else {
+      await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS audit_log_archive (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          original_audit_log_id INTEGER NOT NULL,
+          modul VARCHAR(100) NOT NULL,
+          entitas_id VARCHAR(100) NOT NULL,
+          aksi VARCHAR(50) NOT NULL,
+          data_lama TEXT,
+          data_baru TEXT,
+          pegawai_id VARCHAR(100) NOT NULL,
+          source_created_at TIMESTAMP NOT NULL,
+          archived_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS audit_log_archive_modul_idx ON audit_log_archive (modul);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS audit_log_archive_archived_at_idx ON audit_log_archive (archived_at);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS audit_log_archive_source_created_at_idx ON audit_log_archive (source_created_at);
+      `);
+    }
+  } catch (e) {
+    console.warn("[ensureAuditLogArchiveTable] skipped:", e?.message || e);
+  }
+}
+
 await ensureJfSekretariatTables();
+await ensureAuditLogArchiveTable();
 app.use("/api/bypassdetection", bypassDetectionRoutes);
 app.use("/api/sub-kegiatan-usul", subKegiatanUsulRoutes);
 app.use("/api/uptd-ops", uptdOpsRoutes);
 app.use("/api/sekretaris", sekretarisRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/coordination", coordinationRoutes);
 
 // Register all auto-generated routes
 registerRoutes(app);
@@ -907,33 +1008,135 @@ app.use((err, req, res, next) => {
   });
 });
 
+httpServer.on("error", (error) => {
+  if (error?.code === "EADDRINUSE") {
+    console.error(
+      `[Server] Port ${PORT} sudah dipakai proses lain atau instance lama belum selesai berhenti.`,
+    );
+    console.error(
+      "[Server] Tutup instance backend lama atau tunggu beberapa detik sebelum menjalankan ulang.",
+    );
+  } else {
+    console.error("[Server] HTTP server error:", error);
+  }
+
+  process.exit(1);
+});
+
+async function shutdownServer(signal, { exitCode = 0, reSignal = null } = {}) {
+  if (shutdownPromise) {
+    return shutdownPromise;
+  }
+
+  console.log(`[Server] Menerima ${signal}, mematikan layanan...`);
+
+  shutdownPromise = (async () => {
+    const forceExitTimer = setTimeout(() => {
+      console.warn("[Server] Shutdown timeout, memaksa proses berhenti.");
+      try {
+        httpServer.closeAllConnections?.();
+      } catch {
+        // Ignore forced close errors.
+      }
+      for (const socket of activeSockets) {
+        try {
+          socket.destroy();
+        } catch {
+          // Ignore destroy errors.
+        }
+      }
+      process.exit(exitCode || 1);
+    }, 5000);
+
+    forceExitTimer.unref?.();
+
+    try {
+      stopKPIPolling();
+    } catch {
+      // Ignore polling shutdown errors.
+    }
+
+    try {
+      await closeSocketIO();
+    } catch (error) {
+      console.warn(
+        "[Server] Gagal menutup Socket.IO dengan bersih:",
+        error?.message || error,
+      );
+    }
+
+    await new Promise((resolve) => {
+      try {
+        httpServer.close((closeError) => {
+          if (
+            closeError &&
+            closeError.code !== "ERR_SERVER_NOT_RUNNING"
+          ) {
+            console.warn(
+              "[Server] Error saat menutup HTTP server:",
+              closeError.message,
+            );
+          }
+          resolve();
+        });
+
+        httpServer.closeIdleConnections?.();
+        httpServer.closeAllConnections?.();
+      } catch (closeError) {
+        if (closeError?.code !== "ERR_SERVER_NOT_RUNNING") {
+          console.warn(
+            "[Server] HTTP server sudah berhenti atau gagal ditutup:",
+            closeError?.message || closeError,
+          );
+        }
+        resolve();
+      }
+    });
+
+    for (const socket of activeSockets) {
+      try {
+        socket.destroy();
+      } catch {
+        // Ignore destroy errors.
+      }
+    }
+    activeSockets.clear();
+    clearTimeout(forceExitTimer);
+
+    if (reSignal) {
+      try {
+        process.kill(process.pid, reSignal);
+        return;
+      } catch {
+        // Fall back to exiting normally if signal relay is unavailable.
+      }
+    }
+
+    process.exit(exitCode);
+  })();
+
+  return shutdownPromise;
+}
+
+process.once("SIGTERM", () => {
+  shutdownServer("SIGTERM", { exitCode: 0 });
+});
+
+process.once("SIGINT", () => {
+  shutdownServer("SIGINT", { exitCode: 0 });
+});
+
+process.once("SIGUSR2", () => {
+  shutdownServer("SIGUSR2", { exitCode: 0, reSignal: "SIGUSR2" });
+});
+
 // Start server
 async function startServer() {
   try {
     await testConnection();
 
-    // Sync database models (only create tables if not exist)
-    await sequelize.sync();
-
-    // Hotfix schema patcher (dev-friendly):
-    // pastikan kolom baru yang dipakai model sudah ada di SQLite.
-    // Tanpa ini, Sequelize akan error "column ... does not exist" saat query.
-    try {
-      const qi = sequelize.getQueryInterface();
-      const table = await qi.describeTable("Tasks");
-      if (!table.sumber_perintah_kadin) {
-        await qi.addColumn("Tasks", "sumber_perintah_kadin", {
-          type: SequelizePkg.DataTypes.INTEGER,
-          allowNull: true,
-        });
-        console.log("✅ Patched schema: added Tasks.sumber_perintah_kadin");
-      }
-    } catch (schemaErr) {
-      console.warn(
-        "⚠️ Schema patch skipped:",
-        schemaErr?.message || schemaErr,
-      );
-    }
+    await initDatabaseSchemaPolicy(sequelize);
+    await logCacheStartupSummary();
 
     // Inisialisasi Socket.IO
     await initSocketIOAsync(httpServer);
@@ -944,6 +1147,11 @@ async function startServer() {
     // SLA escalation + daily digest schedulers
     await initSLAScheduler();
     await initDailyDigestScheduler();
+
+    initInstruksiReminderScheduler();
+    initSystemicThreadAlertScheduler();
+    initPolicyExecutionLogScheduler();
+    initExecutiveEnterpriseScheduler();
 
     initInflasiHarianCron(console);
 
@@ -964,15 +1172,6 @@ async function startServer() {
       console.log(`${"=".repeat(60)}\n`);
     });
 
-    // Graceful shutdown
-    process.on("SIGTERM", () => {
-      stopKPIPolling();
-      httpServer.close();
-    });
-    process.on("SIGINT", () => {
-      stopKPIPolling();
-      httpServer.close(() => process.exit(0));
-    });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
     process.exit(1);

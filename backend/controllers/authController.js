@@ -1,4 +1,5 @@
 // Clean ES module auth controller
+import { randomUUID } from "crypto";
 import { Op, fn, col, where } from "sequelize";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
@@ -10,6 +11,128 @@ import {
 } from "../config/auth.js";
 import { generateToken, generateRefreshToken } from "../middleware/auth.js";
 import { logAudit } from "../services/auditLogService.js";
+import AuditLog from "../models/auditLog.js";
+import AuditLogArchive from "../models/AuditLogArchive.js";
+import { archiveUserManagementAuditOlderThan } from "../services/auditLogRetentionService.js";
+
+const USER_MGMT_MODUL = "USER_MANAGEMENT";
+
+/** Snapshot user untuk audit — tanpa hash/kata sandi plaintext. */
+function snapshotUserForAudit(user) {
+  if (!user) return null;
+  const plain = user.get ? user.get({ plain: true }) : { ...user };
+  const o = { ...plain };
+  if ("password" in o) o.password = "[REDACTED]";
+  if ("plain_password" in o) o.plain_password = "[REDACTED]";
+  return o;
+}
+
+function actorPegawaiId(req) {
+  const id = req.user?.id;
+  return id != null && id !== "" ? String(id) : "unknown";
+}
+
+/** Kunci role konsisten untuk JWT + matriks RBAC (sumber: roles.code/name, fallback users.role). */
+function normalizeRoleKeyForRbac(v) {
+  if (v == null || v === "") return "pelaksana";
+  return String(v).trim().toLowerCase().replace(/[\s-]+/g, "_");
+}
+
+function canonicalRoleFromRoleRow(roleRow, fallbackUserRole) {
+  if (roleRow?.code) return normalizeRoleKeyForRbac(roleRow.code);
+  if (roleRow?.name) return normalizeRoleKeyForRbac(roleRow.name);
+  return normalizeRoleKeyForRbac(fallbackUserRole);
+}
+
+/**
+ * Jika role_id mengarah ke peran induk / varian sekretaris (mis. sekretaris_dinas)
+ * sementara kolom users.role memuat peran spesifik (mis. fungsional_keuangan),
+ * utamakan kolom users.role agar dashboard & JWT selaras.
+ */
+function mergeCanonicalRoleWithUsersColumn(
+  canonicalFromRow,
+  usersRoleColumn,
+  roleToDashboard,
+) {
+  const fromColumn = normalizeRoleKeyForRbac(usersRoleColumn || "");
+  if (!fromColumn || fromColumn === canonicalFromRow) return canonicalFromRow;
+  if (!roleToDashboard[fromColumn]) return canonicalFromRow;
+
+  /** Peran spesifik yang disimpan di kolom users.role */
+  const specificRoles = new Set([
+    "fungsional_perencana",
+    "fungsional_perencanaan",
+    "fungsional_keuangan",
+    "fungsional_ketersediaan",
+    "fungsional_distribusi",
+    "fungsional_konsumsi",
+    "fungsional_analis",
+    "ppk",
+    "pelaksana_ketersediaan",
+    "pelaksana_distribusi",
+    "pelaksana_konsumsi",
+    "kasubag_umum_kepegawaian",
+    "kasubag",
+    "kasubbag",
+    "kasubbag_umum",
+    "kasubbag_kepegawaian",
+    "bendahara_pengeluaran",
+    "bendahara_gaji",
+    "bendahara_barang",
+    "jabatan_fungsional",
+    "pejabat_fungsional",
+    "fungsional_uptd_mutu",
+    "fungsional_uptd_teknis",
+    "kasi_mutu_uptd",
+    "kasi_teknis_uptd",
+    "kasubbag_tu_uptd",
+  ]);
+
+  if (!specificRoles.has(fromColumn)) return canonicalFromRow;
+
+  /** Peran “induk” dari baris roles — atau apa pun yang diawali sekretaris_ */
+  const parentRoles = new Set([
+    "sekretaris",
+    "bendahara",
+    "fungsional",
+    "jabatan_fungsional",
+    "staf",
+    "pelaksana",
+  ]);
+
+  const row = String(canonicalFromRow || "");
+  const isParentOrSekretarisFamily =
+    parentRoles.has(canonicalFromRow) ||
+    row.startsWith("sekretaris") ||
+    row.startsWith("kepala_bidang");
+
+  if (isParentOrSekretarisFamily) return fromColumn;
+  return canonicalFromRow;
+}
+
+function buildTokenPayloadFromUser(user, roleRow) {
+  const plain = user?.get?.({ plain: true }) ?? user ?? {};
+  return {
+    id: plain.id,
+    username: plain.username,
+    email: plain.email,
+    role: canonicalRoleFromRoleRow(roleRow, plain.role),
+    unit_kerja: plain.unit_kerja || plain.unit_id || "",
+    nama_lengkap: plain.nama_lengkap || plain.name || "",
+  };
+}
+
+async function resolveRoleRowForLogin(user) {
+  if (user.role_id) {
+    const row = await Role.findByPk(String(user.role_id).trim());
+    if (row) return row;
+  }
+  const { roleRow } = await resolveRoleRow({
+    role: user.role,
+    role_id: null,
+  });
+  return roleRow;
+}
 
 // SSO: Generate short-lived token untuk diverifikasi e-Pelara
 export const generateSsoToken = async (req, res) => {
@@ -158,6 +281,109 @@ async function resolveRoleRow({ role, role_id }) {
   return { roleRow, error: null };
 }
 
+function displayNameFromRoleCode(codeKey) {
+  const s = normalizeRoleKeyForRbac(codeKey);
+  if (!s) return "Role";
+  return s
+    .split("_")
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+async function getNextRoleLevel() {
+  const max = await Role.max("level");
+  const n = max == null || max === undefined ? 0 : Number(max);
+  return Number.isFinite(n) ? n + 1 : 1;
+}
+
+/**
+ * Untuk Manajemen User (Super Admin): jika role belum ada di tabel `roles`,
+ * buat baris baru otomatis agar produksi tidak bergantung pada skrip SQL manual.
+ */
+async function resolveOrCreateRoleRow({ role, role_id }) {
+  const first = await resolveRoleRow({ role, role_id });
+  if (!first.error && first.roleRow) {
+    return { ...first, roleAutoCreated: false };
+  }
+
+  if (role_id) {
+    return { ...first, roleAutoCreated: false };
+  }
+
+  const codeKey = normalizeRoleKeyForRbac(role);
+  if (!codeKey) {
+    return { ...first, roleAutoCreated: false };
+  }
+
+  const existingByCode = await Role.findOne({ where: { code: codeKey } });
+  if (existingByCode) {
+    return { roleRow: existingByCode, error: null, roleAutoCreated: false };
+  }
+
+  let name = displayNameFromRoleCode(codeKey);
+  const nameTaken = await Role.findOne({
+    where: { name },
+  });
+  if (nameTaken) {
+    name = `${displayNameFromRoleCode(codeKey)} [${codeKey}]`;
+  }
+
+  try {
+    let level = await getNextRoleLevel();
+    const created = await Role.create({
+      id: randomUUID(),
+      code: codeKey,
+      name,
+      level,
+      description:
+        "Dibuat otomatis dari Manajemen User (Super Admin). Sesuaikan deskripsi/izin bila perlu.",
+      default_permissions: [],
+      is_active: true,
+    });
+    console.log(
+      `[auth] resolveOrCreateRoleRow: created roles.code=${codeKey} id=${created.id}`,
+    );
+    return { roleRow: created, error: null, roleAutoCreated: true };
+  } catch (err) {
+    const msg = String(err?.message || err);
+    if (
+      msg.includes("unique") ||
+      msg.includes("Unique") ||
+      msg.includes("duplicate")
+    ) {
+      const retry = await Role.findOne({ where: { code: codeKey } });
+      if (retry)
+        return { roleRow: retry, error: null, roleAutoCreated: false };
+    }
+    console.error("[resolveOrCreateRoleRow]", err);
+    return {
+      roleRow: null,
+      error: `Gagal menyimpan role '${role}': ${msg}`,
+      roleAutoCreated: false,
+    };
+  }
+}
+
+/** Jejak audit: role baru dibuat otomatis (agar tim IT bisa filter di DB / UI). */
+async function logRoleAutoCreatedAudit({ roleRow, req, context, targetUserId }) {
+  if (!roleRow?.id) return;
+  await logAudit({
+    modul: USER_MGMT_MODUL,
+    entitas_id: String(roleRow.id),
+    aksi: "ROLE_AUTO_CREATED",
+    data_lama: null,
+    data_baru: {
+      role_id: roleRow.id,
+      code: roleRow.code,
+      name: roleRow.name,
+      context,
+      target_user_id: targetUserId != null ? String(targetUserId) : null,
+    },
+    pegawai_id: actorPegawaiId(req),
+  });
+}
+
 // Register (POST /api/auth/register)
 export const register = async (req, res) => {
   try {
@@ -233,8 +459,9 @@ export const register = async (req, res) => {
       pegawai_id: user.id,
     });
 
-    const token = generateToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const tokenPayload = buildTokenPayloadFromUser(user, roleRow);
+    const token = generateToken(tokenPayload);
+    const refreshToken = generateRefreshToken(tokenPayload);
 
     res.status(201).json({
       success: true,
@@ -323,31 +550,78 @@ export const login = async (req, res) => {
     user.locked_until = null;
     user.last_login = new Date();
     await user.save();
+    await user.reload();
 
-    const token = generateToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const roleRow = await resolveRoleRowForLogin(user);
+    const roleName = roleRow?.name || null;
 
-    // Lookup role from Roles table (source of truth)
-    const roleRow = user.role_id ? await Role.findByPk(user.role_id) : null;
-    const roleName = roleRow?.name || null; // e.g. "GUBERNUR", "KEPALA_DINAS"
-
-    // Dashboard mapping (sesuai dokumenSistem: eksekutif -> /dashboard)
+    const canonicalFromRow = canonicalRoleFromRoleRow(roleRow, user.role);
     const roleToDashboard = {
-      SUPER_ADMIN: "/dashboard/superadmin",
-SEKRETARIS: "/dashboard/sekretaris",
-      KEPALA_DINAS: "/dashboard",
-      GUBERNUR: "/dashboard",
-      KEPALA_BIDANG: "/dashboard",
-      KEPALA_BIDANG_KETERSEDIAAN: "/dashboard/ketersediaan",
-      KEPALA_BIDANG_DISTRIBUSI: "/dashboard/distribusi",
-      KEPALA_BIDANG_KONSUMSI: "/dashboard/konsumsi",
-      KEPALA_UPTD: "/dashboard/uptd",
-      VIEWER: "/dashboard-publik",
+      super_admin: "/dashboard/superadmin",
+      sekretaris: "/dashboard/sekretaris",
+      kepala_dinas: "/dashboard",
+      gubernur: "/dashboard",
+      kepala_bidang: "/dashboard",
+      kepala_bidang_ketersediaan: "/dashboard/ketersediaan",
+      kepala_bidang_distribusi: "/dashboard/distribusi",
+      kepala_bidang_konsumsi: "/dashboard/konsumsi",
+      kepala_uptd: "/dashboard/uptd",
+      viewer: "/dashboard-publik",
+      kasubag_umum_kepegawaian: "/dashboard/kasubag",
+      kasubag: "/dashboard/kasubag",
+      kasubbag: "/dashboard/kasubag",
+      kasubbag_umum: "/dashboard/kasubag",
+      kasubbag_kepegawaian: "/dashboard/kasubag",
+      fungsional_perencana: "/dashboard/fungsional",
+      fungsional_perencanaan: "/dashboard/fungsional",
+      fungsional_keuangan: "/dashboard/fungsional",
+      fungsional_analis: "/dashboard/fungsional",
+      fungsional_ketersediaan: "/dashboard/fungsional",
+      fungsional_distribusi: "/dashboard/fungsional",
+      fungsional_konsumsi: "/dashboard/fungsional",
+      fungsional_uptd_mutu: "/dashboard/fungsional",
+      fungsional_uptd_teknis: "/dashboard/fungsional",
+      ppk: "/dashboard/fungsional",
+      jabatan_fungsional: "/dashboard/fungsional",
+      pejabat_fungsional: "/dashboard/fungsional",
+      fungsional: "/dashboard/fungsional",
+      bendahara: "/dashboard/bendahara",
+      bendahara_pengeluaran: "/dashboard/bendahara",
+      bendahara_gaji: "/dashboard/bendahara",
+      bendahara_barang: "/dashboard/bendahara",
+      pelaksana: "/dashboard/pelaksana",
+      staf_pelaksana: "/dashboard/pelaksana",
+      pelaksana_ketersediaan: "/dashboard/pelaksana",
+      pelaksana_distribusi: "/dashboard/pelaksana",
+      pelaksana_konsumsi: "/dashboard/pelaksana",
+      subbag_tata_usaha: "/dashboard/kasubag-uptd",
+      kasubag_uptd: "/dashboard/kasubag-uptd",
+      kasubbag_tata_usaha: "/dashboard/kasubag-uptd",
+      seksi_manajemen_mutu: "/dashboard/kasi-uptd",
+      seksi_manajemen_teknis: "/dashboard/kasi-uptd",
+      kasi_uptd: "/dashboard/kasi-uptd",
+      kasi_mutu: "/dashboard/kasi-uptd",
+      kasi_teknis: "/dashboard/kasi-uptd",
+      kasi_mutu_uptd: "/dashboard/kasi-uptd",
+      kasi_teknis_uptd: "/dashboard/kasi-uptd",
+      kasubbag_tu_uptd: "/dashboard/kasubag-uptd",
     };
 
-    // Untuk role staf yang tidak ada di mapping eksplisit,
-    // tentukan dashboard berdasarkan unit_kerja
-    let dashboardUrl = roleToDashboard[roleName];
+    const plainUser = user.get?.({ plain: true }) ?? user;
+    const canonicalRole = mergeCanonicalRoleWithUsersColumn(
+      canonicalFromRow,
+      plainUser.role,
+      roleToDashboard,
+    );
+
+    const tokenPayload = {
+      ...buildTokenPayloadFromUser(user, roleRow),
+      role: canonicalRole,
+    };
+    const token = generateToken(tokenPayload);
+    const refreshToken = generateRefreshToken(tokenPayload);
+
+    let dashboardUrl = roleToDashboard[canonicalRole];
     if (!dashboardUrl) {
       const unitKerja = (user.unit_kerja || "").toLowerCase();
       if (unitKerja.includes("ketersediaan"))
@@ -357,7 +631,7 @@ SEKRETARIS: "/dashboard/sekretaris",
       else if (unitKerja.includes("konsumsi"))
         dashboardUrl = "/dashboard/konsumsi";
       else if (unitKerja.includes("sekretariat"))
-        dashboardUrl = "/dashboard/sekretariat";
+        dashboardUrl = "/dashboard/sekretaris";
       else if (unitKerja.includes("uptd")) dashboardUrl = "/dashboard/uptd";
       else dashboardUrl = "/dashboard";
     }
@@ -389,8 +663,11 @@ SEKRETARIS: "/dashboard/sekretaris",
           username: user.username,
           name: user.name,
           email: user.email,
+          role: canonicalRole,
           role_id: user.role_id,
           unit_id: user.unit_id,
+          unit_kerja: user.unit_kerja,
+          jabatan: user.jabatan,
         },
         roleName,
         token,
@@ -557,7 +834,11 @@ export const createUser = async (req, res) => {
       });
     }
 
-    const { roleRow, error: roleError } = await resolveRoleRow({
+    const {
+      roleRow,
+      error: roleError,
+      roleAutoCreated,
+    } = await resolveOrCreateRoleRow({
       role,
       role_id,
     });
@@ -614,10 +895,37 @@ export const createUser = async (req, res) => {
     const created = user.toJSON ? user.toJSON() : user;
     created.password = created.plain_password || password || "";
 
+    const pegawaiId = actorPegawaiId(req);
+    if (roleAutoCreated && roleRow) {
+      await logRoleAutoCreatedAudit({
+        roleRow,
+        req,
+        context: "create_user",
+        targetUserId: user.id,
+      });
+    }
+    await logAudit({
+      modul: USER_MGMT_MODUL,
+      entitas_id: String(user.id),
+      aksi: "CREATE",
+      data_lama: null,
+      data_baru: snapshotUserForAudit(user),
+      pegawai_id: pegawaiId,
+    });
+
     res.status(201).json({
       success: true,
       message: "User berhasil ditambahkan",
       data: created,
+      meta:
+        roleAutoCreated && roleRow
+          ? {
+              role_auto_created: {
+                code: roleRow.code,
+                name: roleRow.name,
+              },
+            }
+          : undefined,
     });
   } catch (error) {
     res.status(500).json({
@@ -652,6 +960,8 @@ export const updateUser = async (req, res) => {
         .json({ success: false, message: "User tidak ditemukan" });
     }
 
+    const dataLama = snapshotUserForAudit(user);
+
     user.username = username ?? user.username;
     user.email = email ?? user.email;
     user.nama_lengkap = nama_lengkap ?? user.nama_lengkap;
@@ -660,9 +970,15 @@ export const updateUser = async (req, res) => {
     user.nip = nip ?? user.nip;
     user.jabatan = jabatan ?? user.jabatan;
 
+    let roleAutoUpdated = false;
+    let resolvedRoleRow = null;
     // Resolve role_id safely if role_id or role provided
     if (role_id || role) {
-      const { roleRow, error: roleError } = await resolveRoleRow({
+      const {
+        roleRow,
+        error: roleError,
+        roleAutoCreated,
+      } = await resolveOrCreateRoleRow({
         role,
         role_id,
       });
@@ -670,6 +986,8 @@ export const updateUser = async (req, res) => {
         return res.status(400).json({ success: false, message: roleError });
       }
       if (roleRow) {
+        resolvedRoleRow = roleRow;
+        roleAutoUpdated = !!roleAutoCreated;
         user.role_id = roleRow.id;
         user.role = roleRow.code || user.role;
       }
@@ -694,10 +1012,37 @@ export const updateUser = async (req, res) => {
     const updated = user.toJSON ? user.toJSON() : user;
     updated.password = updated.plain_password || "";
 
+    const pegawaiId = actorPegawaiId(req);
+    if (roleAutoUpdated && resolvedRoleRow) {
+      await logRoleAutoCreatedAudit({
+        roleRow: resolvedRoleRow,
+        req,
+        context: "update_user",
+        targetUserId: user.id,
+      });
+    }
+    await logAudit({
+      modul: USER_MGMT_MODUL,
+      entitas_id: String(user.id),
+      aksi: "UPDATE",
+      data_lama: dataLama,
+      data_baru: snapshotUserForAudit(user),
+      pegawai_id: pegawaiId,
+    });
+
     res.json({
       success: true,
       message: "User berhasil diupdate",
       data: updated,
+      meta:
+        roleAutoUpdated && resolvedRoleRow
+          ? {
+              role_auto_created: {
+                code: resolvedRoleRow.code,
+                name: resolvedRoleRow.name,
+              },
+            }
+          : undefined,
     });
   } catch (error) {
     res.status(500).json({
@@ -716,20 +1061,222 @@ export const deleteUser = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "User tidak ditemukan" });
-    await user.destroy();
+    const snapshot = snapshotUserForAudit(user);
+    const targetId = String(user.id);
     await logAudit({
-      modul: "AUTH",
-      entitas_id: user.id,
+      modul: USER_MGMT_MODUL,
+      entitas_id: targetId,
       aksi: "DELETE",
-      data_lama: user,
+      data_lama: snapshot,
       data_baru: null,
-      pegawai_id: req.user?.id || null,
+      pegawai_id: actorPegawaiId(req),
     });
+    await user.destroy();
     res.json({ success: true, message: "User berhasil dihapus" });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error menghapus user",
+      error: error.message,
+    });
+  }
+};
+
+// Admin: Jejak audit Manajemen User (tabel audit_log, modul USER_MANAGEMENT)
+export const getUserManagementAuditLog = async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 40));
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await AuditLog.findAndCountAll({
+      where: { modul: USER_MGMT_MODUL },
+      order: [["created_at", "DESC"]],
+      limit,
+      offset,
+    });
+
+    const rawIds = rows.map((r) => r.pegawai_id).filter(Boolean);
+    const numericIds = [
+      ...new Set(
+        rawIds
+          .map((id) => parseInt(String(id), 10))
+          .filter((n) => Number.isFinite(n)),
+      ),
+    ];
+    const actors =
+      numericIds.length > 0
+        ? await User.findAll({
+            where: { id: { [Op.in]: numericIds } },
+            attributes: ["id", "username", "nama_lengkap", "role"],
+          })
+        : [];
+    const actorMap = new Map(actors.map((a) => [String(a.id), a]));
+
+    const data = rows.map((r) => {
+      const j = r.toJSON ? r.toJSON() : r;
+      const a = actorMap.get(String(j.pegawai_id));
+      return {
+        ...j,
+        pelaku_username: a?.username ?? null,
+        pelaku_nama: a?.nama_lengkap ?? null,
+        pelaku_role: a?.role ?? null,
+      };
+    });
+
+    res.json({
+      success: true,
+      data,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit) || 1,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil jejak audit",
+      error: error.message,
+    });
+  }
+};
+
+/** Jejak yang sudah dipindah ke audit_log_archive (retensi). */
+export const getUserManagementAuditArchiveLog = async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 40));
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await AuditLogArchive.findAndCountAll({
+      where: { modul: USER_MGMT_MODUL },
+      order: [["archived_at", "DESC"]],
+      limit,
+      offset,
+    });
+
+    const rawIds = rows.map((r) => r.pegawai_id).filter(Boolean);
+    const numericIds = [
+      ...new Set(
+        rawIds
+          .map((id) => parseInt(String(id), 10))
+          .filter((n) => Number.isFinite(n)),
+      ),
+    ];
+    const actors =
+      numericIds.length > 0
+        ? await User.findAll({
+            where: { id: { [Op.in]: numericIds } },
+            attributes: ["id", "username", "nama_lengkap", "role"],
+          })
+        : [];
+    const actorMap = new Map(actors.map((a) => [String(a.id), a]));
+
+    const data = rows.map((r) => {
+      const j = r.toJSON ? r.toJSON() : r;
+      const a = actorMap.get(String(j.pegawai_id));
+      return {
+        ...j,
+        pelaku_username: a?.username ?? null,
+        pelaku_nama: a?.nama_lengkap ?? null,
+        pelaku_role: a?.role ?? null,
+      };
+    });
+
+    res.json({
+      success: true,
+      data,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit) || 1,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil jejak arsip",
+      error: error.message,
+    });
+  }
+};
+
+function csvEscapeCell(val) {
+  if (val === null || val === undefined) return "";
+  const s = typeof val === "object" ? JSON.stringify(val) : String(val);
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+/** Ekspor CSV jejak audit Manajemen User (UTF-8 BOM untuk Excel). */
+export const exportUserManagementAuditCsv = async (req, res) => {
+  try {
+    const limit = Math.min(
+      10000,
+      Math.max(1, parseInt(req.query.limit, 10) || 5000),
+    );
+    const rows = await AuditLog.findAll({
+      where: { modul: USER_MGMT_MODUL },
+      order: [["created_at", "DESC"]],
+      limit,
+    });
+    const header = [
+      "id",
+      "created_at",
+      "aksi",
+      "entitas_id",
+      "pegawai_id",
+      "data_lama_json",
+      "data_baru_json",
+    ];
+    const lines = [header.join(",")];
+    for (const r of rows) {
+      const p = r.get({ plain: true });
+      lines.push(
+        [
+          csvEscapeCell(p.id),
+          csvEscapeCell(p.created_at),
+          csvEscapeCell(p.aksi),
+          csvEscapeCell(p.entitas_id),
+          csvEscapeCell(p.pegawai_id),
+          csvEscapeCell(p.data_lama == null ? "" : JSON.stringify(p.data_lama)),
+          csvEscapeCell(p.data_baru == null ? "" : JSON.stringify(p.data_baru)),
+        ].join(","),
+      );
+    }
+    const bom = "\ufeff";
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="user-management-audit-${Date.now()}.csv"`,
+    );
+    res.send(bom + lines.join("\n"));
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengekspor CSV",
+      error: error.message,
+    });
+  }
+};
+
+/** Retensi: pindahkan ke audit_log_archive + hapus dari audit_log. */
+export const archiveUserManagementAuditRetention = async (req, res) => {
+  try {
+    const { olderThanDays } = req.body || {};
+    const result = await archiveUserManagementAuditOlderThan({ olderThanDays });
+    res.json({
+      success: true,
+      message: `Berhasil mengarsipkan ${result.moved} baris ke audit_log_archive`,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Gagal menjalankan retensi arsip",
       error: error.message,
     });
   }

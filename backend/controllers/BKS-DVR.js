@@ -6,6 +6,7 @@
 
 import BksDvr from "../models/BKS-DVR.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BksDvr records
 // @route   GET /api/bks-dvr
@@ -76,6 +77,8 @@ export const getBksDvrById = async (req, res) => {
 // @access  Private
 export const createBksDvr = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BksDvr.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBksDvr = async (req, res) => {
         message: "BksDvr not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

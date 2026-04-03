@@ -6,6 +6,7 @@
 
 import BktFsl from "../models/BKT-FSL.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BktFsl records
 // @route   GET /api/bkt-fsl
@@ -76,6 +77,8 @@ export const getBktFslById = async (req, res) => {
 // @access  Private
 export const createBktFsl = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BktFsl.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBktFsl = async (req, res) => {
         message: "BktFsl not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

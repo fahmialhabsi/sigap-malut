@@ -1,11 +1,37 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../../services/api";
+import ExecutiveHorizontalCoordinationPanel from "../../components/coordination/ExecutiveHorizontalCoordinationPanel.jsx";
+import ExecutiveFormModal from "../../components/executive/ExecutiveFormModal.jsx";
 import useAuthStore from "../../stores/authStore";
-import { roleIdToName } from "../../utils/roleMap";
-import api from "../../utils/api";
 import KadinExecutiveTimeline from "../../components/kadin/KadinExecutiveTimeline.jsx";
+import ClarificationThreadPanel, {
+  ANCHOR,
+  LANES,
+} from "../../components/clarification/ClarificationThreadPanel.jsx";
+import { roleIdToName } from "../../utils/roleMap";
+import { executiveTheme } from "./executiveTheme";
+import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
+import CrossThreadSystemicPanel from "../../components/execution/CrossThreadSystemicPanel.jsx";
 
 const JENIS_PERLU_PIN_KADIN = new Set(["persetujuan_anggaran"]);
+const MENU_ITEMS = [
+  { k: "overview", label: "Dashboard" },
+  { k: "inbox", label: "Inbox Gubernur" },
+  {
+    k: "pengajuan_gub",
+    label: "Pengajuan ke Gubernur",
+  },
+  { k: "buat_perintah", label: "Buat Perintah ke Bawahan" },
+  { k: "perintah", label: "Perintah Saya" },
+  {
+    k: "approval",
+    label: "Antrean internal dinas",
+  },
+  { k: "kinerja", label: "Monitor Kinerja" },
+  { k: "diskusi", label: "Diskusi & tanya jawab" },
+];
 
 function normalizeRoleName(user) {
   return (
@@ -19,14 +45,31 @@ function normalizeRoleName(user) {
 
 function Tile({ label, value, hint }) {
   return (
-    <div className="rounded-2xl border border-exec-border bg-gradient-to-br from-white via-teal-50/35 to-rose-50/30 p-4 shadow-sm ring-1 ring-teal-100/40">
-      <div className="text-xs text-exec-muted font-medium">{label}</div>
-      <div className="text-2xl font-extrabold mt-1 text-teal-900 tabular-nums">
-        {value ?? "—"}
-      </div>
-      {hint ? <div className="text-[11px] text-exec-muted mt-1">{hint}</div> : null}
+    <div className={executiveTheme.tile}>
+      <div className={executiveTheme.tileAccent} aria-hidden />
+      <div className={executiveTheme.tileLabel}>{label}</div>
+      <div className={executiveTheme.tileValue}>{value ?? "-"}</div>
+      {hint ? <div className={executiveTheme.tileHint}>{hint}</div> : null}
     </div>
   );
+}
+
+function PanelHeader({ title, subtitle, right }) {
+  return (
+    <div className={executiveTheme.panelHeader}>
+      <div>
+        <div className={executiveTheme.panelTitle}>{title}</div>
+        {subtitle ? (
+          <div className={executiveTheme.panelSubtitle}>{subtitle}</div>
+        ) : null}
+      </div>
+      {right ? <div>{right}</div> : null}
+    </div>
+  );
+}
+
+function EmptyState({ text }) {
+  return <div className={executiveTheme.mutedText}>{text}</div>;
 }
 
 export default function DashboardKepalaDinas() {
@@ -52,22 +95,75 @@ export default function DashboardKepalaDinas() {
     due_date: "",
     priority: 3,
   });
+  /** Jika diisi, Kirim Perintah menyertakan metadata turunan instruksi Gubernur (untuk selesai otomatis). */
+  const [linkedInstruksiId, setLinkedInstruksiId] = useState(null);
+  const [diskusiInstruksiId, setDiskusiInstruksiId] = useState(null);
+  const [diskusiTaskId, setDiskusiTaskId] = useState("");
+
+  const [pengajuanGub, setPengajuanGub] = useState([]);
+  const [kadisCockpit, setKadisCockpit] = useState(null);
+  const [formPengGub, setFormPengGub] = useState({
+    judul: "",
+    jenis: "laporan_strategis",
+    isi_pengajuan: "",
+    lampiran_url: "",
+    instruksi_id: "",
+  });
+
+  const [modalLapor, setModalLapor] = useState(null);
+  const [teksLaporan, setTeksLaporan] = useState("");
+
+  const [modalApproval, setModalApproval] = useState(null);
+  const [teksApprovalCatatan, setTeksApprovalCatatan] = useState("");
+  const [teksApprovalPin, setTeksApprovalPin] = useState("");
+
+  function applyInstruksiKeForm(item) {
+    if (!item) return;
+    const deadline =
+      item.deadline != null && item.deadline !== ""
+        ? String(item.deadline).slice(0, 10)
+        : "";
+    setFormPerintah((prev) => ({
+      ...prev,
+      title: item.judul || prev.title,
+      description: item.isi_perintah || prev.description,
+      due_date: deadline || prev.due_date,
+    }));
+    setLinkedInstruksiId(item.id);
+  }
+
+  function clearLinkedInstruksi() {
+    setLinkedInstruksiId(null);
+  }
+
+  const refreshKadinCockpit = useCallback(async () => {
+    try {
+      const r = await api.get("/kadin/dashboard/cockpit");
+      setKadisCockpit(r.data?.data || null);
+    } catch {
+      /* biarkan data lama */
+    }
+  }, []);
 
   async function refreshAll() {
     setLoading(true);
     try {
-      const [a, b, c, d, e] = await Promise.all([
-        api.get("/api/kadin/dashboard/summary"),
-        api.get("/api/kadin/inbox-gubernur?limit=25"),
-        api.get("/api/kadin/perintah?limit=25"),
-        api.get("/api/kadin/approval?limit=25"),
-        api.get("/api/kadin/kinerja/bawahan"),
+      const [a, b, c, d, e, pg, ck] = await Promise.all([
+        api.get("/kadin/dashboard/summary"),
+        api.get("/kadin/inbox-gubernur?limit=25"),
+        api.get("/kadin/perintah?limit=25"),
+        api.get("/kadin/approval?limit=25"),
+        api.get("/kadin/kinerja/bawahan"),
+        api.get("/kadin/pengajuan-gubernur").catch(() => ({ data: {} })),
+        api.get("/kadin/dashboard/cockpit").catch(() => ({ data: {} })),
       ]);
+      setKadisCockpit(ck.data?.data || null);
       setSummary(a.data?.data || null);
       setInbox(b.data?.data || []);
       setPerintah(c.data?.data || []);
       setApproval(d.data?.data || []);
       setKinerja(e.data?.data || []);
+      setPengajuanGub(pg.data?.data || []);
     } catch (err) {
       toast.error(
         err?.response?.data?.message || "Gagal memuat dashboard Kepala Dinas",
@@ -83,64 +179,115 @@ export default function DashboardKepalaDinas() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAllowed]);
 
+  useEffect(() => {
+    if (!isAllowed) return;
+    const t = setInterval(() => {
+      void refreshKadinCockpit();
+    }, 90000);
+    return () => clearInterval(t);
+  }, [isAllowed, refreshKadinCockpit]);
+
   const tiles = useMemo(() => {
     const s = summary || {};
     return [
       {
         label: "Inbox Gubernur",
-        value: s.inbox_gubernur ?? "—",
-        hint: "Instruksi baru (diterbitkan)",
+        value: s.inbox_gubernur ?? "-",
+        hint: "Instruksi baru yang sudah diterbitkan.",
       },
       {
         label: "Perintah Aktif",
-        value: s.perintah_aktif ?? "—",
-        hint: "Tugas ke 5 bawahan langsung",
+        value: s.perintah_aktif ?? "-",
+        hint: "Tugas berjalan ke lima bawahan langsung.",
       },
       {
-        label: "Approval Queue",
-        value: s.approval_queue ?? "—",
-        hint: "Setelah gateway Sekretaris",
+        label: "Antrean internal",
+        value: s.approval_queue ?? "-",
+        hint: "Pengajuan internal setelah validasi Sekretaris (bukan ke Gubernur).",
       },
       {
-        label: "SLA%",
-        value: typeof s.sla_persen === "number" ? `${s.sla_persen}%` : "—",
-        hint: "MVP",
+        label: "SLA",
+        value: typeof s.sla_persen === "number" ? `${s.sla_persen}%` : "-",
+        hint: "Indikator layanan agregat tahap MVP.",
       },
-      { label: "Alert Kritis", value: s.alert_kritis ?? "—", hint: "MVP" },
+      {
+        label: "Alert Kritis",
+        value: s.alert_kritis ?? "-",
+        hint: "Butuh perhatian cepat dari pimpinan.",
+      },
     ];
   }, [summary]);
 
   async function konfirmasiInstruksi(id) {
     try {
-      await api.post(`/api/kadin/inbox-gubernur/${id}/konfirmasi`);
-      toast.success("Instruksi dikonfirmasi (dibaca)");
+      await api.post(`/kadin/inbox-gubernur/${id}/konfirmasi`);
+      toast.success("Instruksi dikonfirmasi");
       refreshAll();
     } catch (err) {
       toast.error(err?.response?.data?.message || "Gagal konfirmasi");
     }
   }
 
-  async function laporSelesaiInstruksi(id) {
+  function bukaLaporSelesai(id) {
+    setModalLapor(id);
+    setTeksLaporan("");
+  }
+
+  async function kirimLaporSelesai() {
+    if (!modalLapor) return;
     try {
-      const laporan =
-        window.prompt("Tulis laporan pelaksanaan (opsional):", "") || "";
-      await api.post(`/api/kadin/inbox-gubernur/${id}/lapor-selesai`, {
-        laporan_pelaksanaan: laporan,
+      await api.post(`/kadin/inbox-gubernur/${modalLapor}/lapor-selesai`, {
+        laporan_pelaksanaan: teksLaporan.trim() || undefined,
       });
       toast.success("Instruksi ditandai selesai");
+      setModalLapor(null);
       refreshAll();
     } catch (err) {
       toast.error(err?.response?.data?.message || "Gagal lapor selesai");
     }
   }
 
+  async function kirimPengajuanKeGubernur() {
+    try {
+      if (
+        !formPengGub.judul.trim() ||
+        !formPengGub.isi_pengajuan.trim()
+      ) {
+        toast.error("Judul dan isi pengajuan wajib diisi.");
+        return;
+      }
+      await api.post("/kadin/pengajuan-gubernur", {
+        judul: formPengGub.judul.trim(),
+        jenis: formPengGub.jenis,
+        isi_pengajuan: formPengGub.isi_pengajuan.trim(),
+        lampiran_url: formPengGub.lampiran_url.trim() || null,
+        instruksi_id: formPengGub.instruksi_id
+          ? Number(formPengGub.instruksi_id)
+          : null,
+      });
+      toast.success("Pengajuan terkirim ke Gubernur");
+      setFormPengGub({
+        judul: "",
+        jenis: "laporan_strategis",
+        isi_pengajuan: "",
+        lampiran_url: "",
+        instruksi_id: "",
+      });
+      refreshAll();
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message || "Gagal mengirim pengajuan",
+      );
+    }
+  }
+
   async function buatPerintah() {
     try {
       if (!formPerintah.title || !formPerintah.assignee_role) {
-        toast.error("Lengkapi minimal: judul & penerima");
+        toast.error("Lengkapi minimal judul dan penerima.");
         return;
       }
-      await api.post("/api/kadin/perintah", {
+      await api.post("/kadin/perintah", {
         title: formPerintah.title,
         description: formPerintah.description,
         assignee_role: formPerintah.assignee_role,
@@ -149,6 +296,9 @@ export default function DashboardKepalaDinas() {
           : null,
         due_date: formPerintah.due_date || null,
         priority: Number(formPerintah.priority || 3),
+        ...(linkedInstruksiId
+          ? { sumber_instruksi_gubernur_id: linkedInstruksiId }
+          : {}),
       });
       toast.success("Perintah dikirim");
       setFormPerintah({
@@ -159,36 +309,45 @@ export default function DashboardKepalaDinas() {
         due_date: "",
         priority: 3,
       });
+      setLinkedInstruksiId(null);
       refreshAll();
     } catch (err) {
       toast.error(err?.response?.data?.message || "Gagal membuat perintah");
     }
   }
 
-  async function putuskanApproval(id, keputusan, jenis) {
+  function bukaModalApproval(id, keputusan, jenis) {
+    const perluPin = JENIS_PERLU_PIN_KADIN.has(String(jenis || ""));
+    if (keputusan === "setuju" && !perluPin) {
+      void eksekusiApproval(id, keputusan, jenis, "", "");
+      return;
+    }
+    setModalApproval({ id, keputusan, jenis });
+    setTeksApprovalCatatan("");
+    setTeksApprovalPin("");
+  }
+
+  async function eksekusiApproval(id, keputusan, jenis, catatan, pin) {
     try {
       const perluPin = JENIS_PERLU_PIN_KADIN.has(String(jenis || ""));
-      let pin;
-      if (perluPin) {
-        pin =
-          window.prompt(
-            "PIN wajib untuk persetujuan anggaran (env CRITICAL_ACTION_PIN, default MVP: 123456):",
-            "",
-          ) || "";
-        if (!pin) return;
-      }
-      const catatan =
-        keputusan === "setuju"
-          ? ""
-          : window.prompt("Catatan wajib (tolak/kembalikan):", "") || "";
-      if ((keputusan === "tolak" || keputusan === "kembalikan") && !catatan)
+      if (perluPin && keputusan === "setuju" && !String(pin || "").trim()) {
+        toast.error("PIN wajib untuk jenis persetujuan anggaran.");
         return;
-      await api.post(`/api/kadin/approval/${id}/putuskan`, {
-        ...(perluPin ? { pin } : {}),
+      }
+      if (
+        (keputusan === "tolak" || keputusan === "kembalikan") &&
+        !String(catatan || "").trim()
+      ) {
+        toast.error("Catatan wajib untuk tolak atau kembalikan.");
+        return;
+      }
+      await api.post(`/kadin/approval/${id}/putuskan`, {
+        ...(perluPin && keputusan === "setuju" ? { pin: String(pin).trim() } : {}),
         keputusan,
-        catatan,
+        catatan: String(catatan || "").trim(),
       });
       toast.success("Keputusan tersimpan");
+      setModalApproval(null);
       refreshAll();
     } catch (err) {
       toast.error(err?.response?.data?.message || "Gagal memutuskan approval");
@@ -197,81 +356,271 @@ export default function DashboardKepalaDinas() {
 
   if (!isAllowed) {
     return (
-      <div className="max-w-xl mx-auto mt-16 bg-red-100 border-l-4 border-red-500 text-red-800 p-6 rounded-xl text-center">
-        <div className="font-bold text-lg mb-2">Akses ditolak.</div>
-        <div>Dashboard ini hanya untuk Kepala Dinas.</div>
+      <div className="mx-auto mt-16 max-w-xl rounded-3xl border border-rose-500/25 bg-slate-900/95 p-6 text-center text-slate-100 shadow-[0_24px_48px_-28px_rgba(2,6,23,0.85)]">
+        <div className="mb-1 text-xs font-semibold uppercase tracking-[0.24em] text-rose-300">
+          Akses Terbatas
+        </div>
+        <div className="mb-2 text-lg font-bold text-white">Akses ditolak.</div>
+        <div className="text-sm text-slate-300">
+          Dashboard ini hanya untuk Kepala Dinas.
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] w-full min-w-0 bg-gradient-to-br from-exec-canvas via-white to-exec-canvas2 text-exec-ink antialiased">
-      <div className="w-full max-w-[100vw] mx-auto box-border px-3 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-6 pb-12">
-        <div className="relative rounded-2xl border border-exec-border bg-white/95 shadow-exec mb-6 p-5 sm:p-6 overflow-hidden">
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-teal-600 via-teal-400 to-rose-400"
-            aria-hidden
-          />
-          <div className="relative flex items-start justify-between gap-4 flex-wrap pl-2 sm:pl-3">
+    <div className={executiveTheme.shell}>
+      <div className={executiveTheme.shellGlowLeft} aria-hidden />
+      <div className={executiveTheme.shellGlowRight} aria-hidden />
+      <div className={executiveTheme.shellGlowBottom} aria-hidden />
+
+      <div className={executiveTheme.content}>
+        <div className={`${executiveTheme.hero} mb-6`}>
+          <div className={executiveTheme.heroAccent} aria-hidden />
+          <div className={executiveTheme.heroGlow} aria-hidden />
+
+          <div className={executiveTheme.heroInner}>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-teal-800">
-                Executive Command
+              <div className={executiveTheme.heroKicker}>Executive Command</div>
+              <div className={executiveTheme.heroTitle}>Kepala Dinas</div>
+              <div className={executiveTheme.heroMeta}>
+                Kendali instruksi, approval, dan pengawasan kinerja unit
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-exec-ink">
-                Kepala Dinas Pangan Provinsi Maluku Utara
-              </div>
-              <div className="text-sm text-exec-muted mt-2 max-w-2xl leading-relaxed">
-                Inbox Gubernur, perintah ke 5 bawahan, approval, dan monitoring.
-                Layout memenuhi lebar layar di desktop, laptop, tablet, dan ponsel.
+              <div className={executiveTheme.heroDescription}>
+                Pantau arahan Gubernur, distribusi tugas, antrean persetujuan,
+                dan ringkasan performa unit dalam satu tampilan eksekutif yang
+                lebih tenang, padat, dan profesional.
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-xs text-exec-muted">Login sebagai</div>
-              <div className="text-sm font-semibold text-exec-ink">
+
+            <div className={executiveTheme.heroLoginCard}>
+              <div className={executiveTheme.heroLoginLabel}>Login Sebagai</div>
+              <div className={executiveTheme.heroLoginValue}>
                 {user?.nama_lengkap || user?.username || "Kepala Dinas"}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-          <aside className="rounded-2xl border border-exec-border bg-white/95 shadow-sm p-4 h-fit lg:sticky lg:top-4">
-            <div className="text-xs text-exec-muted font-semibold mb-3">MENU</div>
-            <div className="space-y-1">
-              {[
-                { k: "overview", label: "📊 Dashboard" },
-                { k: "inbox", label: "📥 Inbox Gubernur" },
-                { k: "perintah", label: "📋 Perintah Saya" },
-                { k: "approval", label: "✅ Approval Queue" },
-                { k: "kinerja", label: "📈 Monitor Kinerja Bawahan" },
-              ].map((m) => (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[290px_1fr]">
+          <aside className={executiveTheme.sidebar}>
+            <div className={executiveTheme.sidebarTitle}>
+              Navigasi Eksekutif
+            </div>
+            <div className="space-y-2">
+              {MENU_ITEMS.map((item) => (
                 <button
-                  key={m.k}
-                  onClick={() => setMenu(m.k)}
+                  key={item.k}
                   type="button"
-                  className={`w-full text-left px-3 py-2 rounded-xl text-sm border transition-colors ${
-                    menu === m.k
-                      ? "bg-teal-50 border-teal-200 text-teal-900 font-semibold shadow-sm"
-                      : "bg-transparent border-transparent hover:bg-rose-50/70 hover:border-rose-100 text-exec-ink"
+                  onClick={() => setMenu(item.k)}
+                  className={`${executiveTheme.menuButtonBase} ${
+                    menu === item.k
+                      ? executiveTheme.menuButtonActive
+                      : executiveTheme.menuButtonIdle
                   }`}
                 >
-                  {m.label}
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-3">
+                      <span
+                        className={`h-2.5 w-2.5 rounded-full ${
+                          menu === item.k ? "bg-amber-300" : "bg-slate-600"
+                        }`}
+                        aria-hidden
+                      />
+                      <span>{item.label}</span>
+                    </span>
+                    <span
+                      className={`text-[10px] ${
+                        menu === item.k ? "text-slate-400" : "text-slate-600"
+                      }`}
+                    >
+                      {menu === item.k ? "Aktif" : ""}
+                    </span>
+                  </span>
                 </button>
               ))}
+            </div>
+
+            <div className={executiveTheme.sidebarNote}>
+              <div className={executiveTheme.sidebarNoteTitle}>
+                Fokus Hari Ini
+              </div>
+              <div className={executiveTheme.sidebarNoteText}>
+                Pengendalian komando lintas unit
+              </div>
+              <div className={executiveTheme.sidebarNoteCaption}>
+                Gunakan menu untuk berpindah cepat antara inbox, approval, dan
+                pemantauan kinerja bawahan tanpa mengubah alur kerja yang ada.
+              </div>
             </div>
           </aside>
 
           <main className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {tiles.map((t) => (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+              {tiles.map((tile) => (
                 <Tile
-                  key={t.label}
-                  label={t.label}
-                  value={t.value}
-                  hint={t.hint}
+                  key={tile.label}
+                  label={tile.label}
+                  value={tile.value}
+                  hint={tile.hint}
                 />
               ))}
             </div>
+
+            {menu === "overview" && kadisCockpit ? (
+              <div className={executiveTheme.panel}>
+                <PanelHeader
+                  title="Prioritas dari Gubernur"
+                  subtitle="Instruksi paling urgent, batas waktu dekat, skor Anda, dan pengajuan yang dikembalikan."
+                  right={
+                    <button
+                      type="button"
+                      onClick={refreshAll}
+                      className={executiveTheme.buttonSecondary}
+                    >
+                      Refresh
+                    </button>
+                  }
+                />
+                <div className="grid gap-4 p-4 lg:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                      Instruksi prioritas
+                    </div>
+                    {kadisCockpit.prioritas_instruksi_gubernur?.length ? (
+                      <ul className="mt-3 space-y-2 text-sm">
+                        {kadisCockpit.prioritas_instruksi_gubernur
+                          .slice(0, 4)
+                          .map((x) => (
+                            <li
+                              key={x.id}
+                              className="rounded-xl border border-slate-800/80 px-3 py-2"
+                            >
+                              <span className="font-medium text-slate-100">
+                                {x.nomor_instruksi || `#${x.id}`}
+                              </span>
+                              <span className="text-slate-500"> · </span>
+                              <span className="text-slate-300">{x.judul}</span>
+                              <div className="mt-1 text-[11px] text-slate-500">
+                                {x.prioritas} · {x.status}
+                                {x.deadline ? ` · batas ${x.deadline}` : ""}
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
+                    ) : (
+                      <EmptyState text="Tidak ada instruksi terbuka." />
+                    )}
+                  </div>
+                  <div className="space-y-4">
+                    <div className="rounded-2xl border border-amber-500/25 bg-amber-950/20 p-4">
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-amber-200/90">
+                        Mendekati batas waktu
+                      </div>
+                      {kadisCockpit.instruksi_mendekati_deadline?.length ? (
+                        <ul className="mt-2 space-y-1 text-xs text-amber-50/95">
+                          {kadisCockpit.instruksi_mendekati_deadline.map((x) => (
+                            <li key={x.id}>
+                              {x.nomor_instruksi || `#${x.id}`} — batas{" "}
+                              {x.deadline}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="mt-2 text-xs text-slate-500">
+                          Tidak ada yang jatuh tempo dalam 3 hari.
+                        </div>
+                      )}
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                        Performa Anda (90 hari)
+                      </div>
+                      <div className="mt-2 text-3xl font-extrabold text-white tabular-nums">
+                        {kadisCockpit.performa_skor_90_hari != null
+                          ? `${kadisCockpit.performa_skor_90_hari}%`
+                          : "—"}
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        {kadisCockpit.performa_label}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-rose-500/25 bg-rose-950/20 p-4">
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-rose-200/90">
+                        Pengajuan dikembalikan
+                      </div>
+                      {kadisCockpit.pengajuan_dikembalikan?.length ? (
+                        <ul className="mt-2 space-y-2 text-xs text-rose-50/95">
+                          {kadisCockpit.pengajuan_dikembalikan.map((p) => (
+                            <li key={p.id}>
+                              <span className="font-semibold">
+                                {p.nomor_pengajuan}
+                              </span>
+                              : {p.judul}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="mt-2 text-xs text-slate-500">
+                          Tidak ada pengajuan yang dikembalikan.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {kadisCockpit.execution_threads?.recent_threads?.length ? (
+                    <div className="rounded-2xl border border-cyan-500/20 bg-slate-950/80 p-4 lg:col-span-2">
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-cyan-200/90">
+                        Thread eksekusi (bawahan &amp; rantai)
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400">
+                        <span>
+                          Thread terlacak:{" "}
+                          <strong className="text-slate-200">
+                            {kadisCockpit.execution_threads.threads_tracked ??
+                              "—"}
+                          </strong>
+                        </span>
+                        <span>
+                          Rantai aktif:{" "}
+                          <strong className="text-slate-200">
+                            {kadisCockpit.execution_threads
+                              .rantai_aktif_gabungan ?? "—"}
+                          </strong>
+                        </span>
+                      </div>
+                      <ul className="mt-3 max-h-40 space-y-2 overflow-y-auto text-xs">
+                        {kadisCockpit.execution_threads.recent_threads.map(
+                          (row) => (
+                            <li
+                              key={row.execution_thread_id}
+                              className="rounded-lg border border-slate-800/80 px-2 py-1.5"
+                            >
+                              <Link
+                                to={`/dashboard/execution-thread/${encodeURIComponent(row.execution_thread_id)}`}
+                                className="font-medium text-cyan-200 hover:underline"
+                              >
+                                {row.judul}
+                              </Link>
+                              <div className="font-mono text-[10px] text-slate-500">
+                                {row.execution_thread_id}
+                              </div>
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+
+            {menu === "overview" ? (
+              <div className="mb-4 space-y-4">
+                <ExecutiveHorizontalCoordinationPanel subtitle="Pantau hambatan koordinasi antar unit administrator." />
+                <CrossThreadSystemicPanel />
+                <ExecutionThreadObservabilityPanel title="Thread eksekusi bawah Kepala Dinas" />
+              </div>
+            ) : null}
 
             {(menu === "overview" || menu === "perintah") && (
               <KadinExecutiveTimeline
@@ -282,234 +631,295 @@ export default function DashboardKepalaDinas() {
             )}
 
             {menu === "overview" ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-exec-border bg-white/95 shadow-sm overflow-hidden">
-                  <div className="px-5 py-4 border-b border-exec-border flex items-center justify-between">
-                    <div className="font-semibold">Inbox Gubernur (ringkas)</div>
+              <div className={executiveTheme.panel}>
+                <PanelHeader
+                  title="Inbox Gubernur"
+                  subtitle="Ringkasan instruksi terbaru yang memerlukan tindak lanjut. Gunakan tab « Buat Perintah ke Bawahan » untuk mendistribusikan tugas."
+                  right={
                     <button
                       onClick={refreshAll}
-                      className="text-xs px-3 py-1.5 rounded-lg border border-exec-border hover:bg-slate-50"
+                      className={executiveTheme.buttonSecondary}
                     >
                       Refresh
                     </button>
-                  </div>
-                  <div className="p-4 space-y-3">
-                    {loading ? (
-                      <div className="text-sm text-exec-muted">Memuat...</div>
-                    ) : inbox.length === 0 ? (
-                      <div className="text-sm text-exec-muted">
-                        Tidak ada instruksi.
-                      </div>
-                    ) : (
-                      inbox.slice(0, 6).map((x) => (
-                        <div
-                          key={x.id}
-                          className="rounded-xl border border-exec-border bg-gradient-to-br from-rose-50/40 to-teal-50/35 p-4"
-                        >
-                          <div className="text-sm font-semibold">
-                            {x.nomor_instruksi || `#${x.id}`} — {x.judul}
-                          </div>
-                          <div className="text-xs text-exec-muted mt-1">
-                            Jenis: {x.jenis} · Prioritas: {x.prioritas} · Status:{" "}
-                            <span className="font-medium text-exec-ink">
-                              {x.status}
+                  }
+                />
+
+                <div className="space-y-3 p-4">
+                  {loading ? (
+                    <EmptyState text="Memuat..." />
+                  ) : inbox.length === 0 ? (
+                    <EmptyState text="Tidak ada instruksi." />
+                  ) : (
+                    inbox.slice(0, 6).map((item) => (
+                      <div key={item.id} className={executiveTheme.itemCard}>
+                        <div className="text-sm font-semibold text-slate-100">
+                          {item.nomor_instruksi || `#${item.id}`} -{" "}
+                          {item.judul}
+                        </div>
+                        <div className="mt-1 text-xs text-slate-400">
+                          Jenis: {item.jenis} | Prioritas: {item.prioritas} |
+                          Status:{" "}
+                          <span className="font-medium text-slate-100">
+                            {item.status}
+                          </span>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => konfirmasiInstruksi(item.id)}
+                            className={executiveTheme.buttonInfo}
+                          >
+                            Konfirmasi
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              applyInstruksiKeForm(item);
+                              setMenu("buat_perintah");
+                            }}
+                            className={executiveTheme.buttonSecondary}
+                          >
+                            Tindak lanjut ke bawahan
+                          </button>
+                          {item.lapor_selesai_otomatis ? (
+                            <span className="text-[11px] text-slate-400 max-w-md">
+                              Selesai otomatis bila seluruh turunan perintah pada
+                              Timeline monitor mencapai tahap 4 (Selesai).
                             </span>
-                          </div>
-                          <div className="mt-2 flex items-center gap-2">
+                          ) : (
                             <button
-                              onClick={() => konfirmasiInstruksi(x.id)}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-sky-600 hover:bg-sky-700"
-                            >
-                              Konfirmasi Terima
-                            </button>
-                            <button
-                              onClick={() => laporSelesaiInstruksi(x.id)}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                              onClick={() => bukaLaporSelesai(item.id)}
+                              className={executiveTheme.buttonSuccess}
                             >
                               Lapor Selesai
                             </button>
-                          </div>
+                          )}
                         </div>
-                      ))
-                    )}
-                  </div>
+                      </div>
+                    ))
+                  )}
                 </div>
+              </div>
+            ) : null}
 
-                <div className="rounded-2xl border border-exec-border bg-white/95 shadow-sm overflow-hidden">
-                  <div className="px-5 py-4 border-b border-exec-border">
-                    <div className="font-semibold">Buat Perintah ke Bawahan</div>
-                    <div className="text-xs text-exec-muted">
-                      Penerima valid: Sekretaris, Kabid (3), Kepala UPTD
+            {menu === "buat_perintah" ? (
+              <div className={executiveTheme.panel}>
+                <PanelHeader
+                  title="Buat Perintah ke Bawahan"
+                  subtitle="Penerima valid: Sekretaris, tiga kepala bidang, dan Kepala UPTD. Judul dapat disamakan dengan instruksi Gubernur lewat tombol « Tindak lanjut » dari Inbox Gubernur."
+                  right={
+                    linkedInstruksiId ? (
+                      <button
+                        type="button"
+                        onClick={clearLinkedInstruksi}
+                        className={executiveTheme.buttonSecondary}
+                      >
+                        Lepas tautan instruksi
+                      </button>
+                    ) : null
+                  }
+                />
+
+                {linkedInstruksiId ? (
+                  <div className="mx-4 mb-2 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-[11px] text-sky-100">
+                    Tertaut ke instruksi Gubernur #{linkedInstruksiId}. Laporan
+                    selesai ke Gubernur akan diproses otomatis setelah seluruh
+                    turunan task ini ditutup (status closed di timeline).
+                  </div>
+                ) : null}
+
+                <div className="space-y-3 p-4">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>Judul</label>
+                      <input
+                        value={formPerintah.title}
+                        onChange={(e) =>
+                          setFormPerintah((prev) => ({
+                            ...prev,
+                            title: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>
+                        Penerima (role)
+                      </label>
+                      <select
+                        value={formPerintah.assignee_role}
+                        onChange={(e) =>
+                          setFormPerintah((prev) => ({
+                            ...prev,
+                            assignee_role: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                      >
+                        <option value="sekretaris">Sekretaris</option>
+                        <option value="kepala_bidang_ketersediaan">
+                          Kabid Ketersediaan
+                        </option>
+                        <option value="kepala_bidang_distribusi">
+                          Kabid Distribusi
+                        </option>
+                        <option value="kepala_bidang_konsumsi">
+                          Kabid Konsumsi
+                        </option>
+                        <option value="kepala_uptd">Kepala UPTD</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>
+                        Deadline
+                      </label>
+                      <input
+                        type="date"
+                        value={formPerintah.due_date}
+                        onChange={(e) =>
+                          setFormPerintah((prev) => ({
+                            ...prev,
+                            due_date: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>
+                        Prioritas
+                      </label>
+                      <select
+                        value={formPerintah.priority}
+                        onChange={(e) =>
+                          setFormPerintah((prev) => ({
+                            ...prev,
+                            priority: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                      >
+                        <option value={1}>Urgent</option>
+                        <option value={2}>High</option>
+                        <option value={3}>Normal</option>
+                        <option value={4}>Low</option>
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-2 flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>
+                        Deskripsi
+                      </label>
+                      <textarea
+                        value={formPerintah.description}
+                        onChange={(e) =>
+                          setFormPerintah((prev) => ({
+                            ...prev,
+                            description: e.target.value,
+                          }))
+                        }
+                        className={`${executiveTheme.input} min-h-[110px]`}
+                      />
                     </div>
                   </div>
-                  <div className="p-4 space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="flex flex-col gap-1">
-                        <label className="text-xs text-exec-muted">Judul</label>
-                        <input
-                          value={formPerintah.title}
-                          onChange={(e) =>
-                            setFormPerintah((p) => ({
-                              ...p,
-                              title: e.target.value,
-                            }))
-                          }
-                          className="rounded-lg bg-white border border-exec-border px-3 py-2 text-sm text-exec-ink shadow-inner"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="text-xs text-exec-muted">
-                          Penerima (role)
-                        </label>
-                        <select
-                          value={formPerintah.assignee_role}
-                          onChange={(e) =>
-                            setFormPerintah((p) => ({
-                              ...p,
-                              assignee_role: e.target.value,
-                            }))
-                          }
-                          className="rounded-lg bg-white border border-exec-border px-3 py-2 text-sm text-exec-ink shadow-inner"
-                        >
-                          <option value="sekretaris">Sekretaris</option>
-                          <option value="kepala_bidang_ketersediaan">
-                            Kabid Ketersediaan
-                          </option>
-                          <option value="kepala_bidang_distribusi">
-                            Kabid Distribusi
-                          </option>
-                          <option value="kepala_bidang_konsumsi">
-                            Kabid Konsumsi
-                          </option>
-                          <option value="kepala_uptd">Kepala UPTD</option>
-                        </select>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="text-xs text-exec-muted">
-                          Deadline
-                        </label>
-                        <input
-                          type="date"
-                          value={formPerintah.due_date}
-                          onChange={(e) =>
-                            setFormPerintah((p) => ({
-                              ...p,
-                              due_date: e.target.value,
-                            }))
-                          }
-                          className="rounded-lg bg-white border border-exec-border px-3 py-2 text-sm text-exec-ink shadow-inner"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="text-xs text-exec-muted">
-                          Prioritas
-                        </label>
-                        <select
-                          value={formPerintah.priority}
-                          onChange={(e) =>
-                            setFormPerintah((p) => ({
-                              ...p,
-                              priority: e.target.value,
-                            }))
-                          }
-                          className="rounded-lg bg-white border border-exec-border px-3 py-2 text-sm text-exec-ink shadow-inner"
-                        >
-                          <option value={1}>Urgent</option>
-                          <option value={2}>High</option>
-                          <option value={3}>Normal</option>
-                          <option value={4}>Low</option>
-                        </select>
-                      </div>
-                      <div className="md:col-span-2 flex flex-col gap-1">
-                        <label className="text-xs text-exec-muted">
-                          Deskripsi
-                        </label>
-                        <textarea
-                          value={formPerintah.description}
-                          onChange={(e) =>
-                            setFormPerintah((p) => ({
-                              ...p,
-                              description: e.target.value,
-                            }))
-                          }
-                          className="rounded-lg bg-white border border-exec-border px-3 py-2 text-sm min-h-[96px] text-exec-ink shadow-inner"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={buatPerintah}
-                        className="px-3 py-2 text-xs rounded-lg bg-indigo-600 hover:bg-indigo-700"
-                      >
-                        Kirim Perintah
-                      </button>
-                    </div>
+
+                  <div className="flex items-center justify-end">
+                    <button
+                      onClick={buatPerintah}
+                      className={executiveTheme.buttonPrimary}
+                    >
+                      Kirim Perintah
+                    </button>
                   </div>
                 </div>
               </div>
             ) : null}
 
             {menu === "inbox" ? (
-              <div className="rounded-2xl border border-exec-border bg-white/95 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-exec-border flex items-center justify-between">
-                  <div className="font-semibold">Inbox Gubernur</div>
-                  <button
-                    onClick={refreshAll}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-exec-border hover:bg-slate-50"
-                  >
-                    Refresh
-                  </button>
-                </div>
-                <div className="p-4 space-y-3">
+              <div className={executiveTheme.panel}>
+                <PanelHeader
+                  title="Inbox Gubernur"
+                  subtitle="Daftar lengkap instruksi yang dikirimkan ke Kepala Dinas."
+                  right={
+                    <button
+                      onClick={refreshAll}
+                      className={executiveTheme.buttonSecondary}
+                    >
+                      Refresh
+                    </button>
+                  }
+                />
+
+                <div className="space-y-3 p-4">
                   {loading ? (
-                    <div className="text-sm text-exec-muted">Memuat...</div>
+                    <EmptyState text="Memuat..." />
                   ) : inbox.length === 0 ? (
-                    <div className="text-sm text-exec-muted">
-                      Tidak ada instruksi.
-                    </div>
+                    <EmptyState text="Tidak ada instruksi." />
                   ) : (
-                    inbox.map((x) => (
-                      <div
-                        key={x.id}
-                        className="rounded-xl border border-exec-border bg-gradient-to-br from-rose-50/40 to-teal-50/35 p-4"
-                      >
-                        <div className="flex items-start justify-between gap-3">
+                    inbox.map((item) => (
+                      <div key={item.id} className={executiveTheme.itemCard}>
+                        <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <div className="text-sm font-semibold">
-                              {x.nomor_instruksi || `#${x.id}`} — {x.judul}
+                            <div className="text-sm font-semibold text-slate-100">
+                              {item.nomor_instruksi || `#${item.id}`} -{" "}
+                              {item.judul}
                             </div>
-                            <div className="text-xs text-exec-muted mt-1">
-                              Jenis: {x.jenis} · Prioritas: {x.prioritas} ·
-                              Deadline: {x.deadline || "—"} · Status:{" "}
-                              <span className="font-medium text-exec-ink">
-                                {x.status}
+                            <div className="mt-1 text-xs text-slate-400">
+                              Jenis: {item.jenis} | Prioritas: {item.prioritas}{" "}
+                              | Deadline: {item.deadline || "-"} | Status:{" "}
+                              <span className="font-medium text-slate-100">
+                                {item.status}
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+
+                          <div className="flex flex-wrap items-center gap-2">
                             <button
-                              onClick={() => konfirmasiInstruksi(x.id)}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-sky-600 hover:bg-sky-700"
+                              onClick={() => konfirmasiInstruksi(item.id)}
+                              className={executiveTheme.buttonInfo}
                             >
-                              Konfirmasi Terima
+                              Konfirmasi
                             </button>
                             <button
-                              onClick={() => laporSelesaiInstruksi(x.id)}
-                              className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                              type="button"
+                              onClick={() => {
+                                applyInstruksiKeForm(item);
+                                setMenu("buat_perintah");
+                              }}
+                              className={executiveTheme.buttonSecondary}
                             >
-                              Lapor Selesai
+                              Tindak lanjut ke bawahan
                             </button>
+                            {item.lapor_selesai_otomatis ? (
+                              <span className="text-[11px] text-slate-400 max-w-md">
+                                Selesai otomatis bila seluruh turunan perintah pada
+                                Timeline monitor mencapai tahap 4 (Selesai).
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => bukaLaporSelesai(item.id)}
+                                className={executiveTheme.buttonSuccess}
+                              >
+                                Lapor Selesai
+                              </button>
+                            )}
                           </div>
                         </div>
-                        <div className="mt-2 text-xs text-exec-muted whitespace-pre-wrap">
-                          {x.isi_perintah}
+
+                        <div className="mt-3 whitespace-pre-wrap text-xs text-slate-300">
+                          {item.isi_perintah}
                         </div>
-                        {x.laporan_pelaksanaan ? (
-                          <div className="mt-2 text-xs text-exec-muted whitespace-pre-wrap">
-                            <span className="text-exec-ink font-medium">
+
+                        {item.laporan_pelaksanaan ? (
+                          <div className="mt-3 whitespace-pre-wrap text-xs text-slate-300">
+                            <span className="font-medium text-slate-100">
                               Laporan:
                             </span>{" "}
-                            {x.laporan_pelaksanaan}
+                            {item.laporan_pelaksanaan}
                           </div>
                         ) : null}
                       </div>
@@ -519,64 +929,212 @@ export default function DashboardKepalaDinas() {
               </div>
             ) : null}
 
-            {menu === "perintah" ? (
-              <div className="rounded-2xl border border-exec-border bg-white/95 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-exec-border flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold">Perintah Saya</div>
-                    <div className="text-xs text-exec-muted mt-1">
-                      Ringkasan kartu (timeline visual di atas).
+            {menu === "pengajuan_gub" ? (
+              <div className="space-y-6">
+                <div className={executiveTheme.panel}>
+                  <PanelHeader
+                    title="Kirim pengajuan ke Gubernur"
+                    subtitle="Usulan strategis atau permintaan keputusan. Gubernur akan melihatnya di Inbox Pengajuan."
+                  />
+                  <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2">
+                    <div className="flex flex-col gap-1 md:col-span-2">
+                      <label className={executiveTheme.subtleText}>Judul</label>
+                      <input
+                        value={formPengGub.judul}
+                        onChange={(e) =>
+                          setFormPengGub((p) => ({
+                            ...p,
+                            judul: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                        placeholder="Ringkas dan jelas"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>Jenis</label>
+                      <select
+                        value={formPengGub.jenis}
+                        onChange={(e) =>
+                          setFormPengGub((p) => ({
+                            ...p,
+                            jenis: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                      >
+                        <option value="laporan_strategis">
+                          Laporan strategis
+                        </option>
+                        <option value="persetujuan_kebijakan">
+                          Persetujuan kebijakan
+                        </option>
+                        <option value="persetujuan_anggaran">
+                          Persetujuan anggaran
+                        </option>
+                        <option value="rekomendasi">Rekomendasi</option>
+                        <option value="informasi">Informasi</option>
+                      </select>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>
+                        Kaitkan instruksi Gubernur (opsional)
+                      </label>
+                      <select
+                        value={formPengGub.instruksi_id}
+                        onChange={(e) =>
+                          setFormPengGub((p) => ({
+                            ...p,
+                            instruksi_id: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                      >
+                        <option value="">— Tidak ada —</option>
+                        {inbox.map((it) => (
+                          <option key={it.id} value={String(it.id)}>
+                            {it.nomor_instruksi || `#${it.id}`} — {it.judul}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex flex-col gap-1 md:col-span-2">
+                      <label className={executiveTheme.subtleText}>
+                        Isi pengajuan
+                      </label>
+                      <textarea
+                        value={formPengGub.isi_pengajuan}
+                        onChange={(e) =>
+                          setFormPengGub((p) => ({
+                            ...p,
+                            isi_pengajuan: e.target.value,
+                          }))
+                        }
+                        className={`${executiveTheme.input} min-h-[140px]`}
+                        placeholder="Uraian singkat dan tujuan pengajuan..."
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1 md:col-span-2">
+                      <label className={executiveTheme.subtleText}>
+                        Lampiran (tautan, opsional)
+                      </label>
+                      <input
+                        value={formPengGub.lampiran_url}
+                        onChange={(e) =>
+                          setFormPengGub((p) => ({
+                            ...p,
+                            lampiran_url: e.target.value,
+                          }))
+                        }
+                        className={executiveTheme.input}
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div className="md:col-span-2 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={kirimPengajuanKeGubernur}
+                        className={executiveTheme.buttonPrimary}
+                      >
+                        Kirim ke Gubernur
+                      </button>
                     </div>
                   </div>
-                  <button
-                    onClick={refreshAll}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-exec-border hover:bg-slate-50"
-                  >
-                    Refresh
-                  </button>
                 </div>
-                <div className="p-4 space-y-3">
-                  {loading ? (
-                    <div className="text-sm text-exec-muted">Memuat...</div>
-                  ) : perintah.length === 0 ? (
-                    <div className="text-sm text-exec-muted">
-                      Belum ada perintah.
-                    </div>
-                  ) : (
-                    perintah.map((t) => (
-                      <div
-                        key={t.id}
-                        className="rounded-xl border border-exec-border bg-gradient-to-br from-rose-50/40 to-teal-50/35 p-4"
-                      >
-                        <div className="text-sm font-semibold">{t.title}</div>
-                        <div className="text-xs text-exec-muted mt-1">
-                          Status:{" "}
-                          <span className="text-exec-ink font-medium">
-                            {t.status}
-                          </span>{" "}
-                          · Deadline:{" "}
-                          {t.due_date
-                            ? new Date(t.due_date).toLocaleDateString("id-ID")
-                            : "—"}
+
+                <div className={executiveTheme.panel}>
+                  <PanelHeader
+                    title="Riwayat pengajuan ke Gubernur"
+                    subtitle="Status keputusan akan diperbarui setelah Gubernur memutuskan."
+                  />
+                  <div className="space-y-3 p-4">
+                    {loading ? (
+                      <EmptyState text="Memuat..." />
+                    ) : pengajuanGub.length === 0 ? (
+                      <EmptyState text="Belum ada pengajuan." />
+                    ) : (
+                      pengajuanGub.map((p) => (
+                        <div key={p.id} className={executiveTheme.itemCard}>
+                          <div className="text-sm font-semibold text-slate-100">
+                            {p.nomor_pengajuan} — {p.judul}
+                          </div>
+                          <div className="mt-1 text-xs text-slate-400">
+                            Jenis: {p.jenis} | Status:{" "}
+                            <span className="font-medium text-slate-100">
+                              {p.status}
+                            </span>
+                          </div>
+                          {p.catatan_gubernur ? (
+                            <div className="mt-2 text-xs text-slate-300">
+                              Catatan Gubernur: {p.catatan_gubernur}
+                            </div>
+                          ) : null}
                         </div>
-                        {t.assignments?.length ? (
-                          <div className="mt-2 text-xs text-exec-muted">
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {menu === "perintah" ? (
+              <div className={executiveTheme.panel}>
+                <PanelHeader
+                  title="Perintah Saya"
+                  subtitle="Daftar kartu perintah yang sudah dikeluarkan ke bawahan."
+                  right={
+                    <button
+                      onClick={refreshAll}
+                      className={executiveTheme.buttonSecondary}
+                    >
+                      Refresh
+                    </button>
+                  }
+                />
+
+                <div className="space-y-3 p-4">
+                  {loading ? (
+                    <EmptyState text="Memuat..." />
+                  ) : perintah.length === 0 ? (
+                    <EmptyState text="Belum ada perintah." />
+                  ) : (
+                    perintah.map((task) => (
+                      <div key={task.id} className={executiveTheme.itemCard}>
+                        <div className="text-sm font-semibold text-slate-100">
+                          {task.title}
+                        </div>
+                        <div className="mt-1 text-xs text-slate-400">
+                          Status:{" "}
+                          <span className="font-medium text-slate-100">
+                            {task.status}
+                          </span>{" "}
+                          | Deadline:{" "}
+                          {task.due_date
+                            ? new Date(task.due_date).toLocaleDateString(
+                                "id-ID",
+                              )
+                            : "-"}
+                        </div>
+
+                        {task.assignments?.length ? (
+                          <div className="mt-2 text-xs text-slate-300">
                             Assigned ke:{" "}
-                            {t.assignments
+                            {task.assignments
                               .map(
-                                (a) =>
-                                  `${a.assignee_role}${
-                                    a.assignee_user_id
-                                      ? `#${a.assignee_user_id}`
+                                (assignment) =>
+                                  `${assignment.assignee_role}${
+                                    assignment.assignee_user_id
+                                      ? `#${assignment.assignee_user_id}`
                                       : ""
                                   }`,
                               )
                               .join(", ")}
                           </div>
                         ) : null}
-                        {t.description ? (
-                          <div className="mt-2 text-xs text-exec-muted whitespace-pre-wrap">
-                            {t.description}
+
+                        {task.description ? (
+                          <div className="mt-2 whitespace-pre-wrap text-xs text-slate-300">
+                            {task.description}
                           </div>
                         ) : null}
                       </div>
@@ -587,87 +1145,103 @@ export default function DashboardKepalaDinas() {
             ) : null}
 
             {menu === "approval" ? (
-              <div className="rounded-2xl border border-exec-border bg-white/95 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-exec-border flex items-center justify-between">
-                  <div className="font-semibold">Approval Queue</div>
-                  <div className="text-xs text-exec-muted max-w-md text-right">
-                    Antrean hanya pengajuan yang sudah divalidasi Sekretaris. PIN
-                    hanya untuk jenis strategis (mis. persetujuan anggaran).
-                  </div>
-                </div>
-                <div className="p-4 space-y-3">
-                  {loading ? (
-                    <div className="text-sm text-exec-muted">Memuat...</div>
-                  ) : approval.length === 0 ? (
-                    <div className="text-sm text-exec-muted">
-                      Tidak ada pengajuan.
+              <div className={executiveTheme.panel}>
+                <PanelHeader
+                  title="Antrean internal dinas"
+                  subtitle="Pengajuan yang sudah divalidasi Sekretaris — keputusan di tingkat Kepala Dinas (bukan Inbox Gubernur)."
+                  right={
+                    <div
+                      className={`${executiveTheme.panelMeta} max-w-md text-right`}
+                    >
+                      PIN hanya untuk jenis persetujuan anggaran (sesuai
+                      kebijakan sistem).
                     </div>
+                  }
+                />
+
+                <div className="space-y-3 p-4">
+                  {loading ? (
+                    <EmptyState text="Memuat..." />
+                  ) : approval.length === 0 ? (
+                    <EmptyState text="Tidak ada pengajuan." />
                   ) : (
-                    approval.map((p) => (
-                      <div
-                        key={p.id}
-                        className="rounded-xl border border-exec-border bg-gradient-to-br from-rose-50/40 to-teal-50/35 p-4"
-                      >
-                        <div className="flex items-start justify-between gap-3">
+                    approval.map((item) => (
+                      <div key={item.id} className={executiveTheme.itemCard}>
+                        <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <div className="text-sm font-semibold">
-                              {p.nomor_pengajuan || `#${p.id}`} — {p.judul}
+                            <div className="text-sm font-semibold text-slate-100">
+                              {item.nomor_pengajuan || `#${item.id}`} -{" "}
+                              {item.judul}
                             </div>
-                            <div className="text-xs text-exec-muted mt-1">
-                              Jenis: {p.jenis}{" "}
-                              {JENIS_PERLU_PIN_KADIN.has(p.jenis) ? (
-                                <span className="text-amber-700 font-medium">
-                                  · PIN
+                            <div className="mt-1 text-xs text-slate-400">
+                              Jenis: {item.jenis}{" "}
+                              {JENIS_PERLU_PIN_KADIN.has(item.jenis) ? (
+                                <span className="font-medium text-amber-300">
+                                  | PIN
                                 </span>
                               ) : null}{" "}
-                              · Status:{" "}
-                              <span className="font-medium text-exec-ink">
-                                {p.status}
+                              | Status:{" "}
+                              <span className="font-medium text-slate-100">
+                                {item.status}
                               </span>{" "}
-                              · Revisi: {p.revisi_ke || 0}
+                              | Revisi: {item.revisi_ke || 0}
                             </div>
-                            {p.catatan_sekretaris ? (
-                              <div className="text-[11px] text-exec-muted mt-1">
-                                Sekretaris: {p.catatan_sekretaris}
+                            {item.catatan_sekretaris ? (
+                              <div className="mt-1 text-[11px] text-slate-400">
+                                Sekretaris: {item.catatan_sekretaris}
                               </div>
                             ) : null}
                           </div>
-                          <div className="flex items-center gap-2">
+
+                          <div className="flex flex-wrap items-center gap-2">
                             <button
+                              type="button"
                               onClick={() =>
-                                putuskanApproval(p.id, "setuju", p.jenis)
+                                bukaModalApproval(
+                                  item.id,
+                                  "setuju",
+                                  item.jenis,
+                                )
                               }
-                              className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                              className={executiveTheme.buttonSuccess}
                             >
                               Setujui
                             </button>
                             <button
+                              type="button"
                               onClick={() =>
-                                putuskanApproval(p.id, "kembalikan", p.jenis)
+                                bukaModalApproval(
+                                  item.id,
+                                  "kembalikan",
+                                  item.jenis,
+                                )
                               }
-                              className="px-3 py-1.5 text-xs rounded-lg bg-amber-600 hover:bg-amber-700"
+                              className={executiveTheme.buttonWarning}
                             >
                               Kembalikan
                             </button>
                             <button
+                              type="button"
                               onClick={() =>
-                                putuskanApproval(p.id, "tolak", p.jenis)
+                                bukaModalApproval(item.id, "tolak", item.jenis)
                               }
-                              className="px-3 py-1.5 text-xs rounded-lg bg-rose-600 hover:bg-rose-700"
+                              className={executiveTheme.buttonDanger}
                             >
                               Tolak
                             </button>
                           </div>
                         </div>
-                        <div className="mt-2 text-xs text-exec-muted whitespace-pre-wrap">
-                          {p.isi_pengajuan}
+
+                        <div className="mt-3 whitespace-pre-wrap text-xs text-slate-300">
+                          {item.isi_pengajuan}
                         </div>
-                        {p.catatan_kadin ? (
-                          <div className="mt-2 text-xs text-exec-muted whitespace-pre-wrap">
-                            <span className="text-exec-ink font-medium">
+
+                        {item.catatan_kadin ? (
+                          <div className="mt-3 whitespace-pre-wrap text-xs text-slate-300">
+                            <span className="font-medium text-slate-100">
                               Catatan:
                             </span>{" "}
-                            {p.catatan_kadin}
+                            {item.catatan_kadin}
                           </div>
                         ) : null}
                       </div>
@@ -677,46 +1251,122 @@ export default function DashboardKepalaDinas() {
               </div>
             ) : null}
 
-            {menu === "kinerja" ? (
-              <div className="rounded-2xl border border-exec-border bg-white/95 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-exec-border flex items-center justify-between">
-                  <div className="font-semibold">Monitor Kinerja 5 Bawahan</div>
-                  <button
-                    onClick={refreshAll}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-exec-border hover:bg-slate-50"
-                  >
-                    Refresh
-                  </button>
-                </div>
-                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {loading ? (
-                    <div className="text-sm text-exec-muted">Memuat...</div>
-                  ) : kinerja.length === 0 ? (
-                    <div className="text-sm text-exec-muted">
-                      Belum ada data.
-                    </div>
-                  ) : (
-                    kinerja.map((k) => (
-                      <div
-                        key={k.key}
-                        className="rounded-xl border border-exec-border bg-gradient-to-br from-rose-50/40 to-teal-50/35 p-4"
+            {menu === "diskusi" ? (
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                <div className={executiveTheme.panel}>
+                  <PanelHeader
+                    title="Gubernur ↔ Kepala Dinas"
+                    subtitle="Klarifikasi instruksi strategis (bukan turunan tugas)."
+                  />
+                  <div className="p-4 space-y-3">
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>
+                        Pilih instruksi
+                      </label>
+                      <select
+                        value={diskusiInstruksiId ?? ""}
+                        onChange={(e) =>
+                          setDiskusiInstruksiId(
+                            e.target.value ? Number(e.target.value) : null,
+                          )
+                        }
+                        className={executiveTheme.input}
                       >
-                        <div className="flex items-start justify-between">
+                        <option value="">—</option>
+                        {inbox.map((it) => (
+                          <option key={it.id} value={it.id}>
+                            {it.nomor_instruksi || `#${it.id}`} — {it.judul}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <ClarificationThreadPanel
+                      anchorType={ANCHOR.INSTRUKSI}
+                      anchorId={diskusiInstruksiId}
+                      lane={LANES.GUBERNUR_KADIN}
+                      title="Kanal diskusi"
+                      subtitle="Hanya Gubernur dan Anda yang dapat membaca."
+                      compact
+                    />
+                  </div>
+                </div>
+                <div className={executiveTheme.panel}>
+                  <PanelHeader
+                    title="Kepala Dinas ↔ penerima tugas"
+                    subtitle="Pilih perintah yang sudah dikirim ke bawahan dari daftar Perintah Saya."
+                  />
+                  <div className="p-4 space-y-3">
+                    <div className="flex flex-col gap-1">
+                      <label className={executiveTheme.subtleText}>
+                        Pilih perintah (tugas)
+                      </label>
+                      <select
+                        value={diskusiTaskId}
+                        onChange={(e) => setDiskusiTaskId(e.target.value)}
+                        className={executiveTheme.input}
+                      >
+                        <option value="">— Pilih —</option>
+                        {perintah.map((t) => (
+                          <option key={t.id} value={String(t.id)}>
+                            #{t.id} — {t.title || "Perintah"}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <ClarificationThreadPanel
+                      anchorType={ANCHOR.TASK}
+                      anchorId={
+                        diskusiTaskId ? Number(diskusiTaskId) : null
+                      }
+                      lane={LANES.KADIN_ES3}
+                      title="Kanal diskusi tugas"
+                      compact
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {menu === "kinerja" ? (
+              <div className={executiveTheme.panel}>
+                <PanelHeader
+                  title="Monitor Kinerja Lima Bawahan"
+                  subtitle="Ringkasan performa unit yang melapor langsung ke Kepala Dinas."
+                  right={
+                    <button
+                      onClick={refreshAll}
+                      className={executiveTheme.buttonSecondary}
+                    >
+                      Refresh
+                    </button>
+                  }
+                />
+
+                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
+                  {loading ? (
+                    <EmptyState text="Memuat..." />
+                  ) : kinerja.length === 0 ? (
+                    <EmptyState text="Belum ada data." />
+                  ) : (
+                    kinerja.map((item) => (
+                      <div key={item.key} className={executiveTheme.itemCard}>
+                        <div className="flex items-start justify-between gap-4">
                           <div>
-                            <div className="text-sm font-semibold">
-                              {k.label}
+                            <div className="text-sm font-semibold text-slate-100">
+                              {item.label}
                             </div>
-                            <div className="text-xs text-exec-muted mt-1">
-                              Total: {k.total} · Aktif: {k.aktif} · Terlambat:{" "}
-                              {k.terlambat}
+                            <div className="mt-1 text-xs text-slate-400">
+                              Total: {item.total} | Aktif: {item.aktif} |
+                              Terlambat: {item.terlambat}
                             </div>
                           </div>
+
                           <div className="text-right">
-                            <div className="text-2xl font-extrabold">
-                              {k.skor}
+                            <div className="text-3xl font-extrabold text-slate-100">
+                              {item.skor}
                             </div>
-                            <div className="text-xs text-exec-muted">
-                              {k.kategori}
+                            <div className="text-xs text-slate-400">
+                              {item.kategori}
                             </div>
                           </div>
                         </div>
@@ -729,7 +1379,77 @@ export default function DashboardKepalaDinas() {
           </main>
         </div>
       </div>
+
+      <ExecutiveFormModal
+        open={modalLapor != null}
+        title="Lapor selesai"
+        subtitle="Opsional: ringkasan pelaksanaan untuk arsip Gubernur."
+        onClose={() => setModalLapor(null)}
+        primaryLabel="Kirim"
+        onPrimary={kirimLaporSelesai}
+      >
+        <textarea
+          value={teksLaporan}
+          onChange={(e) => setTeksLaporan(e.target.value)}
+          className={`${executiveTheme.input} min-h-[100px] w-full`}
+          placeholder="Tuliskan ringkasan tindak lanjut (boleh dikosongkan)..."
+        />
+      </ExecutiveFormModal>
+
+      <ExecutiveFormModal
+        open={!!modalApproval}
+        title={
+          modalApproval?.keputusan === "kembalikan"
+            ? "Kembalikan ke pengaju"
+            : modalApproval?.keputusan === "tolak"
+              ? "Tolak pengajuan"
+              : "PIN persetujuan anggaran"
+        }
+        subtitle={
+          modalApproval?.keputusan === "setuju"
+            ? "Masukkan PIN untuk mengonfirmasi keputusan sensitif."
+            : "Catatan wajib agar pengaju memahami alasan."
+        }
+        onClose={() => setModalApproval(null)}
+        primaryLabel="Konfirmasi"
+        onPrimary={() =>
+          eksekusiApproval(
+            modalApproval.id,
+            modalApproval.keputusan,
+            modalApproval.jenis,
+            teksApprovalCatatan,
+            teksApprovalPin,
+          )
+        }
+        primaryDisabled={
+          modalApproval?.keputusan === "setuju"
+            ? !teksApprovalPin.trim()
+            : !teksApprovalCatatan.trim()
+        }
+      >
+        {modalApproval &&
+        modalApproval.keputusan === "setuju" &&
+        JENIS_PERLU_PIN_KADIN.has(String(modalApproval.jenis || "")) ? (
+          <input
+            type="password"
+            autoComplete="off"
+            value={teksApprovalPin}
+            onChange={(e) => setTeksApprovalPin(e.target.value)}
+            className={executiveTheme.input}
+            placeholder="PIN"
+          />
+        ) : null}
+        {modalApproval &&
+        (modalApproval.keputusan === "tolak" ||
+          modalApproval.keputusan === "kembalikan") ? (
+          <textarea
+            value={teksApprovalCatatan}
+            onChange={(e) => setTeksApprovalCatatan(e.target.value)}
+            className={`${executiveTheme.input} min-h-[120px] w-full`}
+            placeholder="Alasan penolakan atau pengembalian..."
+          />
+        ) : null}
+      </ExecutiveFormModal>
     </div>
   );
 }
-

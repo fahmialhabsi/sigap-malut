@@ -6,6 +6,7 @@
 
 import SekKeu from "../models/SEK-KEU.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekKeu records
 // @route   GET /api/sek-keu
@@ -76,6 +77,8 @@ export const getSekKeuById = async (req, res) => {
 // @access  Private
 export const createSekKeu = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekKeu.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekKeu = async (req, res) => {
         message: "SekKeu not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

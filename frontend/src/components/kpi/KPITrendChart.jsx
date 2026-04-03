@@ -18,7 +18,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function buildMockData(_label) {
   const months = ["Okt", "Nov", "Des", "Jan", "Feb", "Mar"];

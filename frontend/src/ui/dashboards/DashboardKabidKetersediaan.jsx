@@ -5,7 +5,8 @@ import { Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { roleIdToName } from "../../utils/roleMap";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
-import api from "../../utils/api";
+import api from "../../services/api";
+import HorizontalCoordinationRoleDashboard from "../../components/coordination/HorizontalCoordinationRoleDashboard.jsx";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
 import HeroKpiTilesKabid from "../../components/kabidKetersediaan/HeroKpiTilesKabid";
@@ -13,6 +14,17 @@ import EWSPanel from "../../components/kabidKetersediaan/EWSPanel";
 import ApprovalQueueJF from "../../components/kabidKetersediaan/ApprovalQueueJF";
 import TimSayaPanel from "../../components/kabidKetersediaan/TimSayaPanel";
 import DikembalikanSekretarisPanel from "../../components/kabidKetersediaan/DikembalikanSekretarisPanel";
+import CoordinationComposer from "../../components/coordination/CoordinationComposer";
+import CoordinationInboxPanel from "../../components/coordination/CoordinationInboxPanel";
+import CoordinationOutboxPanel from "../../components/coordination/CoordinationOutboxPanel";
+import {
+  COORDINATION_KIND_OPTIONS,
+  SEKRETARIS_ONLY_TARGET_OPTION,
+} from "../../components/coordination/coordinationOptions";
+import KomunikasiPanel, {
+  LANES as KOM_LANES,
+} from "../../components/panel/KomunikasiPanel.jsx";
+import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
 
 function normalizeRoleName(user) {
   return (
@@ -39,6 +51,7 @@ const ALLOWED = [
 const SIDEBAR_MENU = [
   { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
   { id: "inbox", label: "Inbox Kepala Dinas", icon: "📥", badge: 1 },
+  { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
   { id: "approval", label: "Approval Queue (JF)", icon: "📤", badge: 3 },
   { id: "dikembalikan", label: "Dikembalikan Sekretaris", icon: "↩️", badge: 1 },
   { id: "tim", label: "Tim Saya (JF)", icon: "👥" },
@@ -87,7 +100,7 @@ export default function DashboardKabidKetersediaan() {
     if (!user) return;
     setSummaryLoading(true);
     api
-      .get("/api/kabid-ketersediaan/dashboard/summary")
+      .get("/kabid-ketersediaan/dashboard/summary")
       .then((res) => setSummary(res.data?.data ?? null))
       .catch(() => setSummary(null))
       .finally(() => setSummaryLoading(false));
@@ -102,6 +115,11 @@ export default function DashboardKabidKetersediaan() {
           <div className="space-y-6">
             {/* Hero KPI */}
             <HeroKpiTilesKabid summary={summary} loading={summaryLoading} />
+            <HorizontalCoordinationRoleDashboard
+              variant="kabid"
+              title="Koordinasi horizontal & dependensi (Ketersediaan)"
+            />
+            <ExecutionThreadObservabilityPanel title="Thread eksekusi bidang ketersediaan" />
             {/* Row A: EWS */}
             <EWSPanel />
             {/* Row B: Approval Queue + Tim */}
@@ -126,6 +144,24 @@ export default function DashboardKabidKetersediaan() {
         );
       case "approval":
         return <ApprovalQueueJF unitKerja="Bidang Ketersediaan" />;
+      case "komunikasi":
+        return (
+          <KomunikasiPanel
+            lane={KOM_LANES.ES3_ES4}
+            titleTanggapan="Tanggapan JF / Kasubag / Pelaksana"
+            titleDiskusi="Diskusi dengan bawahan (task)"
+          />
+        );
+      case "inbox":
+        return (
+          <CoordinationInboxPanel
+            title="Inbox Sekretaris"
+            subtitle="Perintah dan permintaan koordinasi yang masuk dari Sekretaris."
+            sourceRole="sekretaris"
+            emptyText="Belum ada arahan atau koordinasi dari Sekretaris."
+            allowClose
+          />
+        );
       case "dikembalikan":
         return <DikembalikanSekretarisPanel unitKerja="Bidang Ketersediaan" />;
       case "tim":
@@ -142,6 +178,27 @@ export default function DashboardKabidKetersediaan() {
               <p>Kepala Bidang hanya dapat menilai JF 1 dan JF 2 (bawahan langsung).</p>
               <p className="mt-1 text-red-600 font-medium">❌ Nilai SKP Pelaksana di bawah JF DIBLOKIR TOTAL — Anda tidak dapat mengaksesnya.</p>
             </div>
+          </div>
+        );
+      case "laporan-sekretaris":
+        return (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <CoordinationComposer
+              title="Kirim Koordinasi ke Sekretaris"
+              subtitle="Sampaikan laporan singkat, kebutuhan persetujuan, atau permintaan tindak lanjut kepada Sekretaris."
+              targetOptions={SEKRETARIS_ONLY_TARGET_OPTION}
+              kindOptions={COORDINATION_KIND_OPTIONS}
+              defaultTargetRole="sekretaris"
+              defaultKind="koordinasi"
+              submitLabel="Kirim Koordinasi"
+            />
+            <CoordinationOutboxPanel
+              title="Outbox Koordinasi Sekretaris"
+              subtitle="Pantau status koordinasi yang sudah Anda kirim ke Sekretaris."
+              targetRole="sekretaris"
+              kind="koordinasi"
+              emptyText="Belum ada koordinasi yang dikirim ke Sekretaris."
+            />
           </div>
         );
       default:

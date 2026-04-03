@@ -1,5 +1,6 @@
 import AuditLog from "../models/auditLog.js";
 import HargaPanganLog from "../models/HargaPanganLog.js";
+import { notifyItOfUserMgmtAudit } from "./itAuditEmailService.js";
 
 function toStringSafe(v) {
   if (v === null || v === undefined) return undefined;
@@ -29,6 +30,16 @@ export async function logAudit({
     if (peg !== undefined) payload.pegawai_id = peg;
 
     await AuditLog.create(payload);
+    if (modul === "USER_MANAGEMENT") {
+      void notifyItOfUserMgmtAudit({
+        modul,
+        aksi,
+        entitas_id: ent,
+        pegawai_id: peg,
+        data_lama,
+        data_baru,
+      });
+    }
   } catch (err) {
     console.warn("Audit create failed:", err?.message || err);
     return null;

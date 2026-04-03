@@ -3,7 +3,7 @@
 // Menampilkan status dokumen Renstra aktif + Target vs Realisasi dari e-Pelara.
 // Menjawab kebutuhan Bagian IV, Role 3 dari dokumen analisis.
 import React, { useEffect, useState } from "react";
-import api from "../utils/api";
+import api from "../services/api";
 import BukaEPelaraButton from "./BukaEPelaraButton";
 
 const STATUS_COLOR = {
@@ -32,8 +32,8 @@ export default function RenstraBidangWidget({
   useEffect(() => {
     setLoading(true);
     Promise.allSettled([
-      api.get("/api/epelara/renstra-opd", { params: { tahun, limit: 5 } }),
-      api.get("/api/epelara/target-renstra", { params: { tahun, limit: 8 } }),
+      api.get("/epelara/renstra-opd", { params: { tahun, limit: 5 } }),
+      api.get("/epelara/target-renstra", { params: { tahun, limit: 8 } }),
     ])
       .then(([renstraRes, targetRes]) => {
         if (renstraRes.status === "fulfilled") {

@@ -113,6 +113,14 @@ const SuratKeluar =
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      execution_thread_id: {
+        type: DataTypes.STRING(36),
+        allowNull: true,
+      },
+      task_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       unit_pembuat: {
         type: DataTypes.STRING(100),
         allowNull: true,

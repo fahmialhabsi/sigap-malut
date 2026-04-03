@@ -1,23 +1,33 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { executiveTheme } from "../ui/dashboards/executiveTheme";
 
 export default function DashboardPublikLayout({ children }) {
   return (
-    <div className="flex flex-col min-h-[100dvh] w-full min-w-0 bg-gradient-to-b from-exec-canvas via-white to-exec-canvas2 text-exec-ink font-inter antialiased">
-      <header className="sticky top-0 z-10 border-b border-exec-border bg-white/90 backdrop-blur-md shadow-sm">
-        <div className="w-full max-w-[100vw] mx-auto box-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 sm:px-6 md:px-8 py-4">
+    <div className={executiveTheme.shell}>
+      <div className={executiveTheme.shellGlowLeft} aria-hidden />
+      <div className={executiveTheme.shellGlowRight} aria-hidden />
+      <div className={executiveTheme.shellGlowBottom} aria-hidden />
+
+      <header className="sticky top-0 z-20 border-b border-slate-800/80 bg-slate-950/88 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-[100vw] flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 md:px-8">
           <div>
-            <h2 className="text-xl sm:text-2xl font-display font-bold tracking-tight bg-gradient-to-r from-teal-700 via-teal-600 to-rose-600 bg-clip-text text-transparent">
+            <div className={executiveTheme.heroKicker}>Portal Data Terbuka</div>
+            <h2 className="mt-1 text-xl font-bold tracking-tight text-white sm:text-2xl">
               Dashboard Publik
             </h2>
-            <p className="text-sm text-exec-muted mt-0.5">
-              Ringkasan data terbuka — Provinsi Maluku Utara
+            <p className="mt-1 text-sm text-slate-400">
+              Ringkasan data terbuka Provinsi Maluku Utara
             </p>
           </div>
+
+          <Link to="/" className={executiveTheme.buttonSecondary}>
+            Kembali ke Landing Page
+          </Link>
         </div>
       </header>
-      <main className="flex-1 w-full max-w-[100vw] mx-auto box-border px-4 sm:px-6 md:px-8 py-6 sm:py-8 pb-12">
-        {children}
-      </main>
+
+      <main className={executiveTheme.content}>{children}</main>
     </div>
   );
 }

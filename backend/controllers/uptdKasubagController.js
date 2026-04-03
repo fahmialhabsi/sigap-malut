@@ -22,6 +22,7 @@ function isKasubagTuUptd(user) {
     r.includes("kasubag_uptd") ||
     r.includes("subbag_tata_usaha") ||
     r.includes("kasubbag_tata_usaha") ||
+    r.includes("kasubbag_tu_uptd") ||
     r.includes("tata_usaha")
   );
 }

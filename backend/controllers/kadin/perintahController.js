@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { Task, User } from "../../models/index.js";
+import { Task, User, InstruksiGubernur } from "../../models/index.js";
 import TaskAssignment from "../../models/TaskAssignment.js";
 import { getIO, ROOMS } from "../../services/socketService.js";
 
@@ -70,6 +70,23 @@ export async function createPerintah(req, res) {
       assigned_by: kadinId,
       status: "assigned",
     });
+
+    if (sumber_instruksi_gubernur_id) {
+      const ig = await InstruksiGubernur.findByPk(
+        Number(sumber_instruksi_gubernur_id),
+      ).catch(() => null);
+      if (
+        ig &&
+        ig.assigned_to === kadinId &&
+        !["selesai", "draf"].includes(String(ig.status || ""))
+      ) {
+        if (ig.status !== "diproses") {
+          ig.status = "diproses";
+          ig.diproses_at = new Date();
+          await ig.save();
+        }
+      }
+    }
 
     if (io) {
       // broadcast ke room masing-masing Eselon III melalui room SEKRETARIS/KADIN yg sudah ada

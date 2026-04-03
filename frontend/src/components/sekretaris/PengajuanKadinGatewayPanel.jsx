@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 export default function PengajuanKadinGatewayPanel() {
   const [rows, setRows] = useState([]);
@@ -10,7 +10,7 @@ export default function PengajuanKadinGatewayPanel() {
   async function load() {
     setLoading(true);
     try {
-      const res = await api.get("/api/sekretaris/pengajuan-kadin", { params: { limit: 40 } });
+      const res = await api.get("/sekretaris/pengajuan-kadin", { params: { limit: 40 } });
       setRows(Array.isArray(res.data?.data) ? res.data.data : []);
     } catch (e) {
       toast.error(e?.response?.data?.message || "Gagal memuat gateway Ka.Dinas");
@@ -26,7 +26,7 @@ export default function PengajuanKadinGatewayPanel() {
 
   async function mulaiReview(id) {
     try {
-      await api.post(`/api/sekretaris/pengajuan-kadin/${id}/mulai-review`);
+      await api.post(`/sekretaris/pengajuan-kadin/${id}/mulai-review`);
       toast.success("Status: dalam review Sekretaris");
       load();
     } catch (e) {
@@ -36,7 +36,7 @@ export default function PengajuanKadinGatewayPanel() {
 
   async function teruskan(id) {
     try {
-      await api.post(`/api/sekretaris/pengajuan-kadin/${id}/teruskan-kadin`, {
+      await api.post(`/sekretaris/pengajuan-kadin/${id}/teruskan-kadin`, {
         catatan_sekretaris: catatan[id] || null,
       });
       toast.success("Diteruskan ke Kepala Dinas");
@@ -54,7 +54,7 @@ export default function PengajuanKadinGatewayPanel() {
       return;
     }
     try {
-      await api.post(`/api/sekretaris/pengajuan-kadin/${id}/kembalikan`, {
+      await api.post(`/sekretaris/pengajuan-kadin/${id}/kembalikan`, {
         catatan: c.trim(),
       });
       toast.success("Pengajuan dikembalikan ke pengaju (draft)");

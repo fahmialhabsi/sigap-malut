@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 const TABS = [
   { id: "kasubag", label: "Kasubag" },
@@ -56,7 +56,7 @@ export default function ApprovalQueuePanel() {
   const fetchTab = async (tab) => {
     setLoading(true);
     try {
-      const res = await api.get("/api/sekretaris/approval", {
+      const res = await api.get("/sekretaris/approval", {
         params: { tab, limit: 50 },
       });
       const rows = res.data?.data || res.data || [];
@@ -84,7 +84,7 @@ export default function ApprovalQueuePanel() {
     if (!selected || !keputusan) return;
     setSubmitting(true);
     try {
-      await api.post(`/api/sekretaris/approval/${selected.id}/putuskan`, {
+      await api.post(`/sekretaris/approval/${selected.id}/putuskan`, {
         keputusan,
         catatan,
       });
@@ -102,7 +102,7 @@ export default function ApprovalQueuePanel() {
     e.stopPropagation();
     try {
       await api.post(
-        `/api/sekretaris/approval/${approval.id}/teruskan-kadin`,
+        `/sekretaris/approval/${approval.id}/teruskan-kadin`,
       );
       await fetchTab(activeTab);
     } catch (err) {

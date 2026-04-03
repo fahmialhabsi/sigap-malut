@@ -6,6 +6,7 @@
 
 import BktMev from "../models/BKT-MEV.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all BktMev records
 // @route   GET /api/bkt-mev
@@ -76,6 +77,8 @@ export const getBktMevById = async (req, res) => {
 // @access  Private
 export const createBktMev = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await BktMev.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateBktMev = async (req, res) => {
         message: "BktMev not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

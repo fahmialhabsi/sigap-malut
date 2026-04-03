@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Navigate } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
-import { roleIdToName } from "../../utils/roleMap";
+import { normalizeRoleKey } from "../../utils/normalizeRole";
 import sekretariatModules from "../../data/sekretariatModules";
 import HeroKpiTilesSekretaris from "../../components/sekretaris/HeroKpiTilesSekretaris";
 import ApprovalQueuePanel from "../../components/sekretaris/ApprovalQueuePanel";
@@ -12,21 +12,32 @@ import MonitorPerintahTimeline from "../../components/sekretaris/MonitorPerintah
 import ScorecardBawahanPanel from "../../components/sekretaris/ScorecardBawahanPanel";
 import BypassAlertCenter from "../../components/sekretaris/BypassAlertCenter";
 import KonsolidasiLaporanPanel from "../../components/sekretaris/KonsolidasiLaporanPanel";
+import SekretarisCoordinationWorkspace from "../../components/coordination/SekretarisCoordinationWorkspace";
 import FieldMappingPreview from "../../components/FieldMappingPreview";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
 import UploadSuratMasukQuickAction from "../../components/surat/UploadSuratMasukQuickAction";
-import api from "../../utils/api";
+import api from "../../services/api";
+import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
+import HorizontalCoordinationRoleDashboard from "../../components/coordination/HorizontalCoordinationRoleDashboard.jsx";
 import { useSekretarisDashboard } from "../../hooks/useSekretarisDashboard";
+import KomunikasiPanel, {
+  LANES as KOM_LANES,
+} from "../../components/panel/KomunikasiPanel.jsx";
+import {
+  isDemoDataAllowed,
+  showSimulationBadge,
+} from "../../config/appMode.js";
+import NextActionStrip from "../../components/dashboard/NextActionStrip.jsx";
 
-function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
-    roleIdToName?.[user?.role_id] ||
-    roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
-}
+// Fallback hanya jika mode demo (VITE_DEMO_DATA / dev) — produksi: tidak menampilkan KPI statis palsu
+const EMPTY_KPI = {
+  complianceAlurKoordinasi: null,
+  zeroBypassViolations30d: null,
+  totalTransaksi30d: null,
+  avgApprovalTimeHours: null,
+  konsistensiDataKomoditas: null,
+  inflasiPangan: null,
+};
 
 // Fallback bila API belum tersedia
 const FALLBACK_KPI = {
@@ -281,14 +292,789 @@ function OpenDataPortal() {
   );
 }
 
+function SpipReportPanel() {
+  const [granularity, setGranularity] = useState("year");
+  const [source, setSource] = useState("db");
+  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const [month, setMonth] = useState(String(new Date().getMonth() + 1));
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      const token = localStorage.getItem("token");
+      const url = new URL("/spip/report/export", window.location.origin);
+      url.searchParams.set("source", source);
+      url.searchParams.set("format", "xlsx");
+      url.searchParams.set("granularity", granularity);
+      if (granularity === "day") url.searchParams.set("date", date);
+      if (granularity === "month") {
+        url.searchParams.set("year", year);
+        url.searchParams.set("month", month);
+      }
+      if (granularity === "year") url.searchParams.set("year", year);
+
+      const res = await fetch(url.toString(), {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error("Gagal mengunduh laporan SPIP");
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.download = `laporan-spip-${granularity}-${stamp}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <PanelBox title="Laporan SPIP (Auto)" accent="emerald">
+      <div className="text-sm text-slate-700">
+        Generate laporan lengkap SPIP/Manajemen Risiko dan unduh otomatis.
+      </div>
+      <div className="mt-3 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div>
+          <label className="block text-xs mb-1 text-slate-500">Periode</label>
+          <select
+            value={granularity}
+            onChange={(e) => setGranularity(e.target.value)}
+            className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+          >
+            <option value="day">Per tanggal</option>
+            <option value="month">Per bulan</option>
+            <option value="year">Per tahun</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs mb-1 text-slate-500">Sumber Data</label>
+          <select
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
+            className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+          >
+            <option value="db">DB (transaksi)</option>
+            <option value="master">Master-data (CSV)</option>
+          </select>
+        </div>
+
+        {granularity === "day" ? (
+          <div>
+            <label className="block text-xs mb-1 text-slate-500">Tanggal</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+            />
+          </div>
+        ) : (
+          <div>
+            <label className="block text-xs mb-1 text-slate-500">Tahun</label>
+            <input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+            />
+          </div>
+        )}
+
+        {granularity === "month" ? (
+          <div>
+            <label className="block text-xs mb-1 text-slate-500">Bulan</label>
+            <input
+              type="number"
+              min={1}
+              max={12}
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+            />
+          </div>
+        ) : (
+          <div className="hidden md:block" />
+        )}
+
+        <div className="flex items-end">
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            className="w-full bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-emerald-700 border border-emerald-600/80 text-xs md:text-sm disabled:opacity-60"
+          >
+            {downloading ? "Mengunduh…" : "Download Excel SPIP"}
+          </button>
+        </div>
+      </div>
+      <div className="mt-2 text-[11px] text-slate-500">
+        Catatan: pilih sumber data DB untuk periodisasi per tanggal/bulan yang akurat.
+      </div>
+    </PanelBox>
+  );
+}
+
+function SpipFieldInput({ label, value, onChange, type = "text", placeholder, disabled }) {
+  return (
+    <div>
+      <label className="block text-xs mb-1 text-slate-500">{label}</label>
+      <input
+        type={type}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+        className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800 disabled:opacity-60"
+      />
+    </div>
+  );
+}
+
+function SpipFieldTextArea({ label, value, onChange, rows = 3, placeholder }) {
+  return (
+    <div>
+      <label className="block text-xs mb-1 text-slate-500">{label}</label>
+      <textarea
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        rows={rows}
+        placeholder={placeholder}
+        className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+      />
+    </div>
+  );
+}
+
+function SpipDbPanel() {
+  const user = useAuthStore((s) => s.user);
+  const now = new Date();
+  const defaultYear = String(now.getFullYear());
+  const [activeTab, setActiveTab] = useState("risk");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [risks, setRisks] = useState([]);
+  const [selectedRiskId, setSelectedRiskId] = useState("");
+  const selectedRisk = risks.find((r) => String(r.id) === String(selectedRiskId)) || null;
+
+  const [rtps, setRtps] = useState([]);
+  const [monitoring, setMonitoring] = useState([]);
+  const [links, setLinks] = useState([]);
+
+  const [riskForm, setRiskForm] = useState({
+    unit_kerja: user?.unit_kerja || "Sekretariat",
+    periode_tahun: defaultYear,
+    kode_risiko: "",
+    nama_risiko: "",
+    kategori_risiko: "",
+    sasaran_konteks: "",
+    proses_bisnis_konteks: "",
+    pemilik_risiko: "",
+    status: "active",
+  });
+  const [rtpForm, setRtpForm] = useState({
+    uraian_rtp: "",
+    penanggung_jawab: "",
+    target_tanggal: new Date().toISOString().slice(0, 10),
+    status: "planned",
+  });
+  const [monForm, setMonForm] = useState({
+    jenis: "kegiatan_pengendalian",
+    tanggal: new Date().toISOString().slice(0, 10),
+    uraian: "",
+    hasil: "",
+    nilai: "",
+  });
+  const [linkForm, setLinkForm] = useState({
+    spip_ref_type: "risk",
+    spip_ref_id: "",
+    sumber_modul: "manual",
+    sumber_tabel: "",
+    sumber_id: "",
+    judul: "",
+    url: "",
+    occurred_at: "",
+    created_by: "",
+  });
+
+  const fetchRisks = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get("/spip/risk", {
+        params: {
+          limit: 200,
+          unit_kerja: riskForm.unit_kerja || undefined,
+          periode_tahun: riskForm.periode_tahun || undefined,
+        },
+      });
+      const data = res.data?.data || [];
+      setRisks(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setError(e?.message || "Gagal memuat Risk Register");
+      setRisks([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [riskForm.unit_kerja, riskForm.periode_tahun]);
+
+  const fetchChildren = useCallback(async (riskId) => {
+    if (!riskId) {
+      setRtps([]);
+      setMonitoring([]);
+      setLinks([]);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const [r1, r2, r3] = await Promise.all([
+        api.get("/spip/rtp", { params: { risk_id: riskId, limit: 200 } }),
+        api.get("/spip/monitoring", { params: { risk_id: riskId, limit: 200 } }),
+        api.get("/spip/evidence/link", {
+          params: { spip_ref_type: "risk", spip_ref_id: riskId, limit: 200 },
+        }),
+      ]);
+      setRtps(Array.isArray(r1.data?.data) ? r1.data.data : []);
+      setMonitoring(Array.isArray(r2.data?.data) ? r2.data.data : []);
+      setLinks(Array.isArray(r3.data?.data) ? r3.data.data : []);
+    } catch (e) {
+      setError(e?.message || "Gagal memuat data turunan (RTP/Pemantauan/Bukti)");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRisks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (selectedRiskId) fetchChildren(selectedRiskId);
+  }, [selectedRiskId, fetchChildren]);
+
+  const submitRisk = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        ...riskForm,
+        periode_tahun: riskForm.periode_tahun ? parseInt(String(riskForm.periode_tahun), 10) : null,
+      };
+      const res = await api.post("/spip/risk", payload);
+      const created = res.data?.data;
+      await fetchRisks();
+      if (created?.id) setSelectedRiskId(String(created.id));
+      setActiveTab("rtp");
+      setRiskForm((s) => ({ ...s, kode_risiko: "", nama_risiko: "" }));
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || "Gagal menyimpan risiko");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitRtp = async () => {
+    if (!selectedRiskId) {
+      setError("Pilih risiko terlebih dahulu");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await api.post("/spip/rtp", { risk_id: parseInt(String(selectedRiskId), 10), ...rtpForm });
+      setRtpForm((s) => ({ ...s, uraian_rtp: "" }));
+      await fetchChildren(selectedRiskId);
+      setActiveTab("monitoring");
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || "Gagal menyimpan RTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitMonitoring = async () => {
+    if (!selectedRiskId) {
+      setError("Pilih risiko terlebih dahulu");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        risk_id: parseInt(String(selectedRiskId), 10),
+        ...monForm,
+        nilai: monForm.nilai === "" ? null : Number(monForm.nilai),
+      };
+      await api.post("/spip/monitoring", payload);
+      setMonForm((s) => ({ ...s, uraian: "", hasil: "", nilai: "" }));
+      await fetchChildren(selectedRiskId);
+      setActiveTab("evidence");
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || "Gagal menyimpan pemantauan");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitEvidenceLink = async () => {
+    const refId = linkForm.spip_ref_id || selectedRiskId;
+    if (!refId) {
+      setError("Isi spip_ref_id atau pilih risiko terlebih dahulu");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        ...linkForm,
+        spip_ref_id: parseInt(String(refId), 10),
+        occurred_at: linkForm.occurred_at ? new Date(linkForm.occurred_at).toISOString() : null,
+      };
+      await api.post("/spip/evidence/link", payload);
+      setLinkForm((s) => ({ ...s, judul: "", url: "", sumber_id: "" }));
+      await fetchChildren(selectedRiskId);
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || "Gagal menyimpan evidence");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <PanelBox title="SPIP (DB) — Input dari awal" accent="emerald">
+      <div className="text-sm text-slate-700">
+        Isi Risk Register → RTP → Pemantauan → Bukti. Data tersimpan di database dan otomatis muncul di laporan
+        `source=db`.
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-1">
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs font-semibold text-slate-600">Pilih Risiko</div>
+            <button
+              onClick={fetchRisks}
+              className="text-xs px-2 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50"
+              disabled={loading}
+            >
+              Refresh
+            </button>
+          </div>
+          <select
+            value={selectedRiskId}
+            onChange={(e) => setSelectedRiskId(e.target.value)}
+            className="mt-2 w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+          >
+            <option value="">— pilih —</option>
+            {risks.map((r) => (
+              <option key={r.id} value={String(r.id)}>
+                [{r.kode_risiko || r.id}] {String(r.nama_risiko).slice(0, 60)}
+              </option>
+            ))}
+          </select>
+          {selectedRisk ? (
+            <div className="mt-2 text-xs text-slate-600">
+              <div className="font-semibold text-slate-700">{selectedRisk.nama_risiko}</div>
+              <div>Unit: {selectedRisk.unit_kerja} • Tahun: {selectedRisk.periode_tahun || "-"}</div>
+            </div>
+          ) : null}
+          {error ? (
+            <div className="mt-2 text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-2">
+              {error}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="lg:col-span-2">
+          <div className="flex flex-wrap gap-2">
+            {[
+              ["risk", "1) Risk Register"],
+              ["rtp", "2) RTP"],
+              ["monitoring", "3) Pemantauan"],
+              ["evidence", "4) Bukti"],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`px-3 py-1.5 rounded-lg text-xs border ${
+                  activeTab === id
+                    ? "bg-emerald-600 text-white border-emerald-600"
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === "risk" ? (
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <SpipFieldInput
+                label="Unit Kerja"
+                value={riskForm.unit_kerja}
+                onChange={(v) => setRiskForm((s) => ({ ...s, unit_kerja: v }))}
+              />
+              <SpipFieldInput
+                label="Periode Tahun"
+                type="number"
+                value={riskForm.periode_tahun}
+                onChange={(v) => setRiskForm((s) => ({ ...s, periode_tahun: v }))}
+              />
+              <SpipFieldInput
+                label="Kode Risiko"
+                value={riskForm.kode_risiko}
+                onChange={(v) => setRiskForm((s) => ({ ...s, kode_risiko: v }))}
+                placeholder="mis: RISK-2026-001"
+              />
+              <SpipFieldInput
+                label="Kategori Risiko"
+                value={riskForm.kategori_risiko}
+                onChange={(v) => setRiskForm((s) => ({ ...s, kategori_risiko: v }))}
+              />
+              <div className="md:col-span-2">
+                <SpipFieldTextArea
+                  label="Nama Risiko"
+                  value={riskForm.nama_risiko}
+                  onChange={(v) => setRiskForm((s) => ({ ...s, nama_risiko: v }))}
+                  rows={2}
+                />
+              </div>
+              <SpipFieldTextArea
+                label="Sasaran/Konteks"
+                value={riskForm.sasaran_konteks}
+                onChange={(v) => setRiskForm((s) => ({ ...s, sasaran_konteks: v }))}
+              />
+              <SpipFieldTextArea
+                label="Proses Bisnis/Konteks"
+                value={riskForm.proses_bisnis_konteks}
+                onChange={(v) => setRiskForm((s) => ({ ...s, proses_bisnis_konteks: v }))}
+              />
+              <SpipFieldInput
+                label="Pemilik Risiko"
+                value={riskForm.pemilik_risiko}
+                onChange={(v) => setRiskForm((s) => ({ ...s, pemilik_risiko: v }))}
+              />
+              <div>
+                <label className="block text-xs mb-1 text-slate-500">Status</label>
+                <select
+                  value={riskForm.status}
+                  onChange={(e) => setRiskForm((s) => ({ ...s, status: e.target.value }))}
+                  className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+                >
+                  <option value="active">active</option>
+                  <option value="draft">draft</option>
+                  <option value="closed">closed</option>
+                </select>
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <button
+                  onClick={submitRisk}
+                  disabled={loading}
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-emerald-700 border border-emerald-600/80 text-xs md:text-sm disabled:opacity-60"
+                >
+                  {loading ? "Menyimpan…" : "Simpan Risiko"}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {activeTab === "rtp" ? (
+            <div className="mt-3 space-y-3">
+              <div className="text-xs text-slate-600">
+                Risk terpilih: <span className="font-semibold">{selectedRisk ? selectedRisk.nama_risiko : "(belum dipilih)"}</span>
+              </div>
+              <SpipFieldTextArea
+                label="Uraian RTP"
+                value={rtpForm.uraian_rtp}
+                onChange={(v) => setRtpForm((s) => ({ ...s, uraian_rtp: v }))}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <SpipFieldInput
+                  label="Penanggung Jawab"
+                  value={rtpForm.penanggung_jawab}
+                  onChange={(v) => setRtpForm((s) => ({ ...s, penanggung_jawab: v }))}
+                />
+                <SpipFieldInput
+                  label="Target Tanggal"
+                  type="date"
+                  value={rtpForm.target_tanggal}
+                  onChange={(v) => setRtpForm((s) => ({ ...s, target_tanggal: v }))}
+                />
+                <div>
+                  <label className="block text-xs mb-1 text-slate-500">Status RTP</label>
+                  <select
+                    value={rtpForm.status}
+                    onChange={(e) => setRtpForm((s) => ({ ...s, status: e.target.value }))}
+                    className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+                  >
+                    <option value="planned">planned</option>
+                    <option value="in_progress">in_progress</option>
+                    <option value="done">done</option>
+                    <option value="blocked">blocked</option>
+                    <option value="cancelled">cancelled</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={submitRtp}
+                  disabled={loading}
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-emerald-700 border border-emerald-600/80 text-xs md:text-sm disabled:opacity-60"
+                >
+                  {loading ? "Menyimpan…" : "Tambah RTP"}
+                </button>
+              </div>
+
+              <div className="mt-4 border-t pt-3">
+                <div className="text-xs font-semibold text-slate-600 mb-2">Daftar RTP</div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-xs">
+                    <thead>
+                      <tr className="text-slate-600">
+                        <th className="text-left p-2 border-b">Uraian</th>
+                        <th className="text-left p-2 border-b">PJ</th>
+                        <th className="text-left p-2 border-b">Target</th>
+                        <th className="text-left p-2 border-b">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(rtps || []).map((r) => (
+                        <tr key={r.id} className="text-slate-800">
+                          <td className="p-2 border-b">{r.uraian_rtp}</td>
+                          <td className="p-2 border-b">{r.penanggung_jawab || "-"}</td>
+                          <td className="p-2 border-b">{r.target_tanggal || "-"}</td>
+                          <td className="p-2 border-b">{r.status}</td>
+                        </tr>
+                      ))}
+                      {(!rtps || rtps.length === 0) ? (
+                        <tr>
+                          <td className="p-2 text-slate-500" colSpan={4}>
+                            (belum ada RTP)
+                          </td>
+                        </tr>
+                      ) : null}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {activeTab === "monitoring" ? (
+            <div className="mt-3 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs mb-1 text-slate-500">Jenis Pemantauan</label>
+                  <select
+                    value={monForm.jenis}
+                    onChange={(e) => setMonForm((s) => ({ ...s, jenis: e.target.value }))}
+                    className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+                  >
+                    <option value="kegiatan_pengendalian">kegiatan_pengendalian</option>
+                    <option value="peristiwa_risiko">peristiwa_risiko</option>
+                    <option value="level_risiko">level_risiko</option>
+                    <option value="efektivitas_pengendalian">efektivitas_pengendalian</option>
+                  </select>
+                </div>
+                <SpipFieldInput
+                  label="Tanggal"
+                  type="date"
+                  value={monForm.tanggal}
+                  onChange={(v) => setMonForm((s) => ({ ...s, tanggal: v }))}
+                />
+                <SpipFieldInput
+                  label="Nilai (opsional)"
+                  type="number"
+                  value={monForm.nilai}
+                  onChange={(v) => setMonForm((s) => ({ ...s, nilai: v }))}
+                />
+              </div>
+              <SpipFieldTextArea
+                label="Uraian"
+                value={monForm.uraian}
+                onChange={(v) => setMonForm((s) => ({ ...s, uraian: v }))}
+              />
+              <SpipFieldTextArea
+                label="Hasil"
+                value={monForm.hasil}
+                onChange={(v) => setMonForm((s) => ({ ...s, hasil: v }))}
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={submitMonitoring}
+                  disabled={loading}
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-emerald-700 border border-emerald-600/80 text-xs md:text-sm disabled:opacity-60"
+                >
+                  {loading ? "Menyimpan…" : "Tambah Pemantauan"}
+                </button>
+              </div>
+
+              <div className="mt-4 border-t pt-3">
+                <div className="text-xs font-semibold text-slate-600 mb-2">Daftar Pemantauan</div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-xs">
+                    <thead>
+                      <tr className="text-slate-600">
+                        <th className="text-left p-2 border-b">Jenis</th>
+                        <th className="text-left p-2 border-b">Tanggal</th>
+                        <th className="text-left p-2 border-b">Uraian</th>
+                        <th className="text-left p-2 border-b">Hasil</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(monitoring || []).map((r) => (
+                        <tr key={r.id} className="text-slate-800">
+                          <td className="p-2 border-b">{r.jenis}</td>
+                          <td className="p-2 border-b">{r.tanggal}</td>
+                          <td className="p-2 border-b">{r.uraian || "-"}</td>
+                          <td className="p-2 border-b">{r.hasil || "-"}</td>
+                        </tr>
+                      ))}
+                      {(!monitoring || monitoring.length === 0) ? (
+                        <tr>
+                          <td className="p-2 text-slate-500" colSpan={4}>
+                            (belum ada pemantauan)
+                          </td>
+                        </tr>
+                      ) : null}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {activeTab === "evidence" ? (
+            <div className="mt-3 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs mb-1 text-slate-500">Ref Type</label>
+                  <select
+                    value={linkForm.spip_ref_type}
+                    onChange={(e) => setLinkForm((s) => ({ ...s, spip_ref_type: e.target.value }))}
+                    className="w-full border border-slate-200 bg-white rounded-lg px-3 py-2 text-sm text-slate-800"
+                  >
+                    <option value="risk">risk</option>
+                    <option value="rtp">rtp</option>
+                    <option value="monitoring">monitoring</option>
+                  </select>
+                </div>
+                <SpipFieldInput
+                  label="Ref ID (kosong = pakai risk terpilih)"
+                  type="number"
+                  value={linkForm.spip_ref_id}
+                  onChange={(v) => setLinkForm((s) => ({ ...s, spip_ref_id: v }))}
+                  placeholder={selectedRiskId ? `contoh: ${selectedRiskId}` : "id"}
+                />
+                <SpipFieldInput
+                  label="Sumber Modul"
+                  value={linkForm.sumber_modul}
+                  onChange={(v) => setLinkForm((s) => ({ ...s, sumber_modul: v }))}
+                  placeholder="audit_log / approval_log / spj / sek_ast / manual"
+                />
+                <SpipFieldInput
+                  label="Sumber ID"
+                  value={linkForm.sumber_id}
+                  onChange={(v) => setLinkForm((s) => ({ ...s, sumber_id: v }))}
+                  placeholder="id dari sumber (opsional)"
+                />
+                <SpipFieldInput
+                  label="URL Bukti (opsional)"
+                  value={linkForm.url}
+                  onChange={(v) => setLinkForm((s) => ({ ...s, url: v }))}
+                  placeholder="https://..."
+                />
+                <SpipFieldInput
+                  label="Occurred At (opsional)"
+                  type="datetime-local"
+                  value={linkForm.occurred_at}
+                  onChange={(v) => setLinkForm((s) => ({ ...s, occurred_at: v }))}
+                />
+                <div className="md:col-span-2">
+                  <SpipFieldTextArea
+                    label="Judul Bukti"
+                    value={linkForm.judul}
+                    onChange={(v) => setLinkForm((s) => ({ ...s, judul: v }))}
+                    rows={2}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={submitEvidenceLink}
+                  disabled={loading}
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-emerald-700 border border-emerald-600/80 text-xs md:text-sm disabled:opacity-60"
+                >
+                  {loading ? "Menyimpan…" : "Tambah Bukti"}
+                </button>
+              </div>
+
+              <div className="mt-4 border-t pt-3">
+                <div className="text-xs font-semibold text-slate-600 mb-2">Daftar Bukti (Evidence Link)</div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-xs">
+                    <thead>
+                      <tr className="text-slate-600">
+                        <th className="text-left p-2 border-b">Occurred</th>
+                        <th className="text-left p-2 border-b">Sumber</th>
+                        <th className="text-left p-2 border-b">Judul</th>
+                        <th className="text-left p-2 border-b">URL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(links || []).map((r) => (
+                        <tr key={r.id} className="text-slate-800">
+                          <td className="p-2 border-b">{r.occurred_at ? String(r.occurred_at).slice(0, 19) : "-"}</td>
+                          <td className="p-2 border-b">{r.sumber_modul}</td>
+                          <td className="p-2 border-b">{r.judul || "-"}</td>
+                          <td className="p-2 border-b">
+                            {r.url ? (
+                              <a className="text-emerald-700 underline" href={r.url} target="_blank" rel="noreferrer">
+                                link
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                      {(!links || links.length === 0) ? (
+                        <tr>
+                          <td className="p-2 text-slate-500" colSpan={4}>
+                            (belum ada bukti)
+                          </td>
+                        </tr>
+                      ) : null}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </PanelBox>
+  );
+}
+
 export default function DashboardSekretariat() {
   const user = useAuthStore((state) => state.user);
-  const roleName = normalizeRoleName(user);
+  const roleName = normalizeRoleKey(user);
   const [activeMenu, setActiveMenu] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { inboxCount, approvalCount, bypassCount } = useSekretarisDashboard();
-  const [kpi, setKpi] = useState(FALLBACK_KPI);
-  const [alertData, setAlertData] = useState(FALLBACK_ALERTS);
+  const [kpi, setKpi] = useState(() =>
+    isDemoDataAllowed() ? FALLBACK_KPI : EMPTY_KPI,
+  );
+  const [alertData, setAlertData] = useState(() =>
+    isDemoDataAllowed() ? FALLBACK_ALERTS : [],
+  );
   const [kpiLoading, setKpiLoading] = useState(false);
   const [renstraQueue, setRenstraQueue] = useState([]);
   const [renstraLoading, setRenstraLoading] = useState(true);
@@ -334,7 +1120,13 @@ export default function DashboardSekretariat() {
         if (liveAlerts.length > 0) setAlertData(liveAlerts);
       }
     } catch {
-      // silently fallback — dummy data already in state
+      if (isDemoDataAllowed()) {
+        setKpi(FALLBACK_KPI);
+        setAlertData(FALLBACK_ALERTS);
+      } else {
+        setKpi(EMPTY_KPI);
+        setAlertData([]);
+      }
     } finally {
       setKpiLoading(false);
     }
@@ -348,7 +1140,7 @@ export default function DashboardSekretariat() {
   useEffect(() => {
     setRenstraLoading(true);
     api
-      .get("/api/epelara/renstra-opd", { params: { limit: 10 } })
+      .get("/epelara/renstra-opd", { params: { limit: 10 } })
       .then((res) => {
         const d = res.data;
         setRenstraQueue(Array.isArray(d) ? d : d?.data || []);
@@ -362,7 +1154,7 @@ export default function DashboardSekretariat() {
     if (!user) return;
     setCascadeLoading(true);
     api
-      .get("/api/epelara/cascading")
+      .get("/epelara/cascading")
       .then((res) => setCascadeData(res.data ?? null))
       .catch(() => setCascadeData(null))
       .finally(() => setCascadeLoading(false));
@@ -409,11 +1201,18 @@ export default function DashboardSekretariat() {
 
   const SIDEBAR_MENU = [
     { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
+    { id: "spip_db", label: "SPIP (DB) Input", icon: "🧾", badge: null },
     {
       id: "inbox",
-      label: "Inbox Kepala Dinas",
+      label: "Inbox Kepala Dinas & Bawahan",
       icon: "📥",
       badge: inboxCount || null,
+    },
+    {
+      id: "komunikasi",
+      label: "Tanggapan & diskusi",
+      icon: "💬",
+      badge: null,
     },
     {
       id: "approval",
@@ -424,10 +1223,17 @@ export default function DashboardSekretariat() {
     {
       id: "gateway_kadin",
       label: "Gateway Ka.Dinas",
+      iconOverride: "[GW]",
       icon: "🛡️",
       badge: null,
     },
     { id: "timeline", label: "Monitor Perintah", icon: "📋", badge: null },
+    {
+      id: "coordination",
+      label: "Perintah & Koordinasi",
+      icon: "🔗",
+      badge: null,
+    },
     {
       id: "scorecard",
       label: "Kinerja / SKP Bawahan",
@@ -459,7 +1265,38 @@ export default function DashboardSekretariat() {
       case "overview":
         return (
           <div className="space-y-6">
+            {showSimulationBadge() ? (
+              <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900">
+                Mode data simulasi / demo aktif (bukan data produksi). Matikan
+                dengan VITE_DEMO_DATA=0 pada build produksi.
+              </div>
+            ) : null}
+            <NextActionStrip
+              title="Aksi utama (data real-time)"
+              items={[
+                approvalCount > 0 && {
+                  key: "appr",
+                  label: `Tinjau ${approvalCount} item di approval queue`,
+                  onClick: () => setActiveMenu("approval"),
+                },
+                inboxCount > 0 && {
+                  key: "inbox",
+                  label: `Buka ${inboxCount} item inbox Ka.Dinas`,
+                  onClick: () => setActiveMenu("inbox"),
+                },
+                bypassCount > 0 && {
+                  key: "bypass",
+                  label: `Tinjau ${bypassCount} temuan bypass alur`,
+                  onClick: () => setActiveMenu("bypass"),
+                },
+              ].filter(Boolean)}
+            />
             <HeroKpiTilesSekretaris />
+            <HorizontalCoordinationRoleDashboard
+              variant="sekretaris"
+              title="Pusat koordinasi lintas bidang"
+            />
+            <ExecutionThreadObservabilityPanel title="Thread eksekusi & koordinasi" />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <ApprovalQueuePanel />
@@ -470,18 +1307,72 @@ export default function DashboardSekretariat() {
                 <PanelBox title="Aksi Cepat" accent="emerald">
                   <QuickActionBar />
                 </PanelBox>
+                <SpipReportPanel />
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DataFlowChart />
-              <LintasBidangTable tableData={tableData} />
+              {isDemoDataAllowed() ? (
+                <LintasBidangTable tableData={tableData} />
+              ) : (
+                <PanelBox title="Lintas bidang" accent="slate">
+                  <p className="text-sm text-slate-600">
+                    Tabel contoh statis dinonaktifkan di build produksi. Data
+                    lintas bidang akan tampil ketika endpoint/agregasi resmi
+                    tersedia. Untuk contoh UI, set{" "}
+                    <code className="text-xs">VITE_DEMO_DATA=1</code>.
+                  </p>
+                </PanelBox>
+              )}
             </div>
+            <PanelBox title="Perintah & Koordinasi Sekretaris" accent="blue">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <p className="text-sm text-slate-700">
+                  Workspace ini memisahkan perintah Sekretaris ke bawahan formal
+                  dari koordinasi lintas unit dengan Kepala Bidang dan Kepala
+                  UPTD, sehingga alurnya lebih rapi dan sesuai pedoman.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveMenu("coordination")}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-blue-700 border border-blue-600/80 text-xs md:text-sm"
+                  >
+                    Buka Form Koordinasi
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMenu("timeline")}
+                    className="bg-slate-800 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-slate-900 border border-slate-800/80 text-xs md:text-sm"
+                  >
+                    Lihat Monitor Perintah
+                  </button>
+                </div>
+              </div>
+            </PanelBox>
+          </div>
+        );
+      case "spip_db":
+        return (
+          <div className="space-y-6">
+            <SpipDbPanel />
+            <SpipReportPanel />
           </div>
         );
       case "inbox":
         return <InboxKadinPanel />;
+      case "komunikasi":
+        return (
+          <KomunikasiPanel
+            lane={KOM_LANES.ES3_ES4}
+            titleTanggapan="Tanggapan Kasubag / JF / Bendahara"
+            titleDiskusi="Diskusi dengan bawahan (task)"
+          />
+        );
       case "approval":
         return <ApprovalQueuePanel />;
+      case "coordination":
+        return <SekretarisCoordinationWorkspace />;
       case "timeline":
         return <MonitorPerintahTimeline />;
       case "scorecard":
@@ -542,7 +1433,7 @@ export default function DashboardSekretariat() {
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <span>{item.icon}</span>
+                  <span>{item.iconOverride || item.icon}</span>
                   <span className="truncate">{item.label}</span>
                 </span>
                 {item.badge ? (

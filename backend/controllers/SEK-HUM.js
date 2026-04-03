@@ -6,6 +6,7 @@
 
 import SekHum from "../models/SEK-HUM.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekHum records
 // @route   GET /api/sek-hum
@@ -76,6 +77,8 @@ export const getSekHumById = async (req, res) => {
 // @access  Private
 export const createSekHum = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekHum.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekHum = async (req, res) => {
         message: "SekHum not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

@@ -4,29 +4,21 @@
 //   JF di Bidang            → ADMINISTRATOR (approve + verifikasi teknis)
 //   JF di Sekretariat/UPTD  → PENGAWAS (view-only)
 // P12 + P15: JF Ketersediaan & Distribusi — satu dashboard, konten adaptif per unit_kerja
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import JfVerifikasiDataMasukPanel from "../../components/jfBidang/JfVerifikasiDataMasukPanel";
 import WorkspaceAnalisaDistribusi from "../../components/jfBidang/workspace/WorkspaceAnalisaDistribusi";
 import WorkspaceAnalisaKetersediaan from "../../components/jfBidang/workspace/WorkspaceAnalisaKetersediaan";
 import WorkspaceAnalisaKonsumsi from "../../components/jfBidang/workspace/WorkspaceAnalisaKonsumsi";
 import WorkspaceVerifikasiUptd from "../../components/jfBidang/workspace/WorkspaceVerifikasiUptd";
 import TimPelaksanaPanel from "../../components/jfBidang/TimPelaksanaPanel";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
-import { roleIdToName } from "../../utils/roleMap";
+import { normalizeRoleKey } from "../../utils/normalizeRole";
 import { workflowStatusUpdateAPI } from "../../services/workflowStatusService";
 import BukaEPelaraButton from "../../components/BukaEPelaraButton";
-import api from "../../utils/api";
-
-function normalizeRoleName(user) {
-  return (
-    (user?.roleName && String(user.roleName).toLowerCase()) ||
-    user?.role ||
-    roleIdToName?.[user?.role_id] ||
-    roleIdToName?.[String(user?.role_id)] ||
-    null
-  );
-}
+import DashboardNotificationStrip from "../../components/notifications/DashboardNotificationStrip";
+import SekretariatSubordinateWorkspace from "../../components/coordination/SekretariatSubordinateWorkspace";
+import api from "../../services/api";
 
 function normalizeUnit(user) {
   return user?.unit_kerja ? String(user.unit_kerja).toLowerCase() : "";
@@ -37,15 +29,27 @@ const ALLOWED = [
   "pejabat_fungsional",
   "fungsional",
   "fungsional_perencana",
+  "fungsional_perencanaan",
   "fungsional_keuangan",
+  "fungsional_analis",
+  "fungsional_ketersediaan",
+  "fungsional_distribusi",
+  "fungsional_konsumsi",
+  "fungsional_uptd_mutu",
+  "fungsional_uptd_teknis",
   "ppk",
   "super_admin",
   "kepala_dinas",
 ];
 
+function isFungsionalUptdRole(r) {
+  const s = String(r || "");
+  return s === "fungsional_uptd_mutu" || s === "fungsional_uptd_teknis" || s.startsWith("fungsional_uptd_");
+}
+
 export default function DashboardFungsional() {
   const user = useAuthStore((state) => state.user);
-  const roleName = normalizeRoleName(user);
+  const roleName = normalizeRoleKey(user);
   const unit = normalizeUnit(user);
 
   const isSekretariat = unit.includes("sekretariat");
@@ -74,6 +78,11 @@ export default function DashboardFungsional() {
   // Prompt 5/6: Mode Sekretariat (JF Perencanaan / JF Keuangan-PPK)
   // ────────────────────────────────────────────────────────────────────────────
   const [sekMenu, setSekMenu] = useState("overview");
+  const [coordinationHighlightId, setCoordinationHighlightId] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const processedCoordTaskRef = useRef(null);
+  /** Sidebar JF Sekretariat: drawer di mobile/tablet */
+  const [sekMobileNavOpen, setSekMobileNavOpen] = useState(false);
   const [sekSummary, setSekSummary] = useState(null);
   const [sekInbox, setSekInbox] = useState([]);
   const [sekInboxLoading, setSekInboxLoading] = useState(false);
@@ -109,6 +118,32 @@ export default function DashboardFungsional() {
       .then((r) => setSekSummary(r.data?.data ?? null))
       .catch(() => setSekSummary(null));
   }, [user, isSekretariat, sekBase]);
+
+  useEffect(() => {
+    if (!isSekretariat) return;
+    const raw = searchParams.get("coordinationTask");
+    if (!raw || processedCoordTaskRef.current === raw) return;
+    const id = Number(raw);
+    if (!Number.isFinite(id)) return;
+    processedCoordTaskRef.current = raw;
+    setSekMenu("inbox");
+    setCoordinationHighlightId(id);
+    setSearchParams(
+      (prev) => {
+        const n = new URLSearchParams(prev);
+        n.delete("coordinationTask");
+        return n;
+      },
+      { replace: true },
+    );
+  }, [isSekretariat, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (!isSekretariat) return;
+    if (coordinationHighlightId == null) return;
+    const t = setTimeout(() => setCoordinationHighlightId(null), 8000);
+    return () => clearTimeout(t);
+  }, [isSekretariat, coordinationHighlightId]);
 
   useEffect(() => {
     if (!user) return;
@@ -325,7 +360,9 @@ export default function DashboardFungsional() {
       .finally(() => setCascadeLoading(false));
   }, [user]);
 
-  const isAllowed = !!user && ALLOWED.includes(roleName);
+  const isAllowed =
+    !!user &&
+    (ALLOWED.includes(roleName) || isFungsionalUptdRole(roleName));
   if (!isAllowed) return <Navigate to="/" replace />;
 
   // ─── Render Sekretariat JF Perencana/PPK mode ────────────────────────────────
@@ -442,28 +479,36 @@ export default function DashboardFungsional() {
     ].filter(Boolean);
 
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="flex">
-          <aside className="w-[280px] bg-slate-900 text-slate-100 min-h-screen hidden md:block">
-            <div className="px-5 py-5 border-b border-slate-700/60">
-              <div className="font-extrabold tracking-wide">🏛️ SIGAP-MALUT</div>
+      <div className="min-h-[100dvh] h-[100dvh] flex flex-col bg-gray-50 overflow-hidden">
+        <DashboardNotificationStrip />
+        <div className="flex flex-1 min-h-0 relative">
+          <aside
+            className={`fixed md:static top-11 bottom-0 left-0 md:inset-y-0 z-40 w-[min(280px,88vw)] bg-slate-900 text-slate-100 flex flex-col shrink-0 transition-transform duration-200 ease-out md:translate-x-0 ${
+              sekMobileNavOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+          >
+            <div className="px-4 sm:px-5 py-4 sm:py-5 border-b border-slate-700/60 shrink-0">
+              <div className="font-extrabold tracking-wide text-sm sm:text-base">🏛️ SIGAP-MALUT</div>
               <div className="text-xs text-slate-300 mt-1">
                 {isPerencana ? "JF Perencanaan" : "JF Keuangan / PPK"}
               </div>
             </div>
-            <nav className="px-3 py-3 space-y-1">
+            <nav className="px-2 sm:px-3 py-3 space-y-1 overflow-y-auto flex-1 min-h-0 pb-4">
               {sidebarItems.map((it) => (
                 <button
                   key={it.id}
-                  onClick={() => setSekMenu(it.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between hover:bg-slate-800 transition ${
+                  onClick={() => {
+                    setSekMenu(it.id);
+                    setSekMobileNavOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center justify-between hover:bg-slate-800 transition ${
                     sekMenu === it.id ? "bg-slate-800" : ""
                   }`}
                 >
                   <span className="truncate">{it.label}</span>
                   {typeof it.badge === "number" ? (
                     <span
-                      className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
+                      className={`ml-2 text-xs px-2 py-0.5 rounded-full shrink-0 ${
                         it.badge > 0 ? "bg-amber-500 text-white" : "bg-slate-700 text-slate-200"
                       }`}
                     >
@@ -475,24 +520,43 @@ export default function DashboardFungsional() {
             </nav>
           </aside>
 
-          <main className="flex-1">
-            <header className="bg-white border-b border-slate-200">
-              <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm text-slate-500">
-                    {new Date().toLocaleDateString("id-ID", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </div>
-                  <div className="text-lg font-bold text-slate-800 truncate">
-                    {isPerencana ? "Dashboard JF Perencanaan" : "Dashboard JF Keuangan / PPK"} ·{" "}
-                    {user?.nama_lengkap || user?.name || user?.username || "—"}
+          {sekMobileNavOpen && (
+            <button
+              type="button"
+              aria-label="Tutup menu"
+              className="fixed inset-0 bg-black/50 z-30 md:hidden"
+              onClick={() => setSekMobileNavOpen(false)}
+            />
+          )}
+
+          <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+            <header className="bg-white border-b border-slate-200 shrink-0">
+              <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-2 sm:gap-3 min-w-0">
+                  <button
+                    type="button"
+                    className="md:hidden shrink-0 mt-0.5 p-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
+                    onClick={() => setSekMobileNavOpen(true)}
+                    aria-label="Buka menu"
+                  >
+                    ☰
+                  </button>
+                  <div className="min-w-0">
+                    <div className="text-xs sm:text-sm text-slate-500">
+                      {new Date().toLocaleDateString("id-ID", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </div>
+                    <div className="text-base sm:text-lg font-bold text-slate-800 truncate">
+                      {isPerencana ? "Dashboard JF Perencanaan" : "Dashboard JF Keuangan / PPK"} ·{" "}
+                      {user?.nama_lengkap || user?.name || user?.username || "—"}
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex flex-wrap items-center gap-2 shrink-0 pl-0 sm:pl-0">
                   <button
                     onClick={refreshSummary}
                     className="text-xs px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50"
@@ -508,7 +572,7 @@ export default function DashboardFungsional() {
               </div>
             </header>
 
-            <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
               {/* Hero KPI tiles */}
               <div className={`grid grid-cols-2 ${isPerencana ? "md:grid-cols-5" : "md:grid-cols-6"} gap-3`}>
                 {tiles.map((t) => (
@@ -579,53 +643,67 @@ export default function DashboardFungsional() {
               )}
 
               {sekMenu === "inbox" && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="font-bold text-slate-800">📥 Inbox Sekretaris</div>
-                    <button
-                      onClick={() => setSekMenu("overview")}
-                      className="text-xs text-slate-500 hover:text-slate-700"
-                    >
-                      ← Kembali
-                    </button>
-                  </div>
-                  {sekInboxLoading ? (
-                    <div className="text-sm text-slate-500 animate-pulse">Memuat…</div>
-                  ) : sekInbox.length === 0 ? (
-                    <div className="text-sm text-slate-500 italic">Inbox kosong.</div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
-                          <tr>
-                            <th className="px-3 py-2 text-left">Judul</th>
-                            <th className="px-3 py-2 text-left">Prioritas</th>
-                            <th className="px-3 py-2 text-left">Deadline</th>
-                            <th className="px-3 py-2 text-left">Aksi</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sekInbox.map((t) => (
-                            <tr key={t.id} className="border-t border-slate-100">
-                              <td className="px-3 py-2 font-medium">{t.title}</td>
-                              <td className="px-3 py-2">{t.priority ?? "—"}</td>
-                              <td className="px-3 py-2">
-                                {t.due_date ? new Date(t.due_date).toLocaleDateString("id-ID") : "—"}
-                              </td>
-                              <td className="px-3 py-2">
-                                <button
-                                  onClick={() => handleKonfirmasiTerima(t.id)}
-                                  className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-                                >
-                                  Konfirmasi Terima
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                <div className="space-y-6">
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <div className="font-bold text-slate-800">📥 Inbox Sekretaris</div>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Penugasan ringkas dan kanal formal perintah/koordinasi Sekretaris dalam satu
+                          halaman.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setSekMenu("overview")}
+                        className="text-xs text-slate-500 hover:text-slate-700"
+                      >
+                        ← Kembali
+                      </button>
                     </div>
-                  )}
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Ringkas — penugasan</p>
+                    {sekInboxLoading ? (
+                      <div className="text-sm text-slate-500 animate-pulse">Memuat…</div>
+                    ) : sekInbox.length === 0 ? (
+                      <div className="text-sm text-slate-500 italic">Tidak ada penugasan ringkas.</div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                          <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+                            <tr>
+                              <th className="px-3 py-2 text-left">Judul</th>
+                              <th className="px-3 py-2 text-left">Prioritas</th>
+                              <th className="px-3 py-2 text-left">Deadline</th>
+                              <th className="px-3 py-2 text-left">Aksi</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sekInbox.map((t) => (
+                              <tr key={t.id} className="border-t border-slate-100">
+                                <td className="px-3 py-2 font-medium">{t.title}</td>
+                                <td className="px-3 py-2">{t.priority ?? "—"}</td>
+                                <td className="px-3 py-2">
+                                  {t.due_date ? new Date(t.due_date).toLocaleDateString("id-ID") : "—"}
+                                </td>
+                                <td className="px-3 py-2">
+                                  <button
+                                    onClick={() => handleKonfirmasiTerima(t.id)}
+                                    className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+                                  >
+                                    Konfirmasi Terima
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                  <SekretariatSubordinateWorkspace
+                    actorRole={roleName}
+                    actorLabel={isPerencana ? "JF Perencanaan" : "JF Keuangan / PPK"}
+                    highlightTaskId={coordinationHighlightId}
+                  />
                 </div>
               )}
 
@@ -906,22 +984,62 @@ export default function DashboardFungsional() {
     );
   }
 
+  /** Tema khusus JF di UPTD: kontras nyaman, bukan putih dominan, layar lebar penuh */
+  const themeUptdJf = isUptd;
+  const shellBg = themeUptdJf
+    ? "bg-gradient-to-br from-slate-400/45 via-slate-300/55 to-slate-400/40"
+    : "bg-slate-50";
+  const contentWrap = themeUptdJf
+    ? "w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-16 py-5 sm:py-6 space-y-5 sm:space-y-6 pb-[max(1rem,env(safe-area-inset-bottom))]"
+    : "max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-[max(1rem,env(safe-area-inset-bottom))]";
+  const panel =
+    themeUptdJf
+      ? "rounded-2xl border border-slate-500/35 bg-slate-100/95 text-slate-900 shadow-[0_2px_8px_rgba(15,23,42,0.06)] backdrop-blur-[1px]"
+      : "bg-white rounded-xl border border-gray-100 shadow-sm text-gray-900";
+  const panelHead = themeUptdJf ? "text-slate-900" : "text-gray-800";
+  const panelMuted = themeUptdJf ? "text-slate-600" : "text-gray-500";
+  const panelSubtle = themeUptdJf ? "text-slate-500" : "text-gray-400";
+  const tableHead = themeUptdJf
+    ? "bg-slate-200/80 text-slate-700"
+    : "bg-gray-50 text-gray-500";
+  const tableRow = themeUptdJf
+    ? "border-t border-slate-300/60 hover:bg-slate-200/50"
+    : "border-t border-gray-100 hover:bg-gray-50";
+  const badgeSt = themeUptdJf
+    ? "bg-teal-900/25 text-teal-900 border border-teal-800/30"
+    : "bg-indigo-100 text-indigo-700";
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div
+      className={`min-h-[100dvh] h-[100dvh] flex flex-col overflow-hidden ${shellBg}`}
+    >
+      <DashboardNotificationStrip />
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden w-full overscroll-y-contain">
+        <div className={contentWrap}>
       {/* Hero */}
-      <div className="bg-gradient-to-r from-indigo-900/95 to-slate-900/80 border-2 border-indigo-700/50 rounded-2xl p-8 shadow-xl">
-        <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
-          <span className="text-4xl">🎓</span>
-          Dashboard Jabatan Fungsional
+      <div
+        className={
+          themeUptdJf
+            ? "bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border border-teal-800/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl"
+            : "bg-gradient-to-r from-indigo-900/95 to-slate-900/80 border-2 border-indigo-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl"
+        }
+      >
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 flex flex-wrap items-center gap-2 sm:gap-3">
+          <span className="text-3xl sm:text-4xl shrink-0" aria-hidden>
+            🎓
+          </span>
+          <span className="min-w-0 leading-tight">Dashboard Jabatan Fungsional</span>
         </h1>
-        <p className="text-indigo-200/80 text-sm">
+        <p
+          className={`text-xs sm:text-sm break-words ${themeUptdJf ? "text-teal-100/95" : "text-indigo-200/80"}`}
+        >
           Unit:{" "}
           <span className="font-semibold text-white">
             {user?.unit_kerja || "—"}
           </span>
           {" · "}Role e-Pelara:{" "}
           <span
-            className={`font-bold ${epelараRole === "ADMINISTRATOR" ? "text-green-300" : "text-amber-300"}`}
+            className={`font-bold ${epelараRole === "ADMINISTRATOR" ? "text-emerald-300" : "text-amber-200"}`}
           >
             {epelараRole}
           </span>
@@ -929,67 +1047,97 @@ export default function DashboardFungsional() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          {
-            label: "Tugas Aktif",
-            value: loading ? "…" : tugas.length,
-            color: "indigo",
-          },
-          { label: "Verifikasi Teknis", value: verifCount == null ? "…" : verifCount, color: "blue" },
-          { label: "Analisis Selesai", value: "—", color: "emerald" },
-          { label: "Permintaan Revisi", value: "—", color: "amber" },
-        ].map((kpi) => (
-          <div
-            key={kpi.label}
-            className={`rounded-xl border p-4 flex flex-col gap-1 bg-${kpi.color}-50 border-${kpi.color}-200`}
-          >
-            <div className={`text-3xl font-bold text-${kpi.color}-700`}>
-              {kpi.value}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+        {themeUptdJf ? (
+          <>
+            <div className="rounded-xl border border-slate-500/35 bg-slate-200/90 p-3 sm:p-4 flex flex-col gap-1 shadow-sm">
+              <div className="text-2xl sm:text-3xl font-bold text-slate-900 tabular-nums">
+                {loading ? "…" : tugas.length}
+              </div>
+              <div className="text-xs font-semibold text-slate-700">Tugas Aktif</div>
             </div>
-            <div className={`text-xs font-medium text-${kpi.color}-600`}>
-              {kpi.label}
+            <div className="rounded-xl border border-teal-800/25 bg-teal-900/15 p-3 sm:p-4 flex flex-col gap-1 shadow-sm">
+              <div className="text-2xl sm:text-3xl font-bold text-teal-950 tabular-nums">
+                {verifCount == null ? "…" : verifCount}
+              </div>
+              <div className="text-xs font-semibold text-teal-900/90">Verifikasi Teknis</div>
             </div>
-          </div>
-        ))}
+            <div className="rounded-xl border border-slate-500/35 bg-slate-200/90 p-3 sm:p-4 flex flex-col gap-1 shadow-sm">
+              <div className="text-2xl sm:text-3xl font-bold text-slate-800 tabular-nums">—</div>
+              <div className="text-xs font-semibold text-slate-700">Analisis Selesai</div>
+            </div>
+            <div className="rounded-xl border border-amber-800/25 bg-amber-900/10 p-3 sm:p-4 flex flex-col gap-1 shadow-sm">
+              <div className="text-2xl sm:text-3xl font-bold text-amber-950 tabular-nums">—</div>
+              <div className="text-xs font-semibold text-amber-950/90">Permintaan Revisi</div>
+            </div>
+          </>
+        ) : (
+          [
+            {
+              label: "Tugas Aktif",
+              value: loading ? "…" : tugas.length,
+              color: "indigo",
+            },
+            { label: "Verifikasi Teknis", value: verifCount == null ? "…" : verifCount, color: "blue" },
+            { label: "Analisis Selesai", value: "—", color: "emerald" },
+            { label: "Permintaan Revisi", value: "—", color: "amber" },
+          ].map((kpi) => (
+            <div
+              key={kpi.label}
+              className={`rounded-xl border p-3 sm:p-4 flex flex-col gap-1 bg-${kpi.color}-50 border-${kpi.color}-200`}
+            >
+              <div className={`text-2xl sm:text-3xl font-bold text-${kpi.color}-700`}>
+                {kpi.value}
+              </div>
+              <div className={`text-xs font-medium text-${kpi.color}-600`}>
+                {kpi.label}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Daftar Tugas */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+      <div className={`${panel} p-4 sm:p-5`}>
+        <h2
+          className={`font-bold mb-3 sm:mb-4 flex items-center gap-2 text-base sm:text-lg ${panelHead}`}
+        >
           📋 Tugas Ditugaskan ke Saya
         </h2>
         {loading ? (
-          <p className="text-sm text-gray-500 animate-pulse">Memuat tugas…</p>
+          <p className={`text-sm animate-pulse ${panelMuted}`}>Memuat tugas…</p>
         ) : tugas.length === 0 ? (
-          <p className="text-sm text-gray-400 italic">
+          <p className={`text-sm italic ${panelSubtle}`}>
             Belum ada tugas yang ditugaskan.
           </p>
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            className={`overflow-x-auto rounded-lg border ${
+              themeUptdJf ? "border-slate-400/30" : "border-gray-100"
+            }`}
+          >
             <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+              <thead className={`uppercase text-xs ${tableHead}`}>
                 <tr>
-                  <th className="px-3 py-2 text-left">Judul</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Modul</th>
+                  <th className="px-3 py-2 text-left font-semibold">Judul</th>
+                  <th className="px-3 py-2 text-left font-semibold">Status</th>
+                  <th className="px-3 py-2 text-left font-semibold">Modul</th>
                 </tr>
               </thead>
               <tbody>
                 {tugas.map((t, i) => (
-                  <tr
-                    key={t.id ?? i}
-                    className="border-t border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-3 py-2 font-medium">
+                  <tr key={t.id ?? i} className={tableRow}>
+                    <td className={`px-3 py-2 font-medium ${panelHead}`}>
                       {t.judul || t.title || "—"}
                     </td>
                     <td className="px-3 py-2">
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-indigo-100 text-indigo-700">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${badgeSt}`}
+                      >
                         {t.status || "—"}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-gray-500">
+                    <td className={`px-3 py-2 ${panelMuted}`}>
                       {t.modul_id || t.modulId || "—"}
                     </td>
                   </tr>
@@ -1093,9 +1241,9 @@ export default function DashboardFungsional() {
       )}
 
       {/* ─── PANEL STATUS REVIEW ATASAN — Priority 2 ─── */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+      <div className={`${panel} p-5`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-gray-800 flex items-center gap-2">
+          <h2 className={`font-bold flex items-center gap-2 ${panelHead}`}>
             📬 Status Review Atasan
           </h2>
           <BukaEPelaraButton
@@ -1104,16 +1252,16 @@ export default function DashboardFungsional() {
             className="!py-1.5 !px-3 !text-xs"
           />
         </div>
-        <p className="text-xs text-gray-400 mb-3">
+        <p className={`text-xs mb-3 ${panelSubtle}`}>
           Status dokumen yang sudah Anda ajukan — apakah sudah diverifikasi
           Sekretaris atau disetujui Kepala Dinas.
         </p>
         {reviewLoading ? (
-          <p className="text-sm text-gray-400 animate-pulse">
+          <p className={`text-sm animate-pulse ${panelSubtle}`}>
             Memuat status review…
           </p>
         ) : reviewData.length === 0 ? (
-          <p className="text-sm text-gray-400 italic">
+          <p className={`text-sm italic ${panelSubtle}`}>
             Belum ada dokumen yang diajukan dari unit Anda.
           </p>
         ) : (
@@ -1136,13 +1284,17 @@ export default function DashboardFungsional() {
               return (
                 <div
                   key={dok.id ?? i}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-slate-50 rounded-lg border border-slate-100"
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg border ${
+                    themeUptdJf
+                      ? "bg-slate-200/70 border-slate-400/35"
+                      : "bg-slate-50 border-slate-100"
+                  }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">
+                    <p className={`text-sm font-medium truncate ${panelHead}`}>
                       {dok.judul ?? dok.jenis_dokumen ?? `Dokumen #${i + 1}`}
                     </p>
-                    <p className="text-xs text-gray-400">{dok.tahun ?? "—"}</p>
+                    <p className={`text-xs ${panelSubtle}`}>{dok.tahun ?? "—"}</p>
                   </div>
                   {/* Progress steps horizontal */}
                   <div className="flex items-center gap-1 shrink-0">
@@ -1187,12 +1339,12 @@ export default function DashboardFungsional() {
       </div>
 
       {/* ─── Cascading Check ─── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+      <div className={`${panel} p-5`}>
+        <h2 className={`font-bold mb-3 flex items-center gap-2 ${panelHead}`}>
           🔗 Cascading Check Perencanaan
         </h2>
         {cascadeLoading ? (
-          <p className="text-sm text-gray-400 animate-pulse">
+          <p className={`text-sm animate-pulse ${panelSubtle}`}>
             Memuat data cascading…
           </p>
         ) : (
@@ -1238,7 +1390,7 @@ export default function DashboardFungsional() {
               const allOk = steps.every((s) => s.ok);
               return (
                 <>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {steps.map((step, i) => (
                       <div
                         key={i}
@@ -1253,14 +1405,18 @@ export default function DashboardFungsional() {
                         </span>
                         <div>
                           <div className="font-semibold">{step.label}</div>
-                          <div className="text-gray-500">{step.detail}</div>
+                          <div className={themeUptdJf ? "text-slate-600" : "text-gray-500"}>
+                            {step.detail}
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div className="flex items-center justify-between pt-2 mt-1 border-t border-gray-100">
+                  <div
+                    className={`flex items-center justify-between pt-2 mt-1 border-t border-slate-400/25`}
+                  >
                     <span
-                      className={`text-xs font-semibold ${allOk ? "text-green-600" : "text-amber-600"}`}
+                      className={`text-xs font-semibold ${allOk ? "text-green-700" : "text-amber-700"}`}
                     >
                       {allOk
                         ? "✅ Cascading chain: Lengkap"
@@ -1275,7 +1431,11 @@ export default function DashboardFungsional() {
                           .catch(() => setCascadeData(null))
                           .finally(() => setCascadeLoading(false));
                       }}
-                      className="text-xs text-gray-400 hover:text-indigo-500 transition"
+                      className={`text-xs transition ${
+                        themeUptdJf
+                          ? "text-slate-600 hover:text-teal-800"
+                          : "text-gray-400 hover:text-indigo-500"
+                      }`}
                     >
                       ↺ Refresh
                     </button>
@@ -1288,9 +1448,9 @@ export default function DashboardFungsional() {
       </div>
 
       {/* e-Pelara */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="font-bold text-gray-800 mb-3">Akses e-Pelara</h2>{" "}
-        <p className="text-xs text-gray-500 mb-3">
+      <div className={`${panel} p-5`}>
+        <h2 className={`font-bold mb-3 ${panelHead}`}>Akses e-Pelara</h2>{" "}
+        <p className={`text-xs mb-3 ${panelMuted}`}>
           Sebagai <strong>{epelараRole}</strong> — Anda dapat{" "}
           {epelараRole === "ADMINISTRATOR"
             ? "memverifikasi dan menyetujui dokumen perencanaan bidang."
@@ -1302,6 +1462,8 @@ export default function DashboardFungsional() {
           className="w-full md:w-auto"
         />
       </div>
+        </div>
+      </main>
     </div>
   );
 }

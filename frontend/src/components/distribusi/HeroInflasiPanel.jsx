@@ -1,6 +1,6 @@
 // Hero panel — Kepala Bidang Distribusi (data nyata: inflasi_harian)
 import React, { useState, useEffect } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 function fmtPct(v) {
   if (v == null || Number.isNaN(Number(v))) return "—";

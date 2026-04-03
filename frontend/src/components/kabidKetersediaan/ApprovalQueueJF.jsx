@@ -1,6 +1,6 @@
 // Approval Queue dari JF — Panel untuk Kepala Bidang mereview dokumen dari JF
 import React, { useState, useEffect } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 export default function ApprovalQueueJF({ unitKerja = "Bidang Ketersediaan" }) {
   const [queue, setQueue] = useState([]);
@@ -12,24 +12,24 @@ export default function ApprovalQueueJF({ unitKerja = "Bidang Ketersediaan" }) {
 
   const uk = unitKerja.toLowerCase();
   const endpoint = uk.includes("distribusi")
-    ? "/api/kabid-distribusi/approval-queue"
+    ? "/kabid-distribusi/approval-queue"
     : uk.includes("konsumsi")
-      ? "/api/kabid-konsumsi/approval-queue"
-      : "/api/kabid-ketersediaan/approval-queue";
+      ? "/kabid-konsumsi/approval-queue"
+      : "/kabid-ketersediaan/approval-queue";
 
   const setujuiEndpoint = (id) =>
     uk.includes("distribusi")
-      ? `/api/kabid-distribusi/approval-queue/${id}/setujui`
+      ? `/kabid-distribusi/approval-queue/${id}/setujui`
       : uk.includes("konsumsi")
-        ? `/api/kabid-konsumsi/approval-queue/${id}/setujui`
-        : `/api/kabid-ketersediaan/approval-queue/${id}/setujui`;
+        ? `/kabid-konsumsi/approval-queue/${id}/setujui`
+        : `/kabid-ketersediaan/approval-queue/${id}/setujui`;
 
   const kembalikanEndpoint = (id) =>
     uk.includes("distribusi")
-      ? `/api/kabid-distribusi/approval-queue/${id}/kembalikan`
+      ? `/kabid-distribusi/approval-queue/${id}/kembalikan`
       : uk.includes("konsumsi")
-        ? `/api/kabid-konsumsi/approval-queue/${id}/kembalikan`
-        : `/api/kabid-ketersediaan/approval-queue/${id}/kembalikan`;
+        ? `/kabid-konsumsi/approval-queue/${id}/kembalikan`
+        : `/kabid-ketersediaan/approval-queue/${id}/kembalikan`;
 
   useEffect(() => {
     setLoading(true);

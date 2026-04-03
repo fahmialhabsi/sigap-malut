@@ -2,7 +2,7 @@
 // A-08 / K-03: Widget "DPA Bidang Saya" — ditampilkan di dashboard 3 Kepala Bidang
 // Data diambil via SIGAP proxy → e-Pelara GET /api/dpa
 import React, { useEffect, useState } from "react";
-import api from "../utils/api";
+import api from "../services/api";
 
 function formatRupiah(value) {
   if (value == null || value === "") return "—";

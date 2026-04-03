@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 export default function BypassAlertCenter() {
   const [rows, setRows] = useState([]);
@@ -9,7 +9,7 @@ export default function BypassAlertCenter() {
   const fetchList = async (p = 1) => {
     setLoading(true);
     try {
-      const res = await api.get("/api/sekretaris/bypass/list", {
+      const res = await api.get("/sekretaris/bypass/list", {
         params: { page: p, limit: 20 },
       });
       setRows(Array.isArray(res.data?.data) ? res.data.data : []);

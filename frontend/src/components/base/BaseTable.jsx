@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import api from "../../utils/api";
+import api from "../../services/api";
 import ConfirmModal from "../ui/ConfirmModal";
 import { notifySuccess, notifyError } from "../../utils/notify";
 import { exportToCSV, exportToExcel, exportToPDF } from "../../utils/export";

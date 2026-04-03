@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../utils/api";
+import api from "../../services/api";
 import { notifySuccess, notifyError } from "../../utils/notify";
 
 const MEDIA_TERIMA_OPTIONS = [

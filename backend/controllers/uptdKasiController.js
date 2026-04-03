@@ -32,7 +32,9 @@ function isKasiUptd(user) {
     r.includes("seksi_manajemen_teknis") ||
     r.includes("kasi_uptd") ||
     r.includes("kasi_mutu") ||
-    r.includes("kasi_teknis")
+    r.includes("kasi_teknis") ||
+    r.includes("kasi_mutu_uptd") ||
+    r.includes("kasi_teknis_uptd")
   );
 }
 

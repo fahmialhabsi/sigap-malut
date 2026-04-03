@@ -1,6 +1,6 @@
 // Input harga pasar harian — Pelaksana Bidang Distribusi (9 komoditas pokok)
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import api from "../../utils/api";
+import api from "../../services/api";
 
 const WAJIB = [
   { key: "beras_medium", label: "Beras Medium", satuan: "kg" },

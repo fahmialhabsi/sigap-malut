@@ -1,7 +1,7 @@
 // frontend/src/stores/authStore.js
 
 import { create } from "zustand";
-import api from "../utils/api";
+import api from "../services/api";
 import { logAuditTrail } from "../utils/auditTrail";
 import { roleIdToName } from "../utils/roleMap"; // <- sudah ada
 import unitNameToId from "../utils/unitMap"; // <- import untuk mapping unit

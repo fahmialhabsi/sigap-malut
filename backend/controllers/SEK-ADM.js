@@ -6,6 +6,7 @@
 
 import SekAdm from "../models/SEK-ADM.js";
 import { logAudit } from "../services/auditLogService.js";
+import { gateOperationalWrite, gateOperationalUpdate } from "../services/executionThreadGate.js";
 
 // @desc    Get all SekAdm records
 // @route   GET /api/sek-adm
@@ -76,6 +77,8 @@ export const getSekAdmById = async (req, res) => {
 // @access  Private
 export const createSekAdm = async (req, res) => {
   try {
+    const threadOk = await gateOperationalWrite(req, res);
+    if (!threadOk) return;
     const record = await SekAdm.create({
       ...req.body,
       created_by: req.user?.id,
@@ -114,6 +117,8 @@ export const updateSekAdm = async (req, res) => {
         message: "SekAdm not found",
       });
     }
+    const threadUp = await gateOperationalUpdate(req, res, record);
+    if (!threadUp) return;
     const dataLama = { ...record.get() };
     await record.update({
       ...req.body,

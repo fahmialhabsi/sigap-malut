@@ -14,6 +14,8 @@ import ApprovalLog from "../models/approvalLog.js";
 import ApprovalWorkflow from "../models/approvalWorkflow.js";
 import Komoditas from "../models/komoditas.js";
 import BdsHrg from "../models/BDS-HRG.js";
+import Task from "../models/Task.js";
+import User from "../models/User.js";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -225,6 +227,94 @@ async function getInflasiPangan() {
     return null;
   }
 }
+
+// ── CONTROLLER: GET /api/dashboard/super-admin/summary ───────────────────────
+/** Agregat lintas organisasi untuk System Control Center (hanya super_admin). */
+export const getSuperAdminSummary = async (req, res) => {
+  try {
+    const since30d = THIRTY_DAYS_AGO();
+
+    const [
+      userTotal,
+      userActive,
+      auditEntriesTotal,
+      compliance,
+      avgApprovalHours,
+      tasksOverdue,
+      tasksOpenPipeline,
+      tasksClosed30d,
+      tasksCreated30d,
+    ] = await Promise.all([
+      User.count().catch(() => 0),
+      User.count({ where: { is_active: true } }).catch(() => 0),
+      AuditLog.count().catch(() => 0),
+      getComplianceKPIs(),
+      getAvgApprovalTime(),
+      Task.count({
+        where: {
+          due_date: { [Op.lt]: new Date() },
+          status: { [Op.notIn]: ["closed", "rejected"] },
+        },
+      }).catch(() => 0),
+      Task.count({
+        where: {
+          status: { [Op.notIn]: ["closed", "rejected", "draft"] },
+        },
+      }).catch(() => 0),
+      Task.count({
+        where: {
+          status: "closed",
+          updated_at: { [Op.gte]: since30d },
+        },
+      }).catch(() => 0),
+      Task.count({
+        where: { created_at: { [Op.gte]: since30d } },
+      }).catch(() => 0),
+    ]);
+
+    const completionRate30dPct =
+      tasksCreated30d > 0
+        ? parseFloat(
+            ((tasksClosed30d / tasksCreated30d) * 100).toFixed(1),
+          )
+        : null;
+
+    const data = {
+      users: {
+        total: userTotal,
+        active: userActive,
+      },
+      auditLog: {
+        entriesTotal: auditEntriesTotal,
+      },
+      compliance: {
+        complianceAlurKoordinasiPct: compliance.complianceAlurKoordinasi,
+        bypassViolations30d: compliance.zeroBypassViolations30d,
+        auditEvents30d: compliance.totalTransaksi30d,
+      },
+      tasks: {
+        overdue: tasksOverdue,
+        openPipeline: tasksOpenPipeline,
+        closedLast30d: tasksClosed30d,
+        createdLast30d: tasksCreated30d,
+        completionRate30dPct,
+      },
+      workflow: {
+        avgApprovalTimeHours:
+          avgApprovalHours !== null ? parseFloat(avgApprovalHours) : null,
+      },
+      generatedAt: new Date().toISOString(),
+    };
+
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil ringkasan Super Admin",
+      error: error.message,
+    });
+  }
+};
 
 // ── CONTROLLER: GET /api/dashboard/sekretaris/summary ────────────────────────
 export const getSekretarisSummary = async (req, res) => {

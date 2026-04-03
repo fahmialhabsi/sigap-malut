@@ -1,0 +1,226 @@
+kategori_risiko,nama_risiko,klasifikasi_unit
+"Risiko Fraud","pencurian uang kas di bendahara",Sekretariat
+"Risiko Operasional","Bendahara salah transfer",Sekretariat
+"Risiko Fraud","Pegawai Memanipulasi Dokumen Hasil Tindak Lanjut Pengawasan",Sekretariat
+"Risiko Stakeholder","Terjadinya kondisi makro yang berpengaruh buruk pada kemampuan badan usaha menghasilkan pendapatan",Sekretariat
+"Risiko Operasional","Tidak tersedianya sarana transportasi yang memadai menuju lokasi pengawasan",Sekretariat
+"Risiko Operasional","Tampilan Laporan tidak menarik",Sekretariat
+"Risiko Kepatuhan","Inovasi SPBE tidak melalui pengajuan dan persetujuan Pusinfowas",Sekretariat
+"Risiko Fraud","Arsip penting dihilangkan secara sengaja",Sekretariat
+"Risiko Fraud","Pegawai membocorkan data/infromasi kepada pihak luar",Sekretariat
+"Risiko Fraud","Pengadaan Fiktif",Sekretariat
+"Risiko Fraud","Plagiarisme dalam materi modul diklat",Sekretariat
+"Risiko Fraud","Konflik kepentingan dalam pemilihan WI/pengajar diklat",Sekretariat
+"Risiko Fraud","Panitia Diklat sengaja menetapkan calon peserta yang tidak memenuhi syarat sebagai peserta diklat",Sekretariat
+"Risiko Fraud","Penetapan WI/Pengajar Diklat yang tidak sesuai ketentuan",Sekretariat
+"Risiko Fraud","Pemilihan vendor/hotel sebagai lokasi diklat dengan motif imbalan atau bonus menginap dari pihak vendor/hotel",Sekretariat
+"Risiko Fraud","Peserta diklat mencontek pada saat ujian/pretest/postest",Sekretariat
+"Risiko Fraud","Panitia diklat membocorkan naskah ujian kepada peserta diklat",Sekretariat
+"Risiko Fraud","Panitia diklat menjual naskah ujian sertifikasi kepada peserta diklat",Sekretariat
+"Risiko Fraud","Kecurangan dalam penetapan kelulusan ujian sertfikasi",Sekretariat
+"Risiko Fraud","Panitia diklat tidak meluluskan peserta diklat karena konflik kepentingan",Sekretariat
+"Risiko Fraud","Tim Penilai Kinerja menerima gratifikasi",Sekretariat
+"Risiko Fraud","Memalsukan data koordinat saat menggunakan aplikasi presensi",Sekretariat
+"Risiko Fraud","Penyajian laporan lebih tinggi dari seharusnya (Overstatement)",Sekretariat
+"Risiko Fraud","Tim penyusun kebijakan nasional pengawasan intern terlibat konfilk kepentingan dengan pemangku kepentingan",Sekretariat
+"Risiko Fraud","Manipulasi Hasil Rakornaswasin",Sekretariat
+"Risiko Fraud","Penyalahgunaan Informasi Rakornaswasin",Sekretariat
+"Risiko Fraud","Pegawai menyembunyikan informasi penting atas permintaan penugasan",Sekretariat
+"Risiko Fraud","Manipulasi dalam penentuan tim penugasan",Sekretariat
+"Risiko Fraud","Manipulasi anggaran penugasan",Sekretariat
+"Risiko Fraud","Manipulasi Program Kerja Pengawasan",Sekretariat
+"Risiko Fraud","Pegawai menyusun ST fiktif",Sekretariat
+"Risiko Fraud","Penggelembungan Biaya Penugasan",Sekretariat
+"Risiko Fraud","Pegawai melakukan tindak pidana korupsi",Sekretariat
+"Risiko Fraud","Pegawai terlibat praktik kolusi dengan mitra kerja",Sekretariat
+"Risiko Fraud","Pegawai melakukan praktitk nepotisme",Sekretariat
+"Risiko Fraud","Pegawai Memalsukan dokumen bukti dukung penugasan pengawasan",Sekretariat
+"Risiko Fraud","Manipulasi Data Dukung Pengawasan",Sekretariat
+"Risiko Fraud","Pegawai terlibat praktik KKN dengan mitra kerja",Sekretariat
+"Risiko Fraud","Pegawai memalsukan dokumen JFA",Sekretariat
+"Risiko Fraud","Manipulasi Database JFA",Sekretariat
+"Risiko Fraud","Penyalahgunaan akses data sistem informasi",Sekretariat
+"Risiko Fraud","Pegawai menyalahgunaan Dana Pelatihan/sertifikasi",Sekretariat
+"Risiko Fraud","Panitia memanipulasi Data Calon Peserta Pelatihan/sertifikasi",Sekretariat
+"Risiko Fraud","Calon peserta sertifikasi memanipulasi data persyaratan",Sekretariat
+"Risiko Fraud","Pegawai memalsukan hasil temuan pengawasan",Sekretariat
+"Risiko Fraud","Penghilangan informasi penting hasil pengawasan",Sekretariat
+"Risiko Fraud","Pegawai memalsukan tanda tangan pimpinan / pejabat / pegawai yang berwenang",Sekretariat
+"Risiko Fraud","Manipulasi data hasil pengawasan",Sekretariat
+"Risiko Fraud","Pemalsuan data pada aplikasi",Sekretariat
+"Risiko Fraud","Pemalsuan Informasi",Sekretariat
+"Risiko Fraud","Pemalusuan Konten Informasi Digital",Sekretariat
+"Risiko Fraud","Pemalsuan Press Conference / press release",Sekretariat
+"Risiko Fraud","Pemalsuan Identitas",Sekretariat
+"Risiko Fraud","Analisis isu tidak jujur dan sesuai fakta",Sekretariat
+"Risiko Fraud","Penilaian Risiko atas Isu tidak Objektif",Sekretariat
+"Risiko Fraud","Pegawai melakukan pemerasan",Sekretariat
+"Risiko Fraud","Penyalahgunaann Informasi Rahasia",Sekretariat
+"Risiko Fraud","Pemalsuan permintaan informasi publik",Sekretariat
+"Risiko Fraud","Penyalahgunaan data informasi publik",Sekretariat
+"Risiko Fraud","Pemalsuan informasi PUblik",Sekretariat
+"Risiko Fraud","Pegawai memalsukan rencana publikasi",Sekretariat
+"Risiko Fraud","Pegawai mempublikasi Informasi Palsu atau Tidak Akurat",Sekretariat
+"Risiko Fraud","Pegawai tidak bersedia membayar ganti rugi ikatan dinas",Sekretariat
+"Risiko Fraud","Pegawai menerima suap terkait proses revisi anggaran",Sekretariat
+"Risiko Fraud","Pegawai memberikan gratifikasi",Sekretariat
+"Risiko Fraud","Pertanggungjawaban belanja fiktif",Sekretariat
+"Risiko Fraud","Pegawai pengujian tagihan dan verifikasi PPK menerima suap/pelicin",Sekretariat
+"Risiko Fraud","Penyewaan BMN tidak dilaporkan ke Kementerian Keuangan",Sekretariat
+"Risiko Fraud","BMN dikuasai oleh pihak ketiga tanpa adanya pungutan PNBP",Sekretariat
+"Risiko Fraud","Instansi pemberi sewa membantu sebagian pembayaran PNBP rekanan",Sekretariat
+"Risiko Fraud","Pemalsuan Dokumen",Sekretariat
+"Risiko Fraud","Rekayasa laporan keuangan saat pelaksanaan PPIPK",Sekretariat
+"Risiko Fraud","Pemalsuan atribut pengendalian",Sekretariat
+"Risiko Fraud","Prinsip akuntansi yang salah diterapkan secara sengaja",Sekretariat
+"Risiko Fraud","Pembangunan fisik gedung belum rampung namun dilaporkan telah selesai pada akhir tahun",Sekretariat
+"Risiko Fraud","Penggantian uang sewa rumah dinas dari penghuni baru kepada penghuni lama",Sekretariat
+"Risiko Fraud","Kendaraan dinas digunakan tidak sesuai peruntukannya",Sekretariat
+"Risiko Fraud","Pegawai menjual sarana dan prasarana kantor",Sekretariat
+"Risiko Fraud","Dokumen tidak diarsipkan secara sengaja",Sekretariat
+"Risiko Operasional","Keterlambatan respons terhadap isu strategis",Sekretariat
+"Risiko Operasional","Implementasi reward and punishment berdasarkan evaluasi kinerja belum dilaksanakan di unit kerja",Sekretariat
+"Risiko Operasional","Media digital yang diserahkan auditan berada dalam keadaan rusak.",Sekretariat
+"Risiko Operasional","Terjadi kerusakan pada media digital milik auditan ketika proses akuisisi.",Sekretariat
+"Risiko Operasional","Informasi Hasil Pengawasan Terlambat disampaikan",Sekretariat
+"Risiko Operasional","Substansi laporan tidak sesuai dengan pedoman",Sekretariat
+"Risiko Operasional","Pemantauan tindak lanjut terhadap hasil kegiatan Consulting tidak dilaksanakan",Sekretariat
+"Risiko Fraud","Manipulasi Data",Sekretariat
+"Risiko Operasional","Penyerapan anggaran yg tidak memenuhi target setiap triwulan",Sekretariat
+"Risiko Operasional","Deviasi antara rencana penarikan dana dan realisasi setiap triwulan",Sekretariat
+"Risiko Operasional","Terlambatnya penyediaan ATK dan Keperluan perkantoran lainnya",Sekretariat
+"Risiko Operasional","Keterlambatan pembayaran KP/KJ/KGB/Pensiun/Uang Makan/Gaji dan tukin",Sekretariat
+"Risiko Operasional","Double pembayaran untuk penugasan lebih dari satu sumber dana",Sekretariat
+"Risiko Operasional","Tidak terlaksananya program pembinaan JFA yang telah disusun",Sekretariat
+"Risiko Operasional","Terlambatnya penyusunan grand design pembinaan JFA",Sekretariat
+"Risiko Operasional","Tidak terlaksananya kegiatan/program yang bersumber dari pembiayaan Loan",Sekretariat
+"Risiko Operasional","Kegagalan dalam mempertahankan nilai atau hasil sertifikasi ISO",Sekretariat
+"Risiko Operasional","Keterlambatan penyusunan laporan Survei Kepuasan Masyarakat/Layanan",Sekretariat
+"Risiko Operasional","Proses penerbitan nomor keanggotaan AAIPI terlalu lama",Sekretariat
+"Risiko Operasional","Penetapan RMP pengawasan tidak sesuai dengan pertimbangan jadwal unit kerja",Sekretariat
+"Risiko Operasional","APP/APPD belum menjadi indikator kinerja",Sekretariat
+"Risiko Kepatuhan","Area of Improvement (AoI) yang disusun tidak ditindaklanjuti",Sekretariat
+"Risiko Operasional","Area of Improvement (AoI) yang disusun tidak tepat",Sekretariat
+"Risiko Stakeholder","Penilaian responden tidak sesuai dengan keadaan yang sebenarnya",Sekretariat
+"Risiko Operasional","Data kecurangan peserta ujian tidak akurat",Sekretariat
+"Risiko Operasional","Kegiatan consulting (Bimbingan Teknis, Asistensi, dan Sosialisasi) tidak dilaksanakan",Sekretariat
+"Risiko Operasional","Data pendaftaran peserta diklat dalam aplikasi Registrasi Online hilang",Sekretariat
+"Risiko Operasional","Peserta Ujian Melakukan Kecurangan",Sekretariat
+"Risiko Operasional","Keterlambatan penetapan peserta diklat",Sekretariat
+"Risiko Operasional","Barang Milik Negara (BMN) rusak/tidak bisa digunakan/usang",Sekretariat
+"Risiko Operasional","Keterlambatan penerimaan diklat/seminar kit",Sekretariat
+"Risiko Operasional","Pemeliharaan BMN tidak sesuai dengan SOP/Ketentuan",Sekretariat
+"Risiko Operasional","Saran dari tim pendamping kepada saksi/ahli dalam pemberian keterangan pada tahap penyelidikan/penyidikan/persidangan kurang optimal",Sekretariat
+"Risiko Operasional","Data penghasilan pegawai tidak up to date",Sekretariat
+"Risiko Operasional","Kesalahan perhitungan pajak",Sekretariat
+"Risiko Operasional","Pelantikan pegawai terlambat",Sekretariat
+"Risiko Operasional","Data aplikasi kepegawaian tidak update",Sekretariat
+"Risiko Operasional","Persetujuan cuti lambat",Sekretariat
+"Risiko Operasional","Pengelolaan informasi publik tidak dilakukan sesuai SOP",Sekretariat
+"Risiko Operasional","pemrosesan arsip digital tidak tertib",Sekretariat
+"Risiko Operasional","Ketidaktepatan pembayaran uang pindah",Sekretariat
+"Risiko Operasional","Genset tidak berfungsi saat Pemadaman Listrik",Sekretariat
+"Risiko Operasional","Motivasi kerja pegawai menurun",Sekretariat
+"Risiko Operasional","Formasi Pegawai Tidak Sesuai Dengan Beban Kerja",Sekretariat
+"Risiko Operasional","Auditor melakukan lebih dari satu penugasan dalam waktu yang bersamaan",Sekretariat
+"Risiko Operasional","Peraturan BPKP tentang JFA dan SKHK belum memenuhi ekspektasi stakeholders",Sekretariat
+"Risiko Operasional","Pegawai menolak ditugaskan",Sekretariat
+"Risiko Operasional","Proses Bisnis Tidak Relevan dengan Kondisi Organisasi",Sekretariat
+"Risiko Operasional","Jumlah pegawai yang diusulkan tidak sesuai dengan jumlah pegawai yang dibutuhkan",Sekretariat
+"Risiko Fraud","Terdapat praktek KKN dalam tahap verifikasi berkas pelamar",Sekretariat
+"Risiko Operasional","Program Studi pegawai tugas belajar tidak sesuai dengan HCDP",Sekretariat
+"Risiko Operasional","Talenta yang teridentifikasi tidak sesuai dengan realisasi",Sekretariat
+"Risiko Stakeholder","Adanya talent war",Sekretariat
+"Risiko Operasional","Pegawai tugas belajar tidak melaporkan telah selesai kuliah",Sekretariat
+"Risiko Operasional","Pegawai yang telah lulus sertifikasi profesional mengundurkan diri",Sekretariat
+"Risiko Operasional","Tidak ada pegawai yang lulus tahap akhir",Sekretariat
+"Risiko Kepatuhan","Presensi pegawai Dinas Luar Dalam Kota (DLDK) tidak di lokasi tujuan",Sekretariat
+"Risiko Operasional","Ruang server diakses orang yang tidak berkepentingan",Sekretariat
+"Risiko Operasional","Proses pengelolaan kinerja tidak sesuai dengan ketentuan yang berlaku",Sekretariat
+"Risiko Operasional","Kualitas penyelenggaraan pelatihan kurang optimal",Sekretariat
+"Risiko Operasional","Keterlambatan Penerbitan Surat Keputusan (SK) Kenaikan Gaji Berkala",Sekretariat
+"Risiko Operasional","Keterlambatan penerbitan Surat Keputusan (SK) Mutasi Jabatan",Sekretariat
+"Risiko Operasional","Pelaksanaan kegiatan tidak sesuai dengan perencanaan",Sekretariat
+"Risiko Operasional","Keterlambatan penerbitan Surat Keputusan (SK) CPNS",Sekretariat
+"Risiko Operasional","Perencanaan kinerja pegawai tidak melalui dialog kinerja",Sekretariat
+"Risiko Operasional","Pemberian umpan balik atas kinerja pegawai tidak diberikan secara objektif",Sekretariat
+"Risiko Operasional","Implementasi reward and punishment belum dilaksanakan di unit kerja",Sekretariat
+"Risiko Operasional","Database tidak update",Sekretariat
+"Risiko Operasional","Data dukung presensi tidak lengkap (IMEI, mode presensi datang dan pulang)",Sekretariat
+"Risiko Kepatuhan","Application Programming Interface (API) Sistem Informasi/Aplikasi BPKP digunakan oleh pihak yang tidak bertanggung jawab",Sekretariat
+"Risiko Operasional","Pegawai tidak dapat melakukan presensi",Sekretariat
+"Risiko Kepatuhan","Presensi Perjalanan Dinas pegawai tidak sesuai lokasi tujuan",Sekretariat
+"Risiko Kepatuhan","Presensi pegawai menggunakan lokasi palsu, zona waktu palsu, dan/atau Smartphone pegawai lain (titip absen)",Sekretariat
+"Risiko Kebijakan","Analisis kebutuhan talenta tidak sesuai dengan Rencana Strategis BPKP",Sekretariat
+"Risiko Operasional","Data kelulusan Sertifikasi tidak akurat/update",Sekretariat
+"Risiko Kepatuhan","Gagal kontrak pengadaan barang/jasa",Sekretariat
+"Risiko Operasional","Pelatihan tertentu tidak dapat diselenggarakan oleh Penyelenggara Diklat BPKP",Sekretariat
+"Risiko Operasional","Biaya yang dianggarkan untuk penugasan tidak dapat memenuhi kebutuhan yang sebenarnya",Sekretariat
+"Risiko Operasional","Belum terdapat kebijakan/pedoman/SOP Layanan",Sekretariat
+"Risiko Kepatuhan","Laporan keuangan tidak sesuai SAP",Sekretariat
+"Risiko Operasional","Rencana kinerja tidak selaras dengan rencana kegiatan dan anggaran",Sekretariat
+"Risiko Kepatuhan","Keterlambatan Pengumpulan Laporan Keuangan",Sekretariat
+"Risiko Stakeholder","Kurangnya komitmen pimpinan BUMD dalam mencapai Good Corporate Governance (GCG) yang baik",Sekretariat
+"Risiko Stakeholder","Stakeholder tidak dilayani dengan baik",Sekretariat
+"Risiko Operasional","Arsitektur SPBE BPKP tidak selaras dengan Arsitektur SPBE Nasional",Sekretariat
+"Risiko Kebijakan","Peta Rencana SPBE BPKP tidak selaras dengan Peta Rencana SPBE Nasional",Sekretariat
+"Risiko Operasional","Inisiatif strategis TI tidak mengacu pada Arsitektur SPBE BPKP",Sekretariat
+"Risiko Operasional","Inisiatif strategis TI tidak mengacu pada Peta Rencana SPBE BPKP",Sekretariat
+"Risiko Operasional","Pembangunan/pengembangan aplikasi tidak disertai dokumentasi",Sekretariat
+"Risiko Operasional","Pembangunan/Pengembangan aplikasi tidak dilakukan Quality Assurance",Sekretariat
+"Risiko Operasional","Minimnya literasi SPBE",Sekretariat
+"Risiko Operasional","Belanja TIK tidak lolos clearance",Sekretariat
+"Risiko Kebijakan","Belum terdapat kebijakan/pedoman manajemen data",Sekretariat
+"Risiko Kebijakan","Inisiatif strategis BPKP tidak mengacu pada Peta Rencana SPBE Nasional",Sekretariat
+"Risiko Kebijakan","Aturan/kebijakan/pedoman/SOP TI sudah tidak relevan untuk panduan pelaksanaan tugas",Sekretariat
+"Risiko Kebijakan","Pedoman/kebijakan TI yang disusun kurang lengkap",Sekretariat
+"Risiko Kebijakan","Keterlambatan penyusunan aturan/pedoman/kebijakan TI",Sekretariat
+"Risiko Operasional","Fisik dokumen disimpan di Pusat Berkas (central file) rusak",Sekretariat
+"Risiko Operasional","Fisik dokumen yang disimpan di Pusat Arsip (record center) rusak",Sekretariat
+"Risiko Operasional","Naskah dinas masuk tidak diterima oleh penerima yang dituju",Sekretariat
+"Risiko Stakeholder","BUMDes Gagal dalam Menjalankan Proses Bisnis/Usahanya",Sekretariat
+"Risiko Stakeholder","Kurangnya Komitmen Pimpinan untuk Mencapai IEPK Badan Usaha yang Baik",Sekretariat
+"Risiko Stakeholder","Kurangnya Komitmen Pimpinan pada Pemerintah Daerah untuk Mencapai IEPK Level Baik",Sekretariat
+"Risiko Kebijakan","Tidak Adanya Standar Kualitas Layanan Eksternal",Sekretariat
+"Risiko Operasional","Terdapat aset yang tidak ditemukan saat inventarisasi",Sekretariat
+"Risiko Operasional","Penyelenggaraan Manajemen Risiko tidak terdokumentasi dengan baik",Sekretariat
+"Risiko Operasional","Hasil pengawasan tidak menggambarkan kondisi yang sebenarnya",Sekretariat
+"Risiko Fraud","Naskah soal ujian beredar sebelum waktunya",Sekretariat
+"Risiko Fraud","Menggugurkan penawaran <80% dari HPS",Sekretariat
+"Risiko Fraud","Kualitas barang/jasa tidak sesuai dengan spesifikasi teknis/kuantitas pada kontrak",Sekretariat
+"Risiko Fraud","Penggunaan nama dan logo BPKP tanpa ijin",Sekretariat
+"Risiko Fraud","Pegawai menerima gratifikasi",Sekretariat
+"Risiko Kebijakan","Pedoman Pengawasan Sudah Tidak Relevan Untuk Panduan Pelaksanaan Tugas",Sekretariat
+"Risiko Kebijakan","Belum ada kebijakan mengenai standar kompetensi",Sekretariat
+"Risiko Kebijakan","Rencana pengawasan tidak selaras dengan Renstra",Sekretariat
+"Risiko Kebijakan","Perubahan regulasi dari KemenPAN RB",Sekretariat
+"Risiko Kebijakan","Auditor belum mendapatkan pengembangan atau pelatihan sesuai kompetensi yang diharapkan",Sekretariat
+"Risiko Kepatuhan","Pegawai BPKP tidak netral (menjadi simpatisan) partai politik",Sekretariat
+"Risiko Kepatuhan","PegawaI tidak hadir tanpa alasan yang sah",Sekretariat
+"Risiko Kepatuhan","Deviasi realisasi pencairan dana dibandingkan rencana bulanan/disbursement plan",Sekretariat
+"Risiko Kepatuhan","Barang Milik Negara rusak saat dibawa pegawai",Sekretariat
+"Risiko Kepatuhan","Pedoman Pengawasan yang Terbit Tidak Memiliki Penetapan Hukum",Sekretariat
+"Risiko Kepatuhan","Pedoman Non-Pengawasan yang Terbit Tidak Memiliki Penetapan Hukum",Sekretariat
+"Risiko Operasional","Fraud Control Plan (FCP) gagal diterapkan",Sekretariat
+"Risiko Operasional","Ketidaktepatan Pembayaran Tunjangan Kinerja",Sekretariat
+"Risiko Operasional","Lambatnya pelaksanaan revisi anggaran",Sekretariat
+"Risiko Operasional","Respon terhadap permintaan layanan belum memenuhi kebutuhan pengguna",Sekretariat
+"Risiko Operasional","Terkendalanya koordinasi lintas unit kerja",Sekretariat
+"Risiko Operasional","PKAU tidak selaras dengan Kerangka Acuan Pengawasan (KAP)",Sekretariat
+"Risiko Operasional","Stakeholder tidak memperoleh pemahaman yang memadai terkait lingkup dan tujuan penugasan",Sekretariat
+"Risiko Operasional","Pedoman Non-Pengawasan Terlambat Terbit",Sekretariat
+"Risiko Operasional","Pedoman Non-Pengawasan Sudah Tidak Relevan Untuk Panduan Pelaksanaan Tugas",Sekretariat
+"Risiko Operasional","SOP Non-Pengawasan Sudah Tidak Relevan Untuk Panduan Pelaksanaan Tugas",Sekretariat
+"Risiko Operasional","SOP Non-Pengawasan Terlambat Terbit",Sekretariat
+"Risiko Operasional","Pedoman Non-Pengawasan Memiliki Mutu di Bawah Ekspektasi",Sekretariat
+"Risiko Operasional","SOP Non-Pengawasan Memiliki Mutu di Bawah Ekspektasi",Sekretariat
+"Risiko Operasional","SOP Pengawasan Sudah Tidak Relevan Untuk Panduan Pelaksanaan Tugas",Sekretariat
+"Risiko Operasional","SOP Pengawasan Memiliki Mutu di Bawah Ekspektasi",Sekretariat
+"Risiko Operasional","SOP Pengawasan Terlambat Terbit",Sekretariat
+"Risiko Operasional","Penerbitan Rekomendasi Pengangkatan ke dalam JFA melebihi batas waktu yang ditentukan",Sekretariat
+"Risiko Operasional","Penetapan Angka Kredit (PAK) lambat tersusun",Sekretariat
+"Risiko Operasional","Turunnya tingkat akurasi Penetapan Angka Kredit (PAK)",Sekretariat
+"Risiko Operasional","Pegawai mengalami kecelakaan kerja saat penugasan",Sekretariat
+"Risiko Operasional","RTP (Rencana Tindak Pengendalian) tidak dapat menyelesaikan penyebab hakiki timbulnya risiko",Sekretariat
+"Risiko Operasional","Kejadian risiko tidak diinput ke dalam aplikasi",Sekretariat
+"Risiko Operasional","Kejadian risiko yang diinput ke dalam aplikasi tidak valid",Sekretariat
