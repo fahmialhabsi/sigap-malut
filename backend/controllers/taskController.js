@@ -92,6 +92,16 @@ const upload = multer({
 })();
 
 // ─── State machine ───────────────────────────────────────────────────────────
+// Role aliases: DB canonical = kasubag_umum_kepegawaian (1 b).
+// Legacy code used kasubbag (2 b). Both are listed for backward compat.
+const KASUBAG_ROLES = [
+  "kasubag_umum_kepegawaian", // canonical (DB)
+  "kasubbag",                  // legacy alias
+  "kasubbag_umum",             // legacy alias
+  "kasubbag_kepegawaian",      // legacy alias
+  "kasubag",                   // generic alias
+];
+
 const TRANSITIONS = {
   assign: {
     // `accepted`: penanggung jawab sudah terima; masih boleh delegasi ke bawah
@@ -101,27 +111,30 @@ const TRANSITIONS = {
     roles: [
       "sekretaris",
       "kepala_bidang",
-      "kasubbag",
-      "kasubbag_umum",
-      "kasubbag_kepegawaian",
-      "kasubag_umum_kepegawaian",
-      "kasubag",
+      ...KASUBAG_ROLES,
       "super_admin",
     ],
   },
   accept: { from: ["assigned"], to: "accepted", roles: null },
   reject_assignment: { from: ["assigned"], to: "draft", roles: null },
-  start: { from: ["accepted"], to: "in_progress", roles: null },
+  // start: normal path (accepted) + resume path (returned_to_pelaksana)
+  start: {
+    from: ["accepted", "returned_to_pelaksana"],
+    to: "in_progress",
+    roles: null,
+  },
   submit: {
-    from: ["in_progress"],
+    // Also accepts returned_to_pelaksana so pelaksana can re-submit after revision
+    // without manually clicking "mulai" again (minor correction UX path).
+    from: ["in_progress", "returned_to_pelaksana"],
     to: "submitted",
     roles: [
       "pelaksana",
+      "pelaksana_sekretariat",
       "bendahara",
       "fungsional",
       "fungsional_analis",
-      "kasubbag",
-      "kasubbag_umum",
+      ...KASUBAG_ROLES,
       "super_admin",
     ],
   },
@@ -132,19 +145,22 @@ const TRANSITIONS = {
       "fungsional",
       "fungsional_analis",
       "kepala_bidang",
-      "kasubbag",
+      ...KASUBAG_ROLES,
       "sekretaris",
       "super_admin",
     ],
   },
   verify_reject: {
+    // Kasubag/JF mengembalikan ke pelaksana dengan catatan perbaikan.
+    // Menggunakan status dedicated `returned_to_pelaksana` (bukan langsung in_progress)
+    // agar pelaksana tahu ada catatan yang harus dibaca sebelum melanjutkan.
     from: ["submitted"],
-    to: "in_progress",
+    to: "returned_to_pelaksana",
     roles: [
       "fungsional",
       "fungsional_analis",
       "kepala_bidang",
-      "kasubbag",
+      ...KASUBAG_ROLES,
       "sekretaris",
       "super_admin",
     ],
@@ -165,11 +181,13 @@ const TRANSITIONS = {
     roles: ["sekretaris", "super_admin"],
   },
   close: {
+    // SECURITY: hanya boleh close setelah melalui jalur approval sekretaris.
+    // `submitted` dihapus dari sini untuk mencegah bypass mandatory verification.
+    // `verified` dipertahankan untuk kasus darurat (Sekretaris approve verbal + langsung tutup).
     from: [
       "approved_by_secretary",
       "forwarded_to_kadin",
       "verified",
-      "submitted",
     ],
     to: "closed",
     roles: ["sekretaris", "kepala_dinas", "super_admin"],
@@ -182,6 +200,7 @@ const TRANSITIONS = {
       "in_progress",
       "submitted",
       "verified",
+      "returned_to_pelaksana",
     ],
     to: "rejected",
     roles: ["sekretaris", "kepala_bidang", "kepala_uptd", "super_admin"],
@@ -194,6 +213,7 @@ const TRANSITIONS = {
       "in_progress",
       "submitted",
       "verified",
+      "returned_to_pelaksana",
     ],
     to: "escalated",
     roles: ["sekretaris", "kepala_bidang", "kepala_uptd", "super_admin"],

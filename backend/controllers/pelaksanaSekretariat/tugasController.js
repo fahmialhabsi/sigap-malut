@@ -46,8 +46,16 @@ export async function listTugasSaya(req, res) {
     const status = String(req.query.status || "aktif").toLowerCase(); // aktif|selesai|semua|dikembalikan
 
     if (status === "dikembalikan") {
-      const rows = await loadMyAssignments(userId, ["assigned", "accepted", "in_progress"], limit);
-      const returned = rows.filter((t) => t.status === "returned_to_pelaksana" || t.status === "rejected");
+      // Semua assignment aktif — lalu filter task yang di-return
+      const rows = await loadMyAssignments(
+        userId,
+        ["assigned", "accepted", "in_progress"],
+        limit,
+      );
+      const returned = rows.filter(
+        (t) =>
+          t.status === "returned_to_pelaksana" || t.status === "rejected",
+      );
       return res.json({ success: true, data: returned, total: returned.length });
     }
 
@@ -99,7 +107,9 @@ export async function mulaiTugas(req, res) {
 
     const t = await Task.findByPk(taskId);
     if (!t) return res.status(404).json({ success: false, message: "Task tidak ditemukan" });
-    if (!["accepted", "assigned"].includes(t.status)) {
+    // returned_to_pelaksana diizinkan agar pelaksana dapat melanjutkan pekerjaan
+    // setelah membaca catatan perbaikan dari Kasubag/JF.
+    if (!["accepted", "assigned", "returned_to_pelaksana"].includes(t.status)) {
       return res.status(400).json({ success: false, message: "Task tidak bisa dimulai pada status ini" });
     }
     t.status = "in_progress";
@@ -115,18 +125,49 @@ export async function submitHasil(req, res) {
     const userId = req.user?.id;
     const taskId = parseInt(req.params.id, 10);
     const { output_ringkas, output_url } = req.body || {};
+
+    // ── Validation (canonical: sama dengan POST /api/tasks/:id/submit) ─────────
+    const ringkas = String(output_ringkas || "").trim();
+    if (ringkas.length < 50) {
+      return res.status(400).json({
+        success: false,
+        code: "OUTPUT_TOO_SHORT",
+        message: "Ringkasan hasil wajib diisi minimal 50 karakter sebelum dikirim ke atasan.",
+      });
+    }
+
     const a = await TaskAssignment.findOne({ where: { task_id: taskId, assignee_user_id: userId } });
     if (!a) return res.status(404).json({ success: false, message: "Assignment tidak ditemukan" });
 
     const t = await Task.findByPk(taskId);
     if (!t) return res.status(404).json({ success: false, message: "Task tidak ditemukan" });
 
+    // ── Status check: hanya in_progress atau returned_to_pelaksana ───────────
+    const VALID_FROM = ["in_progress", "returned_to_pelaksana"];
+    if (!VALID_FROM.includes(t.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Task tidak dapat disubmit dari status '${t.status}'. Pastikan tugas sedang berjalan atau dikembalikan untuk revisi.`,
+      });
+    }
+
+    // ── URL wajib untuk tugas kepegawaian / ASN ──────────────────────────────
+    const modul = String(t.module || t.modul_id || "").toLowerCase();
+    const isAsnTask = ["kepegawaian", "asn", "kgb", "absensi"].some((k) => modul.includes(k));
+    if (isAsnTask && !String(output_url || "").trim()) {
+      return res.status(400).json({
+        success: false,
+        code: "OUTPUT_URL_REQUIRED",
+        message: "Tugas kepegawaian/ASN wajib menyertakan tautan dokumen pendukung (output_url).",
+      });
+    }
+
     t.status = "submitted";
     t.metadata = {
       ...(t.metadata || {}),
       pelaksana_submit: {
-        output_ringkas: output_ringkas || null,
-        output_url: output_url || null,
+        output_ringkas: ringkas,
+        output_url: String(output_url || "").trim() || null,
         submitted_at: new Date().toISOString(),
         submitted_by: userId,
       },
