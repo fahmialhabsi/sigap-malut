@@ -1,4 +1,4 @@
-# 38 — Pedoman Mekanisme SPJ: Mandiri dan Delegasi Pembuatan Dokumen
+# 41 — Pedoman Mekanisme SPJ: Mandiri dan Delegasi Pembuatan Dokumen
 ## Sistem SIGAP-MALUT — Dinas Pangan Provinsi Maluku Utara
 
 **Versi:** 1.0

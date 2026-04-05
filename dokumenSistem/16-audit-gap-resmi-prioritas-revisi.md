@@ -14,12 +14,12 @@ Dokumen ini juga menyelaraskan kebutuhan integrasi e-Pelara, terutama untuk peng
 
 Temuan utama diambil dari:
 
-- 01-kondisi-dinas-pangan.md
-- 12-IT-Governance-SPBE-SPIP-Alignment.md
-- 13-System-Architecture-Document.md
-- openapi.yaml
-- 14-Role-Service-Requirements-Matrix.md
-- 15-e-pelara-integration-guide-for-sigap-malut.md
+- `01-profil-dan-kondisi-dinas-pangan.md`
+- `12-tata-kelola-it-spbe-spip.md`
+- `13-arsitektur-sistem.md`
+- `openapi.yaml`
+- `14b-matriks-kebutuhan-layanan-per-role.md`
+- `15-panduan-integrasi-e-pelara-ke-sigap.md`
 
 ## 3. Ringkasan Gap Kritis
 
@@ -35,7 +35,7 @@ Temuan utama diambil dari:
 
 ## 4. Kesesuaian Terhadap Masalah Inti Dinas
 
-Mengacu masalah inti pada 01-kondisi-dinas-pangan.md:
+Mengacu masalah inti pada `01-profil-dan-kondisi-dinas-pangan.md`:
 
 - Peran sekretariat: sebagian besar sudah dipetakan, tetapi butuh enforcement teknis dan audit kontrol.
 - Perencanaan: belum cukup detail pada aturan data-driven planning, linkage RPJMD/RPJPD, dan sinkronisasi lintas OPD.
@@ -71,12 +71,12 @@ Mengacu masalah inti pada 01-kondisi-dinas-pangan.md:
 
 | Dokumen                           | Aksi                                     | Owner Rekomendasi          | Target   |
 | --------------------------------- | ---------------------------------------- | -------------------------- | -------- |
-| 17-Keamanan-Informasi-Lengkap.md  | Tambah dan jadikan acuan utama keamanan  | Security + BE Lead         | Minggu 1 |
-| 18-Deployment-Production-Guide.md | Tambah dan jadikan standar rilis         | DevOps + BE Lead           | Minggu 1 |
-| 19-Operations-Runbook.md          | Tambah dan jadikan SOP operasional       | Ops/SRE + QA               | Minggu 2 |
-| 20-Testing-Strategy.md            | Tambah dan jadikan quality gate          | QA Lead + Squad Lead       | Minggu 2 |
-| 21-Compliance-Matrix-SPBE-SPIP.md | Tambah dan jadikan matriks audit bukti   | PMO/QA/Inspektorat liaison | Minggu 2 |
-| openapi.yaml                      | Lengkapi endpoint prioritas lintas modul | BE/API Team                | Minggu 2 |
+| `17-keamanan-informasi-operasional.md`  | Tambah dan jadikan acuan utama keamanan  | Security + BE Lead         | Minggu 1 |
+| `18-panduan-deployment-production.md` | Tambah dan jadikan standar rilis         | DevOps + BE Lead           | Minggu 1 |
+| `19-runbook-operasional-dan-sop.md`          | Tambah dan jadikan SOP operasional       | Ops/SRE + QA               | Minggu 2 |
+| `20-strategi-testing-dan-quality-gate.md`            | Tambah dan jadikan quality gate          | QA Lead + Squad Lead       | Minggu 2 |
+| `21-matriks-kepatuhan-spbe-spip.md` | Tambah dan jadikan matriks audit bukti   | PMO/QA/Inspektorat liaison | Minggu 2 |
+| `openapi.yaml`                      | Lengkapi endpoint prioritas lintas modul | BE/API Team                | Minggu 2 |
 
 ## 7. Gate Keberhasilan Revisi Dokumen
 

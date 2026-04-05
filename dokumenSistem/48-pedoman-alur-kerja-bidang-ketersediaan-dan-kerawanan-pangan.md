@@ -1,4 +1,4 @@
-# 39 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
+# 48 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
 ## Bidang Ketersediaan dan Kerawanan Pangan — Dinas Pangan Provinsi Maluku Utara
 
 **Versi:** 1.0

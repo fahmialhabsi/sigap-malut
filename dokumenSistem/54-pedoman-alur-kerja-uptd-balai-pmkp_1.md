@@ -1,4 +1,4 @@
-# 42 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
+# 54 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
 ## UPTD Balai Pengawasan Mutu dan Keamanan Pangan — Dinas Pangan Provinsi Maluku Utara
 
 **Versi:** 1.0

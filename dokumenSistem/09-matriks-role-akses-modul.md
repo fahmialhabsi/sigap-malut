@@ -1,4 +1,4 @@
-# 07-Role-Module-Matrix
+# 09 — Matriks Role Akses Modul SIGAP-MALUT
 
 > **CATATAN REVISI (22 Maret 2026):** Matriks ini diperbarui untuk mencakup seluruh 15 role yang telah dikunci pada dokumen 33. Sebelumnya hanya mendefinisikan 5 role — banyak role kritikal yang belum terdefinisi.
 

@@ -1,4 +1,4 @@
-# 40 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
+# 50 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
 ## Bidang Distribusi dan Cadangan Pangan — Dinas Pangan Provinsi Maluku Utara
 
 **Versi:** 1.0

@@ -1,4 +1,4 @@
-# 37 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
+# 45 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
 ## Sekretariat Dinas Pangan Provinsi Maluku Utara dalam Sistem SIGAP-MALUT
 
 **Versi:** 1.0

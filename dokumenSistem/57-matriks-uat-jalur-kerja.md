@@ -32,7 +32,7 @@
 | A-05 | Kasubag terima + assign Pelaksana | Kasubag | POST accept → POST assign ke Pelaksana | HTTP 200, Pelaksana dapat tugas | Sesuai | Ada | Tim Saya | PASS (API) | |
 | A-06 | Pelaksana accept, mulai, submit | Pelaksana | POST accept → start → submit | Status: in_progress → submitted | Sesuai | Ada | Kanban | PASS (API) | |
 | A-07 | Kasubag verifikasi berkas | Kasubag | POST verifikasi/:id/ok | Status: verified | Sesuai | Ada | Badge berkurang | | Belum diuji manual; perlu cek setelah CL-004 |
-| A-08 | Sekretaris setujui verified | Sekretaris | Panel "Perlu Persetujuan" → setujui | Status: approved_by_secretary | Sesuai | Ada | — | ⛔ BELUM ADA | BL-001: endpoint dan UI belum dibuat |
+| A-08 | Sekretaris setujui verified | Sekretaris | Panel "Perlu Persetujuan" → setujui | Status: approved_by_secretary | Sesuai | Ada | — | PASS (BL-001 FIXED) | Endpoint `GET /api/sekretaris/tugas-terverifikasi` + komponen `ReviewTugasVerifiedPanel.jsx` telah diimplementasi; diverifikasi via pilot-hardening-report.md |
 
 ## 3. Bidang (Ketersediaan / Distribusi / Konsumsi)
 
