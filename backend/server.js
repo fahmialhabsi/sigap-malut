@@ -21,7 +21,9 @@ import "./models/SpipRtp.js";
 import "./models/SpipMonitoring.js";
 import "./models/SpipEvidenceLink.js";
 import "./models/Task.js";
+import "./models/TaskDiscussion.js";
 import "./models/InstruksiGubernur.js";
+import "./models/InstruksiTindakLanjutPesan.js";
 import { registerExecutionThreadHooks } from "./services/executionThreadHooks.js";
 import { registerOperationalExecutionThreadHooks } from "./services/operationalExecutionThreadHooks.js";
 registerExecutionThreadHooks();
@@ -38,6 +40,7 @@ import dashboardRoutes from "./routes/dashboard.js";
 import inflasiRoutes from "./routes/inflasi.js";
 import komoditasStockRoutes from "./routes/komoditasStock.js";
 import taskRoutes from "./routes/tasks.js";
+import taskDiscussionRoutes from "./routes/taskDiscussion.js";
 import suratRoutes from "./routes/surat.js";
 import notificationRoutes from "./routes/notification.js";
 import mfaRoutes from "./routes/mfa.js";
@@ -59,6 +62,7 @@ import { existsSync, mkdirSync } from "fs";
 import http from "http";
 import helmet from "helmet";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 import winston from "winston";
 import express from "express";
@@ -139,6 +143,42 @@ app.use(
     credentials: true,
   }),
 );
+
+// ── Rate Limiting (BL-011) ────────────────────────────────────────────────────
+// Auth endpoints: strict limit (brute force prevention)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.NODE_ENV === "production" ? 20 : 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Terlalu banyak percobaan. Coba lagi dalam 15 menit." },
+  skipSuccessfulRequests: true,
+});
+
+// Submit task: prevent flooding
+const submitLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: process.env.NODE_ENV === "production" ? 10 : 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Terlalu banyak submit. Tunggu sebentar." },
+});
+
+// General API limiter
+const generalApiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: process.env.NODE_ENV === "production" ? 300 : 5000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Terlalu banyak permintaan. Coba lagi nanti." },
+  skip: (req) => req.path === "/health" || req.path === "/metrics",
+});
+
+app.use("/api/auth", authLimiter);
+app.use("/api/tasks/:id/submit", submitLimiter);
+app.use("/api", generalApiLimiter);
+// ─────────────────────────────────────────────────────────────────────────────
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -163,6 +203,14 @@ app.use(
   "/master-data",
   express.static(path.join(__dirname, "..", "master-data")),
 );
+
+const uploadsDir = path.join(__dirname, "uploads");
+try {
+  if (!existsSync(uploadsDir)) mkdirSync(uploadsDir, { recursive: true });
+} catch {
+  /* ignore */
+}
+app.use("/uploads", express.static(uploadsDir));
 
 /** Health ringan (LB) — default. Tambah ?deep=1 untuk DB + Redis. */
 app.get("/health", async (req, res) => {
@@ -221,6 +269,7 @@ app.use("/api/bks-evl", bksEvlRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/inflasi", inflasiRoutes);
 app.use("/api/komoditas", komoditasStockRoutes);
+app.use("/api/tasks", taskDiscussionRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/surat", suratRoutes);
 app.use("/api/notifications", notificationRoutes);
@@ -984,8 +1033,64 @@ async function ensureAuditLogArchiveTable() {
   }
 }
 
+/** Diskusi antarpejabat per tugas — selaras model TaskDiscussion (paranoid) */
+async function ensureTaskDiscussionsTable() {
+  try {
+    const dialect = sequelize.getDialect?.() || process.env.DB_DIALECT || "";
+    const isPg = String(dialect).toLowerCase().includes("postgres");
+    if (isPg) {
+      await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS task_discussions (
+          id SERIAL PRIMARY KEY,
+          task_id INTEGER NOT NULL,
+          pengirim_id INTEGER NOT NULL,
+          penerima_id INTEGER NOT NULL,
+          pesan TEXT NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+          deleted_at TIMESTAMPTZ NULL
+        );
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS idx_task_discussions_task_id ON task_discussions (task_id);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS idx_task_discussions_pengirim_id ON task_discussions (pengirim_id);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS idx_task_discussions_penerima_id ON task_discussions (penerima_id);
+      `);
+    } else {
+      await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS task_discussions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          task_id INTEGER NOT NULL,
+          pengirim_id INTEGER NOT NULL,
+          penerima_id INTEGER NOT NULL,
+          pesan TEXT NOT NULL,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          deleted_at DATETIME NULL
+        );
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS idx_task_discussions_task_id ON task_discussions (task_id);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS idx_task_discussions_pengirim_id ON task_discussions (pengirim_id);
+      `);
+      await sequelize.query(`
+        CREATE INDEX IF NOT EXISTS idx_task_discussions_penerima_id ON task_discussions (penerima_id);
+      `);
+    }
+  } catch (e) {
+    console.warn("[ensureTaskDiscussionsTable] skipped:", e?.message || e);
+  }
+}
+
 await ensureJfSekretariatTables();
 await ensureAuditLogArchiveTable();
+await ensureTaskDiscussionsTable();
 app.use("/api/bypassdetection", bypassDetectionRoutes);
 app.use("/api/sub-kegiatan-usul", subKegiatanUsulRoutes);
 app.use("/api/uptd-ops", uptdOpsRoutes);

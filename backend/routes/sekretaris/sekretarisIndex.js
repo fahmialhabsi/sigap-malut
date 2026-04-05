@@ -8,6 +8,7 @@ import bypassRoutes from "./bypassRoutes.js";
 import kinerjaRoutes from "./kinerjaRoutes.js";
 import konsolidasiRoutes from "./konsolidasiRoutes.js";
 import pengajuanKadinRoutes from "./pengajuanKadinRoutes.js";
+import { listTugasVerified } from "../../controllers/sekretaris/tugasVerifiedController.js";
 
 const router = express.Router();
 
@@ -22,5 +23,8 @@ router.use("/perintah", perintahRoutes);
 router.use("/bypass", bypassRoutes);
 router.use("/kinerja", kinerjaRoutes);
 router.use("/konsolidasi", konsolidasiRoutes);
+
+// BL-001: tugas yang sudah diverifikasi Kasubag → menunggu review Sekretaris
+router.get("/tugas-terverifikasi", listTugasVerified);
 
 export default router;

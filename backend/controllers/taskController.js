@@ -94,7 +94,9 @@ const upload = multer({
 // ─── State machine ───────────────────────────────────────────────────────────
 const TRANSITIONS = {
   assign: {
-    from: ["draft", "assigned"],
+    // `accepted`: penanggung jawab sudah terima; masih boleh delegasi ke bawah
+    // (status tugas kembali ke `assigned` untuk penerima berikutnya).
+    from: ["draft", "assigned", "accepted"],
     to: "assigned",
     roles: [
       "sekretaris",
@@ -102,6 +104,8 @@ const TRANSITIONS = {
       "kasubbag",
       "kasubbag_umum",
       "kasubbag_kepegawaian",
+      "kasubag_umum_kepegawaian",
+      "kasubag",
       "super_admin",
     ],
   },
@@ -532,7 +536,8 @@ router.get("/:id", async (req, res) => {
 router.post("/:id/assign", async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const { assignee_user_id, assignee_role, note } = req.body;
+    const { assignee_user_id, assignee_role, note, due_date, tanggal_penugasan } =
+      req.body;
     const task = await Task.findByPk(req.params.id, { transaction: t });
     if (!task) {
       await t.rollback();
@@ -612,6 +617,26 @@ router.post("/:id/assign", async (req, res) => {
 
     const old = task.toJSON();
     task.status = to;
+
+    if (due_date != null && String(due_date).trim() !== "") {
+      const d = new Date(due_date);
+      if (!Number.isNaN(d.getTime())) task.due_date = d;
+    }
+
+    const meta = { ...(task.metadata || {}) };
+    const tglRaw =
+      tanggal_penugasan != null && String(tanggal_penugasan).trim() !== ""
+        ? String(tanggal_penugasan).trim()
+        : new Date().toISOString().slice(0, 10);
+    meta.surat_tugas_ke_pelaksana = {
+      ...(meta.surat_tugas_ke_pelaksana || {}),
+      tanggal_penugasan: tglRaw,
+      dicatat_pada: new Date().toISOString(),
+      assigned_by_user_id: uid(req),
+      catatan_kasubag: note ? String(note).slice(0, 2000) : null,
+    };
+    task.metadata = meta;
+
     await task.save({ transaction: t });
 
     const assignment = await TaskAssignment.create(
@@ -781,18 +806,86 @@ router.post(
   })),
 );
 
-router.post(
-  "/:id/submit",
-  transitionHandler(
-    "submit",
-    (req) => req.body.note || null,
-    (task) => ({
-      userId: task.created_by,
-      msg: `Tugas "${task.title}" disubmit untuk diverifikasi`,
-      link: `/tasks/${task.id}`,
-    }),
-  ),
-);
+// POST /api/tasks/:id/submit
+// BL-002 fix: enforce content validation at this layer (not only pelaksanaSekretariat controller).
+// Rationale: preventing bypass via direct API call without UI validation.
+router.post("/:id/submit", async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const task = await Task.findByPk(req.params.id, { transaction: t });
+    if (!task) {
+      await t.rollback();
+      return res.status(404).json({ success: false, message: "Tugas tidak ditemukan" });
+    }
+
+    const { ok, reason, to } = canTransition("submit", task.status, urole(req));
+    if (!ok) {
+      await t.rollback();
+      return res.status(403).json({ success: false, message: reason });
+    }
+
+    // ── Content validation (mirrors pelaksanaSekretariat/tugasController.js) ──
+    const ringkas = String(req.body.output_ringkas || req.body.note || "").trim();
+    if (ringkas.length < 50) {
+      await t.rollback();
+      return res.status(400).json({
+        success: false,
+        code: "OUTPUT_TOO_SHORT",
+        message:
+          "Ringkasan hasil minimal 50 karakter. Jelaskan konkret apa yang sudah disiapkan sesuai perintah.",
+      });
+    }
+
+    const urlStr = String(req.body.output_url || "").trim();
+    const titleNeedUrl = /asn|data\s*asn|kepegawaian/i.test(String(task.title || ""));
+    if (titleNeedUrl && urlStr.length < 8) {
+      await t.rollback();
+      return res.status(400).json({
+        success: false,
+        code: "URL_REQUIRED",
+        message:
+          "Untuk tugas terkait Data ASN/kepegawaian, isi tautan lampiran atau lokasi berkas hasil yang sudah diunggah.",
+      });
+    }
+
+    const old = task.toJSON();
+    task.status = to;
+    task.metadata = {
+      ...(task.metadata || {}),
+      pelaksana_submit: {
+        output_ringkas: ringkas,
+        output_url: urlStr || null,
+        submitted_at: new Date().toISOString(),
+        submitted_by: uid(req),
+      },
+    };
+    await task.save({ transaction: t });
+    await TaskLog.create(
+      {
+        task_id: task.id,
+        actor_id: uid(req),
+        action: "SUBMIT",
+        note: ringkas.slice(0, 500),
+        data_old: old,
+        data_new: task.toJSON(),
+      },
+      { transaction: t },
+    );
+    await t.commit();
+
+    await notifyUser(
+      task.created_by,
+      task.id,
+      `Tugas "${task.title}" disubmit untuk diverifikasi`,
+      `/tasks/${task.id}`,
+    );
+    await writeAudit(task.id, "SUBMIT", old, task.toJSON(), uid(req));
+    return res.json({ success: true, data: task });
+  } catch (err) {
+    await t.rollback();
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // POST /api/tasks/:id/verify
 router.post("/:id/verify", async (req, res) => {
