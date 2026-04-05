@@ -1,4 +1,4 @@
-# 05 — Alur Kerja Perintah/Tugas (Sekretariat, 3 Bidang, UPTD)
+# 14 — Alur Kerja Perintah/Tugas (Sekretariat, 3 Bidang, UPTD)
 
 Versi: 2.0  
 Penulis: Tim SIGAP Malut  
@@ -37,7 +37,8 @@ Ringkasan singkat
 - notifications
   - id, target_pegawai_id, task_id, channel (in_app,email,wa), message, seen, created_at
 - task_statuses (master)
-  - draft, open, in_progress, submitted, verified, approved_by_secretary, forwarded_to_kadin, closed, rejected, escalated
+  - `draft`, `assigned`, `accepted`, `in_progress`, `submitted`, `returned_to_pelaksana`, `verified`, `approved_by_secretary`, `forwarded_to_kadin`, `closed`, `rejected`, `escalated`
+  - **Catatan (v2.2):** `returned_to_pelaksana` adalah status revisi eksplisit. Pelaksana dapat meneruskan ke `in_progress` (via mulai) atau langsung `submitted` (shortcut revisi minor). Status ini memiliki transisi keluar dan tidak dead-end.
 - workflow_rules (optional, for dynamic rules)
   - id, module, from_status, to_status, allowed_roles, requires_approval
 
