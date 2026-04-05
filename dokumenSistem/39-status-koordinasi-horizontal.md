@@ -49,4 +49,6 @@ Sumber kebenaran implementasi: `backend/services/horizontalCoordinationStateMach
 | `HCOORD_FORBIDDEN_ACTOR` | Bukan pihak yang berhak. |
 | `HCOORD_STATUS_INVALID` | Nilai status tidak dikenali. |
 
-OpenAPI: `dokumenSistem/openapi.yaml` (tag **CoordinationHorizontal**). Panduan QA: `horizontal-coordination-qa-uat.md`.
+OpenAPI: `dokumenSistem/openapi.yaml` (tag **CoordinationHorizontal**). Panduan QA: `63-horizontal-coordination-qa-uat.md`.
+
+> **Dokumen terkait:** `40-alur-koordinasi-horizontal.md` (mekanisme alur & policy), `63-horizontal-coordination-qa-uat.md` (QA/UAT), `openapi.yaml` (kontrak API).

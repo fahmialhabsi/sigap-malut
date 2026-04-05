@@ -5,9 +5,13 @@ tanggal: "20 Maret 2026"
 penyusun: "Sekretaris Dinas Pangan Provinsi Maluku Utara"
 status: "Production Standard"
 evidence: true
+nomor_dokumen: "14b"
 ---
 
-# 14 - Role-Based Service Requirements & Compliance Matrix
+# 14b — Role-Based Service Requirements & Compliance Matrix
+
+> **Catatan Dokumen:** Dokumen ini adalah companion dari `14-alur-kerja-sekretariat-bidang-uptd.md` (alur kerja) dan menyediakan matriks persyaratan layanan per role secara detail.  
+> Dokumen terkait: `09-matriks-role-akses-modul.md` (RBAC matrix), `32-rekomendasi-arsitektur-dashboard-per-role.md` (arsitektur dashboard), `33-keputusan-arsitektur-final-dashboard-dan-desain-sistem.md` (keputusan final).
 
 **Dokumen Standar Akses, Layanan, dan Persyaratan untuk Setiap Role dalam SIGAP Malut**
 

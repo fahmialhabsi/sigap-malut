@@ -1,4 +1,6 @@
-# Alur koordinasi horizontal berbasis execution thread
+# 40 — Alur Koordinasi Horizontal Berbasis Execution Thread
+
+> **Dokumen terkait:** `39-status-koordinasi-horizontal.md` (state machine status), `63-horizontal-coordination-qa-uat.md` (QA/UAT), `openapi.yaml` tag `CoordinationHorizontal`, `50.1-alur-koordinasi-bidang-distribusi.md` (contoh implementasi Bidang Distribusi).
 
 ## Prinsip
 
