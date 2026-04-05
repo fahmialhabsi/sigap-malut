@@ -2,6 +2,10 @@
 
 Sistem Informasi Terintegrasi Dinas Pangan Provinsi Maluku Utara.
 
+## Dokumentasi terstruktur
+
+- **Traceability fitur ↔ dokumen:** `dokumenSistem/43-matriks-traceability-fitur-dokumen.md`
+
 ## Struktur
 - backend/
 - frontend/
