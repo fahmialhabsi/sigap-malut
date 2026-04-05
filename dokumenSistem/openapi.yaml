@@ -1573,3 +1573,339 @@ components:
           type: object
           description: Detail transisi (from_status, to_status, allowed_to) bila relevan
           additionalProperties: true
+
+# ==============================================================================
+# ENDPOINT BARU — Ditambahkan v2.2 (BL-001, BL-002, BL-011 fixes)
+# Tanggal sync: 2026-04-05 · Branch: audit/pilot-hardening-release
+# ==============================================================================
+
+  /api/tasks/{id}/submit:
+    post:
+      summary: Submit hasil tugas untuk diverifikasi atasan
+      description: >
+        Pelaksana mengirim hasil tugas ke atasan (Kasubag/Sekretaris) untuk diverifikasi.
+        Status tugas berubah dari `in_progress` → `submitted`.
+
+        **Validasi wajib (BL-002):**
+        - `output_ringkas` minimal 50 karakter
+        - Untuk tugas dengan kata kunci ASN/kepegawaian di judul: `output_url` wajib diisi (min. 8 karakter)
+        - Task harus berstatus `in_progress` (enforced oleh state machine)
+      tags: [Tasks - Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+          description: ID tugas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [output_ringkas]
+              properties:
+                output_ringkas:
+                  type: string
+                  minLength: 50
+                  description: Ringkasan hasil kerja, minimal 50 karakter
+                  example: "Data ASN Dinas Pangan telah direkap sebanyak 45 orang, dipisahkan per golongan I-IV dan sudah diprint."
+                output_url:
+                  type: string
+                  description: >
+                    Tautan lampiran/berkas hasil. Wajib untuk tugas bertajuk ASN/kepegawaian.
+                  example: "https://drive.example.com/file/xyz"
+                note:
+                  type: string
+                  description: Catatan tambahan (opsional)
+      responses:
+        "200":
+          description: Tugas berhasil disubmit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                      status: { type: string, example: submitted }
+                      metadata:
+                        type: object
+                        properties:
+                          pelaksana_submit:
+                            type: object
+                            properties:
+                              output_ringkas: { type: string }
+                              output_url: { type: string, nullable: true }
+                              submitted_at: { type: string, format: date-time }
+                              submitted_by: { type: integer }
+        "400":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: false }
+                  code:
+                    type: string
+                    enum: [OUTPUT_TOO_SHORT, URL_REQUIRED]
+                    description: >
+                      OUTPUT_TOO_SHORT = ringkasan kurang dari 50 karakter.
+                      URL_REQUIRED = tugas ASN/kepegawaian butuh output_url.
+                  message: { type: string }
+        "401":
+          description: Token tidak valid atau tidak ada
+        "403":
+          description: >
+            Role tidak diizinkan submit, atau status tugas bukan `in_progress`
+            (state machine violation)
+        "404":
+          description: Tugas tidak ditemukan
+        "429":
+          description: >
+            Rate limit terlampaui (submit limiter: max 10 req/menit di produksi).
+            Header `Retry-After` tersedia.
+
+  /api/tasks/{id}/review:
+    post:
+      summary: Sekretaris memproses keputusan atas tugas yang sudah diverifikasi
+      description: >
+        Sekretaris (atau super_admin) memutuskan nasib tugas yang sudah berstatus `verified`.
+        Tiga pilihan keputusan:
+        - `approve` → status: `approved_by_secretary`
+        - `back` → status: `in_progress` (kembalikan untuk revisi)
+        - `forward` → status: `forwarded_to_kadin`
+
+        Dicatat di `Approvals` dan `TaskLogs`.
+      tags: [Tasks - Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+          description: ID tugas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision:
+                  type: string
+                  enum: [approve, back, forward]
+                  description: >
+                    approve = setujui (→ approved_by_secretary);
+                    back = kembalikan untuk revisi (→ in_progress);
+                    forward = teruskan ke Kadis (→ forwarded_to_kadin)
+                note:
+                  type: string
+                  description: Catatan keputusan (wajib jika decision = back)
+      responses:
+        "200":
+          description: Keputusan berhasil diproses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                      status:
+                        type: string
+                        enum: [approved_by_secretary, in_progress, forwarded_to_kadin]
+        "403":
+          description: Role bukan sekretaris/super_admin, atau status tugas bukan `verified`
+        "404":
+          description: Tugas tidak ditemukan
+        "401":
+          description: Token tidak valid
+
+  /api/sekretaris/tugas-terverifikasi:
+    get:
+      summary: List tugas yang sudah diverifikasi Kasubag — menunggu keputusan Sekretaris
+      description: >
+        Mengembalikan semua tugas dengan status `verified` yang perlu diproses
+        Sekretaris. Digunakan oleh `ReviewTugasVerifiedPanel.jsx` di Dashboard Sekretaris.
+
+        Hanya dapat diakses oleh role `sekretaris` atau `super_admin`
+        (dijaga oleh `sekretarisGuard` middleware).
+      tags: [Sekretaris - Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 50, maximum: 200 }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        "200":
+          description: List tugas terverifikasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        title: { type: string }
+                        status: { type: string, example: verified }
+                        due_date: { type: string, format: date-time, nullable: true }
+                        source_unit: { type: string, nullable: true }
+                        updated_at: { type: string, format: date-time }
+                        metadata:
+                          type: object
+                          nullable: true
+                          properties:
+                            pelaksana_submit:
+                              type: object
+                              nullable: true
+                              properties:
+                                output_ringkas: { type: string }
+                                output_url: { type: string, nullable: true }
+                                submitted_at: { type: string, format: date-time }
+                        creator:
+                          type: object
+                          nullable: true
+                          properties:
+                            id: { type: integer }
+                            nama_lengkap: { type: string }
+                        assignees:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id: { type: integer }
+                              status: { type: string }
+                              assignee:
+                                type: object
+                                properties:
+                                  id: { type: integer }
+                                  nama_lengkap: { type: string }
+                                  role: { type: string }
+                                  unit_kerja: { type: string, nullable: true }
+                  pagination:
+                    type: object
+                    properties:
+                      page: { type: integer }
+                      limit: { type: integer }
+                      total: { type: integer }
+                      pages: { type: integer }
+        "401":
+          description: Token tidak valid
+        "403":
+          description: Role bukan sekretaris/super_admin
+
+  /api/kasubag/bawahan:
+    get:
+      summary: List staf pelaksana yang dapat menerima penugasan dari Kasubag
+      description: >
+        Mengembalikan daftar staf bawahan langsung (dari `UserHierarchy`) atau
+        fallback ke staf satu `unit_kerja` jika hierarki belum terisi.
+        Field `meta.source` menunjukkan sumber data: `hierarchy` | `same_unit` | `none`.
+      tags: [Kasubag - Penugasan]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List staf
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        nama_lengkap: { type: string }
+                        username: { type: string }
+                        role: { type: string }
+                        unit_kerja: { type: string, nullable: true }
+                  meta:
+                    type: object
+                    properties:
+                      source:
+                        type: string
+                        enum: [hierarchy, same_unit, none]
+                        description: >
+                          hierarchy = dari tabel UserHierarchy;
+                          same_unit = fallback unit_kerja;
+                          none = tidak ada staf ditemukan
+        "401":
+          description: Token tidak valid
+
+  /api/kasubag/verifikasi/{id}/ok:
+    post:
+      summary: Kasubag menyatakan berkas tugas sudah OK (verified)
+      description: >
+        Mengubah status tugas dari `submitted` → `verified`.
+        Dicatat di TaskLogs dan notifikasi dikirim ke pembuat tugas.
+      tags: [Kasubag - Verifikasi]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Verifikasi berhasil
+        "400":
+          description: Status tugas bukan submitted
+        "403":
+          description: Role tidak diizinkan
+        "404":
+          description: Tugas tidak ditemukan
+
+  /api/kasubag/verifikasi/{id}/kembalikan:
+    post:
+      summary: Kasubag mengembalikan berkas tugas ke pelaksana untuk direvisi
+      description: >
+        Mengubah status tugas dari `submitted` → `returned_to_pelaksana`.
+        Body berisi `catatan` alasan pengembalian.
+      tags: [Kasubag - Verifikasi]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                catatan: { type: string, description: Alasan pengembalian }
+      responses:
+        "200":
+          description: Berkas dikembalikan
+        "403":
+          description: Role tidak diizinkan
+        "404":
+          description: Tugas tidak ditemukan

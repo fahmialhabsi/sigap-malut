@@ -132,6 +132,12 @@ app.get("/metrics", async (req, res) => {
 
 app.use("/api/compliance", complianceRoutes);
 
+// Trust proxy: required when deployed behind nginx/load balancer for accurate rate limiting
+// Set to 1 to trust one proxy hop. Disable in local development if not needed.
+if (process.env.TRUST_PROXY === "1" || process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 // Middleware
 app.use(helmet());
 app.use(

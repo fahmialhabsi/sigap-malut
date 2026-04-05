@@ -27,6 +27,9 @@
     "verify:govtech-final": "node scripts/verifyGovtechFinal.mjs",
     "verify:govtech-final:full": "node scripts/runGovtechFinalFull.mjs",
     "verify:bendahara-roles": "node scripts/verifyBendaharaRoles.mjs",
+    "simulasi:api": "node scripts/simulasi-alur-api.mjs",
+    "verify:pilot": "node scripts/verify-pilot-readiness.mjs",
+    "retire:legacy-kadin": "node scripts/postgresRetireLegacyKadin.mjs",
     "migrations:ensure-cjs": "node scripts/rename-migrations-js-to-cjs.mjs",
     "migrations:fix-esm-exports": "node scripts/convert-migrations-esm-to-cjs.mjs"
   },
