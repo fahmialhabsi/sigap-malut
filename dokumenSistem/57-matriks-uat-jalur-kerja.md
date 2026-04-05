@@ -70,6 +70,10 @@
 | N-01 | User tanpa permission memanggil API sek-keu:create | 403 | | Perlu uji manual |
 | N-02 | Koordinasi horizontal tanpa `execution_thread_id` UUID | 400 | PASS (API) | Terverifikasi simulasi 2026-04-04 |
 | N-03 | Dashboard produksi tanpa `VITE_DEMO_DATA` | Tidak menampilkan KPI statis palsu (Sekretaris, Komoditas, Keuangan, Inflasi, Kepegawaian) | | Set `VITE_DEMO_DATA=0` di `.env.production` |
+| N-04 | Close task dari status `verified` langsung | 403 — Transition tidak diizinkan | PASS (v2.6) | `verified` dihapus dari `close.from`; wajib melalui `approved_by_secretary` |
+| N-05 | Submit task tanpa output_ringkas (< 50 char) | 400 `OUTPUT_TOO_SHORT` | PASS (v2.6) | Kedua submit handler memanggil `validateSubmitPayload` dari shared util |
+| N-06 | Submit task modul kepegawaian tanpa output_url | 400 `OUTPUT_URL_REQUIRED` | PASS (v2.6) | Basis check: `task.module` field (bukan title regex) |
+| N-07 | Kirim `{ sekretaris_disetujui: true }` di body ke `requireSekretarisBeforeKadin` | 422 jika task belum `approved_by_secretary` | PASS (v2.6) | Guard query DB, bukan percaya body client |
 
 ---
 
