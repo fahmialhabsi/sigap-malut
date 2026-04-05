@@ -102,16 +102,3 @@ Tanpa evidence lengkap, status kontrol tidak boleh dinyatakan COMPLETE.
 ## 9. Pernyataan Resmi
 
 Dokumen ini menjadi rujukan matriks kepatuhan resmi SIGAP-MALUT untuk pelaksanaan validasi dokumen, quality gate, dan persiapan audit formal lintas domain SPBE/SPIP.
-
----
-
-## 10. Evidence Teknis yang Tersedia — Update 2026-04-05
-
-Dari audit enterprise `audit/dokumen-enterprise-2026-04-05`. Dokumen ini diperbarui dengan pointer ke bukti implementasi nyata.
-
-| Kode | Kontrol | Evidence Tersedia di Codebase | Status Diperbarui |
-|------|---------|-------------------------------|-------------------|
-| CMP-07 | Segregation of duties & workflow approval | `backend/controllers/kasubag/verifikasiQueueController.js` (distinctAssignedTaskIds), state machine `canTransition()` di `taskController.js`, status: draft→assigned→accepted→in_progress→submitted→verified→approved_by_secretary→closed | **PARTIAL** — langkah `approved_by_secretary` di UI belum ada |
-| CMP-08 | Audit trail before-after-user-action | `backend/models/TaskLog.js` (action, metadata, actor), `task.metadata.surat_tugas_ke_pelaksana` (tanggal_penugasan, assignee), `task.metadata.pelaksana_submit` (output_ringkas, output_url, submitted_at) | **PARTIAL** — snapshot before/after belum penuh di semua aksi |
-| CMP-05 | Authn/authz, session, secret | JWT middleware `protect` di semua route, RBAC via `permissionCheck`, `useIdleLogout` 15 menit di frontend | **PARTIAL** — MFA belum terverifikasi flow; rate limiting belum ada |
-| CMP-04 | Kontrak API terversi | `openapi.yaml` ada tapi belum mencakup endpoint baru (kasubag/bawahan, verifikasi, pelaksana submit) | **GAP** |

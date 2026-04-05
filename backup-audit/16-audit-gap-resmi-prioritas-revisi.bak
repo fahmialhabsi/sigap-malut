@@ -100,19 +100,3 @@ Integrasi e-Pelara diposisikan sebagai akselerator untuk menutup gap perencanaan
 ## 9. Pernyataan Resmi
 
 Dokumen ini menjadi baseline resmi untuk prioritas revisi dokumenSistem. Seluruh eksekusi pengembangan dan validasi generator harus merujuk pada baseline ini.
-
----
-
-## 10. Status Penutupan Gap — Update 2026-04-05
-
-Diperbarui dari audit enterprise `audit/dokumen-enterprise-2026-04-05`.
-
-| Kode | Gap Awal | Status Sekarang | Bukti / Catatan |
-|------|----------|-----------------|-----------------|
-| GAP-01 | Keamanan informasi | **Partial-Close** | Dokumen 17 lengkap; kontrol teknis (JWT, RBAC middleware, audit_log) ada di codebase. Residual: rate limiting belum diterapkan → lihat `dev-backlog.md` BL-011 |
-| GAP-02 | Deployment produksi | **Partial-Close** | Dokumen 18 + 60 tersedia; variabel lingkungan, migration guide lengkap. Residual: CI/CD pipeline belum ada → BL-010 |
-| GAP-03 | Operasional dan DR | **Partial-Close** | Dokumen 19 dengan runbook, RTO/RPO, prosedur insiden ada. Residual: belum pernah diuji restore |
-| GAP-04 | Strategi testing | **Partial-Close** | Dokumen 20 ada; simulasi API terverifikasi (dok 59). Residual: coverage target tidak terisi → BL-009 |
-| GAP-05 | Compliance matrix | **Partial-Close** | Dokumen 21 ada dengan 12 kontrol. Residual: semua masih PARTIAL/GAP; tidak ada satu pun COMPLETE |
-| GAP-06 | Kontrak API | **Open** | `openapi.yaml` belum diperbarui untuk endpoint baru (kasubag/bawahan, verifikasi, submit pelaksana) → BL-013 |
-| GAP-07 | Modul perencanaan | **Open** | Integrasi e-Pelara masih pilot; domain perencanaan belum terstruktur setara domain lain |
