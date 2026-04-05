@@ -1,14 +1,4 @@
----
-<<<<<<<< HEAD:dokumenSistem/01-kondisi-dinas-pangan.md
-========
-<<<<<<<< HEAD:dokumenSistem/01-kondisi-dinas-pangan.md
-========
-<<<<<<<< HEAD:dokumenSistem/01-kondisi-dinas-pangan.md
-========
-<<<<<<<< HEAD:dokumenSistem/01-kondisi-dinas-pangan.md
->>>>>>>> main:dokumenSistem/01-profil-dan-kondisi-dinas-pangan.md
->>>>>>>> main:dokumenSistem/01-profil-dan-kondisi-dinas-pangan.md
->>>>>>>> main:dokumenSistem/01-profil-dan-kondisi-dinas-pangan.md
+﻿---
 
 # BAB KHUSUS: SISTEM PENILAIAN KINERJA ASN BERBASIS DIGITAL
 
@@ -55,11 +45,9 @@ Bobot dapat disesuaikan sesuai kebijakan.
 - Dashboard Monitoring
 DOKUMEN KOMPREHENSIF: KONDISI DINAS PANGAN PROVINSI MALUKU UTARA
 
-========
 modul: Sekretariat
 tahun: 2026
 evidence: true
->>>>>>>> main:dokumenSistem/01-profil-dan-kondisi-dinas-pangan.md
 ---
 
 # 01 - Kondisi Dinas Pangan Provinsi Maluku Utara
