@@ -31,7 +31,8 @@
     "verify:pilot": "node scripts/verify-pilot-readiness.mjs",
     "retire:legacy-kadin": "node scripts/postgresRetireLegacyKadin.mjs",
     "migrations:ensure-cjs": "node scripts/rename-migrations-js-to-cjs.mjs",
-    "migrations:fix-esm-exports": "node scripts/convert-migrations-esm-to-cjs.mjs"
+    "migrations:fix-esm-exports": "node scripts/convert-migrations-esm-to-cjs.mjs",
+    "verify:hardening": "node scripts/verify-production-hardening.mjs"
   },
   "dependencies": {
     "axios": "^1.13.6",

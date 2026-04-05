@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import Task from "../../models/Task.js";
 import TaskAssignment from "../../models/TaskAssignment.js";
+import { validateSubmitPayload } from "../../utils/submitValidation.js";
 
 async function loadMyAssignments(userId, statuses, limit) {
   const assignments = await TaskAssignment.findAll({
@@ -126,23 +127,13 @@ export async function submitHasil(req, res) {
     const taskId = parseInt(req.params.id, 10);
     const { output_ringkas, output_url } = req.body || {};
 
-    // ── Validation (canonical: sama dengan POST /api/tasks/:id/submit) ─────────
-    const ringkas = String(output_ringkas || "").trim();
-    if (ringkas.length < 50) {
-      return res.status(400).json({
-        success: false,
-        code: "OUTPUT_TOO_SHORT",
-        message: "Ringkasan hasil wajib diisi minimal 50 karakter sebelum dikirim ke atasan.",
-      });
-    }
-
     const a = await TaskAssignment.findOne({ where: { task_id: taskId, assignee_user_id: userId } });
     if (!a) return res.status(404).json({ success: false, message: "Assignment tidak ditemukan" });
 
     const t = await Task.findByPk(taskId);
     if (!t) return res.status(404).json({ success: false, message: "Task tidak ditemukan" });
 
-    // ── Status check: hanya in_progress atau returned_to_pelaksana ───────────
+    // ── Status check (server-side state — not body) ──────────────────────────
     const VALID_FROM = ["in_progress", "returned_to_pelaksana"];
     if (!VALID_FROM.includes(t.status)) {
       return res.status(400).json({
@@ -151,17 +142,15 @@ export async function submitHasil(req, res) {
       });
     }
 
-    // ── URL wajib untuk tugas kepegawaian / ASN ──────────────────────────────
-    const modul = String(t.module || t.modul_id || "").toLowerCase();
-    const isAsnTask = ["kepegawaian", "asn", "kgb", "absensi"].some((k) => modul.includes(k));
-    if (isAsnTask && !String(output_url || "").trim()) {
-      return res.status(400).json({
-        success: false,
-        code: "OUTPUT_URL_REQUIRED",
-        message: "Tugas kepegawaian/ASN wajib menyertakan tautan dokumen pendukung (output_url).",
-      });
+    // ── Canonical validation via shared util (SINGLE SOURCE OF TRUTH) ────────
+    // Uses submitValidation.js — same function as POST /api/tasks/:id/submit.
+    // URL check: module/modul_id field (NOT title regex).
+    const vResult = validateSubmitPayload(t, output_ringkas, output_url);
+    if (!vResult.ok) {
+      return res.status(400).json({ success: false, code: vResult.code, message: vResult.message });
     }
 
+    const ringkas = String(output_ringkas || "").trim();
     t.status = "submitted";
     t.metadata = {
       ...(t.metadata || {}),

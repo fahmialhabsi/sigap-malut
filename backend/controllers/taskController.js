@@ -13,6 +13,7 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
+import { validateSubmitPayload } from "../utils/submitValidation.js";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
 import fs from "fs";
@@ -181,13 +182,15 @@ const TRANSITIONS = {
     roles: ["sekretaris", "super_admin"],
   },
   close: {
-    // SECURITY: hanya boleh close setelah melalui jalur approval sekretaris.
-    // `submitted` dihapus dari sini untuk mencegah bypass mandatory verification.
-    // `verified` dipertahankan untuk kasus darurat (Sekretaris approve verbal + langsung tutup).
+    // STRICT SECRETARY APPROVAL ENFORCEMENT (v2.6):
+    // `verified` DIHAPUS dari close.from.
+    // Jalur wajib: submitted → verified → approved_by_secretary → closed
+    // Sekretaris TIDAK BOLEH close task langsung dari verified.
+    // Jika butuh force-close, gunakan aksi `reject` + alasan, lalu reopen + close
+    // setelah approval flow dipenuhi. Tidak ada "darurat" path yang diam-diam aktif.
     from: [
       "approved_by_secretary",
       "forwarded_to_kadin",
-      "verified",
     ],
     to: "closed",
     roles: ["sekretaris", "kepala_dinas", "super_admin"],
@@ -844,29 +847,18 @@ router.post("/:id/submit", async (req, res) => {
       return res.status(403).json({ success: false, message: reason });
     }
 
-    // ── Content validation (mirrors pelaksanaSekretariat/tugasController.js) ──
-    const ringkas = String(req.body.output_ringkas || req.body.note || "").trim();
-    if (ringkas.length < 50) {
+    // ── Content validation via shared canonical validator ──────────────────────
+    // Single source of truth: backend/utils/submitValidation.js
+    // Basis URL check: task.module / task.modul_id (NOT title regex — removed in v2.6)
+    const output_ringkas = req.body.output_ringkas || req.body.note;
+    const output_url = req.body.output_url;
+    const vResult = validateSubmitPayload(task, output_ringkas, output_url);
+    if (!vResult.ok) {
       await t.rollback();
-      return res.status(400).json({
-        success: false,
-        code: "OUTPUT_TOO_SHORT",
-        message:
-          "Ringkasan hasil minimal 50 karakter. Jelaskan konkret apa yang sudah disiapkan sesuai perintah.",
-      });
+      return res.status(400).json({ success: false, code: vResult.code, message: vResult.message });
     }
-
-    const urlStr = String(req.body.output_url || "").trim();
-    const titleNeedUrl = /asn|data\s*asn|kepegawaian/i.test(String(task.title || ""));
-    if (titleNeedUrl && urlStr.length < 8) {
-      await t.rollback();
-      return res.status(400).json({
-        success: false,
-        code: "URL_REQUIRED",
-        message:
-          "Untuk tugas terkait Data ASN/kepegawaian, isi tautan lampiran atau lokasi berkas hasil yang sudah diunggah.",
-      });
-    }
+    const ringkas = String(output_ringkas || "").trim();
+    const urlStr = String(output_url || "").trim();
 
     const old = task.toJSON();
     task.status = to;
