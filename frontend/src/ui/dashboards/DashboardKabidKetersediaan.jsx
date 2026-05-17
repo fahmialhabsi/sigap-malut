@@ -25,6 +25,9 @@ import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
 import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
+import ModulFormPanel from "../../components/ModulFormPanel";
+import KabidDataReviewPanel from "../../components/KabidDataReviewPanel";
+import SpjKonfirmasiWidget from "../../components/spj/SpjKonfirmasiWidget";
 
 function normalizeRoleName(user) {
   return (
@@ -122,6 +125,8 @@ export default function DashboardKabidKetersediaan() {
             <ExecutionThreadObservabilityPanel title="Thread eksekusi bidang ketersediaan" />
             {/* Row A: EWS */}
             <EWSPanel />
+            {/* SPJ atas nama Kabid yang menunggu konfirmasi */}
+            <SpjKonfirmasiWidget compact />
             {/* Row B: Approval Queue + Tim */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ApprovalQueueJF unitKerja="Bidang Ketersediaan" />
@@ -167,8 +172,111 @@ export default function DashboardKabidKetersediaan() {
       case "tim":
       case "assign":
         return <TimSayaPanel unitKerja="Bidang Ketersediaan" />;
+      // ── K1: Ketersediaan & Produksi ───────────────────────────────────────
+      // Kabid MENYETUJUI data ketersediaan/produksi yang disubmit Pelaksana,
+      // diverifikasi JF — bukan menginput data operasional harian.
+      case "k1":
+        return (
+          <KabidDataReviewPanel
+            title="Ketersediaan & Produksi Pangan"
+            subtitle="Review dan setujui data ketersediaan/produksi yang disubmit Pelaksana dan diverifikasi JF Bidang."
+            modulId="M032–M034"
+            fetchEndpoint="/api/bkt-ketersediaan"
+            actionEndpoint="/api/bkt-ketersediaan"
+            statsConfig={[
+              { label: "Menunggu Persetujuan", key: "verified_jf", color: "amber" },
+              { label: "Sudah Disetujui", key: "approved_kabid", color: "emerald" },
+              { label: "Dikembalikan", key: "returned", color: "red" },
+              { label: "Total Entri", key: "total", color: "blue" },
+            ]}
+            strategicModulId="M032"
+            strategicTitle="Rekomendasi & Kebijakan Ketersediaan Pangan"
+            emptyMessage="Belum ada data ketersediaan/produksi yang perlu disetujui."
+          />
+        );
+      // ── K2: Peta Kerawanan Pangan ──────────────────────────────────────────
+      // JF menganalisis data lapangan → Kabid mengesahkan peta kerawanan.
+      case "k2":
+        return (
+          <KabidDataReviewPanel
+            title="Peta Kerawanan Pangan"
+            subtitle="Review dan sahkan peta kerawanan pangan yang dianalisis oleh JF Bidang berdasarkan data lapangan Pelaksana."
+            modulId="M036"
+            fetchEndpoint="/api/bkt-kerawanan"
+            actionEndpoint="/api/bkt-kerawanan"
+            statsConfig={[
+              { label: "Menunggu Pengesahan", key: "verified_jf", color: "amber" },
+              { label: "Sudah Disahkan", key: "approved_kabid", color: "emerald" },
+              { label: "Total", key: "total", color: "blue" },
+            ]}
+            emptyMessage="Belum ada peta kerawanan yang perlu disahkan."
+          />
+        );
+      // ── K3: Neraca Pangan Daerah ───────────────────────────────────────────
+      // Neraca dihitung JF dari data Pelaksana → Kabid endorses.
+      case "k3":
+        return (
+          <KabidDataReviewPanel
+            title="Neraca Pangan Daerah"
+            subtitle="Review dan endorsement Neraca Pangan Daerah yang dihitung JF berdasarkan data produksi dan ketersediaan dari Pelaksana."
+            modulId="M035"
+            fetchEndpoint="/api/bkt-neraca"
+            actionEndpoint="/api/bkt-neraca"
+            statsConfig={[
+              { label: "Draft JF", key: "verified_jf", color: "amber" },
+              { label: "Diendorse", key: "approved_kabid", color: "emerald" },
+              { label: "Total Neraca", key: "total", color: "blue" },
+            ]}
+            emptyMessage="Belum ada neraca pangan yang perlu diendorse."
+          />
+        );
+      // ── K4: Early Warning System ───────────────────────────────────────────
+      // EWS otomatis dari data → JF analisis → Kabid tentukan respons kebijakan.
       case "k4":
-        return <EWSPanel />;
+        return (
+          <div className="space-y-5">
+            <EWSPanel />
+            <KabidDataReviewPanel
+              title="Respons Kebijakan EWS"
+              subtitle="Tinjau alert kerawanan yang diverifikasi JF dan tetapkan respons kebijakan Bidang."
+              modulId="M037–M038"
+              fetchEndpoint="/api/bkt-ews"
+              actionEndpoint="/api/bkt-ews"
+              statsConfig={[
+                { label: "Alert Aktif", key: "submitted", color: "red" },
+                { label: "Diverifikasi JF", key: "verified_jf", color: "amber" },
+                { label: "Ditangani", key: "approved_kabid", color: "emerald" },
+              ]}
+              strategicModulId="M038"
+              strategicTitle="Tindak Lanjut & Rekomendasi Kebijakan EWS"
+              emptyMessage="Tidak ada alert EWS aktif yang perlu ditinjau."
+            />
+          </div>
+        );
+      // ── K5: Program & Rencana Aksi ─────────────────────────────────────────
+      // INI KEWENANGAN KABID: input dokumen perencanaan strategis Bidang.
+      case "k5":
+        return (
+          <div className="space-y-4">
+            <div className="bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 text-xs text-cyan-700">
+              <p className="font-semibold">📝 Input Strategis Kabid — Program & Rencana Aksi</p>
+              <p className="mt-0.5">Kabid bertanggung jawab langsung atas dokumen Renstra, Renja, dan Rencana Aksi Bidang.</p>
+            </div>
+            <ModulFormPanel modulId="M031" layout="two-column" showHistory />
+          </div>
+        );
+      // ── K6: Monev & SAKIP ─────────────────────────────────────────────────
+      // INI KEWENANGAN KABID: evaluasi mandiri kinerja Bidang.
+      case "k6":
+        return (
+          <div className="space-y-4">
+            <div className="bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 text-xs text-cyan-700">
+              <p className="font-semibold">📊 Input Strategis Kabid — Monev & SAKIP</p>
+              <p className="mt-0.5">Pengisian evaluasi kinerja, capaian program, dan SAKIP Bidang adalah kewenangan langsung Kabid.</p>
+            </div>
+            <ModulFormPanel modulId="BKT-MEV" layout="two-column" showHistory />
+          </div>
+        );
       case "skp-jf":
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
@@ -201,6 +309,18 @@ export default function DashboardKabidKetersediaan() {
             />
           </div>
         );
+      case "koordinasi":
+        return (
+          <CoordinationComposer
+            title="Koordinasi Lintas Bidang"
+            subtitle="Sampaikan koordinasi ke Bidang Distribusi, Konsumsi, atau UPTD."
+            kindOptions={COORDINATION_KIND_OPTIONS}
+            defaultKind="koordinasi"
+            submitLabel="Kirim Koordinasi"
+          />
+        );
+      case "skp-saya":
+        return <ModulFormPanel modulId="M008" layout="two-column" showHistory />;
       default:
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">

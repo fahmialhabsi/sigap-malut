@@ -21,6 +21,7 @@ import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
 import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
+import ModulFormPanel from "../../components/ModulFormPanel";
 
 function normalizeRoleName(user) {
   return (
@@ -197,6 +198,63 @@ export default function DashboardUPTD() {
             />
           </div>
         );
+      // ── U1: Sample Queue & Uji Lab (M074, M075, M076, M077) ───────────────
+      case "u1":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M074" title="Uji Laboratorium" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M075" title="Hasil Uji Kimia" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M076" title="Hasil Uji Mikrobiologi" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M077" title="Hasil Uji Fisik" layout="two-column" showHistory />
+          </div>
+        );
+
+      // ── U2: Sertifikasi (M068–M073) ────────────────────────────────────────
+      case "u2":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M068" title="Sertifikasi Prima" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M069" title="Sertifikasi GMP/NKV" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M070" title="Sertifikasi GFP" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M071" title="Sertifikasi GHP" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M073" title="Registrasi Produk" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M080" title="Database UMKM Tersertifikasi" layout="two-column" showHistory />
+          </div>
+        );
+
+      // ── U3: Audit Mutu & Inspeksi (M072, M078, M079) ──────────────────────
+      case "u3":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M072" title="Audit Pangan" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M078" title="Pengawasan Pangan Berisiko" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M079" title="Sampling Pangan" layout="two-column" showHistory />
+          </div>
+        );
+
+      // ── U6: Pelaporan & Monev ──────────────────────────────────────────────
+      case "u6":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="UPT-MTU" title="Mutu & Monev UPTD" layout="two-column" showHistory />
+            <ModulFormPanel modulId="UPT-TKN" title="Teknis UPTD" layout="two-column" showHistory />
+          </div>
+        );
+
+      case "approval":
+      case "dikembalikan":
+      case "alert-sertifikasi":
+      case "alert-alat":
+      case "tim":
+      case "assign":
+      case "skp":
+      case "skp-saya":
+        return (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <p className="text-sm text-gray-500">Panel ini sedang dalam pengembangan lanjutan.</p>
+          </div>
+        );
+
       default:
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">

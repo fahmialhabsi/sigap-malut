@@ -100,6 +100,8 @@ export default function DashboardSuperAdmin() {
   const menuItems = useMemo(
     () => [
       { to: "/dashboard/superadmin", label: "Beranda Admin", end: true },
+      { to: "/admin/migration-transactions", label: "Migrasi transaksi regulasi" },
+      { to: "/admin/master-cascade-test", label: "UAT master cascade" },
       { to: "/user-management", label: "Manajemen pengguna & peran" },
       { to: "/audit-trail", label: "Audit trail & kepatuhan" },
       { to: "/module-wizard", label: "Generator modul" },

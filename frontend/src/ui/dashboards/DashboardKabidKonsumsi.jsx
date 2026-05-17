@@ -26,6 +26,9 @@ import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
 import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
+import ModulFormPanel from "../../components/ModulFormPanel";
+import KabidDataReviewPanel from "../../components/KabidDataReviewPanel";
+import SpjKonfirmasiWidget from "../../components/spj/SpjKonfirmasiWidget";
 
 function normalizeRoleName(user) {
   return (
@@ -145,6 +148,7 @@ export default function DashboardKabidKonsumsi() {
             />
             <ExecutionThreadObservabilityPanel title="Thread eksekusi bidang konsumsi" />
             <HeroDualPanel />
+            <SpjKonfirmasiWidget compact />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ApprovalQueueJF unitKerja="Bidang Konsumsi" />
               <TimSayaPanel unitKerja="Bidang Konsumsi" />
@@ -229,18 +233,133 @@ export default function DashboardKabidKonsumsi() {
       case "skp-jf":
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 className="font-bold text-gray-800 mb-4">
-              📊 Penilaian Kinerja JF (SKP)
-            </h2>
+            <h2 className="font-bold text-gray-800 mb-4">📊 Penilaian Kinerja JF (SKP)</h2>
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
               <p className="font-semibold mb-1">⚠️ Pembatasan Akses PP 30/2019</p>
               <p>Kepala Bidang hanya dapat menilai JF 1 dan JF 2 (bawahan langsung).</p>
-              <p className="mt-1 text-red-600 font-medium">
-                ❌ Nilai SKP Pelaksana di bawah JF DIBLOKIR TOTAL — tidak dapat diakses.
-              </p>
+              <p className="mt-1 text-red-600 font-medium">❌ Nilai SKP Pelaksana di bawah JF DIBLOKIR TOTAL — tidak dapat diakses.</p>
             </div>
           </div>
         );
+
+      // ── K1: SPPG & Program MBG ────────────────────────────────────────────
+      // Data penerima SPPG diinput Pelaksana → verifikasi JF → approval Kabid.
+      case "k1":
+        return (
+          <KabidDataReviewPanel
+            title="SPPG & Program Makan Bergizi Gratis (MBG)"
+            subtitle="Review dan setujui data penerima SPPG dan realisasi distribusi MBG yang disubmit Pelaksana, diverifikasi JF."
+            modulId="M058–M060"
+            fetchEndpoint="/api/bks-sppg"
+            actionEndpoint="/api/bks-sppg"
+            statsConfig={[
+              { label: "Menunggu Persetujuan", key: "verified_jf", color: "amber" },
+              { label: "Sudah Disetujui", key: "approved_kabid", color: "emerald" },
+              { label: "Dikembalikan", key: "returned", color: "red" },
+              { label: "Total Entri", key: "total", color: "blue" },
+            ]}
+            emptyMessage="Belum ada data SPPG/MBG yang perlu disetujui."
+          />
+        );
+
+      // ── K2: PPH & Konsumsi Pangan ─────────────────────────────────────────
+      // Survey konsumsi dilakukan Pelaksana → JF hitung PPH → Kabid setujui.
+      case "k2":
+        return (
+          <KabidDataReviewPanel
+            title="PPH & Data Konsumsi Pangan"
+            subtitle="Review dan setujui data konsumsi pangan dan hasil perhitungan PPH yang dianalisis JF dari survei lapangan."
+            modulId="M056–M057"
+            fetchEndpoint="/api/bks-konsumsi"
+            actionEndpoint="/api/bks-konsumsi"
+            statsConfig={[
+              { label: "Menunggu Review", key: "verified_jf", color: "amber" },
+              { label: "Disetujui", key: "approved_kabid", color: "emerald" },
+              { label: "Total", key: "total", color: "blue" },
+            ]}
+            emptyMessage="Belum ada data konsumsi/PPH yang perlu disetujui."
+          />
+        );
+
+      // ── K3: Keamanan Pangan & Inspeksi ────────────────────────────────────
+      // Inspeksi oleh JF/Pelaksana → data keracunan dari lapangan → Kabid endorses.
+      case "k3":
+        return (
+          <div className="space-y-5">
+            <AlertKeracunanPanel />
+            <KabidDataReviewPanel
+              title="Keamanan Pangan — Hasil Inspeksi & Keracunan"
+              subtitle="Review dan setujui laporan inspeksi keamanan pangan serta data kejadian keracunan dari UPTD/lapangan."
+              modulId="M063–M064"
+              fetchEndpoint="/api/bks-keamanan"
+              actionEndpoint="/api/bks-keamanan"
+              statsConfig={[
+                { label: "Laporan Masuk", key: "verified_jf", color: "amber" },
+                { label: "Ditangani", key: "approved_kabid", color: "emerald" },
+                { label: "Total", key: "total", color: "blue" },
+              ]}
+              emptyMessage="Belum ada laporan inspeksi/keracunan yang perlu disetujui."
+            />
+          </div>
+        );
+
+      // ── K4: UMKM Pangan ───────────────────────────────────────────────────
+      // Data UMKM dikumpulkan Pelaksana → JF verifikasi → Kabid setujui.
+      case "k4":
+        return (
+          <KabidDataReviewPanel
+            title="UMKM Pangan — Pendataan & Pembinaan"
+            subtitle="Review dan setujui data UMKM pangan dan laporan kegiatan pembinaan yang diverifikasi JF."
+            modulId="M066–M067"
+            fetchEndpoint="/api/bks-umkm"
+            actionEndpoint="/api/bks-umkm"
+            statsConfig={[
+              { label: "Menunggu Review", key: "verified_jf", color: "amber" },
+              { label: "Disetujui", key: "approved_kabid", color: "emerald" },
+              { label: "Total", key: "total", color: "blue" },
+            ]}
+            emptyMessage="Belum ada data UMKM yang perlu disetujui."
+          />
+        );
+
+      // ── K5: B2SA & Diversifikasi ──────────────────────────────────────────
+      // Kabid bertanggung jawab program B2SA & diversifikasi sebagai kegiatan strategis.
+      case "k5":
+        return (
+          <div className="space-y-4">
+            <div className="bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 text-xs text-cyan-700">
+              <p className="font-semibold">📝 Input Strategis Kabid — B2SA & Diversifikasi Pangan</p>
+              <p className="mt-0.5">Program B2SA dan diversifikasi pangan adalah inisiatif strategis Kabid — input langsung diperbolehkan.</p>
+            </div>
+            <ModulFormPanel modulId="M061" title="Program B2SA" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M062" title="Diversifikasi Pangan" layout="two-column" showHistory />
+          </div>
+        );
+
+      // ── K6: Monev & SAKIP ─────────────────────────────────────────────────
+      // INI KEWENANGAN KABID: evaluasi kinerja dan SAKIP Bidang.
+      case "k6":
+        return (
+          <div className="space-y-4">
+            <div className="bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 text-xs text-cyan-700">
+              <p className="font-semibold">📊 Input Strategis Kabid — Monev & SAKIP</p>
+              <p className="mt-0.5">Evaluasi kinerja, capaian program, dan SAKIP Bidang Konsumsi adalah kewenangan langsung Kabid.</p>
+            </div>
+            <ModulFormPanel modulId="BKS-EVL" title="Evaluasi & Monev Konsumsi" layout="two-column" showHistory />
+          </div>
+        );
+
+      case "skp-saya":
+        return <ModulFormPanel modulId="M008" title="SKP Saya" layout="two-column" showHistory />;
+
+      case "notifikasi":
+        return (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <h2 className="font-bold text-gray-800 mb-3">🔔 Notifikasi</h2>
+            <p className="text-sm text-gray-500">Notifikasi dari sistem akan tampil di sini.</p>
+          </div>
+        );
+
       default:
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">

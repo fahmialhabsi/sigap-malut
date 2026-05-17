@@ -25,6 +25,9 @@ import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
 import TaskDiscussionPanel from "../../components/tasks/TaskDiscussionPanel";
+import ModulFormPanel from "../../components/ModulFormPanel";
+import SpjKonfirmasiWidget from "../../components/spj/SpjKonfirmasiWidget";
+import SpjPpkSkpdPanel from "../../components/spj/SpjPpkSkpdPanel";
 import {
   isDemoDataAllowed,
   showSimulationBadge,
@@ -1149,7 +1152,7 @@ export default function DashboardSekretariat() {
   useEffect(() => {
     setRenstraLoading(true);
     api
-      .get("/epelara/renstra-opd", { params: { limit: 10 } })
+      .get("/api/epelara/renstra-opd", { params: { limit: 10 } })
       .then((res) => {
         const d = res.data;
         setRenstraQueue(Array.isArray(d) ? d : d?.data || []);
@@ -1163,7 +1166,7 @@ export default function DashboardSekretariat() {
     if (!user) return;
     setCascadeLoading(true);
     api
-      .get("/epelara/cascading")
+      .get("/api/epelara/cascading")
       .then((res) => setCascadeData(res.data ?? null))
       .catch(() => setCascadeData(null))
       .finally(() => setCascadeLoading(false));
@@ -1262,6 +1265,11 @@ export default function DashboardSekretariat() {
       badge: bypassCount || null,
     },
     {
+      id: "spj-ppk",
+      label: "Verifikasi SPJ & SPM (PPK)",
+      icon: "🖋️",
+    },
+    {
       id: "konsolidasi",
       label: "Kumpulan laporan",
       icon: "📑",
@@ -1313,6 +1321,8 @@ export default function DashboardSekretariat() {
               title="Pusat koordinasi lintas bidang"
             />
             <ExecutionThreadObservabilityPanel title="Perkembangan penugasan & koordinasi" />
+            {/* SPJ atas nama Sekretaris yang menunggu konfirmasi */}
+            <SpjKonfirmasiWidget />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <ApprovalQueuePanel />
@@ -1404,7 +1414,25 @@ export default function DashboardSekretariat() {
         return <BypassAlertCenter />;
       case "konsolidasi":
         return <KonsolidasiLaporanPanel />;
-      default:
+      case "spj-ppk":
+        return (
+          <div className="space-y-5">
+            <SpjKonfirmasiWidget />
+            <SpjPpkSkpdPanel />
+          </div>
+        );
+      default: {
+        // Handle mod-M001 … mod-M031, mod-SA01 … mod-SA10, dll.
+        if (activeMenu.startsWith("mod-")) {
+          const modulId = activeMenu.replace("mod-", "");
+          return (
+            <ModulFormPanel
+              modulId={modulId}
+              layout="two-column"
+              showHistory
+            />
+          );
+        }
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-400 text-sm">
@@ -1412,6 +1440,7 @@ export default function DashboardSekretariat() {
             </p>
           </div>
         );
+      }
     }
   };
 

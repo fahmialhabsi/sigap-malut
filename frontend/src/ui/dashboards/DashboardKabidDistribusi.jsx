@@ -26,6 +26,9 @@ import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
 import ExecutionThreadObservabilityPanel from "../../components/execution/ExecutionThreadObservabilityPanel.jsx";
+import ModulFormPanel from "../../components/ModulFormPanel";
+import KabidDataReviewPanel from "../../components/KabidDataReviewPanel";
+import SpjKonfirmasiWidget from "../../components/spj/SpjKonfirmasiWidget";
 
 function normalizeRoleName(user) {
   return (
@@ -288,6 +291,7 @@ export default function DashboardKabidDistribusi() {
             />
             <ExecutionThreadObservabilityPanel title="Thread eksekusi bidang distribusi" />
             <HeroInflasiPanel />
+            <SpjKonfirmasiWidget compact />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ApprovalQueueJF unitKerja="Bidang Distribusi" />
               <TimSayaPanel unitKerja="Bidang Distribusi" />
@@ -344,107 +348,125 @@ export default function DashboardKabidDistribusi() {
       case "tim":
         return <TimSayaPanel unitKerja="Bidang Distribusi" />;
 
+      // ── D1: Harga Pangan & Inflasi ────────────────────────────────────────
+      // Data harga diinput Pelaksana harian → diverifikasi JF → Kabid setujui/endorses.
       case "d1":
         return (
           <div className="space-y-6">
             <HeroInflasiPanel />
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-              <h2 className="font-bold text-gray-800 mb-4">📈 Harga Pasar Per Kabupaten/Kota</h2>
-              <p className="text-xs text-gray-500 mb-3">Data harga harian komoditas pokok dari 10 kab/kota Maluku Utara.</p>
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
-                    <tr>
-                      <th className="px-3 py-2 text-left">Kab/Kota</th>
-                      <th className="px-3 py-2 text-left">Beras (Rp/kg)</th>
-                      <th className="px-3 py-2 text-left">Minyak (Rp/L)</th>
-                      <th className="px-3 py-2 text-left">Gula (Rp/kg)</th>
-                      <th className="px-3 py-2 text-left">Update</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { kab: "Ternate", beras: 15000, minyak: 18000, gula: 18000, update: "30 Mar" },
-                      { kab: "Tidore Kepulauan", beras: 14800, minyak: 17500, gula: 17500, update: "29 Mar" },
-                      { kab: "Halmahera Utara", beras: 15200, minyak: 19000, gula: 18200, update: "29 Mar" },
-                      { kab: "Halmahera Selatan", beras: 15500, minyak: 18500, gula: 18500, update: "28 Mar" },
-                      { kab: "Kepulauan Sula", beras: 16000, minyak: 19500, gula: 19000, update: "27 Mar" },
-                    ].map((row, i) => (
-                      <tr key={i} className="border-t border-gray-100 hover:bg-gray-50">
-                        <td className="px-3 py-2 font-medium">{row.kab}</td>
-                        <td className="px-3 py-2">{row.beras.toLocaleString("id-ID")}</td>
-                        <td className="px-3 py-2">{row.minyak.toLocaleString("id-ID")}</td>
-                        <td className="px-3 py-2">{row.gula.toLocaleString("id-ID")}</td>
-                        <td className="px-3 py-2 text-gray-500 text-xs">{row.update}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
             <AlertHargaKritisPanel compact />
+            <KabidDataReviewPanel
+              title="Pemantauan Harga Pangan & Inflasi"
+              subtitle="Review dan setujui data harga pangan harian yang disubmit Pelaksana dan diverifikasi JF."
+              modulId="M043–M045"
+              fetchEndpoint="/api/bds-harga"
+              actionEndpoint="/api/bds-harga"
+              statsConfig={[
+                { label: "Menunggu Persetujuan", key: "verified_jf", color: "amber" },
+                { label: "Sudah Disetujui", key: "approved_kabid", color: "emerald" },
+                { label: "Dikembalikan", key: "returned", color: "red" },
+                { label: "Total Entri", key: "total", color: "blue" },
+              ]}
+              emptyMessage="Belum ada data harga/inflasi yang perlu disetujui."
+            />
           </div>
         );
 
+      // ── D2: CPPD & Cadangan Pangan ───────────────────────────────────────
+      // Stok CPPD diinput Pelaksana → verifikasi JF → approval Kabid.
       case "d2":
         return (
           <div className="space-y-5">
             <CppdStatusPanel />
-            <OperasiPasarPanel />
+            <KabidDataReviewPanel
+              title="CPPD — Cadangan Pangan Pemerintah Daerah"
+              subtitle="Review dan setujui laporan stok CPPD, CBP BULOG, dan rencana pelepasan cadangan yang diverifikasi JF."
+              modulId="M048–M050"
+              fetchEndpoint="/api/bds-cppd"
+              actionEndpoint="/api/bds-cppd"
+              statsConfig={[
+                { label: "Menunggu", key: "verified_jf", color: "amber" },
+                { label: "Disetujui", key: "approved_kabid", color: "emerald" },
+                { label: "Total", key: "total", color: "blue" },
+              ]}
+              emptyMessage="Belum ada laporan CPPD yang perlu disetujui."
+            />
           </div>
         );
 
+      // ── D3: Operasi Pasar & GPM ───────────────────────────────────────────
+      // Realisasi operasi pasar oleh Pelaksana → JF rekap → Kabid setujui.
       case "d3":
-        return <OperasiPasarPanel />;
+        return (
+          <div className="space-y-5">
+            <OperasiPasarPanel />
+            <KabidDataReviewPanel
+              title="Operasi Pasar, GPM & Bantuan Pangan"
+              subtitle="Review dan setujui laporan realisasi operasi pasar, GPM, dan bantuan pangan yang diverifikasi JF."
+              modulId="M051–M053"
+              fetchEndpoint="/api/bds-ops-pasar"
+              actionEndpoint="/api/bds-ops-pasar"
+              statsConfig={[
+                { label: "Menunggu Approval", key: "verified_jf", color: "amber" },
+                { label: "Sudah Disetujui", key: "approved_kabid", color: "emerald" },
+                { label: "Dikembalikan", key: "returned", color: "red" },
+                { label: "Total Kegiatan", key: "total", color: "blue" },
+              ]}
+              emptyMessage="Belum ada realisasi operasi pasar yang perlu disetujui."
+            />
+          </div>
+        );
 
+      // ── D4: Koordinasi TPID ───────────────────────────────────────────────
+      // Koordinasi TPID dipimpin Kabid — Kabid mencatat hasil rapat (bukan Pelaksana).
       case "d4":
-        return <TpidKoordinasiPanel />;
+        return (
+          <div className="space-y-5">
+            <TpidKoordinasiPanel />
+            <div className="bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 text-xs text-cyan-700">
+              <p className="font-semibold">📝 Input Strategis Kabid — Koordinasi TPID</p>
+              <p className="mt-0.5">Kabid selaku anggota TPID bertanggung jawab mencatat hasil rapat dan analisis pasokan.</p>
+            </div>
+            <ModulFormPanel modulId="M054" title="Notulen & Keputusan Rapat TPID" layout="two-column" showHistory />
+            <KabidDataReviewPanel
+              title="Analisis Pasokan (dari JF)"
+              subtitle="Review analisis pasokan yang disusun JF untuk bahan koordinasi TPID."
+              modulId="M055"
+              fetchEndpoint="/api/bds-pasokan"
+              actionEndpoint="/api/bds-pasokan"
+              statsConfig={[
+                { label: "Menunggu Review", key: "verified_jf", color: "amber" },
+                { label: "Diterima", key: "approved_kabid", color: "emerald" },
+                { label: "Total", key: "total", color: "blue" },
+              ]}
+              emptyMessage="Belum ada analisis pasokan dari JF."
+            />
+          </div>
+        );
 
+      // ── D5: Program & Rencana Aksi ────────────────────────────────────────
+      // INI KEWENANGAN KABID: dokumen perencanaan program distribusi.
       case "d5":
         return (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 className="font-bold text-gray-800 mb-4">📋 Program & Rencana Aksi — Bidang Distribusi</h2>
-            <div className="space-y-3">
-              {[
-                { program: "Pemantauan Harga 9 Komoditas Pokok", target: "52 kali/tahun", realisasi: "18/52", pct: 35 },
-                { program: "Operasi Pasar Murah", target: "24 kali/tahun", realisasi: "7/24", pct: 29 },
-                { program: "Koordinasi TPID", target: "24 kali/tahun", realisasi: "6/24", pct: 25 },
-                { program: "Penguatan CPPD", target: "4 kegiatan", realisasi: "1/4", pct: 25 },
-                { program: "Laporan Mendagri (2-Mingguan)", target: "24 laporan", realisasi: "6/24", pct: 25 },
-              ].map((p, i) => (
-                <div key={i} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-medium text-sm text-gray-800">{p.program}</p>
-                    <span className="text-xs text-gray-500">{p.realisasi} · {p.target}</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
-                    <div className={`h-full rounded-full transition-all ${p.pct >= 50 ? "bg-green-500" : p.pct >= 25 ? "bg-blue-500" : "bg-amber-400"}`} style={{ width: `${p.pct}%` }} />
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">{p.pct}% tercapai</p>
-                </div>
-              ))}
+          <div className="space-y-4">
+            <div className="bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 text-xs text-cyan-700">
+              <p className="font-semibold">📋 Input Strategis Kabid — Program & Rencana Aksi Distribusi</p>
+              <p className="mt-0.5">Kabid bertanggung jawab atas dokumen program, target, dan rencana aksi Bidang Distribusi.</p>
             </div>
+            <ModulFormPanel modulId="M047" title="Program & Rencana Aksi Distribusi" layout="two-column" showHistory />
           </div>
         );
 
+      // ── D6: Monev & SAKIP ─────────────────────────────────────────────────
+      // INI KEWENANGAN KABID: evaluasi mandiri kinerja Bidang.
       case "d6":
         return (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 className="font-bold text-gray-800 mb-4">📊 Monev & SAKIP — Bidang Distribusi</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-              {[
-                { label: "Capaian IKU", value: "72%", color: "text-blue-600" },
-                { label: "Realisasi Anggaran", value: "28%", color: "text-green-600" },
-                { label: "Nilai SAKIP", value: "BB", color: "text-amber-600" },
-                { label: "Risiko Aktif", value: "3", color: "text-red-600" },
-              ].map((k, i) => (
-                <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200 text-center">
-                  <p className={`text-2xl font-bold ${k.color}`}>{k.value}</p>
-                  <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-                </div>
-              ))}
+          <div className="space-y-4">
+            <div className="bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 text-xs text-cyan-700">
+              <p className="font-semibold">📊 Input Strategis Kabid — Monev & SAKIP</p>
+              <p className="mt-0.5">Pengisian evaluasi kinerja, capaian program, dan SAKIP Bidang adalah kewenangan langsung Kabid.</p>
             </div>
-            <p className="text-xs text-gray-400">Data SAKIP diperbarui per kuartal. Hubungi Sekretariat untuk detail laporan capaian.</p>
+            <ModulFormPanel modulId="BDS-EVL" title="Evaluasi & Monev Distribusi" layout="two-column" showHistory />
           </div>
         );
 
