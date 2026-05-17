@@ -2,6 +2,7 @@
 import { randomUUID } from "crypto";
 import { Op, fn, col, where } from "sequelize";
 import jwt from "jsonwebtoken";
+import sequelize from "../config/database.js";
 import User from "../models/User.js";
 import Role from "../models/Role.js";
 import {
@@ -119,6 +120,7 @@ function buildTokenPayloadFromUser(user, roleRow) {
     role: canonicalRoleFromRoleRow(roleRow, plain.role),
     unit_kerja: plain.unit_kerja || plain.unit_id || "",
     nama_lengkap: plain.nama_lengkap || plain.name || "",
+    jabatan: plain.jabatan || "",
   };
 }
 
@@ -1058,21 +1060,89 @@ export const deleteUser = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
     if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User tidak ditemukan" });
+      return res.status(404).json({ success: false, message: "User tidak ditemukan" });
+
+    // Jangan izinkan super_admin menghapus dirinya sendiri
+    if (String(user.id) === String(req.user?.id))
+      return res.status(400).json({ success: false, message: "Tidak dapat menghapus akun Anda sendiri." });
+
+    const force = req.query.force === "true";
     const snapshot = snapshotUserForAudit(user);
     const targetId = String(user.id);
-    await logAudit({
-      modul: USER_MGMT_MODUL,
-      entitas_id: targetId,
-      aksi: "DELETE",
-      data_lama: snapshot,
-      data_baru: null,
-      pegawai_id: actorPegawaiId(req),
-    });
-    await user.destroy();
-    res.json({ success: true, message: "User berhasil dihapus" });
+    const ts = Date.now();
+
+    if (force) {
+      // ── HARD DELETE ─────────────────────────────────────────────────────────
+      // Nullify semua FK yang merujuk ke user ini sebelum dihapus,
+      // agar data historis (tasks, spj, dll) tetap ada namun ter-orphan.
+      const db = sequelize;
+      await db.transaction(async (t) => {
+        const nullifyOpts = { where: { created_by: user.id }, transaction: t };
+        const nullifyAssigned = { where: { assigned_to: user.id }, transaction: t };
+
+        // Tabel Tasks
+        await db.query(`UPDATE "Tasks" SET created_by = NULL WHERE created_by = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        await db.query(`UPDATE "Tasks" SET assigned_to = NULL WHERE assigned_to = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        // Tabel TaskAssignments
+        await db.query(`UPDATE "TaskAssignments" SET assigned_by = NULL WHERE assigned_by = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        await db.query(`UPDATE "TaskAssignments" SET assigned_to = NULL WHERE assigned_to = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        // Tabel TaskLogs
+        await db.query(`UPDATE "TaskLogs" SET actor_id = NULL WHERE actor_id = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        // Tabel SPJ
+        await db.query(`UPDATE spj SET dibuat_oleh = NULL WHERE dibuat_oleh = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        await db.query(`UPDATE spj SET atas_nama_pejabat_id = NULL WHERE atas_nama_pejabat_id = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        await db.query(`UPDATE spj SET pptk_id = NULL WHERE pptk_id = :uid`,
+          { replacements: { uid: user.id }, transaction: t });
+        // Hapus user
+        await user.destroy({ transaction: t });
+      });
+
+      await logAudit({
+        modul: USER_MGMT_MODUL,
+        entitas_id: targetId,
+        aksi: "DELETE_PERMANENT",
+        data_lama: snapshot,
+        data_baru: null,
+        pegawai_id: actorPegawaiId(req),
+      });
+
+      return res.json({
+        success: true,
+        message: `User "${snapshot.username}" berhasil dihapus permanen. Data historis ter-orphan tetap tersimpan.`,
+        hard_delete: true,
+      });
+    } else {
+      // ── SOFT DELETE (default) ────────────────────────────────────────────────
+      // Nonaktifkan user. Email & username di-prefix agar tidak memblokir
+      // pendaftaran ulang dengan email/username yang sama di masa depan.
+      await user.update({
+        is_active: false,
+        email: `__nonaktif_${ts}__${user.email}`,
+        username: `__nonaktif_${ts}__${user.username}`,
+      });
+
+      await logAudit({
+        modul: USER_MGMT_MODUL,
+        entitas_id: targetId,
+        aksi: "DELETE_SOFT",
+        data_lama: snapshot,
+        data_baru: { is_active: false, deleted_at: new Date().toISOString() },
+        pegawai_id: actorPegawaiId(req),
+      });
+
+      return res.json({
+        success: true,
+        message: `User "${snapshot.username}" berhasil dinonaktifkan. Data historis (tugas, SPJ, dll) tetap tersimpan.`,
+        soft_delete: true,
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
