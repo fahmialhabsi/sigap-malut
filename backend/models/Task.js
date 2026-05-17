@@ -54,8 +54,7 @@ const Task =
           "in_progress",
           "submitted",
           "verified",
-          // Extra workflow statuses (Prompt 11–13 + Sekretariat hub)
-          // SQLite: not enforced at DB-level; Sequelize validation needs these values.
+          // Bidang workflow statuses (v2.7)
           "review_kabid",
           "submitted_to_kabid",
           "approved_kabid",
@@ -63,8 +62,15 @@ const Task =
           "submitted_to_jf",
           "verified_by_jf",
           "returned_to_pelaksana",
+          // Sekretariat approval chain
           "approved_by_secretary",
           "forwarded_to_kadin",
+          // Strategic governance layer — Gubernur (v2.8)
+          // Tasks needing Gubernur decision are escalated from forwarded_to_kadin.
+          "escalated_to_governor",
+          "approved_by_governor",
+          "rejected_by_governor",
+          // Terminal states
           "closed",
           "rejected",
           "escalated",

@@ -98,6 +98,90 @@ export function blockDirectSubmitToKabid(req, res, next) {
 }
 
 /**
+ * requireKadinBeforeGubernur
+ *
+ * Verifies that a task has been forwarded to Kepala Dinas
+ * (status `forwarded_to_kadin` or beyond) before it can be escalated to Gubernur.
+ *
+ * Prevents any role from bypassing the Kadis layer when escalating to Gubernur.
+ * Trusted evidence: task.status in DB — NOT req.body.
+ */
+export async function requireKadinBeforeGubernur(req, res, next) {
+  const taskId = req.params.id;
+  if (!taskId) {
+    return res.status(400).json({
+      error: "missing_task_id",
+      message: "task id wajib ada di URL params (:id) untuk validasi governance.",
+    });
+  }
+
+  let task;
+  try {
+    task = await Task.findByPk(taskId, { attributes: ["id", "status"] });
+  } catch (err) {
+    return res.status(500).json({ error: "db_error", message: "Gagal validasi status task." });
+  }
+
+  if (!task) {
+    return res.status(404).json({ error: "task_not_found", message: "Task tidak ditemukan." });
+  }
+
+  const KADIN_FORWARDED_STATUSES = ["forwarded_to_kadin", "escalated_to_governor", "approved_by_governor", "rejected_by_governor", "closed"];
+  if (!KADIN_FORWARDED_STATUSES.includes(task.status)) {
+    return res.status(422).json({
+      error: "chain_of_command_violation",
+      code: "BYPASS_KADIN",
+      current_status: task.status,
+      message: `Task harus melewati Kepala Dinas (forwarded_to_kadin) sebelum dapat dieskalasi ke Gubernur. Status saat ini: '${task.status}'.`,
+    });
+  }
+
+  return next();
+}
+
+/**
+ * requireKabidBeforeSekretaris
+ *
+ * Verifies that a task has been approved by Kepala Bidang
+ * (status `approved_kabid` or beyond) before it enters the Sekretaris chain.
+ *
+ * Used in Bidang routes for the kabid_forward_sekretaris action.
+ * Trusted evidence: task.status in DB — NOT req.body.
+ */
+export async function requireKabidBeforeSekretaris(req, res, next) {
+  const taskId = req.params.id;
+  if (!taskId) {
+    return res.status(400).json({
+      error: "missing_task_id",
+      message: "task id wajib ada di URL params (:id) untuk validasi governance.",
+    });
+  }
+
+  let task;
+  try {
+    task = await Task.findByPk(taskId, { attributes: ["id", "status"] });
+  } catch (err) {
+    return res.status(500).json({ error: "db_error", message: "Gagal validasi status task." });
+  }
+
+  if (!task) {
+    return res.status(404).json({ error: "task_not_found", message: "Task tidak ditemukan." });
+  }
+
+  const KABID_APPROVED_STATUSES = ["approved_kabid", "verified", "approved_by_secretary", "forwarded_to_kadin", "closed"];
+  if (!KABID_APPROVED_STATUSES.includes(task.status)) {
+    return res.status(422).json({
+      error: "chain_of_command_violation",
+      code: "BYPASS_KABID",
+      current_status: task.status,
+      message: `Dokumen harus melewati persetujuan Kepala Bidang terlebih dahulu. Status saat ini: '${task.status}'. Status wajib sebelum ke Sekretaris: ${KABID_APPROVED_STATUSES.join(", ")}.`,
+    });
+  }
+
+  return next();
+}
+
+/**
  * requireSekretarisBeforeKadin
  *
  * Verifies that a task has been formally approved by Sekretaris

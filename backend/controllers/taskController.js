@@ -4,10 +4,27 @@
  * Full state machine untuk Perintah/Tugas sesuai dokumen
  * 14-alur-kerja-sekretariat-bidang-uptd.md
  *
- * Lifecycle:
+ * Lifecycle — SEKRETARIAT (v2.2+):
  *   draft → assigned → accepted → in_progress → submitted → verified
  *        → approved_by_secretary → forwarded_to_kadin → closed
- *   Any state → rejected | escalated
+ *
+ * Lifecycle — BIDANG (v2.7+):
+ *   in_progress → submitted_to_jf → verified_by_jf → submitted_to_kabid
+ *              → [review_kabid] → approved_kabid
+ *              → verified → approved_by_secretary → closed
+ *   returned_to_jf   → submitted_to_kabid (JF revisi)
+ *   returned_to_pelaksana → in_progress / re-submit
+ *
+ * Lifecycle — UPTD (v2.7+):
+ *   Uses same core chain with kepala_uptd / kepala_seksi_uptd in verify role.
+ *   in_progress → submitted → verified → approved_by_secretary → closed
+ *
+ * Lifecycle — GUBERNUR (v2.8+):
+ *   forwarded_to_kadin → escalated_to_governor (Kadis escalate task strategis)
+ *                      → approved_by_governor / rejected_by_governor (Gubernur putuskan)
+ *   approved_by_governor → closed
+ *
+ * Any live state → rejected | escalated  (supervisor override)
  */
 
 import express from "express";
@@ -103,7 +120,25 @@ const KASUBAG_ROLES = [
   "kasubag",                   // generic alias
 ];
 
+// JF (Jabatan Fungsional) roles — all 3 Bidang + generic aliases
+const JF_ROLES = [
+  "jabatan_fungsional",
+  "fungsional",
+  "fungsional_analis",
+  "analis_kebijakan",
+  "pengawas_mutu_pangan",
+];
+
+// UPTD roles
+const UPTD_ROLES = [
+  "kepala_uptd",
+  "kasubag_uptd",
+  "kepala_seksi_uptd",
+  "kepala_seksi",
+];
+
 const TRANSITIONS = {
+  // ─── CORE WORKFLOW (Sekretariat + Bidang common) ──────────────────────────
   assign: {
     // `accepted`: penanggung jawab sudah terima; masih boleh delegasi ke bawah
     // (status tugas kembali ke `assigned` untuk penerima berikutnya).
@@ -113,6 +148,7 @@ const TRANSITIONS = {
       "sekretaris",
       "kepala_bidang",
       ...KASUBAG_ROLES,
+      ...UPTD_ROLES,
       "super_admin",
     ],
   },
@@ -125,6 +161,7 @@ const TRANSITIONS = {
     roles: null,
   },
   submit: {
+    // Sekretariat path: pelaksana submits directly to Kasubag/Sekretaris.
     // Also accepts returned_to_pelaksana so pelaksana can re-submit after revision
     // without manually clicking "mulai" again (minor correction UX path).
     from: ["in_progress", "returned_to_pelaksana"],
@@ -132,21 +169,22 @@ const TRANSITIONS = {
     roles: [
       "pelaksana",
       "pelaksana_sekretariat",
+      "pelaksana_bidang",
       "bendahara",
-      "fungsional",
-      "fungsional_analis",
+      ...JF_ROLES,
       ...KASUBAG_ROLES,
       "super_admin",
     ],
   },
   verify: {
+    // Sekretariat & UPTD path: Kasubag/JF/Kepala Seksi verifies submission.
     from: ["submitted"],
     to: "verified",
     roles: [
-      "fungsional",
-      "fungsional_analis",
+      ...JF_ROLES,
       "kepala_bidang",
       ...KASUBAG_ROLES,
+      ...UPTD_ROLES,
       "sekretaris",
       "super_admin",
     ],
@@ -158,10 +196,10 @@ const TRANSITIONS = {
     from: ["submitted"],
     to: "returned_to_pelaksana",
     roles: [
-      "fungsional",
-      "fungsional_analis",
+      ...JF_ROLES,
       "kepala_bidang",
       ...KASUBAG_ROLES,
+      ...UPTD_ROLES,
       "sekretaris",
       "super_admin",
     ],
@@ -188,43 +226,153 @@ const TRANSITIONS = {
     // Sekretaris TIDAK BOLEH close task langsung dari verified.
     // Jika butuh force-close, gunakan aksi `reject` + alasan, lalu reopen + close
     // setelah approval flow dipenuhi. Tidak ada "darurat" path yang diam-diam aktif.
+    //
+    // v2.8: approved_by_governor ditambahkan — Gubernur sudah approve, bisa ditutup.
     from: [
       "approved_by_secretary",
       "forwarded_to_kadin",
+      "approved_by_governor",
     ],
     to: "closed",
-    roles: ["sekretaris", "kepala_dinas", "super_admin"],
+    roles: ["sekretaris", "kepala_dinas", "gubernur", ...UPTD_ROLES, "super_admin"],
   },
   reject: {
+    // Supervisor override — usable from any live state including Bidang + Governor states
     from: [
-      "draft",
-      "assigned",
-      "accepted",
-      "in_progress",
-      "submitted",
-      "verified",
-      "returned_to_pelaksana",
+      "draft", "assigned", "accepted", "in_progress",
+      "submitted", "verified", "returned_to_pelaksana",
+      // Bidang states
+      "submitted_to_jf", "verified_by_jf",
+      "submitted_to_kabid", "review_kabid", "approved_kabid", "returned_to_jf",
+      // Governor states (v2.8)
+      "escalated_to_governor",
     ],
     to: "rejected",
-    roles: ["sekretaris", "kepala_bidang", "kepala_uptd", "super_admin"],
+    roles: ["sekretaris", "kepala_bidang", "kepala_dinas", "gubernur", ...UPTD_ROLES, "super_admin"],
   },
   escalate: {
+    // Supervisor escalate — same from set as reject
     from: [
-      "draft",
-      "assigned",
-      "accepted",
-      "in_progress",
-      "submitted",
-      "verified",
-      "returned_to_pelaksana",
+      "draft", "assigned", "accepted", "in_progress",
+      "submitted", "verified", "returned_to_pelaksana",
+      // Bidang states
+      "submitted_to_jf", "verified_by_jf",
+      "submitted_to_kabid", "review_kabid", "approved_kabid", "returned_to_jf",
     ],
     to: "escalated",
-    roles: ["sekretaris", "kepala_bidang", "kepala_uptd", "super_admin"],
+    roles: ["sekretaris", "kepala_bidang", "kepala_dinas", ...UPTD_ROLES, "super_admin"],
   },
   reopen: {
     from: ["rejected", "escalated"],
     to: "draft",
     roles: ["sekretaris", "super_admin"],
+  },
+
+  // ─── GUBERNUR WORKFLOW (v2.8) ─────────────────────────────────────────────
+  // Triggered when task strategis perlu keputusan Gubernur.
+  // Mandatory chain: must pass through forwarded_to_kadin first.
+  // requireKadinBeforeGubernur guard enforces this — no direct skip from sekretaris.
+  //
+  // Flow:
+  //   forwarded_to_kadin → escalated_to_governor
+  //                      → approved_by_governor → closed
+  //                      → rejected_by_governor (re-handled by Kadis/Sekretaris)
+
+  escalate_to_governor: {
+    // Kadis escalates strategic task to Gubernur
+    from: ["forwarded_to_kadin"],
+    to: "escalated_to_governor",
+    roles: ["kepala_dinas", "super_admin"],
+  },
+  governor_approve: {
+    // Gubernur approves the escalated task
+    from: ["escalated_to_governor"],
+    to: "approved_by_governor",
+    roles: ["gubernur", "super_admin"],
+  },
+  governor_reject: {
+    // Gubernur rejects — task returned to Kadis for follow-up
+    from: ["escalated_to_governor"],
+    to: "rejected_by_governor",
+    roles: ["gubernur", "super_admin"],
+  },
+  kadis_rehandle: {
+    // Kadis re-handles a Gubernur-rejected task (forward back to Sekretaris or close)
+    from: ["rejected_by_governor"],
+    to: "forwarded_to_kadin",
+    roles: ["kepala_dinas", "super_admin"],
+  },
+
+  // ─── BIDANG WORKFLOW (v2.7) ───────────────────────────────────────────────
+  // Canonical flow:
+  //   in_progress → submitted_to_jf → verified_by_jf → submitted_to_kabid
+  //              → [review_kabid] → approved_kabid → verified
+  //              → approved_by_secretary → closed
+  // Revision loops:
+  //   submitted_to_jf → returned_to_pelaksana  (JF rejects pelaksana)
+  //   submitted_to_kabid / review_kabid → returned_to_jf  (Kabid rejects JF)
+  //   returned_to_jf → submitted_to_kabid  (JF revises and resubmits)
+
+  submit_to_jf: {
+    // Pelaksana Bidang submits work to JF for initial verification
+    from: ["in_progress", "returned_to_pelaksana"],
+    to: "submitted_to_jf",
+    roles: [
+      "pelaksana", "pelaksana_bidang",
+      ...JF_ROLES,
+      ...KASUBAG_ROLES,
+      "super_admin",
+    ],
+  },
+  verify_by_jf: {
+    // JF verifies the submission — evidence of JF review complete
+    from: ["submitted_to_jf"],
+    to: "verified_by_jf",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  return_to_pelaksana_jf: {
+    // JF rejects pelaksana's submission — revision required
+    from: ["submitted_to_jf"],
+    to: "returned_to_pelaksana",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  submit_to_kabid: {
+    // JF submits their verified/analysed result to Kepala Bidang
+    from: ["verified_by_jf"],
+    to: "submitted_to_kabid",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  kabid_review: {
+    // Kepala Bidang acknowledges and starts reviewing the JF submission
+    from: ["submitted_to_kabid"],
+    to: "review_kabid",
+    roles: ["kepala_bidang", "super_admin"],
+  },
+  kabid_approve: {
+    // Kepala Bidang approves — task ready for Sekretaris governance chain
+    from: ["review_kabid", "submitted_to_kabid"],
+    to: "approved_kabid",
+    roles: ["kepala_bidang", "super_admin"],
+  },
+  kabid_return: {
+    // Kepala Bidang returns document to JF for revision
+    from: ["review_kabid", "submitted_to_kabid"],
+    to: "returned_to_jf",
+    roles: ["kepala_bidang", "super_admin"],
+  },
+  jf_resubmit: {
+    // JF revises and resubmits to Kabid after return
+    from: ["returned_to_jf"],
+    to: "submitted_to_kabid",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  kabid_forward_sekretaris: {
+    // Kepala Bidang forwards approved task to Sekretaris governance chain.
+    // Transitions to `verified` — the mandatory entry point for Sekretaris approval.
+    // requireKabidBeforeSekretaris guard enforces this path in Bidang routes.
+    from: ["approved_kabid"],
+    to: "verified",
+    roles: ["kepala_bidang", "super_admin"],
   },
 };
 
