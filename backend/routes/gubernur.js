@@ -1,6 +1,7 @@
 import express from "express";
 import { protect } from "../middleware/auth.js";
 import gubernurGuard from "../middleware/gubernurGuard.js";
+import { requireKadinBeforeGubernur } from "../middleware/chainOfCommandGuard.js";
 
 import { getSummary, getPetaPangan, getBriefingHarian } from "../controllers/gubernur/dashboardController.js";
 import {
@@ -57,6 +58,31 @@ router.get("/pengajuan/:id/riwayat", getRiwayatPengajuan);
 router.get("/notifikasi", listNotifikasi);
 router.put("/notifikasi/:id/baca", bacaNotifikasi);
 router.put("/notifikasi/baca-semua", bacaSemua);
+
+// Task governance — Gubernur putuskan task yang dieskalasi dari Kadis (v2.8)
+// requireKadinBeforeGubernur: task must be in escalated_to_governor status
+router.post("/tasks/:id/approve", requireKadinBeforeGubernur, async (req, res, next) => {
+  req.body._governor_action = "governor_approve";
+  next();
+});
+router.post("/tasks/:id/reject", requireKadinBeforeGubernur, async (req, res, next) => {
+  req.body._governor_action = "governor_reject";
+  next();
+});
+// Read-only: list tasks escalated to governor
+router.get("/tasks/escalated", async (req, res) => {
+  try {
+    const { default: Task } = await import("../models/Task.js");
+    const tasks = await Task.findAll({
+      where: { status: "escalated_to_governor" },
+      order: [["updated_at", "DESC"]],
+      limit: 50,
+    });
+    return res.json({ success: true, data: tasks });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 export default router;
 

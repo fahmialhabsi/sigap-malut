@@ -5,6 +5,7 @@ import {
   requireKabidKonsumsi,
   blockSkpPelaksanaForKabid,
 } from "../middleware/kabidKonsumsiGuard.js";
+import { requireJFBeforeKabid, requireKabidBeforeSekretaris } from "../middleware/chainOfCommandGuard.js";
 import {
   getDashboardSummary,
   getDualHero,
@@ -61,10 +62,10 @@ router.get("/koordinasi-uptd/hasil", listHasilUjiUptdMasuk);
 router.get("/tim", getTimJF);
 router.post("/tugas", assignTugasKeJF);
 
-// Approval queue dari JF
+// Approval queue dari JF — requireJFBeforeKabid enforces governance (DB-backed, ZERO TRUST)
 router.get("/approval-queue", getApprovalQueue);
-router.post("/approval-queue/:id/setujui", setujuiDokumenJF);
-router.post("/approval-queue/:id/kembalikan", kembalikanDokumenKJF);
+router.post("/approval-queue/:id/setujui", requireJFBeforeKabid, setujuiDokumenJF);
+router.post("/approval-queue/:id/kembalikan", requireJFBeforeKabid, kembalikanDokumenKJF);
 
 // === SKP (CONFIDENTIAL) ===
 router.get("/skp/jf", getSkpJF);

@@ -20,6 +20,7 @@ import {
   getInflasiLatest,
   getKomoditasStock,
 } from "../controllers/dashboardController.js";
+import { getRenjaRkpdSummary } from "../controllers/planningRenjaRkpdDashboardController.js";
 
 const router = Router();
 
@@ -40,6 +41,12 @@ router.get(
   requireAnyPermission(["dashboard:read", "sek-keu:read"]),
   withCache("dashboard:sekretaris", TTL.DASHBOARD),
   getSekretarisSummary,
+);
+
+router.get(
+  "/renja-summary",
+  requireAnyPermission(["dashboard:read", "sek-keu:read"]),
+  getRenjaRkpdSummary,
 );
 
 export default router;

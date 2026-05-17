@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { protect } from '../middleware/auth.js';
 import { confidentialSkpGuard } from '../middleware/confidentialSkpGuard.js';
-import { blockDirectSubmitToKabid } from '../middleware/chainOfCommandGuard.js';
+import { blockDirectSubmitToKabid, requireKabidBeforeSekretaris } from '../middleware/chainOfCommandGuard.js';
 import {
   getTugasKabid,
   terimaTugasKabid,
