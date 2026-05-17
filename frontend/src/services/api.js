@@ -17,8 +17,8 @@ function normalizeUrlAgainstBase(url, baseURL) {
 
   const basePath = resolveBasePath(baseURL);
   if (basePath.endsWith("/api") && /^\/api(?:\/|$)/.test(url)) {
-    const stripped = url.replace(/^\/api(?=\/|$)/, "");
-    return stripped || "/";
+    // Pertahankan prefix /api agar tidak ter-strip; baseURL juga /api
+    return url;
   }
 
   return url;

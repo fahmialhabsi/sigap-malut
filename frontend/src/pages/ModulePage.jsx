@@ -2,9 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
+import M028ListPage from "./sekretariat/M028ListPage";
+import M029ListPage from "./sekretariat/M029ListPage";
 
 export default function ModulePage() {
   const { moduleId } = useParams();
+  const mid = String(moduleId || "").toLowerCase();
+  if (mid === "m028") return <M028ListPage />;
+  if (mid === "m029") return <M029ListPage />;
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

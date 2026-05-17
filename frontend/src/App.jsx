@@ -10,6 +10,10 @@ import CommentWorkflowPage from "./pages/CommentWorkflowPage";
 import CaseWorkflowPage from "./pages/CaseWorkflowPage";
 import ReminderPage from "./pages/ReminderPage";
 const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
+const RegulasiTransactionMigrationPage = lazy(() =>
+  import("./pages/RegulasiTransactionMigrationPage.jsx"),
+);
+const MasterCascadeTestPage = lazy(() => import("./pages/MasterCascadeTestPage.jsx"));
 
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -146,6 +150,28 @@ function App() {
             <PrivateRoute>
               <DashboardSuperAdmin />
             </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/admin/migration-transactions"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <PrivateRoute>
+                <RegulasiTransactionMigrationPage />
+              </PrivateRoute>
+            </Suspense>
+          }
+        />
+
+        <Route
+          path="/admin/master-cascade-test"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <PrivateRoute>
+                <MasterCascadeTestPage />
+              </PrivateRoute>
+            </Suspense>
           }
         />
 

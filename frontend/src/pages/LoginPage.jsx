@@ -11,10 +11,116 @@ function normalizeUnit(user) {
   return v ? String(v).toLowerCase() : "";
 }
 
+/**
+ * Validasi apakah user yang berhasil login memang berhak masuk
+ * melalui portal yang dipilih di landing page.
+ * Mengembalikan { allowed: boolean, portalLabel: string }
+ */
+function validatePortalAccess(roleParam, user) {
+  if (!roleParam) return { allowed: true, portalLabel: "" };
+
+  const roleName = normalizeRoleKey(user);
+  const unit = normalizeUnit(user);
+  const jabatan = (user?.jabatan || "").toLowerCase();
+
+  // Super admin boleh masuk dari portal mana pun
+  if (roleName === "super_admin") return { allowed: true, portalLabel: "" };
+
+  const PORTAL_MAP = {
+    gubernur: {
+      label: "Gubernur",
+      check: () => roleName === "gubernur",
+    },
+    kepala_dinas: {
+      label: "Kepala Dinas",
+      check: () => roleName === "kepala_dinas" || roleName === "kadin",
+    },
+    sekretaris: {
+      label: "Sekretariat Dinas Pangan",
+      check: () =>
+        unit.includes("sekretariat") ||
+        roleName === "sekretaris" ||
+        roleName === "kasubag" ||
+        roleName === "kasubag_umum_kepegawaian" ||
+        roleName === "kasubbag" ||
+        roleName === "kasubbag_umum" ||
+        roleName === "kasubbag_kepegawaian" ||
+        roleName === "kasubag_kepegawaian" ||
+        jabatan.includes("sekretaris") ||
+        jabatan.includes("kasubag"),
+    },
+    kepala_bidang_ketersediaan: {
+      label: "Bidang Ketersediaan dan Kerawanan Pangan",
+      check: () =>
+        unit.includes("ketersediaan") ||
+        roleName === "kepala_bidang_ketersediaan" ||
+        roleName === "pelaksana_ketersediaan" ||
+        roleName === "fungsional_ketersediaan" ||
+        jabatan.includes("ketersediaan"),
+    },
+    kepala_bidang_distribusi: {
+      label: "Bidang Distribusi dan Cadangan Pangan",
+      check: () =>
+        unit.includes("distribusi") ||
+        unit.includes("cadangan") ||
+        roleName === "kepala_bidang_distribusi" ||
+        roleName === "pelaksana_distribusi" ||
+        roleName === "fungsional_distribusi" ||
+        jabatan.includes("distribusi") ||
+        jabatan.includes("cadangan"),
+    },
+    kepala_bidang_konsumsi: {
+      label: "Bidang Konsumsi dan Keamanan Pangan",
+      check: () =>
+        unit.includes("konsumsi") ||
+        unit.includes("keamanan") ||
+        roleName === "kepala_bidang_konsumsi" ||
+        roleName === "pelaksana_konsumsi" ||
+        roleName === "fungsional_konsumsi" ||
+        jabatan.includes("konsumsi") ||
+        jabatan.includes("keamanan pangan"),
+    },
+    kepala_uptd: {
+      label: "Balai Pengawasan Mutu dan Keamanan Pangan (UPTD)",
+      check: () =>
+        unit.includes("uptd") ||
+        unit.includes("balai") ||
+        roleName === "kepala_uptd" ||
+        roleName === "kasi_uptd" ||
+        roleName === "kasi_mutu" ||
+        roleName === "kasi_teknis" ||
+        roleName === "kasubag_uptd" ||
+        roleName === "kasubbag_tu_uptd" ||
+        jabatan.includes("uptd") ||
+        jabatan.includes("balai"),
+    },
+  };
+
+  const portal = PORTAL_MAP[roleParam];
+  if (!portal) return { allowed: true, portalLabel: "" };
+
+  return {
+    allowed: portal.check(),
+    portalLabel: portal.label,
+  };
+}
+
+// Label portal yang ramah untuk ditampilkan ke pengguna
+const PORTAL_LABELS = {
+  gubernur: "Gubernur",
+  kepala_dinas: "Kepala Dinas",
+  sekretaris: "Sekretariat Dinas Pangan",
+  kepala_bidang_ketersediaan: "Bidang Ketersediaan dan Kerawanan Pangan",
+  kepala_bidang_distribusi: "Bidang Distribusi dan Cadangan Pangan",
+  kepala_bidang_konsumsi: "Bidang Konsumsi dan Keamanan Pangan",
+  kepala_uptd: "Balai Pengawasan Mutu dan Keamanan Pangan (UPTD)",
+  super_admin: "Super Admin",
+};
+
 export default function LoginPage() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const roleParam = params.get("role"); // UI only: gubernur / kepala_bidang_konsumsi / dll
+  const roleParam = params.get("role");
 
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +128,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -40,6 +147,19 @@ export default function LoginPage() {
       try {
         user = JSON.parse(localStorage.getItem("user"));
       } catch {}
+
+      // Validasi: apakah user berhak masuk portal ini?
+      const { allowed, portalLabel } = validatePortalAccess(roleParam, user);
+      if (!allowed) {
+        logout();
+        const selectedPortal = PORTAL_LABELS[roleParam] || roleParam;
+        setError(
+          `Akun Anda tidak terdaftar untuk portal "${selectedPortal}". ` +
+          `Silakan kembali ke halaman utama dan pilih unit kerja yang sesuai.`
+        );
+        setLoading(false);
+        return;
+      }
 
       const roleName = normalizeRoleKey(user);
       const unit = normalizeUnit(user);
@@ -177,15 +297,27 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-800">SIGAP Malut</h1>
           {roleParam && (
             <p className="text-xs text-gray-500 mt-2">
-              Login untuk: <span className="font-semibold">{roleParam}</span>
+              Portal:{" "}
+              <span className="font-semibold text-blue-700">
+                {PORTAL_LABELS[roleParam] || roleParam}
+              </span>
             </p>
           )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <p>{error}</p>
+              {error.includes("tidak terdaftar untuk portal") && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="mt-2 underline text-red-800 font-semibold hover:text-red-900"
+                >
+                  ← Kembali ke Halaman Utama
+                </button>
+              )}
             </div>
           )}
 

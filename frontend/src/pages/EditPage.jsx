@@ -10,6 +10,7 @@ export default function EditPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [renjaList, setRenjaList] = useState([]);
 
   const {
     register,
@@ -18,9 +19,29 @@ export default function EditPage() {
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: {} });
 
+  const normalized = String(moduleId || "").toLowerCase();
+
+  useEffect(() => {
+    if (normalized !== "m029") return;
+    let ok = true;
+    (async () => {
+      try {
+        const res = await api.get("/renja", { params: { limit: 500 } });
+        const data = res.data?.data || [];
+        if (ok) setRenjaList(Array.isArray(data) ? data : []);
+      } catch {
+        if (ok) setRenjaList([]);
+      }
+    })();
+    return () => {
+      ok = false;
+    };
+  }, [normalized]);
+
   const fetchData = useCallback(async () => {
     try {
-      const response = await api.get(`/${moduleId}/${id}`);
+      const path = resolveResourcePath(moduleId, id);
+      const response = await api.get(path);
       reset(response.data.data || {});
     } catch (err) {
       setError(err.response?.data?.message || "Error loading data");
@@ -36,7 +57,8 @@ export default function EditPage() {
   const onSubmit = async (data) => {
     const sanitized = sanitizeObject(data);
     try {
-      await api.put(`/${moduleId}/${id}`, sanitized);
+      const path = resolveResourcePath(moduleId, id);
+      await api.put(path, sanitized);
       notifySuccess("Data berhasil diupdate");
       navigate(`/module/${moduleId}`);
     } catch (err) {
@@ -89,7 +111,7 @@ export default function EditPage() {
                 {field.required && <span className="text-red-500"> *</span>}
               </label>
 
-              {renderField(field, register, errors)}
+              {renderField(field, register, errors, { renjaList })}
               {errors[field.name] && (
                 <p className="mt-1 text-xs text-red-600" role="alert">
                   {errors[field.name]?.message || `${field.label} wajib diisi`}
@@ -121,8 +143,16 @@ export default function EditPage() {
   );
 }
 
+function resolveResourcePath(moduleId, recordId) {
+  const m = String(moduleId || "").toLowerCase();
+  if (m === "m028") return `/renja/${recordId}`;
+  if (m === "m029") return `/rkpd/${recordId}`;
+  return `/${moduleId}/${recordId}`;
+}
+
 // Helper: Render field based on type (react-hook-form register)
-function renderField(field, register, errors) {
+function renderField(field, register, errors, ctx = {}) {
+  const { renjaList = [] } = ctx;
   const hasError = !!errors[field.name];
   const baseClass = `w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
     hasError ? "border-red-400 bg-red-50" : "border-gray-300"
@@ -131,6 +161,19 @@ function renderField(field, register, errors) {
   const validation = {
     ...(field.required && { required: `${field.label} wajib diisi` }),
   };
+
+  if (field.dynamicRenja) {
+    return (
+      <select {...register(field.name, validation)} className={baseClass}>
+        <option value="">— Pilih Renja —</option>
+        {renjaList.map((r) => (
+          <option key={r.id} value={r.id}>
+            [{r.tahun}] {r.judul || r.program || `ID ${r.id}`}
+          </option>
+        ))}
+      </select>
+    );
+  }
 
   if (field.type === "select") {
     return (
@@ -184,6 +227,8 @@ function getModuleName(moduleId) {
     "sek-adm": "Administrasi Umum",
     "bds-hrg": "Harga Pangan",
     "bkt-pgd": "Produksi Pangan",
+    m028: "Renja",
+    m029: "RKPD",
   };
   return names[moduleId] || moduleId.toUpperCase();
 }
@@ -305,6 +350,89 @@ function getEditableFields(moduleId) {
         label: "Keterangan",
         type: "textarea",
         fullWidth: true,
+      },
+    ],
+    m028: [
+      { name: "tahun", label: "Tahun", type: "number", required: true },
+      {
+        name: "perangkat_daerah",
+        label: "Perangkat daerah",
+        type: "text",
+        required: false,
+      },
+      { name: "program", label: "Program", type: "text", required: true },
+      { name: "kegiatan", label: "Kegiatan", type: "text", required: true },
+      { name: "indikator", label: "Indikator", type: "text", required: true },
+      { name: "target", label: "Target", type: "text", required: false },
+      {
+        name: "pagu",
+        label: "Pagu",
+        type: "number",
+        step: "0.01",
+        required: true,
+      },
+      {
+        name: "judul",
+        label: "Judul (opsional)",
+        type: "text",
+        required: false,
+        fullWidth: true,
+      },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        required: true,
+        options: [
+          { value: "draft", label: "Draft" },
+          { value: "diajukan", label: "Diajukan" },
+          { value: "disetujui", label: "Disetujui" },
+          { value: "ditolak", label: "Ditolak" },
+        ],
+      },
+    ],
+    m029: [
+      {
+        name: "renja_id",
+        label: "Renja induk",
+        type: "select",
+        required: true,
+        dynamicRenja: true,
+      },
+      { name: "tahun", label: "Tahun", type: "number", required: true },
+      {
+        name: "nama_sub_kegiatan",
+        label: "Sub kegiatan",
+        type: "text",
+        required: true,
+        fullWidth: true,
+      },
+      {
+        name: "indikator",
+        label: "Indikator",
+        type: "text",
+        required: true,
+        fullWidth: true,
+      },
+      { name: "target", label: "Target", type: "text", required: false },
+      {
+        name: "pagu",
+        label: "Pagu",
+        type: "number",
+        step: "0.01",
+        required: true,
+      },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        required: true,
+        options: [
+          { value: "draft", label: "Draft" },
+          { value: "diajukan", label: "Diajukan" },
+          { value: "disetujui", label: "Disetujui" },
+          { value: "ditolak", label: "Ditolak" },
+        ],
       },
     ],
     "bkt-pgd": [

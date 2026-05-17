@@ -10,7 +10,8 @@ export default function ViewDetailPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await api.get(`/${moduleId}/${id}`);
+      const path = resolveResourcePath(moduleId, id);
+      const response = await api.get(path);
       setData(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || "Error loading data");
@@ -80,8 +81,12 @@ export default function ViewDetailPage() {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Object.entries(data).map(([key, value]) => {
-              // Skip internal fields
-              if (["id", "created_by", "updated_by"].includes(key)) return null;
+              // Skip internal fields & nested yang ditampilkan khusus
+              if (
+                ["id", "created_by", "updated_by", "renstra"].includes(key)
+              ) {
+                return null;
+              }
 
               return (
                 <div key={key} className="border-b border-gray-200 pb-4">
@@ -112,11 +117,20 @@ export default function ViewDetailPage() {
 }
 
 // Helper functions
+function resolveResourcePath(moduleId, recordId) {
+  const m = String(moduleId || "").toLowerCase();
+  if (m === "m028") return `/renja/${recordId}`;
+  if (m === "m029") return `/rkpd/${recordId}`;
+  return `/${moduleId}/${recordId}`;
+}
+
 function getModuleName(moduleId) {
   const names = {
     "sek-adm": "Administrasi Umum",
     "bds-hrg": "Harga Pangan",
     "bkt-pgd": "Produksi Pangan",
+    m028: "Renja",
+    m029: "RKPD",
   };
   return names[moduleId] || moduleId.toUpperCase();
 }
@@ -157,6 +171,31 @@ function formatLabel(key) {
 
 function formatValue(key, value) {
   if (value === null || value === undefined || value === "") return "-";
+
+  if (key === "rkpds" && Array.isArray(value)) {
+    if (value.length === 0) return <span className="text-gray-400">Tidak ada RKPD</span>;
+    return (
+      <ul className="list-disc pl-5 space-y-1 text-sm">
+        {value.map((item) => (
+          <li key={item.id}>
+            <span className="font-medium">{item.nama_sub_kegiatan}</span>
+            {item.pagu != null && (
+              <span className="text-gray-500"> — pagu {String(item.pagu)}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (key === "renja" && value && typeof value === "object") {
+    return (
+      <span>
+        {value.judul || value.program || `Renja #${value.id}`}{" "}
+        <span className="text-gray-500">(tahun {value.tahun})</span>
+      </span>
+    );
+  }
 
   // Date fields
   if (key.includes("tanggal") || key === "periode" || key.includes("_at")) {

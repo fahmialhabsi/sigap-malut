@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +13,8 @@ export default function GenericCreatePage() {
   // Fallback ke 'sa05' jika moduleId tidak ada (khusus User Management)
   if (!moduleId || moduleId === "undefined") moduleId = "sa05";
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [renjaList, setRenjaList] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,14 +27,21 @@ export default function GenericCreatePage() {
   );
 
   // Bangun Zod schema secara dinamis dari field hasil API
-  const schema = useMemo(() => buildZodSchema(fields), [fields]);
+  const schema = useMemo(
+    () => buildZodSchema(fields, normalizedModuleId),
+    [fields, normalizedModuleId],
+  );
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
+
+  const renjaIdWatch = watch("renja_id");
 
   const loadFormConfig = useCallback(async () => {
     setLoading(true);
@@ -40,13 +49,21 @@ export default function GenericCreatePage() {
 
     try {
       const moduleResponse = await api.get(`/modules/${moduleId}`);
-      const moduleData = moduleResponse.data?.data;
+      const moduleData = moduleResponse.data?.data || {};
 
-      if (!moduleData?.tabel_name) {
+      const planningTable =
+        normalizedModuleId === "m028"
+          ? "renja"
+          : normalizedModuleId === "m029"
+            ? "rkpd"
+            : null;
+
+      if (!planningTable && !moduleData?.tabel_name) {
         throw new Error("Konfigurasi tabel modul tidak ditemukan");
       }
 
-      const metaResponse = await api.get(`/${moduleData.tabel_name}/meta`);
+      const tableKey = planningTable || moduleData.tabel_name;
+      const metaResponse = await api.get(`/${tableKey}/meta`);
       const columns = metaResponse.data?.data?.columns || [];
 
       const editableFields = columns.filter((column) => {
@@ -67,7 +84,17 @@ export default function GenericCreatePage() {
         return true;
       });
 
-      setModuleInfo(moduleData);
+      setModuleInfo({
+        ...moduleData,
+        tabel_name: tableKey,
+        nama_modul:
+          moduleData?.nama_modul ||
+          (normalizedModuleId === "m028"
+            ? "Renja"
+            : normalizedModuleId === "m029"
+              ? "RKPD"
+              : moduleData?.nama_modul),
+      });
       setFields(editableFields);
     } catch (err) {
       setError(
@@ -76,23 +103,51 @@ export default function GenericCreatePage() {
     } finally {
       setLoading(false);
     }
-  }, [moduleId]);
+  }, [moduleId, normalizedModuleId]);
 
   useEffect(() => {
     loadFormConfig();
   }, [loadFormConfig]);
 
+  useEffect(() => {
+    if (normalizedModuleId !== "m029") return;
+    let ok = true;
+    (async () => {
+      try {
+        const res = await api.get("/renja", { params: { limit: 500 } });
+        const data = res.data?.data || [];
+        if (ok) setRenjaList(Array.isArray(data) ? data : []);
+      } catch {
+        if (ok) setRenjaList([]);
+      }
+    })();
+    return () => {
+      ok = false;
+    };
+  }, [normalizedModuleId]);
+
   // Reset form dengan nilai default setiap kali fields berubah
   useEffect(() => {
     if (fields.length) {
-      reset(
-        fields.reduce((acc, f) => {
-          acc[f.name] = "";
-          return acc;
-        }, {}),
-      );
+      const defaults = fields.reduce((acc, f) => {
+        acc[f.name] = "";
+        return acc;
+      }, {});
+      const qpRenja = searchParams.get("renja_id");
+      if (normalizedModuleId === "m029" && qpRenja) {
+        defaults.renja_id = qpRenja;
+        const r = renjaList.find((x) => String(x.id) === String(qpRenja));
+        if (r) defaults.tahun = String(r.tahun);
+      }
+      reset(defaults);
     }
-  }, [fields, reset]);
+  }, [fields, reset, searchParams, normalizedModuleId, renjaList]);
+
+  useEffect(() => {
+    if (normalizedModuleId !== "m029" || !renjaIdWatch) return;
+    const r = renjaList.find((x) => String(x.id) === String(renjaIdWatch));
+    if (r) setValue("tahun", String(r.tahun));
+  }, [renjaIdWatch, renjaList, normalizedModuleId, setValue]);
 
   const onSubmit = async (data) => {
     if (!moduleInfo?.tabel_name) return;
@@ -112,6 +167,15 @@ export default function GenericCreatePage() {
     }, {});
 
     try {
+      if (normalizedModuleId === "m029") {
+        if (payload.pagu_anggaran != null && payload.pagu == null) {
+          payload.pagu = payload.pagu_anggaran;
+        }
+        if (!payload.renja_id) {
+          notifyError("Pilih Renja induk untuk RKPD.");
+          return;
+        }
+      }
       await api.post(`/${moduleInfo.tabel_name}`, payload);
       notifySuccess("Data berhasil ditambahkan");
       navigate(`/module/${normalizedModuleId}`);
@@ -199,7 +263,10 @@ export default function GenericCreatePage() {
                 {toLabel(field.name)}
                 {!field.allowNull && <span className="text-red-500"> *</span>}
               </label>
-              {renderInputField(field, register, errors)}
+              {renderInputField(field, register, errors, {
+                moduleId: normalizedModuleId,
+                renjaList,
+              })}
               {errors[field.name] && (
                 <p className="mt-1 text-xs text-red-600" role="alert">
                   {errors[field.name]?.message}
@@ -271,7 +338,7 @@ function normalizeValueByType(value, columnType = "") {
 /**
  * Bangun Zod schema secara dinamis dari daftar field yang dimuat dari API.
  */
-function buildZodSchema(fields) {
+function buildZodSchema(fields, moduleIdNorm) {
   const shape = {};
   for (const field of fields) {
     const isRequired = !field.allowNull;
@@ -294,6 +361,12 @@ function buildZodSchema(fields) {
       }
       shape[field.name] = s;
     }
+  }
+  if (moduleIdNorm === "m029") {
+    shape.renja_id = z.coerce
+      .number({ invalid_type_error: "Renja induk wajib dipilih" })
+      .int()
+      .positive({ message: "Renja induk wajib dipilih" });
   }
   return z.object(shape);
 }
@@ -333,9 +406,23 @@ const INPUT_CLASS =
 /**
  * Render input field yang terintegrasi dengan react-hook-form register.
  */
-function renderInputField(field, register, errors) {
+function renderInputField(field, register, errors, ctx = {}) {
+  const { moduleId, renjaList = [] } = ctx;
   const hasError = !!errors[field.name];
   const cls = `${INPUT_CLASS} ${hasError ? "border-red-400 bg-red-50" : ""}`;
+
+  if (moduleId === "m029" && field.name === "renja_id") {
+    return (
+      <select {...register(field.name)} className={`${cls} bg-white`}>
+        <option value="">— Pilih Renja —</option>
+        {renjaList.map((r) => (
+          <option key={r.id} value={r.id}>
+            [{r.tahun}] {r.judul || r.program || `ID ${r.id}`}
+          </option>
+        ))}
+      </select>
+    );
+  }
 
   if (field.name === "unit_kerja") {
     return (

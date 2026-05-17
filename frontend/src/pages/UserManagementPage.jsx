@@ -43,7 +43,10 @@ export default function UserManagementPage() {
   const [showModal, setShowModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleteTargetUser, setDeleteTargetUser] = useState(null);
+  const [deleteMode, setDeleteMode] = useState("soft"); // "soft" | "hard"
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -170,7 +173,10 @@ export default function UserManagementPage() {
   ];
 
   const handleDelete = (id) => {
+    const target = userList.find((u) => String(u.id) === String(id));
     setDeleteTargetId(id);
+    setDeleteTargetUser(target || null);
+    setDeleteMode("soft");
   };
 
   const handleDeleteConfirm = async () => {
@@ -178,7 +184,10 @@ export default function UserManagementPage() {
     setDeleteLoading(true);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`/api/auth/users/${id}`, {
+      const url = deleteMode === "hard"
+        ? `/api/auth/users/${id}?force=true`
+        : `/api/auth/users/${id}`;
+      const res = await fetch(url, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -190,7 +199,11 @@ export default function UserManagementPage() {
         const usersData = await resUsers.json();
         setUserList(usersData.data || []);
         refreshAuditPanels();
-        notifySuccess("User berhasil dihapus");
+        if (data.soft_delete) {
+          notifySuccess(data.message || "User berhasil dinonaktifkan");
+        } else {
+          notifySuccess(data.message || "User berhasil dihapus permanen");
+        }
       } else {
         notifyError(data.message || "Gagal menghapus user");
       }
@@ -199,6 +212,7 @@ export default function UserManagementPage() {
     } finally {
       setDeleteLoading(false);
       setDeleteTargetId(null);
+      setDeleteTargetUser(null);
     }
   };
 
@@ -564,24 +578,46 @@ export default function UserManagementPage() {
     }
   };
 
-  const dataWithActions = userList.map((u) => ({
+  const filteredUserList = showInactive
+    ? userList
+    : userList.filter((u) => u.is_active !== false);
+
+  const dataWithActions = filteredUserList.map((u) => ({
     ...u,
+    username: (
+      <span className="flex items-center gap-1.5">
+        {u.is_active === false && (
+          <span className="text-[10px] bg-gray-200 text-gray-600 rounded px-1.5 py-0.5 font-semibold uppercase tracking-wide">
+            Nonaktif
+          </span>
+        )}
+        {u.username?.replace(/^__nonaktif_\d+__/, "")}
+      </span>
+    ),
+    email: u.email?.replace(/^__nonaktif_\d+__/, ""),
     aksi: (
       <React.Fragment>
         <div className="flex gap-2 justify-center">
+          {u.is_active !== false && (
+            <button
+              className="flex items-center gap-1 px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow transition"
+              title="Edit User"
+              onClick={() => handleEdit(u)}
+            >
+              <PencilSquareIcon className="w-4 h-4" /> Edit
+            </button>
+          )}
           <button
-            className="flex items-center gap-1 px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow transition"
-            title="Edit User"
-            onClick={() => handleEdit(u)}
-          >
-            <PencilSquareIcon className="w-4 h-4" /> Edit
-          </button>
-          <button
-            className="flex items-center gap-1 px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow transition"
-            title="Hapus User"
+            className={`flex items-center gap-1 px-2 py-1 rounded text-white text-xs font-semibold shadow transition ${
+              u.is_active === false
+                ? "bg-gray-400 hover:bg-gray-500"
+                : "bg-red-600 hover:bg-red-700"
+            }`}
+            title={u.is_active === false ? "Hapus Permanen" : "Hapus / Nonaktifkan"}
             onClick={() => handleDelete(u.id)}
           >
-            <TrashIcon className="w-4 h-4" /> Hapus
+            <TrashIcon className="w-4 h-4" />
+            {u.is_active === false ? "Hapus Permanen" : "Hapus"}
           </button>
         </div>
       </React.Fragment>
@@ -600,7 +636,26 @@ export default function UserManagementPage() {
         >
           <PlusIcon className="w-4 h-4" /> Tambah User
         </button>
-        <div className="overflow-x-auto mt-2 rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-3 mt-2 mb-2">
+          <span className="text-xs text-slate-500">
+            {filteredUserList.length} dari {userList.length} user ditampilkan
+          </span>
+          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-slate-600 select-none">
+            <input
+              type="checkbox"
+              checked={showInactive}
+              onChange={(e) => setShowInactive(e.target.checked)}
+              className="rounded"
+            />
+            Tampilkan user nonaktif
+          </label>
+          {userList.filter((u) => u.is_active === false).length > 0 && (
+            <span className="text-[11px] bg-gray-100 text-gray-600 border border-gray-200 rounded-full px-2 py-0.5 font-semibold">
+              {userList.filter((u) => u.is_active === false).length} nonaktif
+            </span>
+          )}
+        </div>
+        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
           <table className="min-w-[1200px] w-full text-sm border-collapse">
             <thead className="bg-gray-50 dark:bg-slate-800 sticky top-0 z-10">
               <tr>
@@ -936,15 +991,76 @@ export default function UserManagementPage() {
           </div>
         </div>
         {showModal && renderModal()}
-        <ConfirmModal
-          isOpen={deleteTargetId !== null}
-          title="Hapus User"
-          message="Yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan."
-          confirmLabel="Hapus"
-          loading={deleteLoading}
-          onConfirm={handleDeleteConfirm}
-          onCancel={() => setDeleteTargetId(null)}
-        />
+        {/* Dialog hapus user — soft delete default, hard delete opsional */}
+        {deleteTargetId !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+              <h3 className="text-lg font-bold text-gray-800">🗑️ Hapus User</h3>
+              {deleteTargetUser && (
+                <div className="bg-gray-50 rounded-lg px-4 py-2 text-sm text-gray-700 border border-gray-200">
+                  <p><span className="font-semibold">Username:</span> {deleteTargetUser.username}</p>
+                  <p><span className="font-semibold">Nama:</span> {deleteTargetUser.nama_lengkap}</p>
+                  <p><span className="font-semibold">Role:</span> {deleteTargetUser.role}</p>
+                </div>
+              )}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Tipe Penghapusan:</label>
+                <label className="flex items-start gap-3 p-3 rounded-lg border border-emerald-200 bg-emerald-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="deleteMode"
+                    value="soft"
+                    checked={deleteMode === "soft"}
+                    onChange={() => setDeleteMode("soft")}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <p className="font-semibold text-emerald-800 text-sm">✅ Nonaktifkan (Disarankan)</p>
+                    <p className="text-xs text-emerald-700 mt-0.5">User dinonaktifkan, tidak bisa login. Semua data historis (tugas, SPJ, log) tetap tersimpan utuh untuk audit trail.</p>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 p-3 rounded-lg border border-red-200 bg-red-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="deleteMode"
+                    value="hard"
+                    checked={deleteMode === "hard"}
+                    onChange={() => setDeleteMode("hard")}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <p className="font-semibold text-red-800 text-sm">⚠️ Hapus Permanen</p>
+                    <p className="text-xs text-red-700 mt-0.5">User dihapus dari database. Data historis (tugas, SPJ) tetap ada tapi kehilangan referensi pembuat. Tidak dapat dibatalkan.</p>
+                  </div>
+                </label>
+              </div>
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={deleteLoading}
+                  className={`flex-1 py-2 text-sm font-semibold rounded-lg text-white transition disabled:opacity-50 ${
+                    deleteMode === "hard"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-emerald-600 hover:bg-emerald-700"
+                  }`}
+                >
+                  {deleteLoading
+                    ? "Memproses…"
+                    : deleteMode === "hard"
+                    ? "Hapus Permanen"
+                    : "Nonaktifkan User"}
+                </button>
+                <button
+                  onClick={() => { setDeleteTargetId(null); setDeleteTargetUser(null); }}
+                  disabled={deleteLoading}
+                  className="px-4 py-2 text-sm font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition disabled:opacity-50"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <ConfirmModal
           isOpen={archiveModalOpen}
           title="Arsip retensi jejak audit"
