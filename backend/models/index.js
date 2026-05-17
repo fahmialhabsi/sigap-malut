@@ -95,6 +95,8 @@ import Renstra from "./Renstra.js";
 import Renja from "./Renja.js";
 import Monev from "./Monev.js";
 import Lakip from "./Lakip.js";
+import Rkpd from "./Rkpd.js";
+import RpjmdPeriode from "./RpjmdPeriode.js";
 
 // JF Keuangan / PPK (Prompt 6) models
 import Spj from "./Spj.js";
@@ -144,6 +146,20 @@ NotifikasiSekretaris.associate?.(sequelize.models);
 if (typeof BdsCpd.associate === "function") BdsCpd.associate(sequelize.models);
 if (typeof BdsHrg.associate === "function") BdsHrg.associate(sequelize.models);
 if (typeof BdsMon.associate === "function") BdsMon.associate(sequelize.models);
+
+// Planning associations
+if (!Renja.associations?.renstra) {
+  Renja.belongsTo(Renstra, { foreignKey: "renstra_id", as: "renstra" });
+}
+if (!Renja.associations?.rkpds) {
+  Renja.hasMany(Rkpd, { foreignKey: "renja_id", as: "rkpds" });
+}
+if (!Rkpd.associations?.renja) {
+  Rkpd.belongsTo(Renja, { foreignKey: "renja_id", as: "renja" });
+}
+if (!Rkpd.associations?.rpjmdPeriode) {
+  Rkpd.belongsTo(RpjmdPeriode, { foreignKey: "periode_rpjmd_id", as: "rpjmdPeriode" });
+}
 
 // Export semua model
 export {
@@ -223,6 +239,8 @@ export {
   AnalisaPerencanaan,
   Renstra,
   Renja,
+  Rkpd,
+  RpjmdPeriode,
   Monev,
   Lakip,
   Spj,

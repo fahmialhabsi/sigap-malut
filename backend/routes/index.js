@@ -36,6 +36,9 @@ import SEKLKTRoutes from "./SEK-LKT.js";
 import SEKLUPRoutes from "./SEK-LUP.js";
 import SEKRENRoutes from "./SEK-REN.js";
 import SEKRMHRoutes from "./SEK-RMH.js";
+import renstraRoutes from "./renstra.js";
+import renjaRoutes from "./renja.js";
+import rkpdRoutes from "./rkpd.js";
 import UPTADMRoutes from "./UPT-ADM.js";
 import UPTASTRoutes from "./UPT-AST.js";
 import UPTINSRoutes from "./UPT-INS.js";
@@ -109,6 +112,7 @@ import kadinRoutes from "./kadin.js";
 import clarificationRoutes from "./clarification.js";
 import panelRoutes from "./panel.js";
 import executionThreadRoutes from "./executionThread.js";
+import bridgeEpelaraRoutes from "./bridgeEpelara.js";
 import { protect } from "../middleware/auth.js";
 import { createReplicationPilotGuard } from "../middleware/uptdPilotGuard.js";
 
@@ -166,6 +170,9 @@ export default function registerRoutes(app) {
   app.use("/api/sek-lkt", protect, sekretariatPilotGuard, SEKLKTRoutes);
   app.use("/api/sek-lup", protect, sekretariatPilotGuard, SEKLUPRoutes);
   app.use("/api/sek-ren", protect, sekretariatPilotGuard, SEKRENRoutes);
+  app.use("/api/renstra", protect, sekretariatPilotGuard, renstraRoutes);
+  app.use("/api/renja", protect, sekretariatPilotGuard, renjaRoutes);
+  app.use("/api/rkpd", protect, sekretariatPilotGuard, rkpdRoutes);
   app.use("/api/sek-rmh", protect, sekretariatPilotGuard, SEKRMHRoutes);
   app.use("/api/upt-adm", UPTADMRoutes);
   app.use("/api/upt-ast", UPTASTRoutes);
@@ -242,6 +249,7 @@ export default function registerRoutes(app) {
   app.use("/api/clarification", clarificationRoutes);
   app.use("/api/panel", panelRoutes);
   app.use("/api/execution-thread", executionThreadRoutes);
+  app.use("/api/bridge", bridgeEpelaraRoutes);
 
   console.log("✅ API routes registered (incl. kabid/jf distribusi, pelaksana bidang)\n");
 }

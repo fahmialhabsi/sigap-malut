@@ -48,6 +48,19 @@ import ePelaraRoutes from "./routes/ePelaraRoutes.js";
 import bypassDetectionRoutes from "./routes/bypassDetection.js";
 import subKegiatanUsulRoutes from "./routes/subKegiatanUsul.js";
 import uptdOpsRoutes from "./routes/uptdOps.js";
+import uptdRoutes from "./routes/uptd.js";
+// Bidang JF + Kabid + Pelaksana routes (v2.7)
+import jfKetersediaanRoutes from "./routes/jf-ketersediaan.js";
+import jfDistribusiRoutes from "./routes/jf-distribusi.js";
+import jfKonsumsiRoutes from "./routes/jf-konsumsi.js";
+import kabidKetersediaanRoutes from "./routes/kabid-ketersediaan.js";
+import kabidDistribusiRoutes from "./routes/kabid-distribusi.js";
+import kabidKonsumsiRoutes from "./routes/kabid-konsumsi.js";
+import pelaksanaBidangRoutes from "./routes/pelaksana-bidang.js";
+import spjRoutes from "./routes/spj.js";
+// Strategic governance routes (v2.8)
+import gubernurRoutes from "./routes/gubernur.js";
+import kadinRoutes from "./routes/kadin.js";
 import { initSLAScheduler } from "./services/slaService.js";
 import { initDailyDigestScheduler } from "./services/dailyDigestService.js";
 import { initInstruksiReminderScheduler } from "./services/instruksiReminderScheduler.js";
@@ -57,6 +70,9 @@ import { initExecutiveEnterpriseScheduler } from "./services/executiveEnterprise
 import sekretarisRoutes from "./routes/sekretaris/sekretarisIndex.js";
 import publicRoutes from "./routes/public.js";
 import coordinationRoutes from "./routes/coordination.js";
+import migrationTransactionRoutes from "./routes/migrationTransaction.js";
+import migrationTransactionAdminRoutes from "./routes/migrationTransactionAdminRoutes.js";
+import migrationMasterRoutes from "./routes/migrationMasterRoutes.js";
 
 import { existsSync, mkdirSync } from "fs";
 import http from "http";
@@ -281,6 +297,9 @@ app.use("/api/surat", suratRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/auth/mfa", mfaRoutes);
 app.use("/api/epelara", ePelaraRoutes);
+app.use("/api/migration", migrationTransactionRoutes);
+app.use("/api/migration", migrationTransactionAdminRoutes);
+app.use("/api/migration", migrationMasterRoutes);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Runtime schema patch (Prompt 5/6) — memastikan tabel core JF tersedia
@@ -1100,7 +1119,20 @@ await ensureTaskDiscussionsTable();
 app.use("/api/bypassdetection", bypassDetectionRoutes);
 app.use("/api/sub-kegiatan-usul", subKegiatanUsulRoutes);
 app.use("/api/uptd-ops", uptdOpsRoutes);
+app.use("/api/uptd", uptdRoutes);
+// Bidang routes (v2.7) — JF, Kabid, Pelaksana
+app.use("/api/jf/ketersediaan", jfKetersediaanRoutes);
+app.use("/api/jf/distribusi", jfDistribusiRoutes);
+app.use("/api/jf/konsumsi", jfKonsumsiRoutes);
+app.use("/api/kabid/ketersediaan", kabidKetersediaanRoutes);
+app.use("/api/kabid/distribusi", kabidDistribusiRoutes);
+app.use("/api/kabid/konsumsi", kabidKonsumsiRoutes);
+app.use("/api/pelaksana-bidang", pelaksanaBidangRoutes);
+app.use("/api/spj", spjRoutes);
 app.use("/api/sekretaris", sekretarisRoutes);
+// Strategic governance routes (v2.8)
+app.use("/api/gubernur", gubernurRoutes);
+app.use("/api/kadin", kadinRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api/coordination", coordinationRoutes);
 
