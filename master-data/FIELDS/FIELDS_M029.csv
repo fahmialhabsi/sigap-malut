@@ -1,15 +1,22 @@
 field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
 id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
-kpi_code,Kode KPI,varchar,10,true,true,NULL,uppercase,NULL,Contoh: C.1 atau C.25
-kpi_name,Nama KPI,varchar,255,true,false,NULL,none,NULL,Nama indikator keberhasilan
-kategori,Kategori,enum,NULL,true,false,NULL,none,"efisiensi_operasional,akuntabilitas,kepuasan_stakeholder,dampak_strategis,kepegawaian,keuangan,data_pelaporan,inflasi,sppg",Kategori KPI
-target_value,Target,decimal,"10,2",true,false,NULL,none,NULL,Target yang ingin dicapai
-target_unit,Satuan Target,enum,NULL,true,false,persen,none,"persen,hari,jumlah,rupiah",Satuan dari target
-current_value,Nilai Saat Ini,decimal,"10,2",false,false,0,none,NULL,Nilai pencapaian saat ini
-status,Status,enum,NULL,true,false,pending,none,"on_target,warning,critical,achieved",Status pencapaian
-periode,Periode,date,NULL,true,false,NULL,none,NULL,Bulan periode pengukuran
-penanggung_jawab,Penanggung Jawab,varchar,255,false,false,NULL,none,NULL,Unit yang bertanggung jawab
-cara_pengukuran,Cara Pengukuran,text,NULL,false,false,NULL,none,NULL,Metode pengukuran KPI
-is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,KPI masih digunakan
+tahun,Tahun RKPD,int,4,true,false,NULL,min:2000,NULL,Tahun dokumen
+periode_rpjmd_id,Periode RPJMD,int,11,false,false,NULL,none,NULL,Relasi periode RPJMD
+kode_program,Kode Program,varchar,50,true,false,NULL,none,NULL,
+nama_program,Nama Program,varchar,255,true,false,NULL,none,NULL,
+kode_kegiatan,Kode Kegiatan,varchar,50,true,false,NULL,none,NULL,
+nama_kegiatan,Nama Kegiatan,varchar,255,true,false,NULL,none,NULL,
+kode_sub_kegiatan,Kode Sub Kegiatan,varchar,50,true,false,NULL,none,NULL,
+nama_sub_kegiatan,Nama Sub Kegiatan,varchar,255,true,false,NULL,none,NULL,
+indikator,Indikator Kinerja,text,NULL,true,false,NULL,none,NULL,
+target,Target,decimal,"12,2",true,false,NULL,number,NULL,
+satuan,Satuan,enum,NULL,true,false,NULL,none,"unit,persen,km,hektar,juta",Satuan target
+pagu_anggaran,Pagu Anggaran,decimal,"15,2",true,false,0,number,NULL,Pagu indikatif
+sumber_dana,Sumber Dana,varchar,128,false,false,NULL,none,NULL,
+opd_penanggung_jawab,OPD Penanggung Jawab,varchar,255,true,false,NULL,none,NULL,
+status,Status,enum,NULL,true,false,draft,none,"draft,disetujui,final,publish",Tahap dokumen
+epelara_rkpd_id,ID RKPD e-Pelara,varchar,100,false,false,NULL,none,NULL,Mapping eksternal
+sinkronisasi_status,Status Sinkronisasi,enum,NULL,true,false,belum_sinkron,none,"belum_sinkron,sinkron,perlu_revisi",Status sinkronisasi
+sinkronisasi_terakhir,Sinkronisasi Terakhir,timestamp,NULL,false,false,NULL,none,NULL,
 created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
 updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
