@@ -36,7 +36,7 @@ export default function DpaBidangWidget({
     setError(null);
 
     api
-      .get("/epelara/dpa", { params: { tahun } })
+      .get("/api/epelara/dpa", { params: { tahun } })
       .then((res) => {
         if (cancelled) return;
         const rows = Array.isArray(res.data) ? res.data : [];

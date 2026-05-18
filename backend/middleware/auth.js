@@ -41,6 +41,7 @@ export const protect = async (req, res, next) => {
         role: decoded.role,
         unit_kerja: decoded.unit_kerja,
         nama_lengkap: decoded.nama_lengkap,
+        jabatan: decoded.jabatan || "",
       };
 
       next();
@@ -89,6 +90,7 @@ export const optionalAuth = async (req, res, next) => {
         role: decoded.role,
         unit_kerja: decoded.unit_kerja,
         nama_lengkap: decoded.nama_lengkap,
+        jabatan: decoded.jabatan || "",
       };
     } catch (error) {
       // Token invalid tapi tidak block request

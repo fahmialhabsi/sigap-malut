@@ -5,7 +5,11 @@ import { getKasubagDashboardSummary } from "../controllers/kasubag/dashboardCont
 import { listInboxSekretaris } from "../controllers/kasubag/inboxSekretarisController.js";
 import { listVerifikasiQueue } from "../controllers/kasubag/verifikasiQueueController.js";
 import { kembalikanKePelaksana, verifikasiOk } from "../controllers/kasubag/verifikasiQueueController.js";
-import { getTimSayaKanban } from "../controllers/kasubag/timController.js";
+import {
+  getTimSayaKanban,
+  getTimAnggota,
+  createTugasMandiri,
+} from "../controllers/kasubag/timController.js";
 
 const router = express.Router();
 
@@ -18,6 +22,12 @@ router.get("/verifikasi", listVerifikasiQueue);
 router.post("/verifikasi/:id/kembalikan", kembalikanKePelaksana);
 router.post("/verifikasi/:id/ok", verifikasiOk);
 router.get("/tim/kanban", getTimSayaKanban);
+
+// Daftar anggota tim (bawahan langsung) — untuk dropdown pilih pelaksana
+router.get("/tim/anggota", getTimAnggota);
+
+// Buat tugas mandiri ke pelaksana — tanpa perintah dari Sekretaris
+router.post("/tugas-mandiri", createTugasMandiri);
 
 export default router;
 

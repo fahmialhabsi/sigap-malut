@@ -16,6 +16,10 @@ const Dpa =
       pagu_anggaran: { type: DataTypes.DECIMAL(15, 2), allowNull: false },
       realisasi: { type: DataTypes.DECIMAL(15, 2), allowNull: false, defaultValue: 0 },
       epelara_dpa_id: { type: DataTypes.STRING(100), allowNull: true },
+      /** FK master regulasi (nullable — sinkron bertahap dari ePelara / Tahap 6) */
+      master_program_id: { type: DataTypes.INTEGER, allowNull: true },
+      master_kegiatan_id: { type: DataTypes.INTEGER, allowNull: true },
+      master_sub_kegiatan_id: { type: DataTypes.INTEGER, allowNull: true },
       sinkronisasi_terakhir: { type: DataTypes.DATE, allowNull: true },
       created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
       updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },

@@ -1,6 +1,20 @@
-# 08-ERD-Logical-Model
+# 10 — ERD Logical Model Database SIGAP-MALUT
 
-> **VERSI:** 2.0 — Diperbarui 22 Maret 2026 berdasarkan keputusan arsitektur final (dokumen 33)
+> **VERSI:** 2.2 — Update 2026-04-05  
+> **Catatan Sinkronisasi:** Dokumen ini diperbarui agar konsisten dengan model Sequelize aktual di `backend/models/`. Perbedaan antara ERD desain dan implementasi aktual ditandai dengan label **[PLANNED]** atau **[KEPUTUSAN]**.
+
+## ⚠️ Catatan Sinkronisasi v2.2
+
+| Perbedaan | ERD (sebelum) | Implementasi Aktual | Status |
+|-----------|--------------|---------------------|--------|
+| `tasks.priority` | `VARCHAR(20)` ('normal','urgent') | `INTEGER` (1-4) | **[KEPUTUSAN]** INTEGER dipakai — lihat `07-kamus-data-field.md` |
+| `task_assignments.assignee_id_primer` | Ada (substitusi) | **Tidak ada di model** | **[PLANNED]** — belum diimplementasikan |
+| `task_assignments.adalah_substitusi` | Ada | **Tidak ada di model** | **[PLANNED]** |
+| `task_assignments.jenis_tugas` | Ada (standing assignment) | **Tidak ada di model** | **[PLANNED]** |
+| `task_assignments.jadwal_rutin` | Ada | **Tidak ada di model** | **[PLANNED]** |
+| `user_hierarchy.unit_kerja_asal` | Ada | **Tidak ada di model (hanya atasan_id, bawahan_id, adalah_primer, catatan)** | **[PLANNED]** |
+
+
 
 ## Tabel yang Sudah Ada (Existing)
 
@@ -59,7 +73,7 @@ tasks (
   description   TEXT,
   module        VARCHAR(100),
   source_unit   VARCHAR(100),
-  priority      VARCHAR(20) DEFAULT 'normal',
+  priority      INTEGER DEFAULT 3,   -- [KEPUTUSAN v2.2] INTEGER: 1=Urgent, 2=Tinggi, 3=Normal, 4=Rendah (ERD lama VARCHAR salah)
   due_date      TIMESTAMPTZ,
   sla_seconds   INTEGER,
   status        VARCHAR(50),
@@ -76,7 +90,7 @@ tasks (
 task_assignments (
   id                    SERIAL PRIMARY KEY,
   task_id               INTEGER NOT NULL REFERENCES tasks(id),
-  assignee_id_primer    INTEGER REFERENCES users(id),  -- Pelaksana yang seharusnya
+  assignee_id_primer    INTEGER REFERENCES users(id),  -- [PLANNED] Pelaksana seharusnya (substitusi)
   assignee_id_aktual    INTEGER REFERENCES users(id),  -- Pelaksana yang benar-benar kerjakan
   adalah_substitusi     BOOLEAN DEFAULT false,
   alasan_substitusi     TEXT,

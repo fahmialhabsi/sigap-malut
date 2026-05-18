@@ -1,6 +1,7 @@
 import express from "express";
 import { protect } from "../middleware/auth.js";
 import kadinGuard from "../middleware/kadinGuard.js";
+import { requireSekretarisBeforeKadin, requireKadinBeforeGubernur } from "../middleware/chainOfCommandGuard.js";
 
 import { getSummary, getKadinCockpit } from "../controllers/kadin/dashboardController.js";
 import {
@@ -16,6 +17,7 @@ import {
   createPengajuanKeGubernur,
   listPengajuanKeGubernurSaya,
 } from "../controllers/kadin/pengajuanKeGubernurController.js";
+import taskController from "../controllers/taskController.js";
 
 const router = express.Router();
 router.use(protect, kadinGuard);
@@ -39,6 +41,13 @@ router.get("/perintah/:id", getPerintahDetail);
 router.get("/approval", listApproval);
 router.get("/approval/:id", getApprovalDetail);
 router.post("/approval/:id/putuskan", putuskanApproval);
+
+// Task governance — Kadis bisa eskalasikan task ke Gubernur (v2.8)
+// requireKadinBeforeGubernur ensures task is in forwarded_to_kadin before escalation
+router.post("/tasks/:id/escalate-to-governor", requireKadinBeforeGubernur, (req, res, next) => {
+  req.body._action_override = "escalate_to_governor";
+  next();
+}, taskController);
 
 // Monitoring kinerja 5 bawahan langsung
 router.get("/kinerja/bawahan", getKinerjaBawahan);

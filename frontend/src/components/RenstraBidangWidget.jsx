@@ -32,8 +32,8 @@ export default function RenstraBidangWidget({
   useEffect(() => {
     setLoading(true);
     Promise.allSettled([
-      api.get("/epelara/renstra-opd", { params: { tahun, limit: 5 } }),
-      api.get("/epelara/target-renstra", { params: { tahun, limit: 8 } }),
+      api.get("/api/epelara/renstra-opd", { params: { tahun, limit: 5 } }),
+      api.get("/api/epelara/target-renstra", { params: { tahun, limit: 8 } }),
     ])
       .then(([renstraRes, targetRes]) => {
         if (renstraRes.status === "fulfilled") {

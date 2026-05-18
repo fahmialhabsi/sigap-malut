@@ -20,7 +20,7 @@ const SekRen = sequelize.define('SekRen', {
     comment: 'FK ke layanan_menpanrb (LY040-LY045)',
   },
   jenis_layanan_perencanaan: {
-    type: DataTypes.ENUM('"Renstra', 'Renja', 'Fasilitasi Program', 'Sinkronisasi', 'LKJIP/LAKIP', 'Laporan Kinerja"'),
+    type: DataTypes.ENUM('Renstra', 'Renja', 'Fasilitasi Program', 'Sinkronisasi', 'LKJIP/LAKIP', 'Laporan Kinerja'),
     allowNull: false,
     comment: 'Jenis layanan perencanaan',
   },
@@ -126,7 +126,7 @@ const SekRen = sequelize.define('SekRen', {
     comment: 'Rekomendasi perbaikan',
   },
   status_sinkronisasi: {
-    type: DataTypes.ENUM('"Belum', 'Proses', 'Sesuai', 'Tidak Sesuai"'),
+    type: DataTypes.ENUM('Belum', 'Proses', 'Sesuai', 'Tidak Sesuai'),
     comment: 'Sinkronisasi dengan RPJMD/RKPD',
   },
   file_renstra: {
@@ -161,13 +161,13 @@ const SekRen = sequelize.define('SekRen', {
     comment: 'Yang melaksanakan',
   },
   is_sensitive: {
-    type: DataTypes.ENUM('"Biasa', 'Sensitif"'),
+    type: DataTypes.ENUM('Biasa', 'Sensitif'),
     allowNull: false,
     defaultValue: 'Sensitif',
     comment: 'Data perencanaan sensitif',
   },
   status: {
-    type: DataTypes.ENUM('"draft', 'finalisasi', 'disetujui', 'final"'),
+    type: DataTypes.ENUM('draft', 'finalisasi', 'disetujui', 'final'),
     allowNull: false,
     defaultValue: 'draft',
     comment: 'Status dokumen',

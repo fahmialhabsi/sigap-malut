@@ -6,6 +6,8 @@ import Notification from "../../models/Notification.js";
 import sequelize from "../../config/database.js";
 
 // GET /api/kasubag/verifikasi
+// Menampilkan tugas yang SUDAH DISUBMIT oleh Pelaksana bawahan Kasubag ini,
+// menunggu verifikasi/persetujuan Kasubag.
 export async function listVerifikasiQueue(req, res) {
   try {
     const actorId = req.user?.id;
@@ -14,23 +16,50 @@ export async function listVerifikasiQueue(req, res) {
     const limitRaw = Number(req.query?.limit || 15);
     const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(limitRaw, 1), 50) : 15;
 
-    const assignments = await TaskAssignment.findAll({
-      where: { assignee_user_id: actorId },
+    // Ambil task yang di-assign OLEH Kasubag ini ke Pelaksana (assigned_by = actorId)
+    // ATAU task yang dibuat oleh Kasubag ini (created_by = actorId)
+    const byAssignedBy = await TaskAssignment.findAll({
+      where: { assigned_by: actorId },
       attributes: ["task_id"],
-      order: [["created_at", "DESC"]],
       limit: 1000,
     }).catch(() => []);
 
-    const taskIds = assignments.map((a) => a.task_id);
-    if (taskIds.length === 0) return res.json({ success: true, data: [], total: 0 });
+    const byCreatedBy = await Task.findAll({
+      where: { created_by: actorId, status: "submitted" },
+      attributes: ["id"],
+      limit: 1000,
+    }).catch(() => []);
 
+    const assignedTaskIds = byAssignedBy.map((a) => a.task_id);
+    const createdTaskIds = byCreatedBy.map((t) => t.id);
+
+    // Gabungkan dan deduplikasi
+    const allTaskIds = [...new Set([...assignedTaskIds, ...createdTaskIds])];
+    if (allTaskIds.length === 0) return res.json({ success: true, data: [], total: 0 });
+
+    // Filter hanya yang statusnya "submitted" (menunggu verifikasi)
     const rows = await Task.findAll({
-      where: { id: { [Op.in]: taskIds }, status: "submitted" },
+      where: { id: { [Op.in]: allTaskIds }, status: "submitted" },
       order: [["updated_at", "DESC"]],
       limit,
     }).catch(() => []);
 
-    return res.json({ success: true, data: rows, total: rows.length });
+    // Lampirkan info assignee (nama pelaksana) dari TaskAssignment
+    const enriched = await Promise.all(
+      rows.map(async (task) => {
+        const assignment = await TaskAssignment.findOne({
+          where: { task_id: task.id },
+          order: [["created_at", "DESC"]],
+        }).catch(() => null);
+        return {
+          ...task.toJSON(),
+          assignee_user_id: assignment?.assignee_user_id || null,
+          assignee_role: assignment?.assignee_role || null,
+        };
+      })
+    );
+
+    return res.json({ success: true, data: enriched, total: enriched.length });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }

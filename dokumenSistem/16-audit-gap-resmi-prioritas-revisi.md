@@ -14,12 +14,12 @@ Dokumen ini juga menyelaraskan kebutuhan integrasi e-Pelara, terutama untuk peng
 
 Temuan utama diambil dari:
 
-- 01-kondisi-dinas-pangan.md
-- 12-IT-Governance-SPBE-SPIP-Alignment.md
-- 13-System-Architecture-Document.md
-- openapi.yaml
-- 14-Role-Service-Requirements-Matrix.md
-- 15-e-pelara-integration-guide-for-sigap-malut.md
+- `01-profil-dan-kondisi-dinas-pangan.md`
+- `12-tata-kelola-it-spbe-spip.md`
+- `13-arsitektur-sistem.md`
+- `openapi.yaml`
+- `14b-matriks-kebutuhan-layanan-per-role.md`
+- `15-panduan-integrasi-e-pelara-ke-sigap.md`
 
 ## 3. Ringkasan Gap Kritis
 
@@ -35,7 +35,7 @@ Temuan utama diambil dari:
 
 ## 4. Kesesuaian Terhadap Masalah Inti Dinas
 
-Mengacu masalah inti pada 01-kondisi-dinas-pangan.md:
+Mengacu masalah inti pada `01-profil-dan-kondisi-dinas-pangan.md`:
 
 - Peran sekretariat: sebagian besar sudah dipetakan, tetapi butuh enforcement teknis dan audit kontrol.
 - Perencanaan: belum cukup detail pada aturan data-driven planning, linkage RPJMD/RPJPD, dan sinkronisasi lintas OPD.
@@ -71,12 +71,12 @@ Mengacu masalah inti pada 01-kondisi-dinas-pangan.md:
 
 | Dokumen                           | Aksi                                     | Owner Rekomendasi          | Target   |
 | --------------------------------- | ---------------------------------------- | -------------------------- | -------- |
-| 17-Keamanan-Informasi-Lengkap.md  | Tambah dan jadikan acuan utama keamanan  | Security + BE Lead         | Minggu 1 |
-| 18-Deployment-Production-Guide.md | Tambah dan jadikan standar rilis         | DevOps + BE Lead           | Minggu 1 |
-| 19-Operations-Runbook.md          | Tambah dan jadikan SOP operasional       | Ops/SRE + QA               | Minggu 2 |
-| 20-Testing-Strategy.md            | Tambah dan jadikan quality gate          | QA Lead + Squad Lead       | Minggu 2 |
-| 21-Compliance-Matrix-SPBE-SPIP.md | Tambah dan jadikan matriks audit bukti   | PMO/QA/Inspektorat liaison | Minggu 2 |
-| openapi.yaml                      | Lengkapi endpoint prioritas lintas modul | BE/API Team                | Minggu 2 |
+| `17-keamanan-informasi-operasional.md`  | Tambah dan jadikan acuan utama keamanan  | Security + BE Lead         | Minggu 1 |
+| `18-panduan-deployment-production.md` | Tambah dan jadikan standar rilis         | DevOps + BE Lead           | Minggu 1 |
+| `19-runbook-operasional-dan-sop.md`          | Tambah dan jadikan SOP operasional       | Ops/SRE + QA               | Minggu 2 |
+| `20-strategi-testing-dan-quality-gate.md`            | Tambah dan jadikan quality gate          | QA Lead + Squad Lead       | Minggu 2 |
+| `21-matriks-kepatuhan-spbe-spip.md` | Tambah dan jadikan matriks audit bukti   | PMO/QA/Inspektorat liaison | Minggu 2 |
+| `openapi.yaml`                      | Lengkapi endpoint prioritas lintas modul | BE/API Team                | Minggu 2 |
 
 ## 7. Gate Keberhasilan Revisi Dokumen
 
@@ -100,3 +100,19 @@ Integrasi e-Pelara diposisikan sebagai akselerator untuk menutup gap perencanaan
 ## 9. Pernyataan Resmi
 
 Dokumen ini menjadi baseline resmi untuk prioritas revisi dokumenSistem. Seluruh eksekusi pengembangan dan validasi generator harus merujuk pada baseline ini.
+
+---
+
+## 10. Status Penutupan Gap — Update 2026-04-05
+
+Diperbarui dari audit enterprise `audit/dokumen-enterprise-2026-04-05`.
+
+| Kode | Gap Awal | Status Sekarang | Bukti / Catatan |
+|------|----------|-----------------|-----------------|
+| GAP-01 | Keamanan informasi | **Partial-Close** | Dokumen 17 lengkap; kontrol teknis (JWT, RBAC middleware, audit_log) ada di codebase. Residual: rate limiting belum diterapkan → lihat `dev-backlog.md` BL-011 |
+| GAP-02 | Deployment produksi | **Partial-Close** | Dokumen 18 + 60 tersedia; variabel lingkungan, migration guide lengkap. Residual: CI/CD pipeline belum ada → BL-010 |
+| GAP-03 | Operasional dan DR | **Partial-Close** | Dokumen 19 dengan runbook, RTO/RPO, prosedur insiden ada. Residual: belum pernah diuji restore |
+| GAP-04 | Strategi testing | **Partial-Close** | Dokumen 20 ada; simulasi API terverifikasi (dok 59). Residual: coverage target tidak terisi → BL-009 |
+| GAP-05 | Compliance matrix | **Partial-Close** | Dokumen 21 ada dengan 12 kontrol. Residual: semua masih PARTIAL/GAP; tidak ada satu pun COMPLETE |
+| GAP-06 | Kontrak API | **Open** | `openapi.yaml` belum diperbarui untuk endpoint baru (kasubag/bawahan, verifikasi, submit pelaksana) → BL-013 |
+| GAP-07 | Modul perencanaan | **Open** | Integrasi e-Pelara masih pilot; domain perencanaan belum terstruktur setara domain lain |

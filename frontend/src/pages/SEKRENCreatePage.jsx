@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { notifySuccess, notifyError, notifyWarning } from "../utils/notify";
@@ -83,7 +83,26 @@ export default function SEKRENCreatePage() {
         created_by: user.id,
       };
 
-      await api.post("/sek-ren", payload);
+      if (formData.jenis_layanan_perencanaan === "Renstra") {
+        const [awal, akhir] = String(formData.periode_renstra || "").split("-").map((s) => parseInt(s.trim(), 10));
+        payload.periode_awal = Number.isFinite(awal) ? awal : parseInt(formData.tahun_perencanaan, 10);
+        payload.periode_akhir = Number.isFinite(akhir) ? akhir : parseInt(formData.tahun_perencanaan, 10);
+        payload.judul = formData.nama_program || `Renstra ${payload.periode_awal || ""}`.trim();
+      }
+
+      if (formData.jenis_layanan_perencanaan === "Renja") {
+        payload.tahun = parseInt(formData.tahun_perencanaan, 10);
+        payload.judul = formData.nama_program || `Renja ${payload.tahun || ""}`.trim();
+      }
+
+      const endpoint =
+        formData.jenis_layanan_perencanaan === "Renstra"
+          ? "/api/renstra"
+          : formData.jenis_layanan_perencanaan === "Renja"
+            ? "/api/renja"
+            : "/api/sek-ren";
+
+      await api.post(endpoint, payload);
 
       notifyWarning("Data perencanaan berhasil dibuat.");
       navigate("/module/sek-ren");

@@ -1,8 +1,52 @@
-# 05 — Alur Kerja Perintah/Tugas (Sekretariat, 3 Bidang, UPTD)
+# 14 — Alur Kerja Perintah/Tugas (Sekretariat, 3 Bidang, UPTD)
 
-Versi: 2.0  
-Penulis: Tim SIGAP Malut  
-Revisi: 22 Maret 2026 — Ditambahkan: JF Dua Varian, UPTD Dual-Track, Standing Assignments, Substitusi Tugas, Kasubag UPTD & Kepala Seksi UPTD  
+Versi: 2.7 (update 6 April 2026 — Bidang & UPTD workflow transitions aktif, Guard enforcement penuh)
+Penulis: Tim SIGAP Malut
+Revisi sebelumnya: 22 Maret 2026 — JF Dua Varian, UPTD Dual-Track, Standing Assignments, Substitusi Tugas
+
+## State Machine v2.7 — Semua Jalur
+
+### Sekretariat
+```
+draft → assigned → accepted → in_progress → submitted
+     → verified → approved_by_secretary → [forwarded_to_kadin] → closed
+```
+
+### Bidang (3 Bidang — v2.7 aktif)
+```
+in_progress → submitted_to_jf → verified_by_jf → submitted_to_kabid
+           → [review_kabid] → approved_kabid → verified
+           → approved_by_secretary → closed
+
+Revisi: submitted_to_jf → returned_to_pelaksana (JF tolak)
+Revisi: submitted_to_kabid → returned_to_jf (Kabid tolak) → submitted_to_kabid
+```
+
+### UPTD
+```
+in_progress → submitted → verified (kepala_uptd/kepala_seksi_uptd/kasubag_uptd)
+           → approved_by_secretary → closed
+```
+
+### Override (semua jalur)
+```
+[any live state] → rejected | escalated
+rejected | escalated → draft
+```
+
+## Guard Enforcement (v2.7)
+
+| Guard | Route | Basis |
+|---|---|---|
+| `requireJFBeforeKabid` | kabid-*.js `/approval-queue/:id/setujui` | DB task.status |
+| `requireJFBeforeKabid` | kabid-*.js `/approval-queue/:id/kembalikan` | DB task.status |
+| `requireKabidBeforeSekretaris` | `kabid_forward_sekretaris` action | DB task.status |
+| `requireSekretarisBeforeKadin` | forward-to-kadin routes | DB task.status |
+
+---
+
+Versi: 2.0
+Revisi awal: 22 Maret 2026 — Ditambahkan: JF Dua Varian, UPTD Dual-Track, Standing Assignments, Substitusi Tugas, Kasubag UPTD & Kepala Seksi UPTD
 Tujuan: Menspesifikasikan workflow perintah/tugas yang enforce alur SOTK, audit trail, verifikasi, monitoring, eskalasi, dan UI/UX per peran (Sekretaris, Kasubag Umum & Kepegawaian, Pejabat Fungsional, Pelaksana, Bendahara) serta memperluas ke 3 Bidang dan UPTD.
 
 Ringkasan singkat
@@ -36,8 +80,44 @@ Ringkasan singkat
   - id, task_id, file_path, file_type, uploaded_by, uploaded_at
 - notifications
   - id, target_pegawai_id, task_id, channel (in_app,email,wa), message, seen, created_at
+- task_statuses (master — v2.7 lengkap)
+  - Sekretariat: `draft`, `assigned`, `accepted`, `in_progress`, `submitted`, `returned_to_pelaksana`, `verified`, `approved_by_secretary`, `forwarded_to_kadin`, `closed`, `rejected`, `escalated`
+  - Bidang (v2.7): `submitted_to_jf`, `verified_by_jf`, `submitted_to_kabid`, `review_kabid`, `approved_kabid`, `returned_to_jf`
+
+Ringkasan singkat
+
+- Sekretariat = hub / orchestrator untuk administrasi & dokumentasi.
+- Perintah/tugas harus lewat workflow digital: Sekretaris → Kasubag/Pejabat Fungsional → Pelaksana/Bendahara/UPTD → Verifikasi oleh JF/Kepala Bidang → Sekretaris review → (opsional) forward ke Kepala Dinas.
+- Setiap aksi dicatat di audit_log (sudah ada tabel public.audit_log). Workflow menambahkan tabel domain (tasks, task_assignments, task_logs, approvals, notifications).
+
+1. Entitas domain dan tabel database (rekomendasi)
+
+- tasks (perintah/tugas utama)
+  - id (pk), title, description, module, source_unit (sekretariat/bidang/uptd), priority, due_date, sla_seconds, status, metadata JSON, created_by (pegawai_id), created_at, updated_at
+- task_assignments _(v2.0 — extended dengan substitusi & standing assignment)_
+  - id, task_id
+  - `assignee_id_primer` — penerima tugas asli sesuai SOTK
+  - `assignee_id_aktual` — yang benar-benar mengerjakan (bisa sama atau substitusi)
+  - `role` (kasubag/jf/pelaksana/bendahara/uptd)
+  - `jenis_tugas` ENUM(`satu_kali`,`rutin_harian`,`rutin_mingguan`,`projektual`)
+  - `jadwal_rutin` — cron expression untuk tugas berulang (NULL jika satu kali)
+  - `berlaku_sampai` — tanggal batas untuk tugas rutin/projektual
+  - `adalah_substitusi` BOOLEAN — apakah assignee aktual ≠ primer
+  - `alasan_substitusi` TEXT — keterangan pengalihan
+  - `disetujui_oleh` — pegawai_id yang menyetujui substitusi (Kepala Unit)
+  - `kinerja_dihitung_ke` — pegawai siapa yang mendapat kredit kinerja
+  - assigned_by, assigned_at, accepted_at, rejected_at
+- task_logs
+  - id, task_id, actor_pegawai_id, action (create/assign/accept/start/submit/verify/approve/reject/escalate/close), payload JSON, created_at
+- approvals
+  - id, task_id, level (1..N), approver_pegawai_id, action, note, action_at
+- task_files
+  - id, task_id, file_path, file_type, uploaded_by, uploaded_at
+- notifications
+  - id, target_pegawai_id, task_id, channel (in_app,email,wa), message, seen, created_at
 - task_statuses (master)
-  - draft, open, in_progress, submitted, verified, approved_by_secretary, forwarded_to_kadin, closed, rejected, escalated
+  - `draft`, `assigned`, `accepted`, `in_progress`, `submitted`, `returned_to_pelaksana`, `verified`, `approved_by_secretary`, `forwarded_to_kadin`, `closed`, `rejected`, `escalated`
+  - **Catatan (v2.2):** `returned_to_pelaksana` adalah status revisi eksplisit. Pelaksana dapat meneruskan ke `in_progress` (via mulai) atau langsung `submitted` (shortcut revisi minor). Status ini memiliki transisi keluar dan tidak dead-end.
 - workflow_rules (optional, for dynamic rules)
   - id, module, from_status, to_status, allowed_roles, requires_approval
 

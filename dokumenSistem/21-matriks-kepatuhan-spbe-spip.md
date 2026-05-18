@@ -1,4 +1,4 @@
-# 21 - Compliance Matrix SPBE-SPIP SIGAP-MALUT
+﻿# 21 - Compliance Matrix SPBE-SPIP SIGAP-MALUT
 
 Versi: 2026-03-21
 Status: Baseline resmi kepatuhan dan evidence tracking
@@ -36,18 +36,18 @@ Matriks ini berlaku untuk:
 
 | Kode   | Domain                  | Kontrol Utama                                                   | Evidence Wajib                                                       | Referensi Dokumen                                                                                                    | Status Baseline | Prioritas |
 | ------ | ----------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------- | --------- |
-| CMP-01 | SPBE Arsitektur         | Arsitektur layanan dan data lintas modul terdokumentasi         | diagram arsitektur, data flow, service map                           | 13-System-Architecture-Document.md, 04-Dokumen Integrasi Sistem & Mapping Modul SIGAP-MALUT.md                       | PARTIAL         | P0        |
+| CMP-01 | SPBE Arsitektur         | Arsitektur layanan dan data lintas modul terdokumentasi         | diagram arsitektur, data flow, service map                           | 13-arsitektur-sistem.md, 04-integrasi-sistem-dan-mapping-modul.md                       | PARTIAL         | P0        |
 | CMP-02 | SPBE Layanan            | Katalog layanan digital dan SLA tersedia                        | katalog layanan, SLA per layanan                                     | 06-Master-Data-Layanan.md                                                                                            | PARTIAL         | P0        |
-| CMP-03 | SPBE Manajemen Data     | Single source of truth, referential integrity, data governance  | data dictionary, aturan referensi, validasi integritas               | 07-Data-Dictionary.md, 04-Dokumen Integrasi Sistem & Mapping Modul SIGAP-MALUT.md                                    | PARTIAL         | P0        |
+| CMP-03 | SPBE Manajemen Data     | Single source of truth, referential integrity, data governance  | data dictionary, aturan referensi, validasi integritas               | 07-kamus-data-field.md, 04-integrasi-sistem-dan-mapping-modul.md                                    | PARTIAL         | P0        |
 | CMP-04 | SPBE Interoperabilitas  | Kontrak API terversi untuk integrasi internal/eksternal         | OpenAPI lengkap, endpoint versioning, error contract                 | openapi.yaml, 15-e-pelara-integration-guide-for-sigap-malut.md                                                       | GAP             | P0        |
 | CMP-05 | SPBE Keamanan Informasi | Kontrol authn/authz, session, secret, encryption, audit log     | security baseline, config, bukti uji keamanan                        | 17-Keamanan-Informasi-Lengkap.md                                                                                     | PARTIAL         | P0        |
 | CMP-06 | SPIP Risiko             | Risk register, treatment plan, dan owner risiko                 | risk register, mitigasi, review berkala                              | 16-Audit-Gap-Resmi-SIGAP-MALUT.md, 19-Operations-Runbook.md                                                          | PARTIAL         | P0        |
-| CMP-07 | SPIP Kontrol Internal   | Segregation of duties dan kontrol workflow approval             | workflow matrix, role separation, evidence gate                      | 08-Workflow-Specification.md, 09-Role-Module-Matrix.md, 14-Role-Service-Requirements-Matrix.md                       | PARTIAL         | P0        |
-| CMP-08 | SPIP Audit Trail        | Jejak audit before-after-user-action dapat ditelusuri           | sample audit log, retention policy, query evidence                   | 08-Workflow-Specification.md, 17-Keamanan-Informasi-Lengkap.md                                                       | PARTIAL         | P0        |
+| CMP-07 | SPIP Kontrol Internal   | Segregation of duties dan kontrol workflow approval             | workflow matrix, role separation, evidence gate                      | 08-spesifikasi-workflow-bisnis.md, 09-matriks-role-akses-modul.md, 14b-matriks-kebutuhan-layanan-per-role.md                       | PARTIAL         | P0        |
+| CMP-08 | SPIP Audit Trail        | Jejak audit before-after-user-action dapat ditelusuri           | sample audit log, retention policy, query evidence                   | 08-spesifikasi-workflow-bisnis.md, 17-Keamanan-Informasi-Lengkap.md                                                       | PARTIAL         | P0        |
 | CMP-09 | Operasional Layanan     | Monitoring, alerting, incident response, runbook                | dashboard operasional, alert policy, incident report                 | 19-Operations-Runbook.md                                                                                             | PARTIAL         | P0        |
 | CMP-10 | Continuity & DR         | Backup, restore test, RTO/RPO tervalidasi                       | backup report, restore drill, DR checklist                           | 19-Operations-Runbook.md, 18-Deployment-Production-Guide.md                                                          | PARTIAL         | P0        |
 | CMP-11 | Quality Assurance       | Testing strategy, quality gate, release criteria                | coverage report, test result, gate approval                          | 20-Testing-Strategy.md                                                                                               | PARTIAL         | P0        |
-| CMP-12 | Domain Perencanaan      | Perencanaan data-driven terhubung dokumen daerah dan lintas OPD | requirement perencanaan, workflow perencanaan, evidence sinkronisasi | 01-kondisi-dinas-pangan.md, 14-Role-Service-Requirements-Matrix.md, 15-e-pelara-integration-guide-for-sigap-malut.md | PARTIAL         | P0        |
+| CMP-12 | Domain Perencanaan      | Perencanaan data-driven terhubung dokumen daerah dan lintas OPD | requirement perencanaan, workflow perencanaan, evidence sinkronisasi | 01-kondisi-dinas-pangan.md, 14b-matriks-kebutuhan-layanan-per-role.md, 15-e-pelara-integration-guide-for-sigap-malut.md | PARTIAL         | P0        |
 
 ## 5. Matrix Keterkaitan dengan Masalah Inti Dinas
 
@@ -102,3 +102,17 @@ Tanpa evidence lengkap, status kontrol tidak boleh dinyatakan COMPLETE.
 ## 9. Pernyataan Resmi
 
 Dokumen ini menjadi rujukan matriks kepatuhan resmi SIGAP-MALUT untuk pelaksanaan validasi dokumen, quality gate, dan persiapan audit formal lintas domain SPBE/SPIP.
+
+---
+
+## 10. Evidence Teknis yang Tersedia â€” Update 2026-04-05
+
+Dari audit enterprise `audit/dokumen-enterprise-2026-04-05`. Dokumen ini diperbarui dengan pointer ke bukti implementasi nyata.
+
+| Kode | Kontrol | Evidence Tersedia di Codebase | Status Diperbarui |
+|------|---------|-------------------------------|-------------------|
+| CMP-07 | Segregation of duties & workflow approval | `backend/controllers/kasubag/verifikasiQueueController.js` (distinctAssignedTaskIds), state machine `canTransition()` di `taskController.js`, status: draftâ†’assignedâ†’acceptedâ†’in_progressâ†’submittedâ†’verifiedâ†’approved_by_secretaryâ†’closed | **PARTIAL** â€” langkah `approved_by_secretary` di UI belum ada |
+| CMP-08 | Audit trail before-after-user-action | `backend/models/TaskLog.js` (action, metadata, actor), `task.metadata.surat_tugas_ke_pelaksana` (tanggal_penugasan, assignee), `task.metadata.pelaksana_submit` (output_ringkas, output_url, submitted_at) | **PARTIAL** â€” snapshot before/after belum penuh di semua aksi |
+| CMP-05 | Authn/authz, session, secret | JWT middleware `protect` di semua route, RBAC via `permissionCheck`, `useIdleLogout` 15 menit di frontend | **PARTIAL** â€” MFA belum terverifikasi flow; rate limiting belum ada |
+| CMP-04 | Kontrak API terversi | `openapi.yaml` ada tapi belum mencakup endpoint baru (kasubag/bawahan, verifikasi, pelaksana submit) | **GAP** |
+

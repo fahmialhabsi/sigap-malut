@@ -1,4 +1,4 @@
-// Mock export enforce untuk test compliance & audit
+﻿// Mock export enforce untuk test compliance & audit
 export function enforce(workflow) {
   // Simulasi compliance dan alert
   return {
@@ -62,65 +62,79 @@ export const enforceWorkflow = async (req, res, next) => {
 };
 
 // @desc    Workflow rules per unit
+// ROLE NORMALIZATION — DB canonical = kasubag_umum_kepegawaian (1 b).
+// Legacy kasubbag (2 b) dipertahankan sebagai alias untuk backward compat.
+// Referensi: 55-terminology-canonical.md, 33-keputusan-arsitektur-final.
 function getWorkflowRules(unit_kerja) {
   const rules = {
     Sekretariat: {
-      path: "Pelaksana → Kasubbag (Eselon IV) → Sekretaris → Kepala Dinas",
+      path: "Pelaksana → Kasubag Umum & Kepeg. → Sekretaris → Kepala Dinas",
       next_level: {
-        pelaksana: "Kasubbag",
-        kasubbag: "Sekretaris",
-        kasubbag_umum: "Sekretaris",
-        kasubbag_kepegawaian: "Sekretaris",
-        kasubbag_perencanaan: "Sekretaris",
+        pelaksana: "Kasubag",
+        pelaksana_sekretariat: "Kasubag",
+        kasubag_umum_kepegawaian: "Sekretaris", // canonical DB (1 b)
+        kasubbag: "Sekretaris",                  // legacy alias (2 b)
+        kasubbag_umum: "Sekretaris",             // legacy alias
+        kasubbag_kepegawaian: "Sekretaris",      // legacy alias
+        kasubbag_perencanaan: "Sekretaris",      // legacy alias
         sekretaris: "Kepala Dinas",
       },
-      mandatory_levels: ["kasubbag", "sekretaris"],
+      mandatory_levels: ["kasubag_umum_kepegawaian", "sekretaris"],
     },
     UPTD: {
-      path: "Pelaksana → Kasi/Kasubbag TU (Eselon IV) → Kepala UPTD → Sekretaris → Kepala Dinas",
+      path: "Pelaksana → Kasi/Kasubag TU → Kepala UPTD → Sekretaris → Kepala Dinas",
       next_level: {
-        pelaksana: "Kasi UPTD",
-        kasi_uptd: "Kepala UPTD",
-        kasubbag_tu_uptd: "Kepala UPTD",
-        kasi_mutu_uptd: "Kepala UPTD",
-        kasi_teknis_uptd: "Kepala UPTD",
+        pelaksana: "Kepala Seksi UPTD",
+        kepala_seksi_uptd: "Kepala UPTD",  // canonical DB
+        kasubag_uptd: "Kepala UPTD",        // canonical DB
+        kasi_mutu: "Kepala UPTD",           // canonical DB
+        kasi_teknis: "Kepala UPTD",         // canonical DB
+        kasubbag_tu_uptd: "Kepala UPTD",   // legacy alias
+        kasi_mutu_uptd: "Kepala UPTD",     // legacy alias
+        kasi_teknis_uptd: "Kepala UPTD",   // legacy alias
         kepala_uptd: "Sekretaris",
         sekretaris: "Kepala Dinas",
       },
-      mandatory_levels: ["kasi_uptd", "kepala_uptd", "sekretaris"],
+      mandatory_levels: ["kepala_seksi_uptd", "kepala_uptd", "sekretaris"],
     },
     "Bidang Ketersediaan": {
-      path: "Pelaksana → Fungsional → Kepala Bidang → Sekretaris → Kepala Dinas",
+      path: "Pelaksana → Pejabat Fungsional → Kepala Bidang Ketersediaan → Sekretaris → Kepala Dinas",
       next_level: {
-        pelaksana: "Fungsional",
-        fungsional: "Kepala Bidang",
-        fungsional_analis: "Kepala Bidang",
-        kepala_bidang: "Sekretaris",
+        pelaksana: "Pejabat Fungsional",
+        pejabat_fungsional: "Kepala Bidang",  // canonical DB
+        fungsional: "Kepala Bidang",           // legacy alias
+        fungsional_analis: "Kepala Bidang",    // legacy alias
+        kepala_bidang_ketersediaan: "Sekretaris", // canonical DB
+        kepala_bidang: "Sekretaris",           // generic alias
         sekretaris: "Kepala Dinas",
       },
-      mandatory_levels: ["fungsional", "kepala_bidang", "sekretaris"],
+      mandatory_levels: ["pejabat_fungsional", "kepala_bidang_ketersediaan", "sekretaris"],
     },
     "Bidang Distribusi": {
-      path: "Pelaksana → Fungsional → Kepala Bidang → Sekretaris → Kepala Dinas",
+      path: "Pelaksana → Pejabat Fungsional → Kepala Bidang Distribusi → Sekretaris → Kepala Dinas",
       next_level: {
-        pelaksana: "Fungsional",
+        pelaksana: "Pejabat Fungsional",
+        pejabat_fungsional: "Kepala Bidang",
         fungsional: "Kepala Bidang",
         fungsional_analis: "Kepala Bidang",
+        kepala_bidang_distribusi: "Sekretaris", // canonical DB
         kepala_bidang: "Sekretaris",
         sekretaris: "Kepala Dinas",
       },
-      mandatory_levels: ["fungsional", "kepala_bidang", "sekretaris"],
+      mandatory_levels: ["pejabat_fungsional", "kepala_bidang_distribusi", "sekretaris"],
     },
     "Bidang Konsumsi": {
-      path: "Pelaksana → Fungsional → Kepala Bidang → Sekretaris → Kepala Dinas",
+      path: "Pelaksana → Pejabat Fungsional → Kepala Bidang Konsumsi → Sekretaris → Kepala Dinas",
       next_level: {
-        pelaksana: "Fungsional",
+        pelaksana: "Pejabat Fungsional",
+        pejabat_fungsional: "Kepala Bidang",
         fungsional: "Kepala Bidang",
         fungsional_analis: "Kepala Bidang",
+        kepala_bidang_konsumsi: "Sekretaris", // canonical DB
         kepala_bidang: "Sekretaris",
         sekretaris: "Kepala Dinas",
       },
-      mandatory_levels: ["fungsional", "kepala_bidang", "sekretaris"],
+      mandatory_levels: ["pejabat_fungsional", "kepala_bidang_konsumsi", "sekretaris"],
     },
   };
 
@@ -145,7 +159,8 @@ export const enforceSekretarisGateway = (req, res, next) => {
 
   // Kepala Bidang atau Kepala UPTD tidak boleh langsung ke Kepala Dinas
   if (
-    ["kepala_bidang", "kepala_uptd"].includes(req.user.role) &&
+    ["kepala_bidang", "kepala_uptd", "kepala_bidang_ketersediaan",
+     "kepala_bidang_distribusi", "kepala_bidang_konsumsi"].includes(req.user.role) &&
     submit_to === "kepala_dinas"
   ) {
     // Log critical bypass attempt

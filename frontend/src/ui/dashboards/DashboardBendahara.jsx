@@ -9,6 +9,9 @@ import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
 import api from "../../services/api";
+import ModulFormPanel from "../../components/ModulFormPanel";
+import SpjBendaharaAntrian from "../../components/spj/SpjBendaharaAntrian";
+import SpjKonfirmasiWidget from "../../components/spj/SpjKonfirmasiWidget";
 
 const ALLOWED = [
   "bendahara",
@@ -452,6 +455,14 @@ export default function DashboardBendahara() {
           badge: summary?.dikembalikan_ppk || 0,
           tone: (summary?.dikembalikan_ppk || 0) > 0 ? "danger" : "default",
         },
+        { id: "divider-keu", label: "── MODUL KEUANGAN ──", disabled: true },
+        { id: "mod-dpa", label: "📋 DPA (M020)" },
+        { id: "mod-rka", label: "📋 RKA (M021)" },
+        { id: "mod-spj-input", label: "📄 Input SPJ (M022)" },
+        { id: "mod-realisasi", label: "💰 Realisasi Anggaran (M023)" },
+        { id: "mod-belanja-pegawai", label: "👤 Belanja Pegawai (M024)" },
+        { id: "mod-belanja-barang", label: "📦 Belanja Barang (M025)" },
+        { id: "mod-belanja-modal", label: "🏗️ Belanja Modal (M026)" },
       ];
     }
     if (isGaji) {
@@ -767,89 +778,24 @@ export default function DashboardBendahara() {
                     titleTanggapan="Tanggapan ke atasan (task Anda)"
                     titleDiskusi="Diskusi dengan Kasubag / JF (task)"
                   />
+                ) : active === "mod-dpa" ? (
+                  <ModulFormPanel modulId="M020" title="DPA — Dokumen Pelaksanaan Anggaran" layout="two-column" showHistory />
+                ) : active === "mod-rka" ? (
+                  <ModulFormPanel modulId="M021" title="RKA — Rencana Kerja dan Anggaran" layout="two-column" showHistory />
+                ) : active === "mod-spj-input" ? (
+                  <ModulFormPanel modulId="M022" title="Input SPJ" layout="two-column" showHistory />
+                ) : active === "mod-realisasi" ? (
+                  <ModulFormPanel modulId="M023" title="Realisasi Anggaran" layout="two-column" showHistory />
+                ) : active === "mod-belanja-pegawai" ? (
+                  <ModulFormPanel modulId="M024" title="Belanja Pegawai" layout="two-column" showHistory />
+                ) : active === "mod-belanja-barang" ? (
+                  <ModulFormPanel modulId="M025" title="Belanja Barang" layout="two-column" showHistory />
+                ) : active === "mod-belanja-modal" ? (
+                  <ModulFormPanel modulId="M026" title="Belanja Modal" layout="two-column" showHistory />
                 ) : active === "spj_masuk" ? (
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="font-bold text-slate-900">
-                        📄 SPJ Masuk — Verifikasi Administrasi
-                      </div>
-                      <Badge n={summary?.spj_masuk || 0} tone="warn" />
-                    </div>
-                    <div className="text-xs text-slate-500 mb-3">
-                      Bendahara hanya verifikasi{" "}
-                      <span className="font-semibold">administrasi</span>. Setelah
-                      OK, kirim ke{" "}
-                      <span className="font-semibold">JF Keuangan/PPK</span>.
-                    </div>
-                    {spjMasukLoading ? (
-                      <div className="text-sm text-slate-500 animate-pulse">
-                        Memuat…
-                      </div>
-                    ) : spjMasuk.length === 0 ? (
-                      <div className="text-sm text-slate-500 italic">
-                        Tidak ada SPJ masuk.
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full text-sm">
-                          <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
-                            <tr>
-                              <th className="px-3 py-2 text-left">Nomor</th>
-                              <th className="px-3 py-2 text-left">Jenis</th>
-                              <th className="px-3 py-2 text-right">Nominal</th>
-                              <th className="px-3 py-2 text-left">Status</th>
-                              <th className="px-3 py-2 text-left">Aksi</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {spjMasuk.map((s) => (
-                              <tr
-                                key={s.id}
-                                className="border-t border-slate-100"
-                              >
-                                <td className="px-3 py-2 font-mono text-xs">
-                                  {s.nomor_spj || `SPJ#${s.id}`}
-                                </td>
-                                <td className="px-3 py-2">{s.jenis_belanja}</td>
-                                <td className="px-3 py-2 text-right font-mono text-xs">
-                                  {rupiah(s.nominal)}
-                                </td>
-                                <td className="px-3 py-2 text-xs text-slate-600">
-                                  {s.status}
-                                  {s.revisi_ke ? (
-                                    <span className="ml-2 text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold">
-                                      revisi {s.revisi_ke}
-                                    </span>
-                                  ) : null}
-                                </td>
-                                <td className="px-3 py-2 flex flex-wrap gap-2">
-                                  <button
-                                    onClick={() => aksiVerifOk(s)}
-                                    className="text-xs px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-                                  >
-                                    Verif OK
-                                  </button>
-                                  <button
-                                    onClick={() => aksiKembalikan(s)}
-                                    className="text-xs px-3 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700"
-                                  >
-                                    Kembalikan
-                                  </button>
-                                  {s.status === "terverifikasi_bendahara" ? (
-                                    <button
-                                      onClick={() => aksiKirimPpk(s)}
-                                      className="text-xs px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
-                                    >
-                                      Kirim ke PPK
-                                    </button>
-                                  ) : null}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+                  <div className="space-y-4">
+                    <SpjKonfirmasiWidget compact />
+                    <SpjBendaharaAntrian />
                   </div>
                 ) : active === "siap_bayar" ? (
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">

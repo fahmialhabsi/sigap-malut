@@ -1,15 +1,15 @@
 field_name,field_label,field_type,field_length,is_required,is_unique,default_value,validation,dropdown_options,help_text
 id,ID,auto_increment,11,true,true,NULL,none,NULL,Primary Key
-kpi_code,Kode KPI,varchar,10,true,true,NULL,uppercase,NULL,Contoh: C.1 atau C.25
-kpi_name,Nama KPI,varchar,255,true,false,NULL,none,NULL,Nama indikator keberhasilan
-kategori,Kategori,enum,NULL,true,false,NULL,none,"efisiensi_operasional,akuntabilitas,kepuasan_stakeholder,dampak_strategis,kepegawaian,keuangan,data_pelaporan,inflasi,sppg",Kategori KPI
-target_value,Target,decimal,"10,2",true,false,NULL,none,NULL,Target yang ingin dicapai
-target_unit,Satuan Target,enum,NULL,true,false,persen,none,"persen,hari,jumlah,rupiah",Satuan dari target
-current_value,Nilai Saat Ini,decimal,"10,2",false,false,0,none,NULL,Nilai pencapaian saat ini
-status,Status,enum,NULL,true,false,pending,none,"on_target,warning,critical,achieved",Status pencapaian
-periode,Periode,date,NULL,true,false,NULL,none,NULL,Bulan periode pengukuran
-penanggung_jawab,Penanggung Jawab,varchar,255,false,false,NULL,none,NULL,Unit yang bertanggung jawab
-cara_pengukuran,Cara Pengukuran,text,NULL,false,false,NULL,none,NULL,Metode pengukuran KPI
-is_active,Status Aktif,boolean,NULL,true,false,1,none,NULL,KPI masih digunakan
+periode_awal,Periode Awal (RPJMD),int,4,true,false,NULL,min:2000,NULL,Tahun mulai periode
+periode_akhir,Periode Akhir (RPJMD),int,4,true,false,NULL,min:2000,NULL,Tahun akhir periode
+judul,Judul Renstra,varchar,255,true,false,NULL,none,NULL,Judul dokumen Renstra OPD
+sasaran,Sasaran Strategis,text,NULL,false,false,NULL,none,NULL,Sasaran utama
+indikator_kinerja,Indikator Kinerja,text,NULL,true,false,NULL,none,NULL,Indikator utama Renstra
+target_akhir,Target Akhir,decimal,"12,2",true,false,NULL,number,NULL,Target capaian akhir periode
+satuan_target,Satuan Target,enum,NULL,true,false,NULL,none,"unit,persen,km,hektar,juta",Satuan target
+status,Status Dokumen,enum,NULL,true,false,draft,none,"draft,disetujui,final,publish",Tahapan dokumen
+sinkronisasi_status,Status Sinkronisasi,enum,NULL,true,false,belum_sinkron,none,"belum_sinkron,sinkron,perlu_revisi",Sinkronisasi ke RPJMD
+sinkronisasi_terakhir,Sinkronisasi Terakhir,timestamp,NULL,false,false,NULL,none,NULL,Tanggal sinkronisasi terakhir
+dokumen_url,URL Dokumen,varchar,255,false,false,NULL,url,NULL,Tautan PDF Renstra
 created_at,Dibuat Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,
 updated_at,Diperbarui Pada,timestamp,NULL,true,false,CURRENT_TIMESTAMP,none,NULL,

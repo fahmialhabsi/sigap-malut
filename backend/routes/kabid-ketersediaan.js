@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { protect } from '../middleware/auth.js';
 import { requireKabidKetersediaan, blockSkpPelaksanaForKabid } from '../middleware/kabidKetersediaanGuard.js';
+import { requireJFBeforeKabid, requireKabidBeforeSekretaris } from '../middleware/chainOfCommandGuard.js';
 import {
   getDashboardSummary,
   getEwsPanel,
@@ -30,10 +31,10 @@ router.get('/dashboard/ews', getEwsPanel);
 router.post('/ews/kirim-kadin', kirimEwsKeKadin);
 router.get("/laporan-ke-sekretaris/status", getLaporanKeSekretarisStatus);
 
-// Approval Queue
+// Approval Queue — requireJFBeforeKabid enforces governance (DB-backed, ZERO TRUST)
 router.get('/approval-queue', getApprovalQueue);
-router.post('/approval-queue/:id/setujui', setujuiDokumenJF);
-router.post('/approval-queue/:id/kembalikan', kembalikanDokumenKJF);
+router.post('/approval-queue/:id/setujui', requireJFBeforeKabid, setujuiDokumenJF);
+router.post('/approval-queue/:id/kembalikan', requireJFBeforeKabid, kembalikanDokumenKJF);
 
 // Tim JF
 router.get('/tim', getTimJF);

@@ -4,15 +4,33 @@
  * Full state machine untuk Perintah/Tugas sesuai dokumen
  * 14-alur-kerja-sekretariat-bidang-uptd.md
  *
- * Lifecycle:
+ * Lifecycle — SEKRETARIAT (v2.2+):
  *   draft → assigned → accepted → in_progress → submitted → verified
  *        → approved_by_secretary → forwarded_to_kadin → closed
- *   Any state → rejected | escalated
+ *
+ * Lifecycle — BIDANG (v2.7+):
+ *   in_progress → submitted_to_jf → verified_by_jf → submitted_to_kabid
+ *              → [review_kabid] → approved_kabid
+ *              → verified → approved_by_secretary → closed
+ *   returned_to_jf   → submitted_to_kabid (JF revisi)
+ *   returned_to_pelaksana → in_progress / re-submit
+ *
+ * Lifecycle — UPTD (v2.7+):
+ *   Uses same core chain with kepala_uptd / kepala_seksi_uptd in verify role.
+ *   in_progress → submitted → verified → approved_by_secretary → closed
+ *
+ * Lifecycle — GUBERNUR (v2.8+):
+ *   forwarded_to_kadin → escalated_to_governor (Kadis escalate task strategis)
+ *                      → approved_by_governor / rejected_by_governor (Gubernur putuskan)
+ *   approved_by_governor → closed
+ *
+ * Any live state → rejected | escalated  (supervisor override)
  */
 
 import express from "express";
 import multer from "multer";
 import path from "path";
+import { validateSubmitPayload } from "../utils/submitValidation.js";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
 import fs from "fs";
@@ -92,55 +110,96 @@ const upload = multer({
 })();
 
 // ─── State machine ───────────────────────────────────────────────────────────
+// Role aliases: DB canonical = kasubag_umum_kepegawaian (1 b).
+// Legacy code used kasubbag (2 b). Both are listed for backward compat.
+const KASUBAG_ROLES = [
+  "kasubag_umum_kepegawaian", // canonical (DB)
+  "kasubbag",                  // legacy alias
+  "kasubbag_umum",             // legacy alias
+  "kasubbag_kepegawaian",      // legacy alias
+  "kasubag",                   // generic alias
+];
+
+// JF (Jabatan Fungsional) roles — all 3 Bidang + generic aliases
+const JF_ROLES = [
+  "jabatan_fungsional",
+  "fungsional",
+  "fungsional_analis",
+  "analis_kebijakan",
+  "pengawas_mutu_pangan",
+];
+
+// UPTD roles
+const UPTD_ROLES = [
+  "kepala_uptd",
+  "kasubag_uptd",
+  "kepala_seksi_uptd",
+  "kepala_seksi",
+];
+
 const TRANSITIONS = {
+  // ─── CORE WORKFLOW (Sekretariat + Bidang common) ──────────────────────────
   assign: {
-    from: ["draft", "assigned"],
+    // `accepted`: penanggung jawab sudah terima; masih boleh delegasi ke bawah
+    // (status tugas kembali ke `assigned` untuk penerima berikutnya).
+    from: ["draft", "assigned", "accepted"],
     to: "assigned",
     roles: [
       "sekretaris",
       "kepala_bidang",
-      "kasubbag",
-      "kasubbag_umum",
-      "kasubbag_kepegawaian",
+      ...KASUBAG_ROLES,
+      ...UPTD_ROLES,
       "super_admin",
     ],
   },
   accept: { from: ["assigned"], to: "accepted", roles: null },
   reject_assignment: { from: ["assigned"], to: "draft", roles: null },
-  start: { from: ["accepted"], to: "in_progress", roles: null },
+  // start: normal path (accepted) + resume path (returned_to_pelaksana)
+  start: {
+    from: ["accepted", "returned_to_pelaksana"],
+    to: "in_progress",
+    roles: null,
+  },
   submit: {
-    from: ["in_progress"],
+    // Sekretariat path: pelaksana submits directly to Kasubag/Sekretaris.
+    // Also accepts returned_to_pelaksana so pelaksana can re-submit after revision
+    // without manually clicking "mulai" again (minor correction UX path).
+    from: ["in_progress", "returned_to_pelaksana"],
     to: "submitted",
     roles: [
       "pelaksana",
+      "pelaksana_sekretariat",
+      "pelaksana_bidang",
       "bendahara",
-      "fungsional",
-      "fungsional_analis",
-      "kasubbag",
-      "kasubbag_umum",
+      ...JF_ROLES,
+      ...KASUBAG_ROLES,
       "super_admin",
     ],
   },
   verify: {
+    // Sekretariat & UPTD path: Kasubag/JF/Kepala Seksi verifies submission.
     from: ["submitted"],
     to: "verified",
     roles: [
-      "fungsional",
-      "fungsional_analis",
+      ...JF_ROLES,
       "kepala_bidang",
-      "kasubbag",
+      ...KASUBAG_ROLES,
+      ...UPTD_ROLES,
       "sekretaris",
       "super_admin",
     ],
   },
   verify_reject: {
+    // Kasubag/JF mengembalikan ke pelaksana dengan catatan perbaikan.
+    // Menggunakan status dedicated `returned_to_pelaksana` (bukan langsung in_progress)
+    // agar pelaksana tahu ada catatan yang harus dibaca sebelum melanjutkan.
     from: ["submitted"],
-    to: "in_progress",
+    to: "returned_to_pelaksana",
     roles: [
-      "fungsional",
-      "fungsional_analis",
+      ...JF_ROLES,
       "kepala_bidang",
-      "kasubbag",
+      ...KASUBAG_ROLES,
+      ...UPTD_ROLES,
       "sekretaris",
       "super_admin",
     ],
@@ -161,43 +220,159 @@ const TRANSITIONS = {
     roles: ["sekretaris", "super_admin"],
   },
   close: {
+    // STRICT SECRETARY APPROVAL ENFORCEMENT (v2.6):
+    // `verified` DIHAPUS dari close.from.
+    // Jalur wajib: submitted → verified → approved_by_secretary → closed
+    // Sekretaris TIDAK BOLEH close task langsung dari verified.
+    // Jika butuh force-close, gunakan aksi `reject` + alasan, lalu reopen + close
+    // setelah approval flow dipenuhi. Tidak ada "darurat" path yang diam-diam aktif.
+    //
+    // v2.8: approved_by_governor ditambahkan — Gubernur sudah approve, bisa ditutup.
     from: [
       "approved_by_secretary",
       "forwarded_to_kadin",
-      "verified",
-      "submitted",
+      "approved_by_governor",
     ],
     to: "closed",
-    roles: ["sekretaris", "kepala_dinas", "super_admin"],
+    roles: ["sekretaris", "kepala_dinas", "gubernur", ...UPTD_ROLES, "super_admin"],
   },
   reject: {
+    // Supervisor override — usable from any live state including Bidang + Governor states
     from: [
-      "draft",
-      "assigned",
-      "accepted",
-      "in_progress",
-      "submitted",
-      "verified",
+      "draft", "assigned", "accepted", "in_progress",
+      "submitted", "verified", "returned_to_pelaksana",
+      // Bidang states
+      "submitted_to_jf", "verified_by_jf",
+      "submitted_to_kabid", "review_kabid", "approved_kabid", "returned_to_jf",
+      // Governor states (v2.8)
+      "escalated_to_governor",
     ],
     to: "rejected",
-    roles: ["sekretaris", "kepala_bidang", "kepala_uptd", "super_admin"],
+    roles: ["sekretaris", "kepala_bidang", "kepala_dinas", "gubernur", ...UPTD_ROLES, "super_admin"],
   },
   escalate: {
+    // Supervisor escalate — same from set as reject
     from: [
-      "draft",
-      "assigned",
-      "accepted",
-      "in_progress",
-      "submitted",
-      "verified",
+      "draft", "assigned", "accepted", "in_progress",
+      "submitted", "verified", "returned_to_pelaksana",
+      // Bidang states
+      "submitted_to_jf", "verified_by_jf",
+      "submitted_to_kabid", "review_kabid", "approved_kabid", "returned_to_jf",
     ],
     to: "escalated",
-    roles: ["sekretaris", "kepala_bidang", "kepala_uptd", "super_admin"],
+    roles: ["sekretaris", "kepala_bidang", "kepala_dinas", ...UPTD_ROLES, "super_admin"],
   },
   reopen: {
     from: ["rejected", "escalated"],
     to: "draft",
     roles: ["sekretaris", "super_admin"],
+  },
+
+  // ─── GUBERNUR WORKFLOW (v2.8) ─────────────────────────────────────────────
+  // Triggered when task strategis perlu keputusan Gubernur.
+  // Mandatory chain: must pass through forwarded_to_kadin first.
+  // requireKadinBeforeGubernur guard enforces this — no direct skip from sekretaris.
+  //
+  // Flow:
+  //   forwarded_to_kadin → escalated_to_governor
+  //                      → approved_by_governor → closed
+  //                      → rejected_by_governor (re-handled by Kadis/Sekretaris)
+
+  escalate_to_governor: {
+    // Kadis escalates strategic task to Gubernur
+    from: ["forwarded_to_kadin"],
+    to: "escalated_to_governor",
+    roles: ["kepala_dinas", "super_admin"],
+  },
+  governor_approve: {
+    // Gubernur approves the escalated task
+    from: ["escalated_to_governor"],
+    to: "approved_by_governor",
+    roles: ["gubernur", "super_admin"],
+  },
+  governor_reject: {
+    // Gubernur rejects — task returned to Kadis for follow-up
+    from: ["escalated_to_governor"],
+    to: "rejected_by_governor",
+    roles: ["gubernur", "super_admin"],
+  },
+  kadis_rehandle: {
+    // Kadis re-handles a Gubernur-rejected task (forward back to Sekretaris or close)
+    from: ["rejected_by_governor"],
+    to: "forwarded_to_kadin",
+    roles: ["kepala_dinas", "super_admin"],
+  },
+
+  // ─── BIDANG WORKFLOW (v2.7) ───────────────────────────────────────────────
+  // Canonical flow:
+  //   in_progress → submitted_to_jf → verified_by_jf → submitted_to_kabid
+  //              → [review_kabid] → approved_kabid → verified
+  //              → approved_by_secretary → closed
+  // Revision loops:
+  //   submitted_to_jf → returned_to_pelaksana  (JF rejects pelaksana)
+  //   submitted_to_kabid / review_kabid → returned_to_jf  (Kabid rejects JF)
+  //   returned_to_jf → submitted_to_kabid  (JF revises and resubmits)
+
+  submit_to_jf: {
+    // Pelaksana Bidang submits work to JF for initial verification
+    from: ["in_progress", "returned_to_pelaksana"],
+    to: "submitted_to_jf",
+    roles: [
+      "pelaksana", "pelaksana_bidang",
+      ...JF_ROLES,
+      ...KASUBAG_ROLES,
+      "super_admin",
+    ],
+  },
+  verify_by_jf: {
+    // JF verifies the submission — evidence of JF review complete
+    from: ["submitted_to_jf"],
+    to: "verified_by_jf",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  return_to_pelaksana_jf: {
+    // JF rejects pelaksana's submission — revision required
+    from: ["submitted_to_jf"],
+    to: "returned_to_pelaksana",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  submit_to_kabid: {
+    // JF submits their verified/analysed result to Kepala Bidang
+    from: ["verified_by_jf"],
+    to: "submitted_to_kabid",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  kabid_review: {
+    // Kepala Bidang acknowledges and starts reviewing the JF submission
+    from: ["submitted_to_kabid"],
+    to: "review_kabid",
+    roles: ["kepala_bidang", "super_admin"],
+  },
+  kabid_approve: {
+    // Kepala Bidang approves — task ready for Sekretaris governance chain
+    from: ["review_kabid", "submitted_to_kabid"],
+    to: "approved_kabid",
+    roles: ["kepala_bidang", "super_admin"],
+  },
+  kabid_return: {
+    // Kepala Bidang returns document to JF for revision
+    from: ["review_kabid", "submitted_to_kabid"],
+    to: "returned_to_jf",
+    roles: ["kepala_bidang", "super_admin"],
+  },
+  jf_resubmit: {
+    // JF revises and resubmits to Kabid after return
+    from: ["returned_to_jf"],
+    to: "submitted_to_kabid",
+    roles: [...JF_ROLES, "super_admin"],
+  },
+  kabid_forward_sekretaris: {
+    // Kepala Bidang forwards approved task to Sekretaris governance chain.
+    // Transitions to `verified` — the mandatory entry point for Sekretaris approval.
+    // requireKabidBeforeSekretaris guard enforces this path in Bidang routes.
+    from: ["approved_kabid"],
+    to: "verified",
+    roles: ["kepala_bidang", "super_admin"],
   },
 };
 
@@ -532,7 +707,8 @@ router.get("/:id", async (req, res) => {
 router.post("/:id/assign", async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const { assignee_user_id, assignee_role, note } = req.body;
+    const { assignee_user_id, assignee_role, note, due_date, tanggal_penugasan } =
+      req.body;
     const task = await Task.findByPk(req.params.id, { transaction: t });
     if (!task) {
       await t.rollback();
@@ -612,6 +788,26 @@ router.post("/:id/assign", async (req, res) => {
 
     const old = task.toJSON();
     task.status = to;
+
+    if (due_date != null && String(due_date).trim() !== "") {
+      const d = new Date(due_date);
+      if (!Number.isNaN(d.getTime())) task.due_date = d;
+    }
+
+    const meta = { ...(task.metadata || {}) };
+    const tglRaw =
+      tanggal_penugasan != null && String(tanggal_penugasan).trim() !== ""
+        ? String(tanggal_penugasan).trim()
+        : new Date().toISOString().slice(0, 10);
+    meta.surat_tugas_ke_pelaksana = {
+      ...(meta.surat_tugas_ke_pelaksana || {}),
+      tanggal_penugasan: tglRaw,
+      dicatat_pada: new Date().toISOString(),
+      assigned_by_user_id: uid(req),
+      catatan_kasubag: note ? String(note).slice(0, 2000) : null,
+    };
+    task.metadata = meta;
+
     await task.save({ transaction: t });
 
     const assignment = await TaskAssignment.create(
@@ -781,18 +977,75 @@ router.post(
   })),
 );
 
-router.post(
-  "/:id/submit",
-  transitionHandler(
-    "submit",
-    (req) => req.body.note || null,
-    (task) => ({
-      userId: task.created_by,
-      msg: `Tugas "${task.title}" disubmit untuk diverifikasi`,
-      link: `/tasks/${task.id}`,
-    }),
-  ),
-);
+// POST /api/tasks/:id/submit
+// BL-002 fix: enforce content validation at this layer (not only pelaksanaSekretariat controller).
+// Rationale: preventing bypass via direct API call without UI validation.
+router.post("/:id/submit", async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const task = await Task.findByPk(req.params.id, { transaction: t });
+    if (!task) {
+      await t.rollback();
+      return res.status(404).json({ success: false, message: "Tugas tidak ditemukan" });
+    }
+
+    const { ok, reason, to } = canTransition("submit", task.status, urole(req));
+    if (!ok) {
+      await t.rollback();
+      return res.status(403).json({ success: false, message: reason });
+    }
+
+    // ── Content validation via shared canonical validator ──────────────────────
+    // Single source of truth: backend/utils/submitValidation.js
+    // Basis URL check: task.module / task.modul_id (NOT title regex — removed in v2.6)
+    const output_ringkas = req.body.output_ringkas || req.body.note;
+    const output_url = req.body.output_url;
+    const vResult = validateSubmitPayload(task, output_ringkas, output_url);
+    if (!vResult.ok) {
+      await t.rollback();
+      return res.status(400).json({ success: false, code: vResult.code, message: vResult.message });
+    }
+    const ringkas = String(output_ringkas || "").trim();
+    const urlStr = String(output_url || "").trim();
+
+    const old = task.toJSON();
+    task.status = to;
+    task.metadata = {
+      ...(task.metadata || {}),
+      pelaksana_submit: {
+        output_ringkas: ringkas,
+        output_url: urlStr || null,
+        submitted_at: new Date().toISOString(),
+        submitted_by: uid(req),
+      },
+    };
+    await task.save({ transaction: t });
+    await TaskLog.create(
+      {
+        task_id: task.id,
+        actor_id: uid(req),
+        action: "SUBMIT",
+        note: ringkas.slice(0, 500),
+        data_old: old,
+        data_new: task.toJSON(),
+      },
+      { transaction: t },
+    );
+    await t.commit();
+
+    await notifyUser(
+      task.created_by,
+      task.id,
+      `Tugas "${task.title}" disubmit untuk diverifikasi`,
+      `/tasks/${task.id}`,
+    );
+    await writeAudit(task.id, "SUBMIT", old, task.toJSON(), uid(req));
+    return res.json({ success: true, data: task });
+  } catch (err) {
+    await t.rollback();
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // POST /api/tasks/:id/verify
 router.post("/:id/verify", async (req, res) => {

@@ -9,6 +9,8 @@ import SekretariatSubordinateWorkspace from "../../components/coordination/Sekre
 import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
+import TugasMandiriKasubagPanel from "../../components/kasubag/TugasMandiriKasubagPanel";
+import ModulFormPanel from "../../components/ModulFormPanel";
 import api from "../../services/api";
 
 function normalizeRoleName(user) {
@@ -192,6 +194,7 @@ function DashboardKasubag() {
         badge: null,
       },
       { id: "unit", label: "Tugas Unit", icon: "📋", badge: null },
+      { id: "tugas_mandiri", label: "Buat Tugas ke Pelaksana", icon: "📝", badge: null },
       { divider: true, label: "MODUL KEPEGAWAIAN" },
       { id: "asn", label: "Data ASN & Profil", icon: "👤" },
       {
@@ -221,6 +224,208 @@ function DashboardKasubag() {
       {children}
     </div>
   );
+
+  // ── Komponen Verifikasi Queue — tampilan kartu penuh ──────────────────────
+  function VerifikasiQueuePanel({ rows, loading, onRefresh, onRemove }) {
+    const [kembalikanId, setKembalikanId] = useState(null);
+    const [catatan, setCatatan] = useState("");
+    const [actionLoading, setActionLoading] = useState(false);
+    const [expandedId, setExpandedId] = useState(null);
+
+    async function handleVerifikasi(taskId) {
+      setActionLoading(true);
+      try {
+        await api.post(`/api/kasubag/verifikasi/${taskId}/ok`);
+        onRemove(taskId);
+      } catch {/* ignore */}
+      finally { setActionLoading(false); }
+    }
+
+    async function handleKembalikan(taskId) {
+      if (!catatan.trim()) return;
+      setActionLoading(true);
+      try {
+        await api.post(`/api/kasubag/verifikasi/${taskId}/kembalikan`, { catatan: catatan.trim() });
+        onRemove(taskId);
+        setKembalikanId(null);
+        setCatatan("");
+      } catch {/* ignore */}
+      finally { setActionLoading(false); }
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-gray-800 text-base">🔍 Verifikasi Queue</h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Laporan hasil tugas dari Pelaksana yang menunggu verifikasi dan persetujuan Anda.
+              </p>
+            </div>
+            <button onClick={onRefresh} className="text-xs text-cyan-600 hover:underline font-semibold shrink-0">
+              Muat ulang
+            </button>
+          </div>
+
+          <div className="p-5">
+            {loading ? (
+              <p className="text-sm text-gray-400 animate-pulse">Memuat…</p>
+            ) : rows.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-2xl mb-2">✅</p>
+                <p className="text-sm font-semibold text-gray-600">Tidak ada tugas yang menunggu verifikasi</p>
+                <p className="text-xs text-gray-400 mt-1">Semua laporan dari Pelaksana sudah ditangani.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {rows.map((t) => {
+                  const submit = t.metadata?.pelaksana_submit || {};
+                  const submittedAt = submit.submitted_at
+                    ? new Date(submit.submitted_at).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+                    : null;
+                  const isExpanded = expandedId === t.id;
+                  const revisiKe = Number(t.revisi_ke || 0);
+
+                  return (
+                    <div key={t.id} className="border border-amber-200 rounded-xl bg-amber-50 overflow-hidden">
+                      {/* Header kartu */}
+                      <div className="px-4 pt-3 pb-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-gray-900 leading-snug">
+                              {t.priority === "high" && <span className="text-red-500 mr-1">🔴</span>}
+                              {t.title || `Tugas #${t.id}`}
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {t.module && (
+                                <span className="text-[10px] font-mono bg-white border border-gray-200 rounded px-1.5 py-0.5 text-gray-500">
+                                  {t.module}
+                                </span>
+                              )}
+                              {revisiKe > 0 && (
+                                <span className="text-[10px] bg-orange-100 text-orange-700 border border-orange-300 rounded px-1.5 py-0.5 font-semibold">
+                                  Revisi ke-{revisiKe}
+                                </span>
+                              )}
+                              {submittedAt && (
+                                <span className="text-[10px] text-gray-500">
+                                  Disubmit: {submittedAt}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setExpandedId(isExpanded ? null : t.id)}
+                            className="text-xs font-semibold text-amber-700 hover:text-amber-900 shrink-0 border border-amber-300 bg-white rounded-lg px-2 py-1"
+                          >
+                            {isExpanded ? "Tutup ▲" : "Detail ▼"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Detail konten (expanded) */}
+                      {isExpanded && (
+                        <div className="px-4 pb-3 space-y-2 border-t border-amber-200 pt-3">
+                          {/* Ringkasan hasil */}
+                          {submit.output_ringkas ? (
+                            <div>
+                              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide mb-0.5">Ringkasan Hasil (dari Pelaksana)</p>
+                              <p className="text-sm text-gray-800 bg-white border border-gray-200 rounded-lg px-3 py-2 leading-relaxed whitespace-pre-wrap">
+                                {submit.output_ringkas}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-gray-400 italic">Ringkasan hasil tidak tersedia.</p>
+                          )}
+                          {/* Tautan dokumen */}
+                          {submit.output_url && (
+                            <div>
+                              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide mb-0.5">Dokumen Pendukung</p>
+                              <a
+                                href={submit.output_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs text-cyan-700 hover:underline font-semibold bg-white border border-cyan-200 rounded-lg px-3 py-1.5"
+                              >
+                                🔗 Buka Dokumen
+                              </a>
+                            </div>
+                          )}
+                          {/* Riwayat revisi */}
+                          {revisiKe > 0 && Array.isArray(t.metadata?.revision_history) && (
+                            <div>
+                              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide mb-0.5">Riwayat Revisi</p>
+                              <div className="space-y-1">
+                                {t.metadata.revision_history.map((r, i) => (
+                                  <div key={i} className="text-[11px] bg-white border border-red-100 rounded px-2 py-1 text-red-800">
+                                    <span className="font-bold">Revisi {r.revisi_ke}:</span> {r.note}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Panel catatan kembalikan */}
+                      {kembalikanId === t.id && (
+                        <div className="px-4 pb-3 border-t border-red-200 pt-3 bg-red-50 space-y-2">
+                          <p className="text-xs font-semibold text-red-700">Catatan Perbaikan untuk Pelaksana <span className="text-red-500">*</span></p>
+                          <textarea
+                            value={catatan}
+                            onChange={(e) => setCatatan(e.target.value)}
+                            rows={3}
+                            placeholder="Jelaskan apa yang perlu diperbaiki…"
+                            className="w-full border border-red-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none bg-white"
+                            autoFocus
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={() => { setKembalikanId(null); setCatatan(""); }}
+                              className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
+                            >
+                              Batal
+                            </button>
+                            <button
+                              onClick={() => handleKembalikan(t.id)}
+                              disabled={!catatan.trim() || actionLoading}
+                              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white disabled:opacity-40"
+                            >
+                              {actionLoading ? "Mengirim…" : "Kembalikan ke Pelaksana"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tombol aksi */}
+                      {kembalikanId !== t.id && (
+                        <div className="px-4 pb-3 flex gap-2 justify-end border-t border-amber-200 pt-2">
+                          <button
+                            onClick={() => { setKembalikanId(t.id); setCatatan(""); setExpandedId(t.id); }}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 transition"
+                          >
+                            ↩️ Kembalikan
+                          </button>
+                          <button
+                            onClick={() => handleVerifikasi(t.id)}
+                            disabled={actionLoading}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-40 transition"
+                          >
+                            ✅ Verifikasi & Setujui
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     switch (activeMenu) {
@@ -451,86 +656,18 @@ function DashboardKasubag() {
           </div>
         );
       case "verif":
-        return (
-          <PanelBox title="🔍 Verifikasi Queue">
-            {verifLoading ? (
-              <p className="text-sm text-gray-500 animate-pulse">Memuat…</p>
-            ) : verifRows.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">Tidak ada item.</p>
-            ) : (
-              <div className="space-y-2">
-                {verifRows.map((t) => (
-                  <div
-                    key={t.id}
-                    className="border border-gray-100 rounded-lg p-3 bg-amber-50"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold text-gray-800 truncate">
-                          {t.title || `Tugas #${t.id}`}
-                        </div>
-                        <div className="text-xs text-gray-600 mt-0.5">
-                          Status: {t.status || "—"} · Update:{" "}
-                          {t.updated_at
-                            ? String(t.updated_at).slice(0, 10)
-                            : "—"}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <a
-                          href="/tasks"
-                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-white border border-amber-200 text-amber-800 hover:bg-amber-100"
-                        >
-                          Daftar tugas
-                        </a>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const catatan = window.prompt(
-                              "Catatan perbaikan (wajib):",
-                              "",
-                            );
-                            if (!catatan || !String(catatan).trim()) return;
-                            api
-                              .post(
-                                `/api/kasubag/verifikasi/${t.id}/kembalikan`,
-                                { catatan },
-                              )
-                              .then(() =>
-                                setVerifRows((rows) =>
-                                  rows.filter((r) => r.id !== t.id),
-                                ),
-                              )
-                              .catch(() => {});
-                          }}
-                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          Kembalikan
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            api
-                              .post(`/api/kasubag/verifikasi/${t.id}/ok`)
-                              .then(() =>
-                                setVerifRows((rows) =>
-                                  rows.filter((r) => r.id !== t.id),
-                                ),
-                              )
-                              .catch(() => {});
-                          }}
-                          className="text-xs font-semibold px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
-                        >
-                          Verifikasi OK
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </PanelBox>
-        );
+        return <VerifikasiQueuePanel
+          rows={verifRows}
+          loading={verifLoading}
+          onRefresh={() => {
+            setVerifLoading(true);
+            api.get("/api/kasubag/verifikasi", { params: { limit: 20 } })
+              .then((res) => setVerifRows(Array.isArray(res.data?.data) ? res.data.data : []))
+              .catch(() => setVerifRows([]))
+              .finally(() => setVerifLoading(false));
+          }}
+          onRemove={(id) => setVerifRows((rows) => rows.filter((r) => r.id !== id))}
+        />;
       case "tim":
         return (
           <PanelBox title="👥 Tim Saya — Kanban Task Pelaksana">
@@ -628,6 +765,20 @@ function DashboardKasubag() {
             )}
           </PanelBox>
         );
+      case "tugas_mandiri":
+        return (
+          <TugasMandiriKasubagPanel
+            onTugasDibuat={() => {
+              /* refresh kanban setelah tugas baru dibuat */
+              setKanbanLoading(true);
+              api
+                .get("/api/kasubag/tim/kanban")
+                .then((res) => setKanban(res.data?.data || null))
+                .catch(() => setKanban(null))
+                .finally(() => setKanbanLoading(false));
+            }}
+          />
+        );
       case "unit":
         return (
           <PanelBox title="📋 Tugas Unit">
@@ -664,6 +815,44 @@ function DashboardKasubag() {
               </div>
             )}
           </PanelBox>
+        );
+      // ── MODUL KEPEGAWAIAN ─────────────────────────────────────────────────
+      case "asn":
+        return <ModulFormPanel modulId="M001" title="Data ASN & Profil Pegawai" layout="two-column" showHistory />;
+      case "kgb":
+        return <ModulFormPanel modulId="M002" title="Tracking KGB (Kenaikan Gaji Berkala)" layout="two-column" showHistory />;
+      case "pangkat":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M003" title="Tracking Kenaikan Pangkat" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M004" title="Tracking Penghargaan" layout="two-column" showHistory />
+          </div>
+        );
+      case "cuti":
+        return <ModulFormPanel modulId="M005" title="Data Cuti ASN" layout="two-column" showHistory />;
+      case "sppd":
+        return <ModulFormPanel modulId="M006" title="SPPD / Perjalanan Dinas" layout="two-column" showHistory />;
+      case "diklat":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M007" title="Diklat & Pelatihan" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M008" title="SKP (Sasaran Kinerja Pegawai)" layout="two-column" showHistory />
+          </div>
+        );
+      case "absensi":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M009" title="Database Kepegawaian" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M010" title="Arsip Digital Kepegawaian" layout="two-column" showHistory />
+          </div>
+        );
+      case "scorecard":
+        return (
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M011" title="Surat Masuk" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M012" title="Surat Keluar" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M013" title="Disposisi Surat" layout="two-column" showHistory />
+          </div>
         );
       default:
         return (

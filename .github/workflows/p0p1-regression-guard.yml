@@ -1,0 +1,184 @@
+name: P0/P1 Regression Guard
+
+# Tujuan: Memastikan fix kritikal BL-001, BL-002, BL-011 tidak regresi.
+# Dijalankan setiap PR ke main atau feat/next-change.
+# Fail jika: submit validation bypass, rate limit tidak aktif, atau sekretaris endpoint hilang.
+
+on:
+  push:
+    branches: [main, "feat/**", "audit/**"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: p0p1-guard-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Static validation: pastikan file kritis tidak terhapus ──────────────────
+  static-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify critical backend files exist
+        run: |
+          echo "Checking critical files..."
+          test -f backend/controllers/taskController.js || (echo "MISSING: taskController.js" && exit 1)
+          test -f backend/server.js || (echo "MISSING: server.js" && exit 1)
+          test -f backend/controllers/sekretaris/tugasVerifiedController.js || (echo "MISSING: tugasVerifiedController.js" && exit 1)
+          test -f backend/routes/sekretaris/sekretarisIndex.js || (echo "MISSING: sekretarisIndex.js" && exit 1)
+          test -f frontend/src/components/sekretaris/ReviewTugasVerifiedPanel.jsx || (echo "MISSING: ReviewTugasVerifiedPanel.jsx" && exit 1)
+          echo "All critical files present ✅"
+
+      - name: Verify submit validation guard exists in taskController
+        run: |
+          grep -q "OUTPUT_TOO_SHORT" backend/controllers/taskController.js || \
+            (echo "REGRESSION: BL-002 submit validation missing from taskController.js" && exit 1)
+          grep -q "output_ringkas" backend/controllers/taskController.js || \
+            (echo "REGRESSION: BL-002 output_ringkas check missing" && exit 1)
+          echo "BL-002 submit validation guard present ✅"
+
+      - name: Verify rate limiter is imported and applied in server.js
+        run: |
+          grep -q "express-rate-limit" backend/server.js || \
+            (echo "REGRESSION: BL-011 rate-limit import missing from server.js" && exit 1)
+          grep -q "authLimiter" backend/server.js || \
+            (echo "REGRESSION: BL-011 authLimiter not configured" && exit 1)
+          grep -q "submitLimiter" backend/server.js || \
+            (echo "REGRESSION: BL-011 submitLimiter not configured" && exit 1)
+          echo "BL-011 rate limiting guard present ✅"
+
+      - name: Verify secretary approval route exists
+        run: |
+          grep -q "tugas-terverifikasi" backend/routes/sekretaris/sekretarisIndex.js || \
+            (echo "REGRESSION: BL-001 tugas-terverifikasi route missing" && exit 1)
+          grep -q "listTugasVerified" backend/routes/sekretaris/sekretarisIndex.js || \
+            (echo "REGRESSION: BL-001 listTugasVerified controller missing" && exit 1)
+          echo "BL-001 secretary approval route present ✅"
+
+      - name: Verify ReviewTugasVerifiedPanel is integrated in DashboardSekretariat
+        run: |
+          grep -q "ReviewTugasVerifiedPanel" frontend/src/ui/dashboards/DashboardSekretariat.jsx || \
+            (echo "REGRESSION: BL-001 ReviewTugasVerifiedPanel not in DashboardSekretariat.jsx" && exit 1)
+          grep -q "review_tugas" frontend/src/ui/dashboards/DashboardSekretariat.jsx || \
+            (echo "REGRESSION: BL-001 review_tugas menu missing" && exit 1)
+          echo "BL-001 UI integration present ✅"
+
+  # ── Integration: unit test untuk submit validation ──────────────────────────
+  submit-validation-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci --no-audit --no-fund
+
+      - name: Run submit validation guard test
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-test-secret
+          DB_DIALECT: sqlite
+          DB_STORAGE: ":memory:"
+          DB_SYNC_ON_BOOT: "true"
+        run: |
+          node --input-type=module << 'EOF'
+          // Inline test: verifikasi bahwa taskController.js submit handler memiliki validasi
+          import fs from "fs";
+          const src = fs.readFileSync("controllers/taskController.js", "utf-8");
+
+          const checks = [
+            ["OUTPUT_TOO_SHORT code", src.includes("OUTPUT_TOO_SHORT")],
+            ["output_ringkas validation", src.includes("output_ringkas")],
+            ["50 char minimum", src.includes("50")],
+            ["URL_REQUIRED code", src.includes("URL_REQUIRED")],
+            ["ASN keyword check", src.includes("asn") || src.includes("ASN")],
+            ["pelaksana_submit metadata", src.includes("pelaksana_submit")],
+          ];
+
+          let failed = 0;
+          for (const [name, ok] of checks) {
+            console.log((ok ? "✅" : "❌") + " " + name);
+            if (!ok) failed++;
+          }
+
+          if (failed > 0) {
+            console.error(`\n${failed} check(s) gagal — BL-002 mungkin regresi`);
+            process.exit(1);
+          } else {
+            console.log("\nSemua validasi BL-002 hadir ✅");
+          }
+          EOF
+
+      - name: Run rate limit guard test
+        working-directory: backend
+        run: |
+          node --input-type=module << 'EOF'
+          import fs from "fs";
+          const src = fs.readFileSync("server.js", "utf-8");
+
+          const checks = [
+            ["import rateLimit", src.includes("express-rate-limit")],
+            ["authLimiter defined", src.includes("authLimiter")],
+            ["submitLimiter defined", src.includes("submitLimiter")],
+            ["generalApiLimiter defined", src.includes("generalApiLimiter")],
+            ["authLimiter applied", src.includes("app.use(\"/api/auth\", authLimiter)")],
+            ["submitLimiter applied", src.includes("submitLimiter")],
+            ["standardHeaders: true", src.includes("standardHeaders: true")],
+          ];
+
+          let failed = 0;
+          for (const [name, ok] of checks) {
+            console.log((ok ? "✅" : "❌") + " " + name);
+            if (!ok) failed++;
+          }
+
+          if (failed > 0) {
+            console.error(`\n${failed} check(s) gagal — BL-011 mungkin regresi`);
+            process.exit(1);
+          } else {
+            console.log("\nSemua konfigurasi BL-011 hadir ✅");
+          }
+          EOF
+
+      - name: Run sekretaris route guard test
+        working-directory: backend
+        run: |
+          node --input-type=module << 'EOF'
+          import fs from "fs";
+          const routeSrc = fs.readFileSync("routes/sekretaris/sekretarisIndex.js", "utf-8");
+          const ctrlSrc = fs.readFileSync("controllers/sekretaris/tugasVerifiedController.js", "utf-8");
+
+          const checks = [
+            ["route tugas-terverifikasi", routeSrc.includes("tugas-terverifikasi")],
+            ["import listTugasVerified", routeSrc.includes("listTugasVerified")],
+            ["controller export listTugasVerified", ctrlSrc.includes("export async function listTugasVerified")],
+            ["controller uses Task model", ctrlSrc.includes("Task.findAndCountAll")],
+            ["status filter: verified", ctrlSrc.includes('"verified"')],
+          ];
+
+          let failed = 0;
+          for (const [name, ok] of checks) {
+            console.log((ok ? "✅" : "❌") + " " + name);
+            if (!ok) failed++;
+          }
+
+          if (failed > 0) {
+            console.error(`\n${failed} check(s) gagal — BL-001 mungkin regresi`);
+            process.exit(1);
+          } else {
+            console.log("\nSemua konfigurasi BL-001 hadir ✅");
+          }
+          EOF

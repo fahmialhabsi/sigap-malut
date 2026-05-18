@@ -1249,6 +1249,699 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  # ─── TASK LIFECYCLE ENDPOINTS (v2.7) ────────────────────────────────────────
+  /api/tasks/{id}/accept:
+    post:
+      summary: Pelaksana menerima penugasan
+      description: Mengubah status dari `assigned` → `accepted`.
+      tags: [Tasks - Lifecycle]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Tugas diterima
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  status: { type: string, example: accepted }
+        "403": { description: Bukan penerima penugasan }
+        "404": { description: Tugas tidak ditemukan }
+
+  /api/tasks/{id}/start:
+    post:
+      summary: Pelaksana mulai mengerjakan tugas
+      description: Mengubah status dari `accepted` atau `returned_to_pelaksana` → `in_progress`.
+      tags: [Tasks - Lifecycle]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Tugas dimulai
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  status: { type: string, example: in_progress }
+        "403": { description: Role tidak diizinkan }
+        "404": { description: Tugas tidak ditemukan }
+
+  /api/tasks/{id}/close:
+    post:
+      summary: Sekretaris / Kepala Dinas menutup tugas
+      description: >
+        Mengubah status dari `approved_by_secretary` atau `forwarded_to_kadin` → `closed`.
+        Tidak bisa close dari `verified` langsung (v2.6 enforcement).
+      tags: [Tasks - Lifecycle]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Tugas ditutup
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  status: { type: string, example: closed }
+        "403": { description: Hanya sekretaris / kepala_dinas / super_admin }
+        "422":
+          description: Status tidak valid — verified tidak bisa langsung close (chain_of_command_violation)
+
+  # ─── PELAKSANA ENDPOINTS ─────────────────────────────────────────────────────
+  /api/pelaksana-bidang/tugas:
+    get:
+      summary: Daftar tugas pelaksana bidang
+      description: Mengembalikan daftar tugas yang di-assign ke pelaksana bidang yang sedang login.
+      tags: [Pelaksana Bidang]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Daftar tugas pelaksana
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TaskSummary"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/pelaksana-bidang/tugas/{id}/submit:
+    post:
+      summary: Pelaksana bidang submit hasil ke JF
+      description: >
+        Mengubah status `in_progress` → `submitted_to_jf` (Bidang path).
+        Validasi: output_ringkas minimal 50 karakter; output_url wajib untuk modul ASN/kepegawaian.
+      tags: [Pelaksana Bidang]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [output_ringkas]
+              properties:
+                output_ringkas:
+                  type: string
+                  minLength: 50
+                  description: Ringkasan hasil kerja (minimal 50 karakter)
+                output_url:
+                  type: string
+                  description: URL dokumen (wajib untuk modul kepegawaian/ASN)
+      responses:
+        "200": { description: Submit berhasil }
+        "400":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: false }
+                  code:
+                    type: string
+                    enum: [OUTPUT_TOO_SHORT, OUTPUT_URL_REQUIRED]
+                  message: { type: string }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { description: Terlalu banyak request (rate limit) }
+
+  # ─── JF BIDANG ENDPOINTS ─────────────────────────────────────────────────────
+  /api/jf/ketersediaan/verifikasi/masuk:
+    get:
+      summary: JF Ketersediaan — antrian verifikasi dari pelaksana
+      tags: [JF - Bidang Ketersediaan]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Antrian verifikasi }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/jf/ketersediaan/verifikasi/{id}/terima:
+    post:
+      summary: JF Ketersediaan — terima / verifikasi submission pelaksana
+      description: Mengubah status `submitted_to_jf` → `verified_by_jf`.
+      tags: [JF - Bidang Ketersediaan]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Verifikasi berhasil }
+        "403": { description: Bukan JF yang berwenang }
+        "404": { description: Submission tidak ditemukan }
+
+  /api/jf/ketersediaan/verifikasi/{id}/kembalikan:
+    post:
+      summary: JF Ketersediaan — kembalikan submission ke pelaksana
+      description: Mengubah status `submitted_to_jf` → `returned_to_pelaksana`.
+      tags: [JF - Bidang Ketersediaan]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                catatan: { type: string, description: Alasan pengembalian }
+      responses:
+        "200": { description: Dikembalikan ke pelaksana }
+        "403": { description: Role tidak diizinkan }
+
+  /api/jf/ketersediaan/tugas-kabid/{id}/submit:
+    post:
+      summary: JF Ketersediaan — submit hasil analisa ke Kepala Bidang
+      description: Mengubah status `verified_by_jf` → `submitted_to_kabid`.
+      tags: [JF - Bidang Ketersediaan]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Dikirim ke Kabid }
+        "403": { description: Role tidak diizinkan }
+
+  # ─── KABID ENDPOINTS ─────────────────────────────────────────────────────────
+  /api/kabid/ketersediaan/approval-queue:
+    get:
+      summary: Kepala Bidang Ketersediaan — antrian dokumen dari JF
+      tags: [Kabid - Bidang Ketersediaan]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Antrian approval }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/kabid/ketersediaan/approval-queue/{id}/setujui:
+    post:
+      summary: Kepala Bidang Ketersediaan — setujui dokumen JF
+      description: >
+        Mengubah status `submitted_to_kabid` / `review_kabid` → `approved_kabid`.
+        Guard: requireJFBeforeKabid — memverifikasi status task dari DB (ZERO TRUST).
+      tags: [Kabid - Bidang Ketersediaan]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Dokumen disetujui }
+        "403": { description: Bukan Kepala Bidang }
+        "422":
+          description: chain_of_command_violation — JF belum verifikasi (BYPASS_JF)
+
+  /api/kabid/ketersediaan/approval-queue/{id}/kembalikan:
+    post:
+      summary: Kepala Bidang Ketersediaan — kembalikan ke JF untuk revisi
+      description: >
+        Mengubah status → `returned_to_jf`.
+        Guard: requireJFBeforeKabid aktif.
+      tags: [Kabid - Bidang Ketersediaan]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Dikembalikan ke JF }
+        "422":
+          description: chain_of_command_violation (BYPASS_JF)
+
+  /api/kabid/distribusi/approval-queue/{id}/setujui:
+    post:
+      summary: Kepala Bidang Distribusi — setujui dokumen JF
+      description: >
+        Mengubah status `submitted_to_kabid` / `review_kabid` → `approved_kabid`.
+        Guard: requireJFBeforeKabid aktif.
+      tags: [Kabid - Bidang Distribusi]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Dokumen disetujui }
+        "422":
+          description: chain_of_command_violation (BYPASS_JF)
+
+  /api/kabid/konsumsi/approval-queue/{id}/setujui:
+    post:
+      summary: Kepala Bidang Konsumsi — setujui dokumen JF
+      description: >
+        Mengubah status `submitted_to_kabid` / `review_kabid` → `approved_kabid`.
+        Guard: requireJFBeforeKabid aktif.
+      tags: [Kabid - Bidang Konsumsi]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Dokumen disetujui }
+        "422":
+          description: chain_of_command_violation (BYPASS_JF)
+
+  # ─── UPTD ENDPOINTS ──────────────────────────────────────────────────────────
+  /api/uptd/dashboard/summary:
+    get:
+      summary: Dashboard summary UPTD Balai PMKP
+      tags: [UPTD]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Summary dashboard UPTD }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/uptd/kasubag/assign-tu:
+    post:
+      summary: Kasubag TU UPTD — assign tugas ke pelaksana TU
+      tags: [UPTD]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pelaksana_id: { type: integer }
+                task_id: { type: integer }
+                catatan: { type: string }
+      responses:
+        "200": { description: Penugasan berhasil }
+        "403": { description: Bukan Kasubag UPTD }
+
+  /api/uptd/kasi/assign:
+    post:
+      summary: Kepala Seksi UPTD — assign tugas ke staf seksi
+      tags: [UPTD]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pelaksana_id: { type: integer }
+                task_id: { type: integer }
+      responses:
+        "200": { description: Penugasan berhasil }
+        "403": { description: Bukan Kepala Seksi UPTD }
+
+  # ─── GUBERNUR ENDPOINTS (v2.8) ───────────────────────────────────────────────
+  /api/gubernur/dashboard/summary:
+    get:
+      summary: Dashboard Gubernur — ringkasan KPI provinsi
+      tags: [Gubernur]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Ringkasan dashboard Gubernur }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { description: Hanya role gubernur }
+
+  /api/gubernur/instruksi:
+    get:
+      summary: Gubernur — daftar instruksi yang diterbitkan
+      tags: [Gubernur]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Daftar instruksi }
+    post:
+      summary: Gubernur — buat instruksi baru ke Kepala Dinas
+      tags: [Gubernur]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [judul, penerima_id]
+              properties:
+                judul: { type: string }
+                isi: { type: string }
+                penerima_id: { type: integer, description: ID Kepala Dinas penerima }
+                prioritas: { type: string, enum: [biasa, penting, mendesak] }
+      responses:
+        "201": { description: Instruksi dibuat }
+        "400": { description: Field tidak lengkap }
+        "403": { description: Hanya role gubernur }
+
+  /api/gubernur/pengajuan:
+    get:
+      summary: Gubernur — daftar pengajuan dari Kepala Dinas yang menunggu keputusan
+      tags: [Gubernur]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Daftar pengajuan }
+
+  /api/gubernur/pengajuan/{id}/putuskan:
+    post:
+      summary: Gubernur — putuskan pengajuan dari Kepala Dinas
+      tags: [Gubernur]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [keputusan]
+              properties:
+                keputusan: { type: string, enum: [setuju, tolak, kembalikan] }
+                catatan: { type: string }
+      responses:
+        "200": { description: Keputusan dicatat }
+        "403": { description: Hanya role gubernur }
+        "404": { description: Pengajuan tidak ditemukan }
+
+  /api/gubernur/tasks/escalated:
+    get:
+      summary: Gubernur — daftar task yang dieskalasi dari Kepala Dinas
+      description: >
+        Mengembalikan semua task dengan status `escalated_to_governor`.
+        Gubernur dapat memutuskan via `/approve` atau `/reject`.
+      tags: [Gubernur - Task Governance]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Daftar task yang dieskalasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TaskSummary"
+
+  /api/gubernur/tasks/{id}/approve:
+    post:
+      summary: Gubernur — setujui task yang dieskalasi
+      description: >
+        Mengubah status `escalated_to_governor` → `approved_by_governor`.
+        Guard: requireKadinBeforeGubernur — DB-backed, ZERO TRUST.
+      tags: [Gubernur - Task Governance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                catatan: { type: string }
+      responses:
+        "200": { description: Task disetujui Gubernur }
+        "403": { description: Hanya role gubernur }
+        "422":
+          description: chain_of_command_violation — task bukan dalam status escalated_to_governor
+
+  /api/gubernur/tasks/{id}/reject:
+    post:
+      summary: Gubernur — tolak task yang dieskalasi
+      description: >
+        Mengubah status `escalated_to_governor` → `rejected_by_governor`.
+        Kadis dapat re-handle via POST /api/kadin/tasks/{id}/rehandle.
+      tags: [Gubernur - Task Governance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alasan: { type: string }
+      responses:
+        "200": { description: Task ditolak Gubernur }
+        "422":
+          description: chain_of_command_violation (BYPASS_KADIN)
+
+  # ─── KEPALA DINAS ENDPOINTS (v2.8) ───────────────────────────────────────────
+  /api/kadin/dashboard/summary:
+    get:
+      summary: Dashboard Kepala Dinas — ringkasan operasional
+      tags: [Kepala Dinas]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Ringkasan dashboard Kadis }
+        "403": { description: Hanya role kepala_dinas }
+
+  /api/kadin/inbox-gubernur:
+    get:
+      summary: Kepala Dinas — daftar instruksi dari Gubernur
+      tags: [Kepala Dinas]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Daftar instruksi Gubernur }
+
+  /api/kadin/inbox-gubernur/{id}/konfirmasi:
+    post:
+      summary: Kepala Dinas — konfirmasi terima instruksi Gubernur
+      tags: [Kepala Dinas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Instruksi dikonfirmasi diterima }
+
+  /api/kadin/approval:
+    get:
+      summary: Kepala Dinas — antrian approval dari Sekretaris
+      description: >
+        Mengembalikan pengajuan yang sudah melewati gateway Sekretaris
+        (status `diteruskan_ke_kadin`).
+      tags: [Kepala Dinas]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Daftar approval menunggu Kadis }
+
+  /api/kadin/approval/{id}/putuskan:
+    post:
+      summary: Kepala Dinas — putuskan pengajuan dari Sekretaris
+      description: >
+        Kadis memberi keputusan (setuju/tolak/kembalikan) atas pengajuan yang
+        sudah melewati Sekretaris. Audit trail dicatat via auditExecutiveAction.
+      tags: [Kepala Dinas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [keputusan]
+              properties:
+                keputusan: { type: string, enum: [setuju, tolak, kembalikan] }
+                catatan: { type: string }
+                pin:
+                  type: string
+                  description: PIN wajib untuk keputusan jenis persetujuan_anggaran
+      responses:
+        "200": { description: Keputusan dicatat + audit trail tersimpan }
+        "403": { description: PIN salah atau role tidak diizinkan }
+        "404": { description: Pengajuan tidak ditemukan }
+
+  /api/kadin/tasks/{id}/escalate-to-governor:
+    post:
+      summary: Kepala Dinas — eskalasi task ke Gubernur
+      description: >
+        Mengubah status `forwarded_to_kadin` → `escalated_to_governor`.
+        Guard: requireKadinBeforeGubernur (DB-backed, ZERO TRUST).
+        Tidak dapat dibypass oleh role manapun di bawah kepala_dinas.
+      tags: [Kepala Dinas - Task Governance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alasan: { type: string, description: Alasan eskalasi ke Gubernur }
+      responses:
+        "200": { description: Task dieskalasi ke Gubernur }
+        "403": { description: Hanya kepala_dinas }
+        "422":
+          description: chain_of_command_violation — task bukan dalam forwarded_to_kadin (BYPASS_KADIN)
+
+  /api/kadin/pengajuan-gubernur:
+    get:
+      summary: Kepala Dinas — riwayat pengajuan ke Gubernur
+      tags: [Kepala Dinas]
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: Riwayat pengajuan Kadis ke Gubernur }
+    post:
+      summary: Kepala Dinas — buat pengajuan strategis ke Gubernur
+      tags: [Kepala Dinas]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [judul, jenis]
+              properties:
+                judul: { type: string }
+                jenis: { type: string, description: Jenis pengajuan (misal persetujuan_anggaran) }
+                isi: { type: string }
+      responses:
+        "201": { description: Pengajuan dibuat, menunggu keputusan Gubernur }
+
+  # ─── CATATAN SUPER ADMIN ──────────────────────────────────────────────────────
+  # Tidak ada endpoint force-close atau reassign yang aktif.
+  # Jalur kanonik untuk super_admin:
+  #   - Gunakan aksi reject (dengan reason) + assign ulang + close setelah approval
+  #   - Semua aksi tetap melalui governance chain normal dan tercatat di audit log
+  # Referensi: backend/controllers/taskController.js — TRANSITIONS (writeAudit)
+
+  # ─── PUBLIC LAYER ─────────────────────────────────────────────────────────────
+  /api/public/kpi:
+    get:
+      summary: KPI publik SIGAP Malut (sanitized, no internal data)
+      description: >
+        Mengembalikan indikator kinerja terpilih yang aman dipublikasikan.
+        Tidak mengandung data internal, identitas pegawai, atau status task.
+      security: []
+      tags: [Public]
+      responses:
+        "200":
+          description: KPI publik
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      inflasi_yoy: { type: number, nullable: true }
+                      cppd_status: { type: string, enum: [aman, waspada, kritis], nullable: true }
+                      last_updated: { type: string, format: date-time }
+
+  /api/public/laporan:
+    get:
+      summary: Laporan agregat publik (sanitized)
+      description: >
+        Mengembalikan laporan agregat. Tidak ada data identitas atau internal task.
+        Rate limit: 120 req/menit.
+      security: []
+      tags: [Public]
+      parameters:
+        - in: query
+          name: period
+          schema: { type: string, example: "2026-03" }
+      responses:
+        "200":
+          description: Laporan agregat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data: { type: object, additionalProperties: true }
+        "429": { description: Terlalu banyak permintaan }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1271,6 +1964,39 @@ components:
             $ref: "#/components/schemas/ErrorResponse"
 
   schemas:
+    TaskSummary:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        status:
+          type: string
+          enum:
+            - draft
+            - assigned
+            - accepted
+            - in_progress
+            - submitted
+            - submitted_to_jf
+            - verified_by_jf
+            - submitted_to_kabid
+            - review_kabid
+            - approved_kabid
+            - returned_to_jf
+            - returned_to_pelaksana
+            - verified
+            - approved_by_secretary
+            - forwarded_to_kadin
+            - escalated_to_governor
+            - approved_by_governor
+            - rejected_by_governor
+            - closed
+            - rejected
+            - escalated
+        priority: { type: integer, example: 3, description: "1=urgent 2=high 3=normal 4=low" }
+        due_date: { type: string, format: date-time, nullable: true }
+        created_by: { type: integer }
+        created_at: { type: string, format: date-time }
     SuccessResponse:
       type: object
       properties:
@@ -1573,3 +2299,339 @@ components:
           type: object
           description: Detail transisi (from_status, to_status, allowed_to) bila relevan
           additionalProperties: true
+
+# ==============================================================================
+# ENDPOINT BARU — Ditambahkan v2.2 (BL-001, BL-002, BL-011 fixes)
+# Tanggal sync: 2026-04-05 · Branch: audit/pilot-hardening-release
+# ==============================================================================
+
+  /api/tasks/{id}/submit:
+    post:
+      summary: Submit hasil tugas untuk diverifikasi atasan
+      description: >
+        Pelaksana mengirim hasil tugas ke atasan (Kasubag/Sekretaris) untuk diverifikasi.
+        Status tugas berubah dari `in_progress` → `submitted`.
+
+        **Validasi wajib (BL-002):**
+        - `output_ringkas` minimal 50 karakter
+        - Untuk tugas dengan kata kunci ASN/kepegawaian di judul: `output_url` wajib diisi (min. 8 karakter)
+        - Task harus berstatus `in_progress` (enforced oleh state machine)
+      tags: [Tasks - Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+          description: ID tugas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [output_ringkas]
+              properties:
+                output_ringkas:
+                  type: string
+                  minLength: 50
+                  description: Ringkasan hasil kerja, minimal 50 karakter
+                  example: "Data ASN Dinas Pangan telah direkap sebanyak 45 orang, dipisahkan per golongan I-IV dan sudah diprint."
+                output_url:
+                  type: string
+                  description: >
+                    Tautan lampiran/berkas hasil. Wajib untuk tugas bertajuk ASN/kepegawaian.
+                  example: "https://drive.example.com/file/xyz"
+                note:
+                  type: string
+                  description: Catatan tambahan (opsional)
+      responses:
+        "200":
+          description: Tugas berhasil disubmit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                      status: { type: string, example: submitted }
+                      metadata:
+                        type: object
+                        properties:
+                          pelaksana_submit:
+                            type: object
+                            properties:
+                              output_ringkas: { type: string }
+                              output_url: { type: string, nullable: true }
+                              submitted_at: { type: string, format: date-time }
+                              submitted_by: { type: integer }
+        "400":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: false }
+                  code:
+                    type: string
+                    enum: [OUTPUT_TOO_SHORT, URL_REQUIRED]
+                    description: >
+                      OUTPUT_TOO_SHORT = ringkasan kurang dari 50 karakter.
+                      URL_REQUIRED = tugas ASN/kepegawaian butuh output_url.
+                  message: { type: string }
+        "401":
+          description: Token tidak valid atau tidak ada
+        "403":
+          description: >
+            Role tidak diizinkan submit, atau status tugas bukan `in_progress`
+            (state machine violation)
+        "404":
+          description: Tugas tidak ditemukan
+        "429":
+          description: >
+            Rate limit terlampaui (submit limiter: max 10 req/menit di produksi).
+            Header `Retry-After` tersedia.
+
+  /api/tasks/{id}/review:
+    post:
+      summary: Sekretaris memproses keputusan atas tugas yang sudah diverifikasi
+      description: >
+        Sekretaris (atau super_admin) memutuskan nasib tugas yang sudah berstatus `verified`.
+        Tiga pilihan keputusan:
+        - `approve` → status: `approved_by_secretary`
+        - `back` → status: `in_progress` (kembalikan untuk revisi)
+        - `forward` → status: `forwarded_to_kadin`
+
+        Dicatat di `Approvals` dan `TaskLogs`.
+      tags: [Tasks - Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+          description: ID tugas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision:
+                  type: string
+                  enum: [approve, back, forward]
+                  description: >
+                    approve = setujui (→ approved_by_secretary);
+                    back = kembalikan untuk revisi (→ in_progress);
+                    forward = teruskan ke Kadis (→ forwarded_to_kadin)
+                note:
+                  type: string
+                  description: Catatan keputusan (wajib jika decision = back)
+      responses:
+        "200":
+          description: Keputusan berhasil diproses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                      status:
+                        type: string
+                        enum: [approved_by_secretary, in_progress, forwarded_to_kadin]
+        "403":
+          description: Role bukan sekretaris/super_admin, atau status tugas bukan `verified`
+        "404":
+          description: Tugas tidak ditemukan
+        "401":
+          description: Token tidak valid
+
+  /api/sekretaris/tugas-terverifikasi:
+    get:
+      summary: List tugas yang sudah diverifikasi Kasubag — menunggu keputusan Sekretaris
+      description: >
+        Mengembalikan semua tugas dengan status `verified` yang perlu diproses
+        Sekretaris. Digunakan oleh `ReviewTugasVerifiedPanel.jsx` di Dashboard Sekretaris.
+
+        Hanya dapat diakses oleh role `sekretaris` atau `super_admin`
+        (dijaga oleh `sekretarisGuard` middleware).
+      tags: [Sekretaris - Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 50, maximum: 200 }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+      responses:
+        "200":
+          description: List tugas terverifikasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        title: { type: string }
+                        status: { type: string, example: verified }
+                        due_date: { type: string, format: date-time, nullable: true }
+                        source_unit: { type: string, nullable: true }
+                        updated_at: { type: string, format: date-time }
+                        metadata:
+                          type: object
+                          nullable: true
+                          properties:
+                            pelaksana_submit:
+                              type: object
+                              nullable: true
+                              properties:
+                                output_ringkas: { type: string }
+                                output_url: { type: string, nullable: true }
+                                submitted_at: { type: string, format: date-time }
+                        creator:
+                          type: object
+                          nullable: true
+                          properties:
+                            id: { type: integer }
+                            nama_lengkap: { type: string }
+                        assignees:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id: { type: integer }
+                              status: { type: string }
+                              assignee:
+                                type: object
+                                properties:
+                                  id: { type: integer }
+                                  nama_lengkap: { type: string }
+                                  role: { type: string }
+                                  unit_kerja: { type: string, nullable: true }
+                  pagination:
+                    type: object
+                    properties:
+                      page: { type: integer }
+                      limit: { type: integer }
+                      total: { type: integer }
+                      pages: { type: integer }
+        "401":
+          description: Token tidak valid
+        "403":
+          description: Role bukan sekretaris/super_admin
+
+  /api/kasubag/bawahan:
+    get:
+      summary: List staf pelaksana yang dapat menerima penugasan dari Kasubag
+      description: >
+        Mengembalikan daftar staf bawahan langsung (dari `UserHierarchy`) atau
+        fallback ke staf satu `unit_kerja` jika hierarki belum terisi.
+        Field `meta.source` menunjukkan sumber data: `hierarchy` | `same_unit` | `none`.
+      tags: [Kasubag - Penugasan]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List staf
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        nama_lengkap: { type: string }
+                        username: { type: string }
+                        role: { type: string }
+                        unit_kerja: { type: string, nullable: true }
+                  meta:
+                    type: object
+                    properties:
+                      source:
+                        type: string
+                        enum: [hierarchy, same_unit, none]
+                        description: >
+                          hierarchy = dari tabel UserHierarchy;
+                          same_unit = fallback unit_kerja;
+                          none = tidak ada staf ditemukan
+        "401":
+          description: Token tidak valid
+
+  /api/kasubag/verifikasi/{id}/ok:
+    post:
+      summary: Kasubag menyatakan berkas tugas sudah OK (verified)
+      description: >
+        Mengubah status tugas dari `submitted` → `verified`.
+        Dicatat di TaskLogs dan notifikasi dikirim ke pembuat tugas.
+      tags: [Kasubag - Verifikasi]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Verifikasi berhasil
+        "400":
+          description: Status tugas bukan submitted
+        "403":
+          description: Role tidak diizinkan
+        "404":
+          description: Tugas tidak ditemukan
+
+  /api/kasubag/verifikasi/{id}/kembalikan:
+    post:
+      summary: Kasubag mengembalikan berkas tugas ke pelaksana untuk direvisi
+      description: >
+        Mengubah status tugas dari `submitted` → `returned_to_pelaksana`.
+        Body berisi `catatan` alasan pengembalian.
+      tags: [Kasubag - Verifikasi]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                catatan: { type: string, description: Alasan pengembalian }
+      responses:
+        "200":
+          description: Berkas dikembalikan
+        "403":
+          description: Role tidak diizinkan
+        "404":
+          description: Tugas tidak ditemukan

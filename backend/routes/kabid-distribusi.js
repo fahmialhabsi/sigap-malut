@@ -3,6 +3,7 @@ import { Router } from "express";
 import { protect } from "../middleware/auth.js";
 import { requireKabidDistribusi, blockSkpPelaksanaForKabid } from "../middleware/kabidDistribusiGuard.js";
 import { requireHargaPanganDataAdmin } from "../middleware/hargaPanganDataAdminGuard.js";
+import { requireJFBeforeKabid, requireKabidBeforeSekretaris } from "../middleware/chainOfCommandGuard.js";
 import {
   getDashboardSummary,
   getHeroInflasi,
@@ -33,9 +34,10 @@ router.get("/alert-harga-kritis", getAlertHargaKritis);
 router.put("/harga-pangan/:id", requireHargaPanganDataAdmin, adminAmendHargaPangan);
 router.get("/cppd", getCppdStatus);
 
+// Approval Queue — requireJFBeforeKabid enforces governance (DB-backed, ZERO TRUST)
 router.get("/approval-queue", getApprovalQueue);
-router.post("/approval-queue/:id/setujui", setujuiDokumenJF);
-router.post("/approval-queue/:id/kembalikan", kembalikanDokumenKJF);
+router.post("/approval-queue/:id/setujui", requireJFBeforeKabid, setujuiDokumenJF);
+router.post("/approval-queue/:id/kembalikan", requireJFBeforeKabid, kembalikanDokumenKJF);
 
 router.get("/tim", getTimJF);
 router.post("/tugas", assignTugasKeJF);

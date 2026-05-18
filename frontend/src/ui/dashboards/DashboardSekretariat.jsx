@@ -7,6 +7,7 @@ import sekretariatModules from "../../data/sekretariatModules";
 import HeroKpiTilesSekretaris from "../../components/sekretaris/HeroKpiTilesSekretaris";
 import ApprovalQueuePanel from "../../components/sekretaris/ApprovalQueuePanel";
 import PengajuanKadinGatewayPanel from "../../components/sekretaris/PengajuanKadinGatewayPanel";
+import ReviewTugasVerifiedPanel from "../../components/sekretaris/ReviewTugasVerifiedPanel";
 import InboxKadinPanel from "../../components/sekretaris/InboxKadinPanel";
 import MonitorPerintahTimeline from "../../components/sekretaris/MonitorPerintahTimeline";
 import ScorecardBawahanPanel from "../../components/sekretaris/ScorecardBawahanPanel";
@@ -23,6 +24,10 @@ import { useSekretarisDashboard } from "../../hooks/useSekretarisDashboard";
 import KomunikasiPanel, {
   LANES as KOM_LANES,
 } from "../../components/panel/KomunikasiPanel.jsx";
+import TaskDiscussionPanel from "../../components/tasks/TaskDiscussionPanel";
+import ModulFormPanel from "../../components/ModulFormPanel";
+import SpjKonfirmasiWidget from "../../components/spj/SpjKonfirmasiWidget";
+import SpjPpkSkpdPanel from "../../components/spj/SpjPpkSkpdPanel";
 import {
   isDemoDataAllowed,
   showSimulationBadge,
@@ -115,7 +120,7 @@ function PanelBox({ title, accent = "emerald", children, className = "" }) {
 
 function ComplianceAlertPanel({ alertData }) {
   return (
-    <PanelBox title="Compliance & Alert" accent="amber">
+    <PanelBox title="Kepatuhan & peringatan" accent="amber">
       <ul className="space-y-2">
         {alertData.map((alert, idx) => (
           <li
@@ -1083,6 +1088,13 @@ export default function DashboardSekretariat() {
   const [notifResult, setNotifResult] = useState(null);
   const [cascadeData, setCascadeData] = useState(null);
   const [cascadeLoading, setCascadeLoading] = useState(false);
+  const [verifiedCount, setVerifiedCount] = useState(0);
+
+  useEffect(() => {
+    api.get("/sekretaris/tugas-terverifikasi", { params: { limit: 1 } })
+      .then((r) => setVerifiedCount(r.data?.pagination?.total ?? (r.data?.data?.length ?? 0)))
+      .catch(() => setVerifiedCount(0));
+  }, []);
 
   const fetchKPIs = useCallback(async () => {
     setKpiLoading(true);
@@ -1140,7 +1152,7 @@ export default function DashboardSekretariat() {
   useEffect(() => {
     setRenstraLoading(true);
     api
-      .get("/epelara/renstra-opd", { params: { limit: 10 } })
+      .get("/api/epelara/renstra-opd", { params: { limit: 10 } })
       .then((res) => {
         const d = res.data;
         setRenstraQueue(Array.isArray(d) ? d : d?.data || []);
@@ -1154,7 +1166,7 @@ export default function DashboardSekretariat() {
     if (!user) return;
     setCascadeLoading(true);
     api
-      .get("/epelara/cascading")
+      .get("/api/epelara/cascading")
       .then((res) => setCascadeData(res.data ?? null))
       .catch(() => setCascadeData(null))
       .finally(() => setCascadeLoading(false));
@@ -1200,11 +1212,11 @@ export default function DashboardSekretariat() {
     });
 
   const SIDEBAR_MENU = [
-    { id: "overview", label: "Dashboard (Overview)", icon: "📊" },
-    { id: "spip_db", label: "SPIP (DB) Input", icon: "🧾", badge: null },
+    { id: "overview", label: "Beranda ringkas", icon: "📊" },
+    { id: "spip_db", label: "Input SPIP (basis data)", icon: "🧾", badge: null },
     {
       id: "inbox",
-      label: "Inbox Kepala Dinas & Bawahan",
+      label: "Tugas dari Ka.Dinas & bawahan",
       icon: "📥",
       badge: inboxCount || null,
     },
@@ -1216,39 +1228,50 @@ export default function DashboardSekretariat() {
     },
     {
       id: "approval",
-      label: "Approval Queue",
+      label: "Antrean persetujuan",
       icon: "✅",
       badge: approvalCount || null,
     },
     {
+      id: "review_tugas",
+      label: "Perlu persetujuan Sekretaris",
+      icon: "🔐",
+      badge: verifiedCount > 0 ? verifiedCount : null,
+    },
+    {
       id: "gateway_kadin",
-      label: "Gateway Ka.Dinas",
+      label: "Pengajuan ke Kepala Dinas",
       iconOverride: "[GW]",
       icon: "🛡️",
       badge: null,
     },
-    { id: "timeline", label: "Monitor Perintah", icon: "📋", badge: null },
+    { id: "timeline", label: "Pantau penugasan", icon: "📋", badge: null },
     {
       id: "coordination",
-      label: "Perintah & Koordinasi",
+      label: "Perintah & koordinasi",
       icon: "🔗",
       badge: null,
     },
     {
       id: "scorecard",
-      label: "Kinerja / SKP Bawahan",
+      label: "Kinerja bawahan",
       icon: "📊",
       badge: null,
     },
     {
       id: "bypass",
-      label: "Bypass Alert Center",
+      label: "Peringatan pelanggaran alur",
       icon: "🔎",
       badge: bypassCount || null,
     },
     {
+      id: "spj-ppk",
+      label: "Verifikasi SPJ & SPM (PPK)",
+      icon: "🖋️",
+    },
+    {
       id: "konsolidasi",
-      label: "Konsolidasi Laporan",
+      label: "Kumpulan laporan",
       icon: "📑",
       badge: null,
     },
@@ -1267,26 +1290,27 @@ export default function DashboardSekretariat() {
           <div className="space-y-6">
             {showSimulationBadge() ? (
               <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900">
-                Mode data simulasi / demo aktif (bukan data produksi). Matikan
-                dengan VITE_DEMO_DATA=0 pada build produksi.
+                Tampilan sedang memakai <strong>data contoh</strong> untuk uji
+                antarmuka (bukan data resmi). Untuk lingkungan produksi,
+                nonaktifkan mode contoh di pengaturan pembangunan aplikasi.
               </div>
             ) : null}
             <NextActionStrip
-              title="Aksi utama (data real-time)"
+              title="Yang perlu dikerjakan dulu"
               items={[
                 approvalCount > 0 && {
                   key: "appr",
-                  label: `Tinjau ${approvalCount} item di approval queue`,
+                  label: `Lihat ${approvalCount} berkas menunggu persetujuan`,
                   onClick: () => setActiveMenu("approval"),
                 },
                 inboxCount > 0 && {
                   key: "inbox",
-                  label: `Buka ${inboxCount} item inbox Ka.Dinas`,
+                  label: `Buka ${inboxCount} tugas dari Ka.Dinas / bawahan`,
                   onClick: () => setActiveMenu("inbox"),
                 },
                 bypassCount > 0 && {
                   key: "bypass",
-                  label: `Tinjau ${bypassCount} temuan bypass alur`,
+                  label: `Tindaklanjuti ${bypassCount} peringatan pelanggaran alur`,
                   onClick: () => setActiveMenu("bypass"),
                 },
               ].filter(Boolean)}
@@ -1296,7 +1320,9 @@ export default function DashboardSekretariat() {
               variant="sekretaris"
               title="Pusat koordinasi lintas bidang"
             />
-            <ExecutionThreadObservabilityPanel title="Thread eksekusi & koordinasi" />
+            <ExecutionThreadObservabilityPanel title="Perkembangan penugasan & koordinasi" />
+            {/* SPJ atas nama Sekretaris yang menunggu konfirmasi */}
+            <SpjKonfirmasiWidget />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <ApprovalQueuePanel />
@@ -1315,22 +1341,22 @@ export default function DashboardSekretariat() {
               {isDemoDataAllowed() ? (
                 <LintasBidangTable tableData={tableData} />
               ) : (
-                <PanelBox title="Lintas bidang" accent="slate">
+                <PanelBox title="Ringkasan lintas bidang" accent="slate">
                   <p className="text-sm text-slate-600">
-                    Tabel contoh statis dinonaktifkan di build produksi. Data
-                    lintas bidang akan tampil ketika endpoint/agregasi resmi
-                    tersedia. Untuk contoh UI, set{" "}
-                    <code className="text-xs">VITE_DEMO_DATA=1</code>.
+                    Data gabungan antar bidang akan tampil otomatis setelah
+                    sistem menghubungkan sumber data resmi. Saat ini tampilan
+                    contoh dimatikan agar tidak tertukar dengan data definitif.
                   </p>
                 </PanelBox>
               )}
             </div>
-            <PanelBox title="Perintah & Koordinasi Sekretaris" accent="blue">
+            <PanelBox title="Penugasan ke bawahan & koordinasi" accent="blue">
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <p className="text-sm text-slate-700">
-                  Workspace ini memisahkan perintah Sekretaris ke bawahan formal
-                  dari koordinasi lintas unit dengan Kepala Bidang dan Kepala
-                  UPTD, sehingga alurnya lebih rapi dan sesuai pedoman.
+                  Di sini Anda membuat surat tugas ke Kasubag, bendahara, dan
+                  jabatan fungsional Sekretariat, serta surat koordinasi ke
+                  Kepala Bidang atau UPTD — agar alurnya jelas dan terpisah dari
+                  pesan rutin.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <button
@@ -1338,14 +1364,14 @@ export default function DashboardSekretariat() {
                     onClick={() => setActiveMenu("coordination")}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-blue-700 border border-blue-600/80 text-xs md:text-sm"
                   >
-                    Buka Form Koordinasi
+                    Buka formulir penugasan
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveMenu("timeline")}
                     className="bg-slate-800 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-slate-900 border border-slate-800/80 text-xs md:text-sm"
                   >
-                    Lihat Monitor Perintah
+                    Lihat status penugasan
                   </button>
                 </div>
               </div>
@@ -1360,17 +1386,24 @@ export default function DashboardSekretariat() {
           </div>
         );
       case "inbox":
-        return <InboxKadinPanel />;
+        return (
+          <InboxKadinPanel
+            onSesudahTandaiDibaca={() => setActiveMenu("coordination")}
+          />
+        );
       case "komunikasi":
         return (
           <KomunikasiPanel
             lane={KOM_LANES.ES3_ES4}
-            titleTanggapan="Tanggapan Kasubag / JF / Bendahara"
-            titleDiskusi="Diskusi dengan bawahan (task)"
+            titleTanggapan="Tanggapan Kasubag, pejabat fungsional, dan bendahara"
+            titleDiskusi="Diskusi dengan bawahan terkait tugas"
+            diskusiSlot={<TaskDiscussionPanel />}
           />
         );
       case "approval":
         return <ApprovalQueuePanel />;
+      case "review_tugas":
+        return <ReviewTugasVerifiedPanel />;
       case "coordination":
         return <SekretarisCoordinationWorkspace />;
       case "timeline":
@@ -1381,7 +1414,25 @@ export default function DashboardSekretariat() {
         return <BypassAlertCenter />;
       case "konsolidasi":
         return <KonsolidasiLaporanPanel />;
-      default:
+      case "spj-ppk":
+        return (
+          <div className="space-y-5">
+            <SpjKonfirmasiWidget />
+            <SpjPpkSkpdPanel />
+          </div>
+        );
+      default: {
+        // Handle mod-M001 … mod-M031, mod-SA01 … mod-SA10, dll.
+        if (activeMenu.startsWith("mod-")) {
+          const modulId = activeMenu.replace("mod-", "");
+          return (
+            <ModulFormPanel
+              modulId={modulId}
+              layout="two-column"
+              showHistory
+            />
+          );
+        }
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-400 text-sm">
@@ -1389,6 +1440,7 @@ export default function DashboardSekretariat() {
             </p>
           </div>
         );
+      }
     }
   };
 

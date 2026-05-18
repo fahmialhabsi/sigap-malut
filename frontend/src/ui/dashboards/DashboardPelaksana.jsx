@@ -4,6 +4,10 @@
 // e-Pelara role (D-10): pelaksana → DRAFTER (create & update draft dokumen)
 // P13 + P16: Pelaksana — modul data lapangan adaptif per unit_kerja
 import React, { useEffect, useMemo, useState } from "react";
+import SubmitHasilModal from "../../components/pelaksana/SubmitHasilModal";
+import AbsensiHarianPanel from "../../components/pelaksana/AbsensiHarianPanel";
+import ModulFormPanel from "../../components/ModulFormPanel";
+import SpjPelaksanaPanel from "../../components/spj/SpjPelaksanaPanel";
 import FormInputHargaPasar from "../../components/pelaksana/FormInputHargaPasar";
 import FormInputDataKonsumsi from "../../components/pelaksana/FormInputDataKonsumsi";
 import FormInputAdminTU from "../../components/pelaksana/FormInputAdminTU";
@@ -464,14 +468,19 @@ export default function DashboardPelaksana() {
   const user = useAuthStore((state) => state.user);
   const roleName = normalizeRoleName(user);
   const unitKerja = user?.unit_kerja ? String(user.unit_kerja).toLowerCase() : "";
+  // unitKerjaNorm: normalisasi tanda hubung/spasi → underscore untuk deteksi konsisten
+  // Contoh: "UPTD-Teknis" → "uptd-teknis" → "uptd_teknis"
+  const unitKerjaNorm = unitKerja.replace(/[-\s]+/g, "_");
   const isSekretariat = unitKerja === "sekretariat" || unitKerja.includes("sekretariat");
   const isDistribusi = unitKerja.includes("distribusi");
   const isKetersediaan = unitKerja.includes("ketersediaan");
   const isKonsumsi = unitKerja.includes("konsumsi");
-  const isUptdTu = unitKerja.includes("uptd_tu");
-  const isUptdMutu = unitKerja.includes("uptd_mutu");
-  const isUptdTeknis = unitKerja.includes("uptd_teknis");
-  const isUptd = isUptdTu || isUptdMutu || isUptdTeknis;
+  // UPTD — mendukung format hyphen (UPTD-TU) maupun underscore (uptd_tu)
+  const isUptdTu = unitKerjaNorm.includes("uptd_tu") || unitKerja.includes("tata_usaha") || unitKerja.includes("tata-usaha");
+  const isUptdMutu = unitKerjaNorm.includes("uptd_mutu") || (unitKerja.includes("uptd") && unitKerja.includes("mutu"));
+  const isUptdTeknis = unitKerjaNorm.includes("uptd_teknis") || (unitKerja.includes("uptd") && unitKerja.includes("teknis"));
+  // Fallback umum: unit apapun yang mengandung "uptd" atau "balai"
+  const isUptd = isUptdTu || isUptdMutu || isUptdTeknis || unitKerja.includes("uptd") || unitKerja.includes("balai");
   /** Tema visual khusus Pelaksana UPTD: nyaman dipandang lama, layar lebar */
   const themeUptdPl = isUptd;
   // Modul Data Pangan tersedia untuk semua Pelaksana KECUALI sekretariat
@@ -590,6 +599,8 @@ export default function DashboardPelaksana() {
     { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "data-pangan", label: "Data Pangan (Submit ke JF)", icon: "🌾" },
     { id: "dikembalikan", label: "Dikembalikan JF", icon: "↩️", badge: loading ? null : returned },
+    { divider: true, label: "KEUANGAN" },
+    { id: "spj", label: "SPJ Saya", icon: "📁" },
     { divider: true, label: "PRIBADI" },
     { id: "absensi", label: "Absensi Saya", icon: "📅" },
     { id: "kinerja", label: "Nilai Kinerja Saya (read)", icon: "📊" },
@@ -619,6 +630,8 @@ export default function DashboardPelaksana() {
     { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "harga-pasar", label: "Input Harga Pasar (Submit ke JF)", icon: "🛒" },
     { id: "dikembalikan", label: "Dikembalikan JF", icon: "↩️", badge: loading ? null : returned },
+    { divider: true, label: "KEUANGAN" },
+    { id: "spj", label: "SPJ Saya", icon: "📁" },
     { divider: true, label: "PRIBADI" },
     { id: "absensi", label: "Absensi Saya", icon: "📅" },
     { id: "kinerja", label: "Nilai Kinerja Saya (read)", icon: "📊" },
@@ -632,6 +645,8 @@ export default function DashboardPelaksana() {
     { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "data-konsumsi", label: "Input Data Konsumsi (Submit ke JF)", icon: "🍽️" },
     { id: "dikembalikan", label: "Dikembalikan JF", icon: "↩️", badge: loading ? null : returned },
+    { divider: true, label: "KEUANGAN" },
+    { id: "spj", label: "SPJ Saya", icon: "📁" },
     { divider: true, label: "PRIBADI" },
     { id: "absensi", label: "Absensi Saya", icon: "📅" },
     { id: "kinerja", label: "Nilai Kinerja Saya (read)", icon: "📊" },
@@ -645,6 +660,8 @@ export default function DashboardPelaksana() {
     { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "uptd-admin-tu", label: "Admin TU (Submit ke Kasubag)", icon: "🗂️" },
     { id: "dikembalikan", label: "Dikembalikan", icon: "↩️", badge: loading ? null : returned },
+    { divider: true, label: "KEUANGAN" },
+    { id: "spj", label: "SPJ Saya", icon: "📁" },
     { divider: true, label: "PRIBADI" },
     { id: "absensi", label: "Absensi Saya", icon: "📅" },
     { id: "kinerja", label: "Nilai Kinerja Saya (read)", icon: "📊" },
@@ -658,6 +675,8 @@ export default function DashboardPelaksana() {
     { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "uptd-sertifikasi", label: "Sertifikasi (Submit ke Kasi Mutu)", icon: "🏆" },
     { id: "dikembalikan", label: "Dikembalikan", icon: "↩️", badge: loading ? null : returned },
+    { divider: true, label: "KEUANGAN" },
+    { id: "spj", label: "SPJ Saya", icon: "📁" },
     { divider: true, label: "PRIBADI" },
     { id: "absensi", label: "Absensi Saya", icon: "📅" },
     { id: "kinerja", label: "Nilai Kinerja Saya (read)", icon: "📊" },
@@ -671,6 +690,8 @@ export default function DashboardPelaksana() {
     { id: "komunikasi", label: "Tanggapan & diskusi", icon: "💬" },
     { id: "uptd-uji-lab", label: "Hasil Uji Lab (Submit ke Kasi Teknis)", icon: "🧪" },
     { id: "dikembalikan", label: "Dikembalikan", icon: "↩️", badge: loading ? null : returned },
+    { divider: true, label: "KEUANGAN" },
+    { id: "spj", label: "SPJ Saya", icon: "📁" },
     { divider: true, label: "PRIBADI" },
     { id: "absensi", label: "Absensi Saya", icon: "📅" },
     { id: "kinerja", label: "Nilai Kinerja Saya (read)", icon: "📊" },
@@ -737,6 +758,8 @@ export default function DashboardPelaksana() {
   }
 
   function PanelTugasKanban() {
+    const [submitTarget, setSubmitTarget] = useState(null); // task yang sedang di-submit
+
     const list = Array.isArray(tasks) ? tasks : [];
     const toCol = (t) => {
       const st = String(t.status || "pending").toLowerCase();
@@ -750,6 +773,12 @@ export default function DashboardPelaksana() {
       berjalan: list.filter((t) => toCol(t) === "berjalan"),
       dikembalikan: list.filter((t) => toCol(t) === "dikembalikan"),
     };
+
+    async function refreshTasks() {
+      const res = await api.get("/api/pelaksana/tugas", { params: { limit: 15 } });
+      setTasks(Array.isArray(res.data?.data) ? res.data.data : []);
+    }
+
     const Col = ({ title, items, tone }) => (
       <div className="rounded-xl border border-gray-100 bg-white p-3">
         <div className="flex items-center justify-between mb-2">
@@ -770,27 +799,37 @@ export default function DashboardPelaksana() {
           {items.slice(0, 6).map((t) => {
             const due = t.due_date || t.deadline;
             const st = String(t.status || "pending").toLowerCase();
+            const isOverdue = due && new Date(due) < new Date();
+            const revisiKe = Number(t.revisi_ke || 0);
             return (
-              <div key={t.id} className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+              <div key={t.id} className={`rounded-lg border px-3 py-2 ${
+                st.includes("returned")
+                  ? "border-red-200 bg-red-50"
+                  : "border-gray-100 bg-gray-50"
+              }`}>
                 <div className="text-xs font-semibold text-gray-800 truncate">
+                  {t.priority === "high" && <span className="text-red-500 mr-1">🔴</span>}
                   {t.judul || t.title || "—"}
                 </div>
-                <div className="text-[11px] text-gray-500 mt-0.5">
+                <div className={`text-[11px] mt-0.5 ${isOverdue ? "text-red-600 font-semibold" : "text-gray-500"}`}>
                   {due
-                    ? `Deadline: ${new Date(due).toLocaleDateString("id-ID")}`
+                    ? `Deadline: ${new Date(due).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}${isOverdue ? " ⚠️ Overdue" : ""}`
                     : "Deadline: —"}
                 </div>
+                {/* Catatan revisi dari Kasubag */}
+                {st.includes("returned") && t.catatan_verifikasi && (
+                  <div className="mt-1.5 text-[11px] text-red-700 bg-white border border-red-200 rounded px-2 py-1">
+                    <span className="font-bold">Catatan Kasubag:</span> {t.catatan_verifikasi}
+                    {revisiKe > 0 && <span className="ml-1 text-red-500">(revisi ke-{revisiKe})</span>}
+                  </div>
+                )}
                 {isSekretariat && (
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     {(st === "assigned" || st === "pending") && (
                       <button
                         type="button"
-                        onClick={async () => {
-                          await api.post(`/api/pelaksana/tugas/${t.id}/terima`);
-                          const res = await api.get("/api/pelaksana/tugas", { params: { limit: 15 } });
-                          setTasks(Array.isArray(res.data?.data) ? res.data.data : []);
-                        }}
-                        className="text-[11px] px-2 py-1 rounded bg-slate-900 text-white hover:bg-slate-800"
+                        onClick={async () => { await api.post(`/api/pelaksana/tugas/${t.id}/terima`); await refreshTasks(); }}
+                        className="text-[11px] px-2.5 py-1 rounded-lg bg-slate-800 text-white hover:bg-slate-700 font-semibold"
                       >
                         Terima
                       </button>
@@ -798,29 +837,19 @@ export default function DashboardPelaksana() {
                     {(st === "accepted" || st === "assigned") && (
                       <button
                         type="button"
-                        onClick={async () => {
-                          await api.post(`/api/pelaksana/tugas/${t.id}/mulai`);
-                          const res = await api.get("/api/pelaksana/tugas", { params: { limit: 15 } });
-                          setTasks(Array.isArray(res.data?.data) ? res.data.data : []);
-                        }}
-                        className="text-[11px] px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                        onClick={async () => { await api.post(`/api/pelaksana/tugas/${t.id}/mulai`); await refreshTasks(); }}
+                        className="text-[11px] px-2.5 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-semibold"
                       >
                         Mulai
                       </button>
                     )}
-                    {(st === "in_progress" || st === "accepted") && (
+                    {(st === "in_progress" || st === "returned_to_pelaksana") && (
                       <button
                         type="button"
-                        onClick={async () => {
-                          const out = window.prompt("Ringkas hasil/output:", "");
-                          if (!out) return;
-                          await api.post(`/api/pelaksana/tugas/${t.id}/submit`, { output_ringkas: out });
-                          const res = await api.get("/api/pelaksana/tugas", { params: { limit: 15 } });
-                          setTasks(Array.isArray(res.data?.data) ? res.data.data : []);
-                        }}
-                        className="text-[11px] px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-700"
+                        onClick={() => setSubmitTarget(t)}
+                        className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-semibold"
                       >
-                        Submit
+                        {revisiKe > 0 ? `📝 Kirim Revisi (${revisiKe}×)` : "📤 Submit Hasil"}
                       </button>
                     )}
                   </div>
@@ -836,40 +865,50 @@ export default function DashboardPelaksana() {
     );
 
     return (
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-          <h2 className="font-bold text-gray-800 text-base sm:text-lg shrink-0">📋 Tugas Saya Hari Ini</h2>
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-end">
-            {["Semua", "Aktif", "Rutin", "Overdue"].map((f) => (
-              <span
-                key={f}
-                className="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold whitespace-nowrap shrink-0"
-              >
-                {f}
-              </span>
-            ))}
-          </div>
-        </div>
-        {loading ? (
-          <p className="text-sm text-gray-400 animate-pulse">Memuat tugas…</p>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <Col title="⏳ BELUM MULAI" items={cols.belum} tone="amber" />
-              <Col title="🔄 SEDANG BERJALAN" items={cols.berjalan} tone="blue" />
-              <Col title="↩️ DIKEMBALIKAN" items={cols.dikembalikan} tone="red" />
-            </div>
-            <div className="mt-3 text-xs text-gray-500 border-t border-gray-100 pt-3 flex flex-wrap gap-3">
-              <span className="font-semibold">{inProgress + pending} tugas aktif</span>
-              <span>{returned} dikembalikan</span>
-              <span>{done} selesai</span>
-              <span className={overdue > 0 ? "text-red-600 font-semibold" : ""}>
-                {overdue} overdue
-              </span>
-            </div>
-          </>
+      <>
+        {/* Modal submit hasil tugas */}
+        {submitTarget && (
+          <SubmitHasilModal
+            task={submitTarget}
+            onClose={() => setSubmitTarget(null)}
+            onSuccess={refreshTasks}
+          />
         )}
-      </div>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+            <h2 className="font-bold text-gray-800 text-base sm:text-lg shrink-0">📋 Tugas Saya Hari Ini</h2>
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-end">
+              {["Semua", "Aktif", "Rutin", "Overdue"].map((f) => (
+                <span
+                  key={f}
+                  className="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold whitespace-nowrap shrink-0"
+                >
+                  {f}
+                </span>
+              ))}
+            </div>
+          </div>
+          {loading ? (
+            <p className="text-sm text-gray-400 animate-pulse">Memuat tugas…</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <Col title="⏳ BELUM MULAI" items={cols.belum} tone="amber" />
+                <Col title="🔄 SEDANG BERJALAN" items={cols.berjalan} tone="blue" />
+                <Col title="↩️ DIKEMBALIKAN" items={cols.dikembalikan} tone="red" />
+              </div>
+              <div className="mt-3 text-xs text-gray-500 border-t border-gray-100 pt-3 flex flex-wrap gap-3">
+                <span className="font-semibold">{inProgress + pending} tugas aktif</span>
+                <span>{returned} dikembalikan</span>
+                <span>{done} selesai</span>
+                <span className={overdue > 0 ? "text-red-600 font-semibold" : ""}>
+                  {overdue} overdue
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      </>
     );
   }
 
@@ -983,25 +1022,36 @@ export default function DashboardPelaksana() {
       case "dikembalikan":
         return <PanelDikembalikan />;
       case "absensi":
-        return <AbsensiStrip />;
+        return <AbsensiHarianPanel />;
+      // ── Modul Sekretariat (Pelaksana Sekretariat) ─────────────────────────
       case "surat":
-      case "sppd":
-      case "kinerja":
-      case "slip-gaji":
-      case "lapor-aset":
         return (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
-            <p className="text-gray-400 text-sm">
-              Modul ini sedang dalam pengembangan.
-            </p>
+          <div className="space-y-5">
+            <ModulFormPanel modulId="M011" title="Surat Masuk" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M012" title="Surat Keluar" layout="two-column" showHistory />
+            <ModulFormPanel modulId="M013" title="Disposisi Surat" layout="two-column" showHistory />
           </div>
         );
-      default:
+      case "sppd":
+        return <ModulFormPanel modulId="M006" title="SPPD / Perjalanan Dinas" layout="two-column" showHistory />;
+      case "kinerja":
+        return <ModulFormPanel modulId="M008" title="SKP (Sasaran Kinerja Pegawai)" layout="two-column" showHistory />;
+      case "slip-gaji":
+        return <ModulFormPanel modulId="M024" title="Belanja Pegawai" layout="two-column" showHistory />;
+      case "lapor-aset":
+        return <ModulFormPanel modulId="M016" title="Data Aset Barang" layout="two-column" showHistory />;
+      // ── Modul adaptif berdasarkan unit_kerja (mod-*) ──────────────────────
+      default: {
+        if (activeMenu?.startsWith("mod-")) {
+          const modulId = activeMenu.replace("mod-", "");
+          return <ModulFormPanel modulId={modulId} layout="two-column" showHistory />;
+        }
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-400 text-sm">Modul ini sedang dalam pengembangan.</p>
           </div>
         );
+      }
     }
   };
 
@@ -1193,7 +1243,11 @@ export default function DashboardPelaksana() {
             ? menuUptdTu
             : isUptdMutu
               ? menuUptdMutu
-              : menuUptdTeknis;
+              : isUptdTeknis
+                ? menuUptdTeknis
+                : isUptd
+                  ? menuUptdTeknis  // fallback UPTD generic → pakai menu teknis
+                  : menuUptdTeknis;
 
   const renderSidebarContent = () => {
     switch (activeMenu) {
@@ -1425,36 +1479,7 @@ export default function DashboardPelaksana() {
           </div>
         );
       case "spj":
-        return (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="font-bold text-slate-900">📁 SPJ Saya</div>
-              <button
-                onClick={() => setActiveMenu("buat-spj")}
-                className="text-xs px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
-              >
-                + Buat SPJ
-              </button>
-            </div>
-            {spjLoading ? (
-              <div className="text-sm text-slate-500 animate-pulse">Memuat…</div>
-            ) : spjRows.length === 0 ? (
-              <div className="text-sm text-slate-500 italic">Belum ada SPJ.</div>
-            ) : (
-              <div className="space-y-2">
-                {spjRows.map((s) => (
-                  <div key={s.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                    <div className="text-sm font-bold text-slate-900">
-                      {s.nomor_spj || `SPJ#${s.id}`} • {s.jenis_belanja} •{" "}
-                      <span className="font-mono text-xs">{rupiah(s.nominal)}</span>
-                    </div>
-                    <div className="text-xs text-slate-600 mt-1">Status: {s.status}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
+        return <SpjPelaksanaPanel />;
       case "data-pangan":
         return <ModulInputDataPanganKetersediaan unitKerja={user?.unit_kerja} />;
       case "harga-pasar":
@@ -1478,7 +1503,7 @@ export default function DashboardPelaksana() {
       case "dikembalikan":
         return <PanelDikembalikan />;
       case "absensi":
-        return <AbsensiStrip />;
+        return <AbsensiHarianPanel />;
       default:
         return (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
@@ -1513,20 +1538,24 @@ export default function DashboardPelaksana() {
             </span>
             <div className="min-w-0">
               <p className="font-bold text-white text-sm truncate">SIGAP-MALUT</p>
-              <p className="text-xs text-slate-400">
-                {isSekretariat
-                  ? "Pelaksana Sekretariat"
-                  : isKetersediaan
-                  ? "Pelaksana Ketersediaan"
-                  : isDistribusi
-                    ? "Pelaksana Distribusi"
-                    : isKonsumsi
-                      ? "Pelaksana Konsumsi"
-                      : isUptdTu
-                        ? "Pelaksana TU UPTD"
-                        : isUptdMutu
-                          ? "Pelaksana Mutu UPTD"
-                          : "Pelaksana Teknis UPTD"}
+              <p className="text-xs text-slate-400 truncate max-w-[180px]" title={user?.jabatan || ""}>
+                {user?.jabatan
+                  ? user.jabatan
+                  : isSekretariat
+                    ? "Pelaksana Sekretariat"
+                    : isKetersediaan
+                      ? "Pelaksana Ketersediaan"
+                      : isDistribusi
+                        ? "Pelaksana Distribusi"
+                        : isKonsumsi
+                          ? "Pelaksana Konsumsi"
+                          : isUptdTu
+                            ? "Pelaksana TU UPTD"
+                            : isUptdMutu
+                              ? "Pelaksana Mutu UPTD"
+                              : isUptdTeknis
+                                ? "Pelaksana Teknis UPTD"
+                                : "Pelaksana"}
               </p>
             </div>
           </div>
@@ -1615,17 +1644,23 @@ export default function DashboardPelaksana() {
                   themeUptdPl ? "text-teal-100/85" : "text-blue-200/70"
                 }`}
               >
-                {isKetersediaan
-                  ? "Pelaksana Bidang Ketersediaan"
-                  : isDistribusi
-                    ? "Pelaksana Bidang Distribusi"
-                    : isKonsumsi
-                      ? "Pelaksana Bidang Konsumsi"
-                      : isUptdTu
-                        ? "Pelaksana TU UPTD"
-                        : isUptdMutu
-                          ? "Pelaksana Mutu UPTD"
-                          : "Pelaksana Teknis UPTD"}{" "}
+                {user?.jabatan
+                  ? user.jabatan
+                  : isSekretariat
+                    ? "Pelaksana Sekretariat"
+                    : isKetersediaan
+                      ? "Pelaksana Bidang Ketersediaan"
+                      : isDistribusi
+                        ? "Pelaksana Bidang Distribusi"
+                        : isKonsumsi
+                          ? "Pelaksana Bidang Konsumsi"
+                          : isUptdTu
+                            ? "Pelaksana TU UPTD"
+                            : isUptdMutu
+                              ? "Pelaksana Mutu UPTD"
+                              : isUptdTeknis
+                                ? "Pelaksana Teknis UPTD"
+                                : "Pelaksana"}{" "}
                 ·{" "}
                 {new Date().toLocaleDateString("id-ID", {
                   weekday: "long",
