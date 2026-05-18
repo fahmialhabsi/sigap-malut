@@ -1,9 +1,11 @@
 # 54 — Pedoman Alur Kerja, Struktur Organisasi, dan Prinsip Kinerja Berjenjang
 ## UPTD Balai Pengawasan Mutu dan Keamanan Pangan — Dinas Pangan Provinsi Maluku Utara
 
-**Versi:** 1.0
-**Tanggal:** 5 April 2026
-**Status:** FINAL — Telah dikonfirmasi dan disetujui
+**Versi:** 2.0
+**Tanggal Awal:** 5 April 2026
+**Tanggal Revisi:** 6 April 2026
+**Status:** FINAL REVISI — Disesuaikan dengan komposisi ASN riil hasil verifikasi daftar ASN aktual
+**Perubahan dari Versi 1.0:** Komposisi SDM Unit Manajemen Teknis diperbarui dari 2 Pelaksana menjadi 7 Pelaksana (6 biasa + 1 PPTK), menyesuaikan jumlah ASN UPTD yang sebenarnya yaitu 19 orang.
 **Dasar Hukum:**
 - Peraturan Gubernur Nomor 56 Tahun 2021 (SOTK Dinas Pangan)
 - Peraturan Gubernur Nomor 72 Tahun 2023 (Perubahan SOTK)
@@ -38,11 +40,13 @@ UPTD berkedudukan sebagai **unit pelaksana teknis operasional** — berbeda dari
 | Kasi Manajemen Mutu | 1 | Eselon IV — kebijakan mutu, SOP, sertifikasi |
 | Kasi Manajemen Teknis | 1 | Eselon IV — inspeksi, sampling, pengujian laboratorium |
 | JF Pengawas Mutu Hasil Pertanian | 3 | Langsung di bawah Kepala UPTD — ditugaskan ke unit |
-| Pelaksana | 7 | Staf teknis — terbagi di tiga unit |
+| Pelaksana | 12 | Staf teknis — terbagi di tiga unit |
 | PPTK | 3 | Merangkap sebagai Pelaksana — ditetapkan SK KPA |
-| **Total** | **14** | 1 Kepala UPTD + 3 Kasubag/Kasi + 3 JF + 7 Pelaksana |
+| **Total** | **19** | 1 Kepala UPTD + 3 Kasubag/Kasi + 3 JF + 12 Pelaksana |
 
-> **Catatan:** 3 PPTK adalah bagian dari 7 Pelaksana — bukan orang tambahan. Total SDM tetap 1 + 3 + 3 + 7 = 14 orang.
+> **Catatan:** 3 PPTK adalah bagian dari 12 Pelaksana — bukan orang tambahan. Total SDM tetap 1 + 3 + 3 + 12 = 19 orang.
+
+> **Catatan Revisi v2.0:** Jumlah Pelaksana Unit Manajemen Teknis diperbarui dari 1 menjadi 6 orang (ditambah 1 PPTK = 7 total), mencerminkan kondisi riil ASN UPTD yang bertugas di lapangan untuk inspeksi, pengambilan sampel, dan pengujian laboratorium. Kebutuhan tenaga yang lebih besar di unit ini wajar karena cakupan wilayah pengawasan mencakup seluruh kabupaten/kota di Provinsi Maluku Utara.
 
 ### 1.3 Pembagian Tiga Unit Kerja
 
@@ -72,9 +76,11 @@ UPTD berkedudukan sebagai **unit pelaksana teknis operasional** — berbeda dari
 |---------|--------|-------------|
 | Kasi Manajemen Teknis | 1 | Memimpin inspeksi, sampling, dan pengujian |
 | JF 3 — Pengawas Mutu Hasil Pertanian | 1 | Mendukung Kasi Teknis — ditugaskan Kepala UPTD |
-| Pelaksana | 1 | Pengambilan sampel dan pengujian laboratorium |
+| Pelaksana | 6 | Inspeksi lapangan, pengambilan sampel, pengujian laboratorium |
 | PPTK Teknis | 1 | Merangkap Pelaksana — mengelola DPA Teknis |
-| **Subtotal** | **4** | 1 Kasi + 1 JF + 2 Pelaksana (1 merangkap PPTK) |
+| **Subtotal** | **9** | 1 Kasi + 1 JF + 7 Pelaksana (1 merangkap PPTK) |
+
+> **Catatan Unit Manajemen Teknis:** Jumlah Pelaksana yang lebih besar di unit ini mencerminkan kebutuhan operasional lapangan yang tinggi — mencakup inspeksi di pasar, sentra produksi, dan gudang pangan di seluruh wilayah Maluku Utara yang bersifat kepulauan. Pelaksana di unit ini dapat dibagi tugasnya berdasarkan wilayah atau jenis komoditas sesuai arahan Kasi Manajemen Teknis.
 
 ### 1.4 Posisi JF dalam Struktur UPTD
 
@@ -143,9 +149,10 @@ Ketiga JF secara **struktural** berada langsung di bawah Kepala UPTD — bukan d
 **Atasan langsung:** Kepala UPTD
 
 **Tugas dan fungsi:**
-- Mengelola seluruh kegiatan inspeksi lapangan pangan berisiko
+- Mengelola seluruh kegiatan inspeksi lapangan pangan berisiko di seluruh wilayah Maluku Utara
 - Mengelola pengambilan sampel pangan di pasar, sentra produksi, dan gudang
 - Mengelola pengujian laboratorium (uji kimia, mikrobiologi, dan fisik)
+- Membagi penugasan lapangan kepada 6 Pelaksana Teknis berdasarkan wilayah atau jenis komoditas
 - Memeriksa dan menyetujui dokumen teknis dari Pelaksana Teknis setelah diverifikasi JF 3
 - Melaporkan hasil pengujian dan temuan teknis kepada Kepala UPTD
 
@@ -178,10 +185,12 @@ Ketiga JF secara **struktural** berada langsung di bawah Kepala UPTD — bukan d
 **Penugasan operasional:** Kasi Manajemen Teknis
 
 **Tugas dan fungsi:**
-- Menganalisis dan memverifikasi hasil inspeksi, sampling, dan pengujian dari Pelaksana Teknis sebelum naik ke Kasi Teknis
+- Menganalisis dan memverifikasi hasil inspeksi, sampling, dan pengujian dari seluruh Pelaksana Teknis sebelum naik ke Kasi Teknis
 - Menganalisis hasil uji kimia, mikrobiologi, dan fisik sampel pangan
-- Memverifikasi laporan temuan teknis dan rekomendasi tindak lanjut
+- Memverifikasi laporan temuan teknis dan rekomendasi tindak lanjut dari seluruh penugasan lapangan
 - Mendukung penyusunan laporan hasil pengujian resmi UPTD
+
+> **Catatan v2.0:** Dengan bertambahnya Pelaksana Teknis menjadi 6 orang, beban verifikasi JF 3 meningkat signifikan. Dashboard JF 3 harus menampilkan antrian verifikasi berdasarkan prioritas dan tenggat waktu, dengan fitur eskalasi ke Kasi Teknis jika dokumen menunggu lebih dari 2 hari kerja.
 
 ### 2.8 PPTK TU, PPTK Mutu, PPTK Teknis
 
@@ -199,13 +208,27 @@ Masing-masing PPTK menjalankan **dua peran bersamaan**:
 
 **Batasan PPTK:** Tidak berwenang menandatangani kontrak dan tidak berwenang melakukan pembayaran.
 
+### 2.9 Pelaksana Unit Manajemen Teknis (6 orang di luar PPTK Teknis)
+
+**Atasan langsung:** Kasi Manajemen Teknis
+
+**Tugas dan fungsi:**
+- Melaksanakan inspeksi lapangan pangan berisiko sesuai penugasan Kasi Teknis
+- Melaksanakan pengambilan sampel pangan dan mendokumentasikan chain of custody
+- Mengoperasikan peralatan pengujian laboratorium sesuai SOP
+- Menginput data hasil inspeksi dan pengujian ke SIGAP-MALUT
+- Menyusun laporan hasil tugas lapangan untuk diverifikasi JF 3
+- Wajib membuat SPJ sendiri untuk setiap pengeluaran atas namanya
+
+> **Pembagian tugas lapangan:** Kasi Manajemen Teknis dapat membagi penugasan 6 Pelaksana berdasarkan wilayah (per kabupaten/kota) atau berdasarkan jenis komoditas/jenis uji, sesuai kebutuhan dan kondisi lapangan. Pembagian ini bersifat operasional dan dicatat dalam SIGAP-MALUT melalui fitur penugasan Kasi Teknis.
+
 ---
 
 ## BAGIAN III — ALUR KERJA INTERNAL UPTD
 
 ### 3.1 Prinsip Umum Alur Internal
 
-> **"Kinerja Pelaksana TU + PPTK TU adalah kinerja JF 1 dan Kasubag TU. Kinerja Pelaksana Mutu + PPTK Mutu adalah kinerja JF 2 dan Kasi Mutu. Kinerja Pelaksana Teknis + PPTK Teknis adalah kinerja JF 3 dan Kasi Teknis. Kinerja seluruh unit adalah kinerja Kepala UPTD. Kinerja Kepala UPTD adalah kinerja Kepala Dinas."**
+> **"Kinerja 2 Pelaksana TU + PPTK TU adalah kinerja JF 1 dan Kasubag TU. Kinerja 1 Pelaksana Mutu + PPTK Mutu adalah kinerja JF 2 dan Kasi Mutu. Kinerja 6 Pelaksana Teknis + PPTK Teknis adalah kinerja JF 3 dan Kasi Teknis. Kinerja seluruh unit adalah kinerja Kepala UPTD. Kinerja Kepala UPTD adalah kinerja Kepala Dinas."**
 
 **Urutan verifikasi dalam setiap unit:**
 ```
@@ -285,24 +308,31 @@ Kepala Dinas (CC Sekretaris)
 ### 3.4 Jalur 3 — Alur Dokumen Manajemen Teknis
 
 ```
-Pelaksana Teknis (1 orang)
+Pelaksana Teknis (6 orang)
     │
     │  Input data dan dokumen:
     │  Rencana dan hasil inspeksi lapangan pangan berisiko
+    │  (per wilayah atau per jenis komoditas sesuai penugasan Kasi)
     │  Data pengambilan sampel (chain of custody)
     │  Hasil pengujian laboratorium (kimia, mikrobiologi, fisik)
     │  Temuan teknis dan rekomendasi tindak lanjut
     │  Laporan pengawasan pangan berlabel dan dikemas
+    │
+    │  Catatan: 6 Pelaksana dapat menginput secara paralel —
+    │  setiap laporan individu masuk ke antrian verifikasi JF 3
     ▼
 JF 3 — Pengawas Mutu Hasil Pertanian (mendukung Kasi Teknis)
     │
     │  Analisis dan verifikasi teknis hasil pengujian
+    │  dari seluruh Pelaksana Teknis
     │  Verifikasi keabsahan metode dan hasil uji
+    │  Kelola antrian verifikasi berdasarkan prioritas
     │  → Setujui / Kembalikan untuk perbaikan
     ▼
 Kasi Manajemen Teknis
     │
     │  Periksa hasil verifikasi JF 3 → setujui
+    │  Konsolidasikan laporan dari seluruh Pelaksana
     ▼
 Kepala UPTD
     │
@@ -349,7 +379,7 @@ setujui              setujui              setujui
 
 Seluruh ASN di UPTD **wajib membuat SPJ** ketika menerima honor, perjalanan dinas, atau pengeluaran atas namanya. Mekanisme mengikuti **Dokumen 38 SIGAP-MALUT**:
 
-**SPJ Mandiri (Kondisi A)** — berlaku untuk seluruh 7 Pelaksana dan 3 PPTK:
+**SPJ Mandiri (Kondisi A)** — berlaku untuk seluruh 12 Pelaksana dan 3 PPTK:
 
 ```
 Pelaksana / PPTK
@@ -437,10 +467,11 @@ Kepala UPTD
 Kasi Manajemen Teknis
     │
     │  Koordinasikan jadwal inspeksi dan pengambilan sampel
-    │  Pelaksana Teknis lakukan inspeksi lapangan
-    │  dan pengambilan sampel sesuai permintaan
+    │  Tentukan Pelaksana Teknis yang ditugaskan
+    │  (dari 6 Pelaksana yang tersedia sesuai lokasi/komoditas)
     ▼
-Pelaksana Teknis
+Pelaksana Teknis yang ditugaskan
+    │  Lakukan inspeksi lapangan dan pengambilan sampel
     │  Input data hasil inspeksi dan sampel → upload dokumentasi
     ▼
 JF 3 — verifikasi teknis hasil inspeksi dan pengujian
@@ -529,7 +560,7 @@ KINERJA 1 PELAKSANA MUTU + PPTK MUTU
         ↓ merupakan bagian dari
 KINERJA JF 2 dan KASI MANAJEMEN MUTU
 
-KINERJA 1 PELAKSANA TEKNIS + PPTK TEKNIS
+KINERJA 6 PELAKSANA TEKNIS + PPTK TEKNIS
         ↓ merupakan bagian dari
 KINERJA JF 3 dan KASI MANAJEMEN TEKNIS
 
@@ -550,7 +581,7 @@ KINERJA KEPALA DINAS
 | Kepala UPTD | Kasubag TU, Kasi Mutu, Kasi Teknis, JF 1, JF 2, JF 3 | Isi penilaian + lihat nilai |
 | Kasubag TU | Pelaksana TU (2 orang + PPTK TU) | Isi penilaian + lihat nilai |
 | Kasi Mutu | Pelaksana Mutu (1 orang + PPTK Mutu) | Isi penilaian + lihat nilai |
-| Kasi Teknis | Pelaksana Teknis (1 orang + PPTK Teknis) | Isi penilaian + lihat nilai |
+| Kasi Teknis | Pelaksana Teknis (6 orang + PPTK Teknis) | Isi penilaian + lihat nilai |
 | JF 1, JF 2, JF 3 | Tidak ada bawahan | Tidak menilai |
 | Pelaksana | Diri sendiri | Hanya lihat nilai sendiri (read-only) |
 
@@ -578,7 +609,7 @@ KINERJA KEPALA DINAS
 | Pelaksana Mutu | `PELAKSANA` | `unit_kerja = UPTD-Mutu` |
 | Pelaksana Teknis | `PELAKSANA` | `unit_kerja = UPTD-Teknis` |
 
-> Seluruh role mengacu pada 15 role terkunci dalam Dokumen 33 SIGAP-MALUT. Tidak ada penambahan role baru.
+> Seluruh role mengacu pada 15 role terkunci dalam Dokumen 33 SIGAP-MALUT. Tidak ada penambahan role baru. Penambahan Pelaksana Teknis dari 1 menjadi 6 orang tidak memerlukan penambahan role — cukup mendaftarkan 5 akun baru dengan role `PELAKSANA` dan atribut `unit_kerja = UPTD-Teknis`.
 
 ### 7.2 Status Workflow Dokumen Internal UPTD
 
@@ -619,7 +650,18 @@ draft
 | Status DPA TU, Mutu, Teknis | Progres realisasi anggaran ketiga DPA |
 | Dokumen menunggu konfirmasi | SPJ atas nama Kepala UPTD yang menunggu persetujuan digital |
 
-### 7.5 Data yang Wajib Diinput Rutin
+### 7.5 Fitur Antrian Verifikasi JF 3 (Kritis)
+
+Dengan 6 Pelaksana Teknis yang dapat menginput laporan secara paralel, antrian verifikasi JF 3 berpotensi tinggi. Sistem SIGAP-MALUT wajib menyediakan:
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| Antrian prioritas | Dokumen diurutkan berdasarkan urgensi (permintaan dari Bidang lebih prioritas) dan tenggat waktu |
+| Label penugasan | Setiap dokumen berlabel nama Pelaksana Teknis yang mengajukan |
+| Notifikasi eskalasi | Alert ke Kasi Teknis jika dokumen menunggu verifikasi lebih dari 2 hari kerja |
+| Delegasi darurat | Jika JF 3 berhalangan, Kasi Teknis dapat mengambil alih verifikasi sementara |
+
+### 7.6 Data yang Wajib Diinput Rutin
 
 | Data | Frekuensi | Penanggung Jawab |
 |------|-----------|-----------------|
@@ -627,16 +669,28 @@ draft
 | Data absensi seluruh staf UPTD | Bulanan | Pelaksana TU (Kasubag TU) |
 | Status sertifikasi yang sedang diproses | Setiap proses | Pelaksana Mutu |
 | Laporan audit mutu internal | Triwulan | Pelaksana Mutu |
-| Jadwal dan hasil inspeksi lapangan | Setiap kegiatan | Pelaksana Teknis |
-| Chain of custody sampel | Setiap pengambilan sampel | Pelaksana Teknis |
-| Hasil uji laboratorium | Setiap selesai pengujian | Pelaksana Teknis |
-| Laporan temuan teknis dan tindak lanjut | Setiap temuan | Pelaksana Teknis |
+| Jadwal dan hasil inspeksi lapangan | Setiap kegiatan | Pelaksana Teknis (6 orang) |
+| Chain of custody sampel | Setiap pengambilan sampel | Pelaksana Teknis yang bertugas |
+| Hasil uji laboratorium | Setiap selesai pengujian | Pelaksana Teknis yang bertugas |
+| Laporan temuan teknis dan tindak lanjut | Setiap temuan | Pelaksana Teknis yang bertugas |
 
 ---
 
 ## CATATAN AKHIR
 
 Dokumen ini merupakan pedoman, syarat, dan panduan alur kerja di lingkungan UPTD Balai Pengawasan Mutu dan Keamanan Pangan Dinas Pangan Provinsi Maluku Utara yang berlaku dalam sistem SIGAP-MALUT.
+
+**Perubahan dari Versi 1.0 ke Versi 2.0:**
+
+| Bagian | Versi 1.0 | Versi 2.0 |
+|--------|-----------|-----------|
+| Total ASN | 14 orang | 19 orang |
+| Total Pelaksana | 7 orang | 12 orang |
+| Pelaksana Unit Teknis | 1 orang | 6 orang |
+| Subtotal Unit Teknis | 4 | 9 |
+| Rantai kinerja Teknis | 1 Pelaksana + PPTK | 6 Pelaksana + PPTK |
+| Matriks SKP Kasi Teknis | 1 orang + PPTK | 6 orang + PPTK |
+| Fitur dashboard JF 3 | Standar | Ditambahkan fitur antrian khusus |
 
 **Tiga kekhususan UPTD dibandingkan tiga Bidang:**
 
@@ -653,4 +707,4 @@ Dokumen pedoman alur kerja ini merupakan satu kesatuan dengan:
 
 ---
 
-*Dokumen 42 — SIGAP-MALUT — Dinas Pangan Provinsi Maluku Utara — 5 April 2026*
+*Dokumen 54 Revisi v2.0 — SIGAP-MALUT — Dinas Pangan Provinsi Maluku Utara — 6 April 2026*
