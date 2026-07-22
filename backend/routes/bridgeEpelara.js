@@ -33,9 +33,13 @@ router.get("/spj-approved", bridgeAuth, async (req, res) => {
       return res.status(400).json({ message: "Query tahun wajib (2000–2100)" });
     }
 
+    // SPJ tetap approved secara finansial setelah SPM terbit (status pindah ke
+    // "selesai_ppk") — sebelumnya filter cuma exact-match "terverifikasi_ppk",
+    // jadi SPJ yang sudah lanjut ke SPM sebelum sync sempat jalan akan hilang
+    // permanen dari daftar sinkronisasi ke BKU ePeLARA.
     const rows = await Spj.findAll({
       where: {
-        status: "terverifikasi_ppk",
+        status: { [Op.in]: ["terverifikasi_ppk", "selesai_ppk"] },
         tanggal_kegiatan: {
           [Op.gte]: `${tahun}-01-01`,
           [Op.lte]: `${tahun}-12-31`,
