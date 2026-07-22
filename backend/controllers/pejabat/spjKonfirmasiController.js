@@ -77,7 +77,7 @@ export async function listSpjAtasNamaSaya(req, res) {
 export async function getSpjUntukKonfirmasi(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
 
     const row = await Spj.findOne({
       where: { id, atas_nama_pejabat_id: userId },
@@ -108,7 +108,7 @@ export async function getSpjUntukKonfirmasi(req, res) {
 export async function konfirmasiSpj(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
 
     const row = await Spj.findOne({
       where: { id, atas_nama_pejabat_id: userId },
@@ -152,7 +152,7 @@ export async function konfirmasiSpj(req, res) {
 export async function tolakSpj(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const { catatan } = req.body || {};
 
     if (!catatan || catatan.trim().length < 10) {

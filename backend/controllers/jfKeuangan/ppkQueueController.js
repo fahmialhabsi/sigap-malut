@@ -35,7 +35,7 @@ export async function listQueue(req, res) {
 
 export async function getDetail(req, res) {
   try {
-    const spjId = parseInt(req.params.spjId, 10);
+    const spjId = req.params.spjId;
     const row = await Spj.findByPk(spjId);
     if (!row) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
 
@@ -67,7 +67,7 @@ export async function getDetail(req, res) {
 export async function terima(req, res) {
   try {
     const userId = req.user?.id;
-    const spjId = parseInt(req.params.spjId, 10);
+    const spjId = req.params.spjId;
     const row = await Spj.findByPk(spjId);
     if (!row) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
 
@@ -90,7 +90,7 @@ export async function terima(req, res) {
 export async function kembalikan(req, res) {
   try {
     const userId = req.user?.id;
-    const spjId = parseInt(req.params.spjId, 10);
+    const spjId = req.params.spjId;
     const { catatan_ppk } = req.body || {};
     if (!catatan_ppk) {
       return res.status(400).json({ success: false, message: "catatan_ppk wajib diisi" });
@@ -115,7 +115,7 @@ export async function kembalikan(req, res) {
 export async function tolak(req, res) {
   try {
     const userId = req.user?.id;
-    const spjId = parseInt(req.params.spjId, 10);
+    const spjId = req.params.spjId;
     const { dasar_hukum_tolak, catatan_ppk } = req.body || {};
     if (!dasar_hukum_tolak) {
       return res.status(400).json({ success: false, message: "dasar_hukum_tolak wajib diisi" });

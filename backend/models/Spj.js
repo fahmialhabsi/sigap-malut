@@ -22,7 +22,7 @@ const Spj =
   sequelize.define(
     "Spj",
     {
-      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
       nomor_spj: { type: DataTypes.STRING(50), allowNull: true, unique: true },
 
       // ── Kondisi A / B ──────────────────────────────────────────────────────

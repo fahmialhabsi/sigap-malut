@@ -52,7 +52,7 @@ export async function listSpjSaya(req, res) {
 export async function getSpjDetail(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const row = await Spj.findByPk(id);
     if (!ensureOwner(row, userId)) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
 
@@ -153,7 +153,7 @@ export async function createSpjDelegasi(req, res) {
 export async function finalisasiDraftDelegasi(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const row = await Spj.findByPk(id);
 
     if (!ensureOwner(row, userId)) {
@@ -188,7 +188,7 @@ export async function finalisasiDraftDelegasi(req, res) {
 export async function updateSpj(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const row = await Spj.findByPk(id);
     if (!ensureOwner(row, userId)) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
     const threadUp = await gateOperationalUpdate(req, res, row);
@@ -223,7 +223,7 @@ export async function updateSpj(req, res) {
 export async function submitKeBendahara(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const row = await Spj.findByPk(id);
     if (!ensureOwner(row, userId)) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
 

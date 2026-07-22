@@ -67,7 +67,7 @@ export async function listSiapDibayar(req, res) {
 export async function verifikasiOk(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const row = await Spj.findByPk(id);
     if (!row) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
     if (!["diajukan_ke_bendahara", "dikembalikan_bendahara"].includes(row.status)) {
@@ -87,7 +87,7 @@ export async function verifikasiOk(req, res) {
 export async function kembalikanKePelaksana(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const { catatan_bendahara } = req.body || {};
     if (!catatan_bendahara) {
       return res.status(400).json({ success: false, message: "catatan_bendahara wajib diisi" });
@@ -108,7 +108,7 @@ export async function kembalikanKePelaksana(req, res) {
 
 export async function kirimKePpk(req, res) {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const row = await Spj.findByPk(id);
     if (!row) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
     if (row.status !== "terverifikasi_bendahara") {
@@ -125,7 +125,7 @@ export async function kirimKePpk(req, res) {
 export async function prosesPembayaran(req, res) {
   try {
     const userId = req.user?.id;
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const { metode, nomor_bukti } = req.body || {};
     const row = await Spj.findByPk(id);
     if (!row) return res.status(404).json({ success: false, message: "SPJ tidak ditemukan" });
